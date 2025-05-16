@@ -30,8 +30,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 # Application definition
 
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
+    "knox",
     "myapp",
 ]
 
@@ -57,7 +57,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "djangorestframework_camel_case.middleware.CamelCaseMiddleWare",
 ]
+
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(",")
 
 ROOT_URLCONF = "mysite.urls"
 
@@ -129,6 +132,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# MEDIA_URL = "/images/"
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -144,6 +150,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ),
+    "COERCE_DECIMAL_TO_STRING": False,
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -161,3 +168,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
     "ngrok-skip-browser-warning",
 ]
+
+REST_KNOX = {
+    "TOKEN_TTL": None,
+}

@@ -72,7 +72,13 @@ export const MyForm = observer(
           {title}
         </h1>
         {fields.map((s, ind) => (
-          <div className={`grid md:grid-cols-${s.length} md:gap-6`} key={ind}>
+          <div
+            className={`grid md:gap-6`}
+            key={ind}
+            style={{
+              gridTemplateColumns: `repeat(${s.length}, minmax(0, 1fr))`,
+            }}
+          >
             {s.map((t, ind) =>
               !t ? (
                 <div key={ind}></div>

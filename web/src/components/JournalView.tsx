@@ -1,14 +1,14 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { JournalInterface } from "../api/JournalStore";
 import { useStore } from "../api/Store";
 import { MyButton } from "../blueprints/MyButton";
+import { MyConfirmModal } from "../blueprints/MyConfirmModal";
 import { MyModal } from "../blueprints/MyModal";
 import { MyTextArea } from "../blueprints/MyTextArea";
 import { JournalForm } from "./JournalForm";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
 
 export const JournalItem = (props: { item?: JournalInterface }) => {
   const { item } = props;
@@ -27,7 +27,7 @@ export const JournalItem = (props: { item?: JournalInterface }) => {
   };
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between m-2 border border-gray-500 rounded-lg p-2">
       <MyModal isVisible={isVisible1} setVisible={setVisible1}>
         <JournalForm item={item} setVisible={setVisible1} />
       </MyModal>
@@ -58,10 +58,6 @@ export const JournalView = observer(() => {
   const { journalStore } = useStore();
   const [text, setText] = useState("");
 
-  useEffect(() => {
-    journalStore.fetchAll();
-  }, []);
-
   const onSubmit = async () => {
     await journalStore.addItem({
       text: text,
@@ -70,8 +66,7 @@ export const JournalView = observer(() => {
   };
 
   return (
-    <div className="items-center m-auto md:w-1/2 p-4 h-screen">
-      <h1 className="text-xl font-bold mb-4 text-center">Journal App</h1>
+    <div className="items-center m-auto md:w-1/2 p-4">
       <div className="flex flex-row space-x-2 w-full justify-center mb-4">
         <MyTextArea
           value={text}

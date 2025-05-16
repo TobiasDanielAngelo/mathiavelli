@@ -1,42 +1,55 @@
-import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  Model,
+  _async,
+  _await,
+  model,
+  modelAction,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
 
-const slug = "journals";
+const slug = "transactions";
 
-export interface JournalInterface {
+export interface TransactionInterface {
   id?: number;
-  text?: string;
-  datetimeCreated?: string;
+  category?: number;
+  description?: string;
+  transmitter?: number;
+  receiver?: number;
+  amount?: number;
+  datetimeTransacted?: string;
 }
 
-@model("myApp/Journal")
-export class Journal extends Model({
+@model("myApp/Transaction")
+export class Transaction extends Model({
   id: prop<number>(-1),
-  text: prop<string>(""),
-  datetimeCreated: prop<string>(""),
+  category: prop<number>(-1),
+  description: prop<string>(""),
+  transmitter: prop<number>(-1),
+  receiver: prop<number>(-1),
+  amount: prop<number>(0),
+  datetimeTransacted: prop<string>(""),
 }) {
-  update(details: JournalInterface) {
+  update(details: TransactionInterface) {
     Object.assign(this, details);
   }
 }
 
-@model("myApp/JournalStore")
-export class JournalStore extends Model({
-  items: prop<Journal[]>(() => []),
+@model("myApp/TransactionStore")
+export class TransactionStore extends Model({
+  items: prop<Transaction[]>(() => []),
 }) {
-  @computed
-  get allItems() {
-    const map = new Map<number, Journal>();
-    this.items.forEach((item) => map.set(item.id, item));
-    return map;
-  }
-
   get allIDs() {
     return this.items.map((s) => s.id);
   }
 
+  @modelAction
+  getItem(id: number) {
+    return this.items.find((s) => s.id === id) ?? new Transaction({});
+  }
+
   @modelFlow
-  fetchAll = _async(function* (this: JournalStore, params?: string) {
+  fetchAll = _async(function* (this: TransactionStore, params?: string) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -74,7 +87,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal[];
+    let json: Transaction[];
     try {
       const resp = yield* _await(response.json());
 
@@ -86,7 +99,7 @@ export class JournalStore extends Model({
 
     json.forEach((s) => {
       if (!this.allIDs.includes(s.id)) {
-        this.items.push(new Journal(s));
+        this.items.push(new Transaction(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
@@ -96,7 +109,10 @@ export class JournalStore extends Model({
   });
 
   @modelFlow
-  addItem = _async(function* (this: JournalStore, details: JournalInterface) {
+  addItem = _async(function* (
+    this: TransactionStore,
+    details: TransactionInterface
+  ) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -132,7 +148,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal;
+    let json: Transaction;
     try {
       const resp = yield* _await(response.json());
       json = resp;
@@ -141,9 +157,9 @@ export class JournalStore extends Model({
       return { details: "Parsing Error", ok: false, data: null };
     }
 
-    let item: Journal;
+    let item: Transaction;
 
-    item = new Journal(json);
+    item = new Transaction(json);
 
     this.items.push(item);
 
@@ -152,9 +168,9 @@ export class JournalStore extends Model({
 
   @modelFlow
   updateItem = _async(function* (
-    this: JournalStore,
+    this: TransactionStore,
     itemId: number,
-    details: JournalInterface
+    details: TransactionInterface
   ) {
     let token: string;
 
@@ -190,7 +206,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal;
+    let json: Transaction;
     try {
       const resp = yield* _await(response.json());
       json = resp;
@@ -199,13 +215,13 @@ export class JournalStore extends Model({
       return { details: "Parsing Error", ok: false, data: null };
     }
 
-    this.allItems.get(json.id)?.update(json);
+    this.getItem(json.id)?.update(json);
 
     return { details: "", ok: true, data: json };
   });
 
   @modelFlow
-  deleteItem = _async(function* (this: JournalStore, itemId: number) {
+  deleteItem = _async(function* (this: TransactionStore, itemId: number) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -248,4 +264,4 @@ export class JournalStore extends Model({
   });
 }
 
-export const journalStore = new JournalStore({});
+export const transactionStore = new TransactionStore({});

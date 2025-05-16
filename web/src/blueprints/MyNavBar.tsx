@@ -1,10 +1,10 @@
 import MenuIcon from "@mui/icons-material/Menu";
-import PaymentsIcon from "@mui/icons-material/Payments";
+import InsertChartIcon from "@mui/icons-material/InsertChart";
 import { observer } from "mobx-react-lite";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Page } from "../constants/interfaces";
-import anon from "../static/anon.jpg";
+import anon from "../assets/anon.jpg";
 import { MyDropdownMenu } from "./MyDropdownMenu";
 
 const NavLink = (props: { page: Page }) => {
@@ -16,8 +16,8 @@ const NavLink = (props: { page: Page }) => {
         to={page.link ?? ""}
         className={
           page.selected
-            ? "md:text-gray-900 dark:text-blue-100 font-bold"
-            : "md:text-blue-300 dark:text-blue-500 font-bold"
+            ? "md:text-gray-300 font-bold"
+            : "md:text-blue-500 font-bold"
         }
       >
         {page.title}
@@ -49,7 +49,7 @@ export const MyNavBar = observer(
       <nav className="relative bg-white border-gray-200 dark:bg-gray-900">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <a className="flex items-center space-x-3 rtl:space-x-reverse">
-            <PaymentsIcon
+            <InsertChartIcon
               fontSize="large"
               className="text-gray-700 dark:text-gray-100 hover:text-green-700 hover:scale-125 [&:not(hover)]:transition-all hover:transition-all ease-in-out hover:animate-pulse"
             />

@@ -1,13 +1,20 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { createStore, StoreContext } from "./api/Store";
-import { JournalView } from "./components/JournalView";
+import { LoginView } from "./components/LoginView";
+import { MainView } from "./components/MainView";
 
 function App() {
   const store = createStore();
 
   return (
     <StoreContext.Provider value={store}>
-      <JournalView />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/*" element={<MainView />} />
+          <Route path="/login" element={<LoginView />} />
+        </Routes>
+      </BrowserRouter>
     </StoreContext.Provider>
   );
 }

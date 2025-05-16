@@ -1,32 +1,44 @@
 import { computed } from "mobx";
 import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 
-const slug = "journals";
+const slug = "payables";
 
-export interface JournalInterface {
+export interface PayableInterface {
   id?: number;
-  text?: string;
-  datetimeCreated?: string;
+  payment?: number[];
+  borrowerName?: string;
+  lentAmount?: number;
+  description?: string;
+  datetimeOpened?: string;
+  datetimeDue?: string;
+  datetimeClosed?: string;
+  isActive?: boolean;
 }
 
-@model("myApp/Journal")
-export class Journal extends Model({
+@model("myApp/Payable")
+export class Payable extends Model({
   id: prop<number>(-1),
-  text: prop<string>(""),
-  datetimeCreated: prop<string>(""),
+  payment: prop<number[]>(() => []),
+  borrowerName: prop<string>(""),
+  lentAmount: prop<number>(0),
+  description: prop<string>(""),
+  datetimeOpened: prop<string>(""),
+  datetimeDue: prop<string>(""),
+  datetimeClosed: prop<string>(""),
+  isActive: prop<boolean>(true),
 }) {
-  update(details: JournalInterface) {
+  update(details: PayableInterface) {
     Object.assign(this, details);
   }
 }
 
-@model("myApp/JournalStore")
-export class JournalStore extends Model({
-  items: prop<Journal[]>(() => []),
+@model("myApp/PayableStore")
+export class PayableStore extends Model({
+  items: prop<Payable[]>(() => []),
 }) {
   @computed
   get allItems() {
-    const map = new Map<number, Journal>();
+    const map = new Map<number, Payable>();
     this.items.forEach((item) => map.set(item.id, item));
     return map;
   }
@@ -36,7 +48,7 @@ export class JournalStore extends Model({
   }
 
   @modelFlow
-  fetchAll = _async(function* (this: JournalStore, params?: string) {
+  fetchAll = _async(function* (this: PayableStore, params?: string) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -74,7 +86,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal[];
+    let json: Payable[];
     try {
       const resp = yield* _await(response.json());
 
@@ -86,7 +98,7 @@ export class JournalStore extends Model({
 
     json.forEach((s) => {
       if (!this.allIDs.includes(s.id)) {
-        this.items.push(new Journal(s));
+        this.items.push(new Payable(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
@@ -96,7 +108,7 @@ export class JournalStore extends Model({
   });
 
   @modelFlow
-  addItem = _async(function* (this: JournalStore, details: JournalInterface) {
+  addItem = _async(function* (this: PayableStore, details: PayableInterface) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -132,7 +144,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal;
+    let json: Payable;
     try {
       const resp = yield* _await(response.json());
       json = resp;
@@ -141,9 +153,9 @@ export class JournalStore extends Model({
       return { details: "Parsing Error", ok: false, data: null };
     }
 
-    let item: Journal;
+    let item: Payable;
 
-    item = new Journal(json);
+    item = new Payable(json);
 
     this.items.push(item);
 
@@ -152,9 +164,9 @@ export class JournalStore extends Model({
 
   @modelFlow
   updateItem = _async(function* (
-    this: JournalStore,
+    this: PayableStore,
     itemId: number,
-    details: JournalInterface
+    details: PayableInterface
   ) {
     let token: string;
 
@@ -190,7 +202,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal;
+    let json: Payable;
     try {
       const resp = yield* _await(response.json());
       json = resp;
@@ -205,7 +217,7 @@ export class JournalStore extends Model({
   });
 
   @modelFlow
-  deleteItem = _async(function* (this: JournalStore, itemId: number) {
+  deleteItem = _async(function* (this: PayableStore, itemId: number) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -248,4 +260,4 @@ export class JournalStore extends Model({
   });
 }
 
-export const journalStore = new JournalStore({});
+export const payableStore = new PayableStore({});

@@ -1,50 +1,50 @@
-import moment from 'moment'
-import { Option } from './interfaces'
+import moment from "moment";
+import { Option } from "./interfaces";
 
-export const posRamp = (x: number) => (x > 0 ? x : 0)
+export const posRamp = (x: number) => (x > 0 ? x : 0);
 
 export const getOrdinal = (n: number) => {
-  let ord = 'th'
+  let ord = "th";
 
   if (n % 10 == 1 && n % 100 != 11) {
-    ord = 'st'
+    ord = "st";
   } else if (n % 10 == 2 && n % 100 != 12) {
-    ord = 'nd'
+    ord = "nd";
   } else if (n % 10 == 3 && n % 100 != 13) {
-    ord = 'rd'
+    ord = "rd";
   }
-  return ord
-}
+  return ord;
+};
 
 export const replaceCumulative = (
   str: string,
   find: string[],
-  replace: string,
+  replace: string
 ) => {
   for (var i = 0; i < find.length; i++)
-    str = str.replace(new RegExp(find[i], 'g'), replace)
-  return str.replace(/\s/g, '') !== '' ? str : '-'
-}
+    str = str.replace(new RegExp(find[i], "g"), replace);
+  return str.replace(/\s/g, "") !== "" ? str : "-";
+};
 
 export const getDateFromSched = (date: Date, sched: number) => {
   const lastDayOfMonth = new Date(
     date.getFullYear(),
     date.getMonth() + 1,
-    0,
-  ).getDate()
+    0
+  ).getDate();
 
   return new Date(
     date.getFullYear(),
     date.getMonth(),
-    Math.min(sched, lastDayOfMonth),
-  )
-}
+    Math.min(sched, lastDayOfMonth)
+  );
+};
 
 export const isSchedIncluded = (dates: Date[], sched: number) => {
   const lastDayOfMonth = (year: number, month: number) =>
-    new Date(year, month + 1, 0).getDate()
+    new Date(year, month + 1, 0).getDate();
 
-  const day28 = dates.find((s) => s.getDate() === 28)
+  const day28 = dates.find((s) => s.getDate() === 28);
   return sched <= 28
     ? dates.map((s) => s.getDate()).includes(sched)
     : sched <= 31
@@ -54,124 +54,43 @@ export const isSchedIncluded = (dates: Date[], sched: number) => {
       dates
         .map((s) => s.getDate())
         .includes(lastDayOfMonth(day28.getFullYear(), day28.getMonth()))
-    : true
-}
+    : true;
+};
 
 export const scheduledAmount = (
   amount: number,
   dates: Date[],
-  schedule: number,
+  schedule: number
 ) => {
-  return isSchedIncluded(dates, schedule) ? amount : 0
-}
+  return isSchedIncluded(dates, schedule) ? amount : 0;
+};
 
 export const areArraysIdentical = (arr1: string[], arr2: string[]) =>
-  arr2.every((v) => arr1.includes(v)) && arr1.every((v) => arr2.includes(v))
-
-export const accountedOvertimes = (props: {
-  doai: number //Actual day OT
-  noai: number //Actual night OT
-  dori: number //Requested day OT
-  nori: number //Requested night OT
-  xori: number //Requested any OT
-  isNight: boolean
-}) => {
-  const { doai, noai, dori, nori, xori, isNight } = props
-
-  // Get initial ot outputs using detailed OT request
-  let doti = Math.min(dori, doai)
-  let noti = Math.min(nori, noai)
-
-  // Get first remaining actuals
-  let doaj = posRamp(doai - doti)
-  let noaj = posRamp(noai - noti)
-
-  // Get second ot outputs using wildcard OT request
-  let dotj = Math.min(doaj, xori)
-  let notj = Math.min(noaj, posRamp(xori - dotj))
-
-  // Get first remaining requests
-  let dorj = posRamp(dori - doti)
-  let norj = posRamp(nori - noti)
-  let xorj = posRamp(xori - dotj - notj)
-  let torj = dorj + norj + xorj
-
-  // Get second remaining actuals
-  let doak = posRamp(doaj - dotj)
-  let noak = posRamp(noaj - notj)
-
-  // Give total remaining requests to day (night, if isNight)
-  let dotk = 0,
-    tork = 0,
-    notk = 0
-  if (!isNight) {
-    dotk = Math.min(doak, torj)
-    tork = posRamp(dotk - torj)
-    notk = Math.min(noak, tork)
-  } else {
-    notk = Math.min(noak, torj)
-    tork = posRamp(notk - torj)
-    dotk = Math.min(doak, tork)
-  }
-
-  return [doti + dotj + dotk, noti + notj + notk]
-}
-
-export const getMode = (array: number[]) => {
-  const map = new Map()
-  let maxFreq = 0
-  let mode
-  for (const item of array) {
-    let freq = map.has(item) ? map.get(item) : 0
-    freq++
-    if (freq > maxFreq) {
-      maxFreq = freq
-      mode = item
-    }
-    map.set(item, freq)
-  }
-  return array.length > 0 ? mode ?? array[0] : 0
-}
-
-export const accountedTimes = (props: {
-  actDay1: number //Actual day OT
-  actNyt1: number //Actual night OT
-  reqDay1: number //Requested day OT
-  reqNyt1: number //Requested night OT
-}) => {
-  const { actDay1, actNyt1, reqDay1, reqNyt1 } = props
-
-  return [
-    Math.min(reqDay1, actDay1) +
-      Math.min(posRamp(actDay1 - reqDay1), posRamp(reqNyt1 - actNyt1)),
-    Math.min(reqNyt1, actNyt1) +
-      Math.min(posRamp(reqDay1 - actDay1), posRamp(actNyt1 - reqNyt1)),
-  ]
-}
+  arr2.every((v) => arr1.includes(v)) && arr1.every((v) => arr2.includes(v));
 
 export const isSubset = (smallArr: string[], largeArr: string[]) => {
-  return smallArr.every((t) => largeArr.includes(t))
-}
+  return smallArr.every((t) => largeArr.includes(t));
+};
 
 export const addDays = (date: Date, days: number) => {
-  let result = new Date(date)
-  result.setDate(result.getDate() + days)
-  return result
-}
+  let result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
 
 export const timeDifferenceTime = (startTime: string, endTime: string) => {
-  let start = new Date(moment(startTime, 'hh:mm A').toISOString())
-  let end = new Date(moment(endTime, 'hh:mm A').toISOString())
+  let start = new Date(moment(startTime, "hh:mm A").toISOString());
+  let end = new Date(moment(endTime, "hh:mm A").toISOString());
 
   return end.getTime() > start.getTime()
     ? (end.getTime() - start.getTime()) / (1000 * 60 * 60)
-    : 0
-}
+    : 0;
+};
 
 export const sortByKey = <T>(
   arr: any[],
   keyName?: string,
-  decreasing?: boolean,
+  decreasing?: boolean
 ) => {
   return arr
     .slice()
@@ -179,127 +98,127 @@ export const sortByKey = <T>(
       new Date(decreasing ? a[keyName as any] : b[keyName as any]) >
       new Date(decreasing ? b[keyName as any] : a[keyName as any])
         ? -1
-        : 1,
-    ) as T[]
-}
+        : 1
+    ) as T[];
+};
 
 export const toOptions = (items: any[], keyName?: string): Option[] => {
   return items.map((s, ind) => ({
-    id: typeof s === 'string' ? ind + 1 : s.id,
-    name: typeof s === 'string' ? s : (s as any)[keyName ?? ''],
-  }))
-}
+    id: typeof s === "string" ? ind + 1 : s.id,
+    name: typeof s === "string" ? s : (s as any)[keyName ?? ""],
+  }));
+};
 
 export const timeDifference = (start: Date | string, end?: Date | string) => {
-  let td = new Date(end ?? '').getTime() - new Date(start).getTime()
-  return moment(new Date(td)).utc(false).format('H[h] mm[m]')
-}
+  let td = new Date(end ?? "").getTime() - new Date(start).getTime();
+  return moment(new Date(td)).utc(false).format("H[h] mm[m]");
+};
 
 export const toTitleCase = (str?: string) => {
   return str
     ? str
         .match(
-          /[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g,
+          /[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g
         )
         ?.map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-        .join(' ') ?? ''
-    : ''
-}
+        .join(" ") ?? ""
+    : "";
+};
 
 export const toMoney = (n?: any) => {
-  if (isNaN(n)) return ''
-  if (!isFinite(n)) return '\u221e'
+  if (isNaN(n)) return "";
+  if (!isFinite(n)) return "\u221e";
   return (
     `\u20b1` +
     (!n
       ? ` \u2013`
       : n > 0
-      ? n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-      : '(' +
+      ? n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      : "(" +
         Math.abs(n)
           .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
-        ')')
-  )
-}
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
+        ")")
+  );
+};
 
 export const toHours = (n?: any) => {
-  if (isNaN(n)) return ` \u2013`
-  if (!isFinite(n)) return '\u221e'
+  if (isNaN(n)) return ` \u2013`;
+  if (!isFinite(n)) return "\u221e";
   return !n
     ? ` \u2013`
-    : `${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}h`
-}
+    : `${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}h`;
+};
 
 export const hoursToWorkDays = (n: number, hoursPerDay?: number) => {
-  if (isNaN(n)) return ` \u2013`
-  if (!isFinite(n)) return '\u221e'
+  if (isNaN(n)) return ` \u2013`;
+  if (!isFinite(n)) return "\u221e";
   return !n
     ? ` \u2013`
     : `${(n / (hoursPerDay ?? 24))
         .toFixed(2)
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')} work days`
-}
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} work days`;
+};
 
 export const handleKeyDown = (
   e: KeyboardEvent,
   keys: string[],
-  callback?: () => void,
+  callback?: () => void
 ) => {
-  if (keys.includes(e.key)) callback && callback()
-}
+  if (keys.includes(e.key)) callback && callback();
+};
 
 export const rounded = (t: number, numDigits?: number) =>
-  Math.round(t * 10 ** (numDigits ?? 2)) / 10 ** (numDigits ?? 2)
+  Math.round(t * 10 ** (numDigits ?? 2)) / 10 ** (numDigits ?? 2);
 
 export const mySum = (numArr?: number[]) => {
-  return numArr?.reduce((a, b) => a + b, 0) ?? 0
-}
+  return numArr?.reduce((a, b) => a + b, 0) ?? 0;
+};
 
-export const myProduct = (t: number[]) => rounded(t.reduce((a, b) => a * b, 1))
+export const myProduct = (t: number[]) => rounded(t.reduce((a, b) => a * b, 1));
 
 export const camelCaseToWords = (s: string) => {
-  const result = s.replace(/([A-Z])/g, ' $1')
-  return result.charAt(0).toUpperCase() + result.slice(1)
-}
+  const result = s.replace(/([A-Z])/g, " $1");
+  return result.charAt(0).toUpperCase() + result.slice(1);
+};
 
 export const createArrayFromN = (n: number) => {
-  return Array.from(Array(n).keys())
-}
+  return Array.from(Array(n).keys());
+};
 
 export const getDatesFromSched = (
   dateStart: Date,
   sched: number,
   count: number,
-  frequency: number,
+  frequency: number
 ) => {
   return createArrayFromN(count).map((s) => {
-    let date = new Date(dateStart)
-    date.setMonth(date.getMonth() + s * frequency)
+    let date = new Date(dateStart);
+    date.setMonth(date.getMonth() + s * frequency);
     date.setDate(
       Math.min(
         sched,
-        new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(),
-      ),
-    )
-    return date
-  })
-}
+        new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+      )
+    );
+    return date;
+  });
+};
 
 export const intersectionArrStrs = (arr1: string[], arr2: string[]) => {
-  const setA = new Set(arr1)
-  return arr2.filter((value) => setA.has(value))
-}
+  const setA = new Set(arr1);
+  return arr2.filter((value) => setA.has(value));
+};
 
 export const isQueryMatch = (str: string, query: string) => {
   // let regex = /[^A-Za-z0-9]/
   return query
     .split(/[ ,]+/)
-    .every((v) => str.toLowerCase().includes(v.toLowerCase()))
-}
+    .every((v) => str.toLowerCase().includes(v.toLowerCase()));
+};
 
 export const setBlankIfNeg1 = (str: string, val: number) => {
-  return val === -1 ? str : ''
-}
+  return val === -1 ? str : "";
+};
 
-export const cmToPx = (cm: number) => cm / 0.026458
+export const cmToPx = (cm: number) => cm / 0.026458;

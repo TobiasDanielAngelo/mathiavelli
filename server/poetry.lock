@@ -53,6 +53,22 @@ asgiref = ">=3.6"
 django = ">=4.2"
 
 [[package]]
+name = "django-rest-knox"
+version = "5.0.2"
+description = "Authentication for django rest framework"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "django_rest_knox-5.0.2-py3-none-any.whl", hash = "sha256:694da5d0ad6eb3edbfd7cdc8d69c089fc074e6b0e548e00ff2750bf2fdfadb6f"},
+    {file = "django_rest_knox-5.0.2.tar.gz", hash = "sha256:f283622bcf5d28a6a0203845c065d06c7432efa54399ae32070c61ac03af2d6f"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+djangorestframework = "*"
+
+[[package]]
 name = "djangorestframework"
 version = "3.16.0"
 description = "Web APIs for Django, made easy."
@@ -159,4 +175,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "7093c5d9f2dfd43c4c777e12bd0b5f2cd76c023b186ebd49c5610bbed51a1357"
+content-hash = "31d7258d31be2b88ac7656dac342b977dd1dd75c0c8a7de71283964e5276f77c"

@@ -35,7 +35,6 @@ export const MyPrintModal = (
 
   useEffect(() => {
     if (targetRef.current) {
-      console.log(targetRef.current.getBoundingClientRect());
       setDims(targetRef.current.getBoundingClientRect());
     }
   }, [targetRef]);
