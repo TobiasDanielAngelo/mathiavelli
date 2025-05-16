@@ -10,7 +10,7 @@ export const LoginView = observer(() => {
     username: "",
     password: "",
   });
-  const [msg, setMsg] = useState("");
+  const [_, setMsg] = useState("");
   const navigate = useNavigate();
 
   const loginUser = async () => {
