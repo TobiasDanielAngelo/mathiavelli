@@ -131,7 +131,7 @@ export const TransactionForm = observer(
           onClickSubmit={item ? onClickEdit : onClickCreate}
           hasDelete={!!item}
           onDelete={onClickDelete}
-          objectName="log"
+          objectName="transaction"
           msg={msg}
           isLoading={isLoading}
         />

@@ -1,36 +1,30 @@
 import { createContext, useContext } from "react";
-import { JournalStore } from "./JournalStore";
-import { UserStore } from "./UserStore";
-import { AccountStore } from "./AccountStore";
-import { CategoryStore } from "./CategoryStore";
-import { TransactionStore } from "./TransactionStore";
-import { ReceivableStore } from "./ReceivableStore";
-import { PayableStore } from "./PayableStore";
+import { accountStore } from "./AccountStore";
+import { categoryStore } from "./CategoryStore";
+import { eventStore } from "./EventStore";
+import { journalStore } from "./JournalStore";
+import { payableStore } from "./PayableStore";
+import { receivableStore } from "./ReceivableStore";
+import { tagStore } from "./TagStore";
+import { transactionStore } from "./TransactionStore";
+import { userStore } from "./UserStore";
+import { goalStore } from "./GoalStore";
+import { taskStore } from "./TaskStore";
 
 export class Store {
-  journalStore: JournalStore;
-  accountStore: AccountStore;
-  categoryStore: CategoryStore;
-  transactionStore: TransactionStore;
-  receivableStore: ReceivableStore;
-  payableStore: PayableStore;
-  userStore: UserStore;
-  constructor() {
-    this.journalStore = new JournalStore({});
-    this.accountStore = new AccountStore({});
-    this.categoryStore = new CategoryStore({});
-    this.transactionStore = new TransactionStore({});
-    this.receivableStore = new ReceivableStore({});
-    this.payableStore = new PayableStore({});
-    this.userStore = new UserStore({});
-  }
+  userStore = userStore;
+  journalStore = journalStore;
+  accountStore = accountStore;
+  categoryStore = categoryStore;
+  transactionStore = transactionStore;
+  receivableStore = receivableStore;
+  payableStore = payableStore;
+  eventStore = eventStore;
+  tagStore = tagStore;
+  goalStore = goalStore;
+  taskStore = taskStore;
 }
 
-export const createStore = () => {
-  const store = new Store();
-  return store;
-};
-
-export const StoreContext = createContext<Store>(createStore());
-
+export const createStore = () => new Store();
+export const StoreContext = createContext(createStore());
 export const useStore = () => useContext(StoreContext);

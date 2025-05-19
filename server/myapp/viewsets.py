@@ -67,3 +67,23 @@ class ReceivableViewSet(CustomModelViewSet):
 class PayableViewSet(CustomModelViewSet):
     queryset = Payable.objects.all()
     serializer_class = PayableSerializer
+
+
+class EventViewSet(CustomModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+
+class TagViewSet(CustomModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+class GoalViewSet(CustomModelViewSet):
+    queryset = Goal.objects.all()
+    serializer_class = GoalSerializer
+
+
+class TaskViewSet(CustomModelViewSet):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer

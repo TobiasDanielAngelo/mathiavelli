@@ -12,7 +12,8 @@ export const JournalForm = (props: {
   const { item, setVisible } = props;
   const { journalStore } = useStore();
   const [details, setDetails] = useState({
-    text: item?.text,
+    title: item?.title,
+    description: item?.description,
     datetimeCreated: item?.datetimeCreated,
   });
   const [msg, setMsg] = useState<Object>();
@@ -22,7 +23,14 @@ export const JournalForm = (props: {
     () => [
       [
         {
-          name: "text",
+          name: "title",
+          label: "Title",
+          type: "text",
+        },
+      ],
+      [
+        {
+          name: "description",
           label: "Journal Entry",
           type: "textarea",
         },
@@ -40,7 +48,6 @@ export const JournalForm = (props: {
       setMsg(resp.details);
       return;
     }
-    journalStore.fetchAll();
     setVisible && setVisible(false);
   };
 
@@ -86,7 +93,7 @@ export const JournalForm = (props: {
         onClickSubmit={item ? onClickEdit : onClickCreate}
         hasDelete={!!item}
         onDelete={onClickDelete}
-        objectName="log"
+        objectName="entry"
         msg={msg}
         isLoading={isLoading}
       />

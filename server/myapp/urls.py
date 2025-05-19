@@ -14,6 +14,11 @@ router.register(r"categories", CategoryViewSet)
 router.register(r"transactions", TransactionViewSet)
 router.register(r"receivables", ReceivableViewSet)
 router.register(r"payables", PayableViewSet)
+router.register(r"events", EventViewSet)
+router.register(r"tags", TagViewSet)
+router.register(r"goals", GoalViewSet)
+router.register(r"tasks", TaskViewSet)
+
 
 urlpatterns = [
     path("", include(router.urls)),

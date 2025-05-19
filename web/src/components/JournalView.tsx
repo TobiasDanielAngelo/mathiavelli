@@ -6,8 +6,10 @@ import { JournalInterface } from "../api/JournalStore";
 import { useStore } from "../api/Store";
 import { MyButton } from "../blueprints/MyButton";
 import { MyConfirmModal } from "../blueprints/MyConfirmModal";
+import { MyInput } from "../blueprints/MyInput";
 import { MyModal } from "../blueprints/MyModal";
 import { MyTextArea } from "../blueprints/MyTextArea";
+import { getFirstTwoWords, sortByKey } from "../constants/helpers";
 import { JournalForm } from "./JournalForm";
 
 export const JournalItem = (props: { item?: JournalInterface }) => {
@@ -38,15 +40,16 @@ export const JournalItem = (props: { item?: JournalInterface }) => {
         actionName="Delete"
         msg={msg}
       />
-      <div>
+      <div
+        className="hover:underline cursor-pointer"
+        onClick={() => setVisible1(true)}
+      >
         <div className="text-xs text-left text-gray-400">
           {moment(item?.datetimeCreated).format("MMM D, YYYY h:mm A ")}
         </div>
-        <div
-          className="hover:underline cursor-pointer"
-          onClick={() => setVisible1(true)}
-        >
-          {item?.text}
+        <div>{item?.title}</div>
+        <div className="text-xs text-left text-gray-400">
+          {item?.description}
         </div>
       </div>
       <CloseIcon onClick={() => setVisible2(true)} className="cursor-pointer" />
@@ -56,28 +59,46 @@ export const JournalItem = (props: { item?: JournalInterface }) => {
 
 export const JournalView = observer(() => {
   const { journalStore } = useStore();
-  const [text, setText] = useState("");
+  const [entry, setEntry] = useState({
+    title: "",
+    description: "",
+  });
 
   const onSubmit = async () => {
     await journalStore.addItem({
-      text: text,
+      title:
+        entry.title.length > 0
+          ? entry.title
+          : getFirstTwoWords(entry.description),
+      description: entry.description,
     });
-    setText("");
+    setEntry({
+      title: "",
+      description: "",
+    });
   };
 
   return (
-    <div className="items-center m-auto md:w-1/2 p-4">
-      <div className="flex flex-row space-x-2 w-full justify-center mb-4">
-        <MyTextArea
-          value={text}
-          onChangeValue={(t) => setText(t)}
-          label={`Journal (${text.length}/300)`}
-        />
-        <MyButton onClick={onSubmit} label="Submit" />
+    <div className="lg:w-3/4 m-auto justify-center flex lg:flex-row flex-col">
+      <div className="lg:w-1/2">
+        <div className="m-4 items-end">
+          <div className="w-full">
+            <MyInput
+              value={entry.title}
+              onChangeValue={(t) => setEntry({ ...entry, title: t })}
+              label={`Title (Optional)`}
+            />
+            <MyTextArea
+              value={entry.description}
+              onChangeValue={(t) => setEntry({ ...entry, description: t })}
+              label={`Journal (${entry.description.length}/1000)`}
+            />
+          </div>
+          <MyButton onClick={onSubmit} label="Submit" />
+        </div>
       </div>
-
-      <div className="flex-1 w-full overflow-y-auto space-y-2">
-        {journalStore.items.map((s) => (
+      <div className="lg:w-1/2 max-h-[85vh] overflow-scroll">
+        {sortByKey(journalStore.items, "datetimeCreated", true).map((s) => (
           <JournalItem item={s} key={s.id} />
         ))}
       </div>

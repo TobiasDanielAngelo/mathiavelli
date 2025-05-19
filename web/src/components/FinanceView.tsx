@@ -1,16 +1,16 @@
 import AddCardIcon from "@mui/icons-material/AddCard";
+import CloseIcon from "@mui/icons-material/Close";
 import { observer } from "mobx-react-lite";
+import moment from "moment";
 import { useMemo, useState } from "react";
+import { useStore } from "../api/Store";
+import { TransactionInterface } from "../api/TransactionStore";
+import { MyConfirmModal } from "../blueprints/MyConfirmModal";
 import { MyModal } from "../blueprints/MyModal";
 import { MySpeedDial } from "../blueprints/MySpeedDial";
+import { sortByKey, toMoney } from "../constants/helpers";
 import { AccountForm } from "./AccountForm";
 import { TransactionForm } from "./TransactionForm";
-import { TransactionInterface } from "../api/TransactionStore";
-import { useStore } from "../api/Store";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
-import moment from "moment";
-import CloseIcon from "@mui/icons-material/Close";
-import { toMoney } from "../constants/helpers";
 
 export const TransactionItem = observer(
   (props: { item?: TransactionInterface }) => {
@@ -91,12 +91,17 @@ export const FinanceView = observer(() => {
         name: "Add an Account",
         onClick: () => setVisible1(true),
       },
+      {
+        icon: <AddCardIcon />,
+        name: "Add a Transaction",
+        onClick: () => setVisible2(true),
+      },
     ],
     []
   );
 
   return (
-    <div className="items-center m-auto md:w-1/2 p-4">
+    <div className="items-center m-auto md:w-1/2 p-4 max-h-[85vh] overflow-scroll">
       <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
         <AccountForm setVisible={setVisible1} />
       </MyModal>
@@ -104,15 +109,11 @@ export const FinanceView = observer(() => {
         <TransactionForm setVisible={setVisible2} />
       </MyModal>
       <div className="flex-1 w-full overflow-y-auto space-y-2">
-        {transactionStore.items.map((s) => (
+        {sortByKey(transactionStore.items, "datetimeTransacted").map((s) => (
           <TransactionItem item={s} key={s.id} />
         ))}
       </div>
-      <MySpeedDial
-        actions={actions}
-        onClick={() => setVisible2(true)}
-        title="Add a Transaction"
-      />
+      <MySpeedDial actions={actions} />
     </div>
   );
 });

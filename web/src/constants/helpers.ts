@@ -88,18 +88,21 @@ export const timeDifferenceTime = (startTime: string, endTime: string) => {
 };
 
 export const sortByKey = <T>(
-  arr: any[],
-  keyName?: string,
-  decreasing?: boolean
-) => {
-  return arr
-    .slice()
-    .sort((a, b) =>
-      new Date(decreasing ? a[keyName as any] : b[keyName as any]) >
-      new Date(decreasing ? b[keyName as any] : a[keyName as any])
-        ? -1
-        : 1
-    ) as T[];
+  arr: T[],
+  keyName: keyof T,
+  decreasing: boolean = false
+): T[] => {
+  return arr.slice().sort((a, b) => {
+    const aVal = a[keyName];
+    const bVal = b[keyName];
+
+    const dateA = new Date(aVal as any);
+    const dateB = new Date(bVal as any);
+
+    return decreasing
+      ? dateB.getTime() - dateA.getTime()
+      : dateA.getTime() - dateB.getTime();
+  });
 };
 
 export const toOptions = (items: any[], keyName?: string): Option[] => {
@@ -222,3 +225,8 @@ export const setBlankIfNeg1 = (str: string, val: number) => {
 };
 
 export const cmToPx = (cm: number) => cm / 0.026458;
+
+export const getFirstTwoWords = (str: string) => {
+  const words = str.trim().split(/[\s,–—-]+/); // split by space, comma, dash variants
+  return words.length > 2 ? `${words[0]} ${words[1]}...` : str;
+};

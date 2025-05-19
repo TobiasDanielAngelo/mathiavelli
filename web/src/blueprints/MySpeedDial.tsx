@@ -1,16 +1,10 @@
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import { MySpeedDialProps } from "../constants/interfaces";
 
-export const MySpeedDial = (props: {
-  actions?: MySpeedDialProps[];
-  onClick?: () => void;
-  title?: string;
-}) => {
-  const { actions, onClick, title } = props;
+export const MySpeedDial = (props: { actions?: MySpeedDialProps[] }) => {
+  const { actions } = props;
   return (
     <SpeedDial
-      title={title}
-      onClick={onClick}
       hidden={
         !actions ||
         actions.filter((s) => (s.hidden ? !s.hidden : true)).length === 0
@@ -21,6 +15,14 @@ export const MySpeedDial = (props: {
         bottom: 25,
         right: 25,
         zIndex: 1,
+      }}
+      FabProps={{
+        sx: {
+          bgcolor: "teal",
+          "&:hover": {
+            bgcolor: "secondary.main",
+          },
+        },
       }}
       icon={<SpeedDialIcon />}
     >

@@ -1,19 +1,18 @@
-import moment from "moment";
 import { useMemo, useState } from "react";
-import { AccountInterface } from "../api/AccountStore";
 import { useStore } from "../api/Store";
+import { TagInterface } from "../api/TagStore";
 import { MyForm } from "../blueprints/MyForm";
 import { Field } from "../constants/interfaces";
 
-export const AccountForm = (props: {
-  item?: AccountInterface;
+export const TagForm = (props: {
+  item?: TagInterface;
   setVisible?: (t: boolean) => void;
 }) => {
   const { item, setVisible } = props;
-  const { accountStore } = useStore();
+  const { tagStore } = useStore();
   const [details, setDetails] = useState({
     name: item?.name,
-    datetimeAdded: item?.datetimeAdded,
+    color: item?.color ?? "#d0021b",
   });
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);
@@ -23,8 +22,15 @@ export const AccountForm = (props: {
       [
         {
           name: "name",
-          label: "Account Name",
+          label: "Tag Name",
           type: "text",
+        },
+      ],
+      [
+        {
+          name: "color",
+          label: "Color",
+          type: "color",
         },
       ],
     ],
@@ -33,7 +39,7 @@ export const AccountForm = (props: {
 
   const onClickCreate = async () => {
     setLoading(true);
-    const resp = await accountStore.addItem(details);
+    const resp = await tagStore.addItem(details);
     setLoading(false);
 
     if (!resp.ok) {
@@ -46,12 +52,8 @@ export const AccountForm = (props: {
   const onClickEdit = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await accountStore.updateItem(item.id, {
+    const resp = await tagStore.updateItem(item.id, {
       ...details,
-      datetimeAdded: moment(
-        details.datetimeAdded,
-        "MMM D YYYY h:mm A"
-      ).toISOString(),
     });
     setLoading(false);
 
@@ -65,7 +67,7 @@ export const AccountForm = (props: {
   const onClickDelete = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await accountStore.deleteItem(item.id);
+    const resp = await tagStore.deleteItem(item.id);
     setLoading(false);
 
     if (!resp.ok) {
@@ -79,13 +81,13 @@ export const AccountForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Account" : "Account Creation Form"}
+        title={item ? "Edit Tag" : "Tag Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}
         hasDelete={!!item}
         onDelete={onClickDelete}
-        objectName="account"
+        objectName="tag"
         msg={msg}
         isLoading={isLoading}
       />

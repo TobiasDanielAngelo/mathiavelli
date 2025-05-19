@@ -6,7 +6,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Journal(models.Model):
     """Represents a user-submitted journal entry with optional status tracking."""
 
-    text = models.CharField(max_length=255, blank=True, default="")
+    title = models.CharField(max_length=40, blank=True, default="")
+    description = models.CharField(max_length=1000, blank=True, default="")
     datetime_created = models.DateTimeField(auto_now_add=True)
 
 
@@ -104,3 +105,73 @@ class Payable(models.Model):
 
     def __str__(self):
         return f"{self.lender_name} - {self.description}"
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+    color = models.CharField(max_length=7, default="#ffffff")
+
+    def __str__(self):
+        return self.name
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    all_day = models.BooleanField(default=False)
+    location = models.CharField(max_length=255, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.start} - {self.end})"
+
+
+class Goal(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    parent_goal = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="subgoals",
+    )
+    is_completed = models.BooleanField(default=False)
+    date_completed = models.DateField(null=True, blank=True)
+    date_start = models.DateField(null=True, blank=True)
+    date_end = models.DateField(null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_cancelled = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+
+class Task(models.Model):
+    FREQUENCY_CHOICES = [
+        ("NONE", "None"),
+        ("DAILY", "Daily"),
+        ("WEEKLY", "Weekly"),
+        ("MONTHLY", "Monthly"),
+        ("YEARLY", "Yearly"),
+    ]
+
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    goal = models.ForeignKey(
+        Goal, null=True, blank=True, on_delete=models.SET_NULL, related_name="tasks"
+    )
+    repeat = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default="NONE")
+    due_date = models.DateField(null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+    date_completed = models.DateField(null=True, blank=True)
+    date_start = models.DateField(null=True, blank=True)
+    date_end = models.DateField(null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_cancelled = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title

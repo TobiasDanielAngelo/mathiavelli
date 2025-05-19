@@ -5,8 +5,8 @@ import { MyNavBar } from "../blueprints/MyNavBar";
 import { toTitleCase } from "../constants/helpers";
 
 export const NavBar = observer(
-  (props: { setOpen?: Dispatch<SetStateAction<boolean>> }) => {
-    const { setOpen } = props;
+  (props: { open: boolean; setOpen?: Dispatch<SetStateAction<boolean>> }) => {
+    const { open, setOpen } = props;
 
     const location = useLocation();
     const [loc, setLoc] = useState(location.pathname.split("/")[1]);
@@ -14,14 +14,15 @@ export const NavBar = observer(
     return (
       <MyNavBar
         title="Mathiavelli Self-HQ"
+        drawerOpen={open}
         setDrawerOpen={setOpen}
         location={loc}
         setLocation={setLoc}
         profileUrl={"#"}
-        paths={["/journals", "/finances"].map((s) => ({
+        paths={["/journals", "/finances", "/events", "/goals"].map((s) => ({
           title: toTitleCase(s),
           link: s,
-          selected: s === loc,
+          selected: s.replace("/", "") === loc.replace("/", ""),
         }))}
       />
     );

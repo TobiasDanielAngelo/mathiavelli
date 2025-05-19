@@ -3,16 +3,18 @@ import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { daysOfWeek } from "../constants/constants";
 import { toOptions } from "../constants/helpers";
+import { useKeyPress } from "../constants/hooks";
 import { Field } from "../constants/interfaces";
 import { MyButton } from "./MyButton";
+import { MyCheckBox } from "./MyCheckbox";
 import { MyConfirmModal } from "./MyConfirmModal";
 import { MyDateTimePicker } from "./MyDateTimePicker";
 import { MyDropdownSelector } from "./MyDropdownSelector";
 import { MyImageUploader } from "./MyImageUploader";
 import { MyInput } from "./MyInput";
 import { MyMultiSelector } from "./MyMultiSelector";
-import { useKeyPress } from "../constants/hooks";
 import { MyTextArea } from "./MyTextArea";
+import { MyColorPicker } from "./MyColorPicker";
 
 export const MyForm = observer(
   (props: {
@@ -45,7 +47,7 @@ export const MyForm = observer(
     const [isVisible1, setVisible1] = useState(false);
 
     const onChangeValue = (
-      t: string | number | File | number[],
+      t: string | number | File | (number | string)[] | boolean,
       name: string
     ) => {
       setDetails({ ...details, [name]: t });
@@ -143,7 +145,6 @@ export const MyForm = observer(
                       ? `${msg[t.name as keyof Object]}`
                       : ""
                   }
-                  stringified
                 />
               ) : t.type === "multi" ? (
                 <MyMultiSelector
@@ -187,12 +188,38 @@ export const MyForm = observer(
                       : ""
                   }
                 />
+              ) : t.type === "color" ? (
+                <MyColorPicker
+                  label={t.label}
+                  value={details[t.name]}
+                  onChangeValue={(u) => onChangeValue(u, t.name)}
+                  key={ind}
+                  msg={
+                    msg &&
+                    !`${msg[t.name as keyof Object]}`.includes("undefined")
+                      ? `${msg[t.name as keyof Object]}`
+                      : ""
+                  }
+                />
               ) : t.type === "number" ? (
                 <MyInput
                   label={t.label}
                   value={details[t.name]}
                   onChangeValue={(u) => onChangeValue(u, t.name)}
                   centered={t.centered}
+                  key={ind}
+                  msg={
+                    msg &&
+                    !`${msg[t.name as keyof Object]}`.includes("undefined")
+                      ? `${msg[t.name as keyof Object]}`
+                      : ""
+                  }
+                />
+              ) : t.type === "check" ? (
+                <MyCheckBox
+                  label={t.label}
+                  value={details[t.name]}
+                  onChangeValue={(u) => onChangeValue(u, t.name)}
                   key={ind}
                   msg={
                     msg &&

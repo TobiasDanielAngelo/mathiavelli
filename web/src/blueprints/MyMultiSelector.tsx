@@ -1,45 +1,35 @@
-import { Option } from '../constants/interfaces'
+import { Option } from "../constants/interfaces";
 
 export const MyMultiSelector = (props: {
-  label?: string
-  value: number[] | string
-  onChangeValue: (t: number[] | string) => void
-  options?: Option[]
-  stringified?: boolean
-  msg?: string
+  label?: string;
+  value: (number | string)[];
+  onChangeValue: (t: (number | string)[]) => void;
+  options?: Option[];
+  stringified?: boolean;
+  msg?: string;
 }) => {
-  const { label, value, onChangeValue, options, stringified, msg } = props
+  const { label, value, onChangeValue, options, msg } = props;
 
-  const onClickItem = (t: number) => {
-    !stringified
-      ? onChangeValue(
-          (value as number[]).includes(t)
-            ? (value as number[]).filter((s) => s !== t)
-            : [...(value as number[]), t],
-        )
-      : onChangeValue(
-          (value as string).split(', ').includes(`${t}`)
-            ? (value as string)
-                .split(', ')
-                .filter((s) => s !== `${t}`)
-                .join(', ')
-            : `${value}, ${t}`,
-        )
-  }
+  const onClickItem = (t: number | string) => {
+    onChangeValue(
+      value.includes(t) ? value.filter((s) => s !== t) : [...value, t]
+    );
+  };
 
   return (
     <div>
-      <label className="text-xs text-blue-600">{label ?? 'Select Items'}</label>
+      <label className="text-xs text-blue-600">{label ?? "Select Items"}</label>
       <div className="flex flex-row justify-evenly items-center py-2">
         {options?.map((s) => (
           <div
             key={s.id}
             className={
-              (value as number[]).includes(s.id)
-                ? 'cursor-pointer text-blue-600 font-bold'
-                : 'cursor-pointer text-gray-400'
+              value.includes(s.id)
+                ? "cursor-pointer text-blue-600 font-bold"
+                : "cursor-pointer text-gray-400"
             }
-            onClick={() => onClickItem(s.id)}>
+            onClick={() => onClickItem(s.id)}
+          >
             {s.name}
           </div>
         ))}
@@ -48,5 +38,5 @@ export const MyMultiSelector = (props: {
         {msg}
       </label>
     </div>
-  )
-}
+  );
+};

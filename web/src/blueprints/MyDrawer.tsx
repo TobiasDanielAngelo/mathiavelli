@@ -11,12 +11,23 @@ import ListItemText from "@mui/material/ListItemText";
 import { observer } from "mobx-react-lite";
 import { Dispatch, SetStateAction } from "react";
 import { useKeyPress } from "../constants/hooks";
+import { Page } from "../constants/interfaces";
+import { useNavigate } from "react-router-dom";
+import { useStore } from "../api/Store";
 
 const drawerWidth = 240;
 
 export const ResponsiveDrawer = observer(
-  (props: { open?: boolean; setOpen?: Dispatch<SetStateAction<boolean>> }) => {
-    const { open, setOpen } = props;
+  (props: {
+    open?: boolean;
+    setOpen?: Dispatch<SetStateAction<boolean>>;
+    paths?: Page[];
+    location?: string;
+    setLocation?: Dispatch<SetStateAction<string>>;
+  }) => {
+    const { open, setOpen, paths, location, setLocation } = props;
+    const navigate = useNavigate();
+    const { userStore } = useStore();
 
     useKeyPress(["q", "Shift"], () => setOpen && setOpen(false));
 
@@ -33,31 +44,59 @@ export const ResponsiveDrawer = observer(
         >
           <div className="dark:bg-gray-900 dark:text-gray-400 h-full">
             <Toolbar />
-            <IconButton
-              color="inherit"
-              edge="start"
-              sx={{ mr: 2, display: { sm: "none" } }}
-            >
-              <MenuIcon />
-            </IconButton>
-            {/* <List>
-            {['References', 'Records', 'Reports'].map((s, ind) => (
-              <ListItem key={ind} disablePadding>
-                <ListItemButton>
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setLocation && setLocation("/");
+                    navigate("/");
+                    setOpen && setOpen(false);
+                  }}
+                >
                   <ListItemIcon>
-                    {ind % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                    <InboxIcon color="primary" />
                   </ListItemIcon>
-                  <ListItemText primary={s} secondary={''} />
+                  <ListItemText primary={"Dashboard"} secondary={""} />
                 </ListItemButton>
               </ListItem>
-            ))}
-          </List> */}
+              {paths?.map((s, ind) => (
+                <ListItem key={ind} disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      setLocation && s.link && setLocation(s.link);
+                      navigate(s?.link ?? "/");
+                      setOpen && setOpen(false);
+                    }}
+                  >
+                    <ListItemIcon>
+                      {ind % 2 === 0 ? (
+                        <InboxIcon color="primary" />
+                      ) : (
+                        <MailIcon color="primary" />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText primary={s.title} secondary={""} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
             <List>
               {["Logout"].map((s, ind) => (
                 <ListItem key={ind} disablePadding>
-                  <ListItemButton>
+                  <ListItemButton
+                    onClick={() => {
+                      setLocation && setLocation("/");
+                      userStore.logoutUser();
+                      navigate("/login");
+                      setOpen && setOpen(false);
+                    }}
+                  >
                     <ListItemIcon>
-                      {ind % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                      {ind % 2 === 0 ? (
+                        <InboxIcon color="primary" />
+                      ) : (
+                        <MailIcon color="primary" />
+                      )}
                     </ListItemIcon>
                     <ListItemText primary={s} secondary={""} />
                   </ListItemButton>

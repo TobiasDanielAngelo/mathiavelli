@@ -6,6 +6,9 @@ import { useStore } from "../api/Store";
 import { NavBar } from "../blueprints/MainParts";
 import { JournalView } from "./JournalView";
 import { FinanceView } from "./FinanceView";
+import { EventView } from "./EventView";
+import { GoalView } from "./GoalView";
+import { DashboardView } from "./DashboardView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -18,6 +21,10 @@ export const MainView = observer(() => {
     categoryStore,
     payableStore,
     receivableStore,
+    eventStore,
+    tagStore,
+    goalStore,
+    taskStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -38,6 +45,10 @@ export const MainView = observer(() => {
       journalStore.fetchAll();
       payableStore.fetchAll();
       receivableStore.fetchAll();
+      eventStore.fetchAll();
+      tagStore.fetchAll();
+      goalStore.fetchAll();
+      taskStore.fetchAll();
     }
   };
 
@@ -50,12 +61,13 @@ export const MainView = observer(() => {
 
   return (
     <div>
-      <ResponsiveDrawer open={open} setOpen={setOpen} />
-      <NavBar setOpen={setOpen} />
+      <NavBar open={open} setOpen={setOpen} />
       <Routes>
-        <Route path="" element={<FinanceView />} />
+        <Route path="" element={<DashboardView />} />
         <Route path="journals" element={<JournalView />} />
         <Route path="finances" element={<FinanceView />} />
+        <Route path="events" element={<EventView />} />
+        <Route path="goals" element={<GoalView />} />
       </Routes>
     </div>
   );

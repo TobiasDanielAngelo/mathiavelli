@@ -1,34 +1,46 @@
 import { computed } from "mobx";
 import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 
-const slug = "journals";
+const slug = "goals";
 
-export interface JournalInterface {
+export interface GoalInterface {
   id?: number;
   title?: string;
   description?: string;
-  datetimeCreated?: string;
+  parentGoal?: number | null;
+  isCompleted?: boolean;
+  isCancelled?: boolean;
+  dateCompleted?: string;
+  dateStart?: string;
+  dateEnd?: string;
+  dateCreated?: string;
 }
 
-@model("myApp/Journal")
-export class Journal extends Model({
+@model("myApp/Goal")
+export class Goal extends Model({
   id: prop<number>(-1),
   title: prop<string>(""),
   description: prop<string>(""),
-  datetimeCreated: prop<string>(""),
+  parentGoal: prop<number | null>(-1),
+  isCompleted: prop<boolean>(false),
+  isCancelled: prop<boolean>(false),
+  dateCompleted: prop<string>(""),
+  dateStart: prop<string>(""),
+  dateEnd: prop<string>(""),
+  dateCreated: prop<string>(""),
 }) {
-  update(details: JournalInterface) {
+  update(details: GoalInterface) {
     Object.assign(this, details);
   }
 }
 
-@model("myApp/JournalStore")
-export class JournalStore extends Model({
-  items: prop<Journal[]>(() => []),
+@model("myApp/GoalStore")
+export class GoalStore extends Model({
+  items: prop<Goal[]>(() => []),
 }) {
   @computed
   get allItems() {
-    const map = new Map<number, Journal>();
+    const map = new Map<number, Goal>();
     this.items.forEach((item) => map.set(item.id, item));
     return map;
   }
@@ -38,7 +50,7 @@ export class JournalStore extends Model({
   }
 
   @modelFlow
-  fetchAll = _async(function* (this: JournalStore, params?: string) {
+  fetchAll = _async(function* (this: GoalStore, params?: string) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -76,7 +88,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal[];
+    let json: Goal[];
     try {
       const resp = yield* _await(response.json());
 
@@ -88,7 +100,7 @@ export class JournalStore extends Model({
 
     json.forEach((s) => {
       if (!this.allIDs.includes(s.id)) {
-        this.items.push(new Journal(s));
+        this.items.push(new Goal(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
@@ -98,7 +110,7 @@ export class JournalStore extends Model({
   });
 
   @modelFlow
-  addItem = _async(function* (this: JournalStore, details: JournalInterface) {
+  addItem = _async(function* (this: GoalStore, details: GoalInterface) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -134,7 +146,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal;
+    let json: Goal;
     try {
       const resp = yield* _await(response.json());
       json = resp;
@@ -143,9 +155,9 @@ export class JournalStore extends Model({
       return { details: "Parsing Error", ok: false, data: null };
     }
 
-    let item: Journal;
+    let item: Goal;
 
-    item = new Journal(json);
+    item = new Goal(json);
 
     this.items.push(item);
 
@@ -154,9 +166,9 @@ export class JournalStore extends Model({
 
   @modelFlow
   updateItem = _async(function* (
-    this: JournalStore,
+    this: GoalStore,
     itemId: number,
-    details: JournalInterface
+    details: GoalInterface
   ) {
     let token: string;
 
@@ -192,7 +204,7 @@ export class JournalStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    let json: Journal;
+    let json: Goal;
     try {
       const resp = yield* _await(response.json());
       json = resp;
@@ -207,7 +219,7 @@ export class JournalStore extends Model({
   });
 
   @modelFlow
-  deleteItem = _async(function* (this: JournalStore, itemId: number) {
+  deleteItem = _async(function* (this: GoalStore, itemId: number) {
     let token: string;
 
     token = localStorage.getItem("@userToken") ?? "";
@@ -250,4 +262,4 @@ export class JournalStore extends Model({
   });
 }
 
-export const journalStore = new JournalStore({});
+export const goalStore = new GoalStore({});
