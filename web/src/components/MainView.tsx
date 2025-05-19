@@ -1,14 +1,13 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { ResponsiveDrawer } from "../blueprints/MyDrawer";
 import { useStore } from "../api/Store";
 import { NavBar } from "../blueprints/MainParts";
-import { JournalView } from "./JournalView";
-import { FinanceView } from "./FinanceView";
-import { EventView } from "./EventView";
-import { GoalView } from "./GoalView";
 import { DashboardView } from "./DashboardView";
+import { EventView } from "./EventView";
+import { FinanceView } from "./FinanceView";
+import { GoalView } from "./GoalView";
+import { JournalView } from "./JournalView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
