@@ -1,24 +1,26 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from knox.views import LogoutView as KnoxLogoutView
+from rest_framework.viewsets import ViewSetMixin
+import re
+import inflect
 from . import views
-from .viewsets import *
 from django.conf import settings
 from django.conf.urls.static import static
+from . import viewsets as vs_module
 
 router = DefaultRouter()
 
-router.register(r"journals", JournalViewSet)
-router.register(r"accounts", AccountViewSet)
-router.register(r"categories", CategoryViewSet)
-router.register(r"transactions", TransactionViewSet)
-router.register(r"receivables", ReceivableViewSet)
-router.register(r"payables", PayableViewSet)
-router.register(r"events", EventViewSet)
-router.register(r"tags", TagViewSet)
-router.register(r"goals", GoalViewSet)
-router.register(r"tasks", TaskViewSet)
+inflector = inflect.engine()
 
+for attr_name in dir(vs_module):
+    viewset = getattr(vs_module, attr_name)
+
+    if isinstance(viewset, type) and issubclass(viewset, ViewSetMixin):
+        base = re.sub(r"ViewSet$", "", attr_name)
+        route = inflector.plural(base.lower())
+        if base != "CustomModel":
+            router.register(route, viewset, basename=route)
 
 urlpatterns = [
     path("", include(router.urls)),

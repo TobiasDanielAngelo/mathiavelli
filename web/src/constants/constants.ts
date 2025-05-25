@@ -1,8 +1,14 @@
 export const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+export const frequency = ["None", "Daily", "Weekly", "Monthly", "Yearly"];
 
 export const lowerFirstLetter = (str: string) => {
   return str.charAt(0).toLowerCase() + str.slice(1);
 };
+
+export const isTouchDevice = () =>
+  "ontouchstart" in window ||
+  navigator.maxTouchPoints > 0 ||
+  window.matchMedia("(pointer: coarse)").matches;
 
 const getOrdinal = (n: number) => {
   let ord = "th";

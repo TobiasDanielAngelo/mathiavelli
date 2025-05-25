@@ -2,12 +2,14 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../api/Store";
-import { NavBar } from "../blueprints/MainParts";
 import { DashboardView } from "./DashboardView";
 import { EventView } from "./EventView";
 import { FinanceView } from "./FinanceView";
 import { GoalView } from "./GoalView";
 import { JournalView } from "./JournalView";
+import { NavBar } from "../blueprints/MyNavigation";
+import { HealthView } from "./HealthView";
+import { TaskView } from "./TaskView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -59,7 +61,7 @@ export const MainView = observer(() => {
   }, []);
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <NavBar open={open} setOpen={setOpen} />
       <Routes>
         <Route path="" element={<DashboardView />} />
@@ -67,6 +69,8 @@ export const MainView = observer(() => {
         <Route path="finances" element={<FinanceView />} />
         <Route path="events" element={<EventView />} />
         <Route path="goals" element={<GoalView />} />
+        <Route path="health" element={<HealthView />} />
+        <Route path="tasks" element={<TaskView />} />
       </Routes>
     </div>
   );

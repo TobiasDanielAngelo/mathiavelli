@@ -1,18 +1,20 @@
 import EventIcon from "@mui/icons-material/Event";
 import moment from "moment";
 import { Dispatch, SetStateAction, useState } from "react";
-import { EventInterface } from "../api/EventStore";
-import { GuidedDiv } from "./MyGuidedDiv";
+import { useStore } from "../api/Store";
 import { TwoDates } from "../constants/classes";
+import { GuidedDiv } from "./MyGuidedDiv";
+import { useWindowWidth } from "../constants/hooks";
 
 export const MyCalendar = (props: {
   date: Date;
   setDate: Dispatch<SetStateAction<Date>>;
-  events?: EventInterface[];
 }) => {
-  const { date, setDate, events } = props;
+  const { eventStore } = useStore();
+  const { date, setDate } = props;
   const [view, setView] = useState("month");
   const [currentDate, setCurrentDate] = useState(moment());
+  const width = useWindowWidth();
 
   const startDecade = Math.floor(currentDate.year() / 10) * 10;
 
@@ -53,8 +55,10 @@ export const MyCalendar = (props: {
           const isToday = day.isSame(moment(), "day");
           const isSelected = day.isSame(date, "day");
           const isWeekend = day.day() === 0 || day.day() === 6;
-          const allEvents = events?.filter((s) =>
-            new TwoDates(s.start, s.end).contains(day.toDate())
+          const allEvents = eventStore.items?.filter((s) =>
+            new TwoDates(s.start, s.end).contains(
+              day.endOf("day").subtract(1, "second").toDate()
+            )
           );
           return (
             <GuidedDiv
@@ -71,18 +75,20 @@ export const MyCalendar = (props: {
               }
               key={i}
               onClick={() => setDate(day.toDate())}
-              className={`text-right items-right justify-between flex flex-row-reverse p-2 rounded cursor-pointer
+              className={`text-right text-sm md:text-md md:text-lg items-right justify-between flex flex-row-reverse p-2 rounded cursor-pointer
                 ${day.month() === currentDate.month() ? "" : "text-gray-500"}
                 ${isWeekend ? "text-red-500" : ""}
                 ${isToday ? "text-blue-500 font-bold" : ""}
                 ${isSelected ? "bg-teal-300 text-black" : ""}`}
             >
               {day.date()}
-              {events
+              {eventStore.items
                 ?.map((s) =>
-                  new TwoDates(s.start, s.end).contains(day.toDate())
+                  new TwoDates(s.start, s.end).contains(
+                    day.endOf("day").subtract(1, "second").toDate()
+                  )
                 )
-                .reduce((a, b) => a || b, false) ? (
+                .reduce((a, b) => a || b, false) && width > 512 ? (
                 <EventIcon />
               ) : (
                 <></>

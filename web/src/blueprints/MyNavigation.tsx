@@ -1,12 +1,141 @@
 import InsertChartIcon from "@mui/icons-material/InsertChart";
 import MenuIcon from "@mui/icons-material/Menu";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import { Toolbar } from "@mui/material";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import { observer } from "mobx-react-lite";
 import { Dispatch, SetStateAction, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useStore } from "../api/Store";
 import anon from "../assets/anon.jpg";
+import { toTitleCase } from "../constants/helpers";
+import { useKeyPress } from "../constants/hooks";
 import { Page } from "../constants/interfaces";
-import { ResponsiveDrawer } from "./MyDrawer";
 import { MyDropdownMenu } from "./MyDropdownMenu";
+
+const drawerWidth = 240;
+
+export const NavBar = observer(
+  (props: { open: boolean; setOpen?: Dispatch<SetStateAction<boolean>> }) => {
+    const { open, setOpen } = props;
+
+    const location = useLocation();
+    const [loc, setLoc] = useState(location.pathname.split("/")[1]);
+
+    return (
+      <MyNavBar
+        title="Mathiavelli Self-HQ"
+        drawerOpen={open}
+        setDrawerOpen={setOpen}
+        location={loc}
+        setLocation={setLoc}
+        profileUrl={"#"}
+        paths={[
+          "/journals",
+          "/finances",
+          "/events",
+          "/goals",
+          "/health",
+          "/tasks",
+        ].map((s) => ({
+          title: toTitleCase(s),
+          link: s,
+          selected: s.replace("/", "") === loc.replace("/", ""),
+        }))}
+      />
+    );
+  }
+);
+
+export const ResponsiveDrawer = observer(
+  (props: {
+    open?: boolean;
+    setOpen?: Dispatch<SetStateAction<boolean>>;
+    paths?: Page[];
+    location?: string;
+    setLocation?: Dispatch<SetStateAction<string>>;
+  }) => {
+    const { open, setOpen, paths, setLocation } = props;
+    const navigate = useNavigate();
+    const { userStore } = useStore();
+
+    useKeyPress(["q", "Shift"], () => setOpen && setOpen(false));
+
+    return (
+      <div style={{ display: "flex" }}>
+        <Drawer
+          sx={{
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+            },
+          }}
+          open={open}
+          onClose={setOpen && (() => setOpen(false))}
+        >
+          <div className="dark:bg-gray-900 dark:text-gray-400 h-full">
+            <Toolbar />
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setLocation && setLocation("/");
+                    navigate("/");
+                    setOpen && setOpen(false);
+                  }}
+                >
+                  <ListItemIcon>
+                    <InboxIcon color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary={"Dashboard"} secondary={""} />
+                </ListItemButton>
+              </ListItem>
+              {paths?.map((s, ind) => (
+                <ListItem key={ind} disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      setLocation && s.link && setLocation(s.link);
+                      navigate(s?.link ?? "/");
+                      setOpen && setOpen(false);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <InboxIcon color="primary" />
+                    </ListItemIcon>
+                    <ListItemText primary={s.title} secondary={""} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+            <List>
+              {["Logout"].map((s, ind) => (
+                <ListItem key={ind} disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      setLocation && setLocation("/");
+                      userStore.logoutUser();
+                      navigate("/login");
+                      setOpen && setOpen(false);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <InboxIcon color="primary" />
+                    </ListItemIcon>
+                    <ListItemText primary={s} secondary={""} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        </Drawer>
+      </div>
+    );
+  }
+);
 
 const NavLink = (props: { page: Page }) => {
   const { page } = props;

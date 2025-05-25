@@ -13,7 +13,7 @@ export const AccountForm = (props: {
   const { accountStore } = useStore();
   const [details, setDetails] = useState({
     name: item?.name,
-    datetimeAdded: item?.datetimeAdded,
+    datetimeAdded: moment(item?.datetimeAdded).format("MMM D YYYY h:mm A"),
   });
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);

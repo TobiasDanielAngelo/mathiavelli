@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class Journal(models.Model):
@@ -8,12 +9,12 @@ class Journal(models.Model):
 
     title = models.CharField(max_length=40, blank=True, default="")
     description = models.CharField(max_length=1000, blank=True, default="")
-    datetime_created = models.DateTimeField(auto_now_add=True)
+    datetime_created = models.DateTimeField(default=timezone.now, null=True, blank=True)
 
 
 class Account(models.Model):
     name = models.CharField(max_length=20, default="")
-    datetime_added = models.DateTimeField(auto_now_add=True)
+    datetime_added = models.DateTimeField(default=timezone.now, null=True, blank=True)
 
     def __str__(self):
         return f"{self.pk} - {self.name}"
@@ -61,7 +62,9 @@ class Transaction(models.Model):
         null=True,
     )
     amount = models.DecimalField(default=0, decimal_places=2, max_digits=10)
-    datetime_transacted = models.DateTimeField(auto_now_add=True)
+    datetime_transacted = models.DateTimeField(
+        default=timezone.now, null=True, blank=True
+    )
 
     def __str__(self):
         return f"{self.description}"
@@ -78,7 +81,7 @@ class Receivable(models.Model):
         max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0
     )
     description = models.CharField(max_length=100, default="", blank=True)
-    datetime_opened = models.DateTimeField(auto_now_add=True)
+    datetime_opened = models.DateTimeField(default=timezone.now, null=True, blank=True)
     datetime_due = models.DateTimeField(blank=True, null=True)
     datetime_closed = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -94,7 +97,7 @@ class Payable(models.Model):
         related_name="payment_payable",
     )
     lender_name = models.CharField(max_length=30, default="", blank=True)
-    datetime_opened = models.DateTimeField(auto_now_add=True)
+    datetime_opened = models.DateTimeField(default=timezone.now, null=True, blank=True)
     datetime_due = models.DateTimeField(blank=True, null=True)
     description = models.CharField(max_length=100, default="", blank=True)
     datetime_closed = models.DateTimeField(blank=True, null=True)
@@ -123,7 +126,11 @@ class Event(models.Model):
     all_day = models.BooleanField(default=False)
     location = models.CharField(max_length=255, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now, null=True, blank=True)
+
+    def clean(self):
+        if self.start and self.end and self.start >= self.end:
+            raise ValidationError("Start time must be before end time.")
 
     def __str__(self):
         return f"{self.title} ({self.start} - {self.end})"
@@ -143,20 +150,24 @@ class Goal(models.Model):
     date_completed = models.DateField(null=True, blank=True)
     date_start = models.DateField(null=True, blank=True)
     date_end = models.DateField(null=True, blank=True)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now, null=True, blank=True)
     is_cancelled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
 
+    def clean(self):
+        if self.date_start and self.date_end and self.date_start >= self.date_end:
+            raise ValidationError("Start time must be before end time.")
+
 
 class Task(models.Model):
     FREQUENCY_CHOICES = [
-        ("NONE", "None"),
-        ("DAILY", "Daily"),
-        ("WEEKLY", "Weekly"),
-        ("MONTHLY", "Monthly"),
-        ("YEARLY", "Yearly"),
+        ("1", "None"),
+        ("2", "Daily"),
+        ("3", "Weekly"),
+        ("4", "Monthly"),
+        ("5", "Yearly"),
     ]
 
     title = models.CharField(max_length=255)
@@ -170,8 +181,12 @@ class Task(models.Model):
     date_completed = models.DateField(null=True, blank=True)
     date_start = models.DateField(null=True, blank=True)
     date_end = models.DateField(null=True, blank=True)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now, null=True, blank=True)
     is_cancelled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        if self.date_start and self.date_end and self.date_start >= self.date_end:
+            raise ValidationError("Start time must be before end time.")

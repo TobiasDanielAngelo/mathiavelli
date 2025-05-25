@@ -69,14 +69,14 @@ class PayableViewSet(CustomModelViewSet):
     serializer_class = PayableSerializer
 
 
-class EventViewSet(CustomModelViewSet):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
-
-
 class TagViewSet(CustomModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+
+
+class EventViewSet(CustomModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
 
 
 class GoalViewSet(CustomModelViewSet):

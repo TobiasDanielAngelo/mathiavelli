@@ -105,11 +105,18 @@ export const sortByKey = <T>(
   });
 };
 
-export const toOptions = (items: any[], keyName?: string): Option[] => {
-  return items.map((s, ind) => ({
-    id: typeof s === "string" ? ind + 1 : s.id,
-    name: typeof s === "string" ? s : (s as any)[keyName ?? ""],
-  }));
+export const toOptions = <T>(items: T[], keyName?: keyof T): Option[] => {
+  return items.map((item, index) => {
+    if (typeof item === "string") {
+      return { id: index + 1, name: item };
+    } else {
+      const obj = item as Record<string, any>;
+      return {
+        id: obj.id ?? index + 1,
+        name: obj[keyName as string] ?? "",
+      };
+    }
+  });
 };
 
 export const timeDifference = (start: Date | string, end?: Date | string) => {
@@ -229,4 +236,10 @@ export const cmToPx = (cm: number) => cm / 0.026458;
 export const getFirstTwoWords = (str: string) => {
   const words = str.trim().split(/[\s,–—-]+/); // split by space, comma, dash variants
   return words.length > 2 ? `${words[0]} ${words[1]}...` : str;
+};
+
+export const isDateValue = (val: any) => {
+  return (
+    typeof val === "string" && !isNaN(Date.parse(val)) && val.length >= 10 // crude ISO check
+  );
 };

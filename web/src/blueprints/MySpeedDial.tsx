@@ -22,9 +22,10 @@ export const MySpeedDial = (props: { actions?: MySpeedDialProps[] }) => {
           "&:hover": {
             bgcolor: "secondary.main",
           },
+          padding: 4,
         },
       }}
-      icon={<SpeedDialIcon />}
+      icon={<SpeedDialIcon sx={{ transform: "scale(1.5)" }} />}
     >
       {actions?.map(
         (action) =>
@@ -34,6 +35,9 @@ export const MySpeedDial = (props: { actions?: MySpeedDialProps[] }) => {
               key={action.name}
               icon={action.icon}
               onClick={action.onClick}
+              sx={{
+                padding: 4,
+              }}
             />
           )
       )}

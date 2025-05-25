@@ -7,13 +7,15 @@ export interface TaskInterface {
   id?: number;
   title?: string;
   description?: string;
-  parentTask?: number;
+  goal?: number;
   isCompleted?: boolean;
   isCancelled?: boolean;
   dateCompleted?: string;
   dateStart?: string;
   dateEnd?: string;
   dateCreated?: string;
+  dueDate?: string;
+  repeat?: string;
 }
 
 @model("myApp/Task")
@@ -21,13 +23,15 @@ export class Task extends Model({
   id: prop<number>(-1),
   title: prop<string>(""),
   description: prop<string>(""),
-  parentTask: prop<number>(-1),
+  goal: prop<number>(-1),
   isCompleted: prop<boolean>(false),
   isCancelled: prop<boolean>(false),
   dateCompleted: prop<string>(""),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
   dateCreated: prop<string>(""),
+  dueDate: prop<string>(""),
+  repeat: prop<string>(""),
 }) {
   update(details: TaskInterface) {
     Object.assign(this, details);

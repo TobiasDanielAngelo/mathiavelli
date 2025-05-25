@@ -14,7 +14,7 @@ export const JournalForm = (props: {
   const [details, setDetails] = useState({
     title: item?.title,
     description: item?.description,
-    datetimeCreated: item?.datetimeCreated,
+    datetimeCreated: moment(item?.datetimeCreated).format("MMM D, YYYY h:mm A"),
   });
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);
@@ -33,6 +33,13 @@ export const JournalForm = (props: {
           name: "description",
           label: "Journal Entry",
           type: "textarea",
+        },
+      ],
+      [
+        {
+          name: "datetimeCreated",
+          label: "Created",
+          type: "datetime",
         },
       ],
     ],

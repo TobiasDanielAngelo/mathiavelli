@@ -5,7 +5,6 @@ export const MyMultiSelector = (props: {
   value: (number | string)[];
   onChangeValue: (t: (number | string)[]) => void;
   options?: Option[];
-  stringified?: boolean;
   msg?: string;
 }) => {
   const { label, value, onChangeValue, options, msg } = props;

@@ -1,117 +1,130 @@
 import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
-import moment from "moment";
 import { useMemo, useState } from "react";
-import { GoalInterface } from "../api/GoalStore";
 import { useStore } from "../api/Store";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
+import { Task, TaskInterface } from "../api/TaskStore";
 import { MyModal } from "../blueprints/MyModal";
+import { MyMultiDropdownSelector } from "../blueprints/MyMultiDropdownSelector";
 import { MySpeedDial } from "../blueprints/MySpeedDial";
+import { SideBySideView } from "../blueprints/SideBySideView";
+import { sortByKey, toTitleCase } from "../constants/helpers";
 import { GoalForm } from "./GoalForm";
-
-export const GoalItem = observer(
-  (props: { item: GoalInterface; border?: boolean }) => {
-    const { item, border } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
-    const [showChildren, setShowChildren] = useState(true);
-    const [msg, setMsg] = useState("");
-    const { goalStore } = useStore();
-
-    const subgoals = goalStore.items.filter((g) => g.parentGoal === item.id);
-
-    const onDelete = async () => {
-      const resp = await goalStore.deleteItem(item?.id ?? -1);
-      if (!resp.ok) {
-        setMsg(resp.details);
-        return;
-      }
-      setVisible1(false);
-    };
-
-    return (
-      <div
-        className="m-1 border-gray-700 rounded-lg p-2"
-        style={{ borderWidth: border ? 1 : 0 }}
-      >
-        <MyModal isVisible={isVisible1} setVisible={setVisible1}>
-          <GoalForm item={item} setVisible={setVisible1} />
-        </MyModal>
-        <MyConfirmModal
-          isVisible={isVisible2}
-          setVisible={setVisible2}
-          onClickCheck={onDelete}
-          actionName="Delete"
-          msg={msg}
-        />
-
-        <div className="flex justify-between">
-          <div className="flex-1 mx-5">
-            <div className="flex gap-2 text-xs text-gray-400">
-              <div>
-                {moment(item.dateCreated).format("MMM D, YYYY h:mm A ")}
-              </div>
-              <div>{item.description}</div>
-            </div>
-            <div className="flex items-center gap-2">
-              {subgoals.length > 0 && (
-                <div
-                  onClick={() => setShowChildren((prev) => !prev)}
-                  className="text-lg cursor-pointer mx-2 font-mono text-gray-500 hover:text-white"
-                >
-                  {showChildren ? "▾" : "▸"}
-                </div>
-              )}
-              <div
-                className="hover:underline cursor-pointer"
-                onClick={() => setVisible1(true)}
-              >
-                {item.title}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {showChildren && subgoals.length > 0 && (
-          <div className="ml-8 mt-2 space-y-2 border-l-2 border-gray-500 pl-2">
-            {subgoals.map((sub) => (
-              <GoalItem key={sub.id} item={sub} />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-);
+import { GoalItem } from "./GoalItem";
+import { TaskForm } from "./TaskForm";
+import { TaskItem } from "./TaskItem";
+import { Goal, GoalInterface } from "../api/GoalStore";
 
 export const GoalView = observer(() => {
   const [isVisible1, setVisible1] = useState(false);
-  const { goalStore } = useStore();
-
+  const [isVisible2, setVisible2] = useState(false);
+  const [isVisible3, setVisible3] = useState(false);
+  const [isVisible4, setVisible4] = useState(false);
+  const { goalStore, taskStore } = useStore();
+  const [shownTaskFields, setShownTaskFields] = useState<
+    (keyof TaskInterface)[]
+  >(Object.keys(new Task({}).$) as (keyof TaskInterface)[]);
+  const [shownGoalFields, setShownGoalFields] = useState<
+    (keyof GoalInterface)[]
+  >(Object.keys(new Goal({}).$) as (keyof GoalInterface)[]);
   const mainGoals = goalStore.items.filter((g) => g.parentGoal == -1);
 
   const actions = useMemo(
     () => [
       {
-        icon: <AddCardIcon />,
+        icon: (
+          <div className="flex flex-col items-center">
+            <AddCardIcon fontSize="large" />
+            <div className="text-xs text-gray-500 font-bold">GOAL</div>
+          </div>
+        ),
         name: "Add a Goal",
         onClick: () => setVisible1(true),
+      },
+      {
+        icon: (
+          <div className="flex flex-col items-center">
+            <AddCardIcon fontSize="large" />
+            <div className="text-xs text-gray-500 font-bold">TASK</div>
+          </div>
+        ),
+        name: "Add a Task",
+        onClick: () => setVisible2(true),
+      },
+      {
+        icon: (
+          <div className="flex flex-col items-center">
+            <div className="text-xs text-gray-500 font-bold">TASK FIELDS</div>
+          </div>
+        ),
+        name: "Filter Task Fields",
+        onClick: () => setVisible3(true),
+      },
+      {
+        icon: (
+          <div className="flex flex-col items-center">
+            <div className="text-xs text-gray-500 font-bold">GOAL FIELDS</div>
+          </div>
+        ),
+        name: "Filter Goal Fields",
+        onClick: () => setVisible4(true),
       },
     ],
     []
   );
 
   return (
-    <div className="items-center m-auto md:w-1/2 p-4 max-h-[85vh] overflow-scroll">
+    <>
       <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
         <GoalForm setVisible={setVisible1} />
       </MyModal>
-      <div className="space-y-2">
-        {mainGoals.map((mainGoal) => (
-          <GoalItem key={mainGoal.id} item={mainGoal} border />
-        ))}
-      </div>
+      <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
+        <TaskForm setVisible={setVisible2} />
+      </MyModal>
+      <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>
+        <MyMultiDropdownSelector
+          label="Fields"
+          value={shownTaskFields}
+          onChangeValue={(t) =>
+            setShownTaskFields(t as (keyof TaskInterface)[])
+          }
+          options={Object.keys(new Task({}).$).map((s) => ({
+            id: s,
+            name: toTitleCase(s),
+          }))}
+          relative
+          open
+        />
+      </MyModal>
+      <MyModal isVisible={isVisible4} setVisible={setVisible4} disableClose>
+        <MyMultiDropdownSelector
+          label="Fields"
+          value={shownGoalFields}
+          onChangeValue={(t) =>
+            setShownGoalFields(t as (keyof GoalInterface)[])
+          }
+          options={Object.keys(new Goal({}).$).map((s) => ({
+            id: s,
+            name: toTitleCase(s),
+          }))}
+          relative
+          open
+        />
+      </MyModal>
       <MySpeedDial actions={actions} />
-    </div>
+      <SideBySideView
+        SideA={sortByKey(taskStore.items, "dateCreated").map((s) => (
+          <TaskItem item={s.$} key={s.id} shownFields={shownTaskFields} />
+        ))}
+        SideB={mainGoals.map((mainGoal) => (
+          <GoalItem
+            key={mainGoal.id}
+            item={mainGoal.$}
+            border
+            shownFields={shownGoalFields}
+          />
+        ))}
+        ratio={0.7}
+      />
+    </>
   );
 });

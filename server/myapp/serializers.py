@@ -45,6 +45,18 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = "__all__"
 
+    def validate(self, data):
+        start = data.get("start")
+        end = data.get("end")
+        if start and end and start >= end:
+            raise ValidationError(
+                {
+                    "start": ["Start time must be before end time."],
+                    "end": ["End time must be after start time."],
+                }
+            )
+        return data
+
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,11 +69,35 @@ class GoalSerializer(serializers.ModelSerializer):
         model = Goal
         fields = "__all__"
 
+    def validate(self, data):
+        start = data.get("date_start")
+        end = data.get("date_end")
+        if start and end and start >= end:
+            raise ValidationError(
+                {
+                    "date_start": ["Start time must be before end time."],
+                    "date_end": ["End time must be after start time."],
+                }
+            )
+        return data
+
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = "__all__"
+
+    def validate(self, data):
+        start = data.get("date_start")
+        end = data.get("date_end")
+        if start and end and start >= end:
+            raise ValidationError(
+                {
+                    "date_start": ["Start time must be before end time."],
+                    "date_end": ["End time must be after start time."],
+                }
+            )
+        return data
 
 
 class LoginSerializer(serializers.Serializer):

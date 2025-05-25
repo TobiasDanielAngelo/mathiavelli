@@ -20,7 +20,9 @@ export const TransactionForm = observer(
       transmitter: item?.transmitter,
       receiver: item?.receiver,
       amount: item?.amount,
-      datetimeTransacted: item?.datetimeTransacted,
+      datetimeTransacted: moment(item?.datetimeTransacted).format(
+        "MMM D YYYY h:mm A"
+      ),
     });
     const [msg, setMsg] = useState<Object>();
     const [isLoading, setLoading] = useState(false);
@@ -78,7 +80,13 @@ export const TransactionForm = observer(
 
     const onClickCreate = async () => {
       setLoading(true);
-      const resp = await transactionStore.addItem(details);
+      const resp = await transactionStore.addItem({
+        ...details,
+        datetimeTransacted: moment(
+          details.datetimeTransacted,
+          "MMM D YYYY h:mm A"
+        ).toISOString(),
+      });
       setLoading(false);
 
       if (!resp.ok) {

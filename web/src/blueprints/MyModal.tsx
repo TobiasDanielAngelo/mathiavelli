@@ -58,7 +58,9 @@ export const MyModal = (
             onClick={() => setVisible(false)}
           />
         </div>
-        <div className="min-w-[300px] min-h-[100px] p-3">{children}</div>
+        <div className="min-w-[300px] max-w-[80vw] min-h-[100px] p-3">
+          {children}
+        </div>
       </div>
     </Dialog>
   );

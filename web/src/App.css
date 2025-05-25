@@ -1,0 +1,8 @@
+.dynamic-text {
+  text-align: center;
+  width: 100%;
+}
+
+.dynamic-text:has(br) {
+  font-size: 0.3rem; /* Tailwind's text-[0.6rem] equivalent */
+}

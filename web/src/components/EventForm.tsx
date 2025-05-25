@@ -20,7 +20,7 @@ export const EventForm = (props: {
     allDay: item?.allDay,
     location: item?.location,
     tags: item?.tags ?? [],
-    createdAt: item?.createdAt,
+    createdAt: moment(item?.createdAt).format("MMM D YYYY h:mm A"),
   });
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);
@@ -63,6 +63,13 @@ export const EventForm = (props: {
           name: "location",
           label: "Location",
           type: "text",
+        },
+      ],
+      [
+        {
+          name: "createdAt",
+          label: "Created At",
+          type: "datetime",
         },
       ],
       [

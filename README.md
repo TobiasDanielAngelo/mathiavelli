@@ -12,6 +12,7 @@ February 9, 2024
 | djangorestframework-camel-case | Convert keys to camelCase      |
 | django-rest-knox               | Token auth for DRF             |
 | pillow                         | Image processing library       |
+| inflect                        | Word pluralizer                |
 
 <pre><code>poetry add django djangorestframework django-cors-headers psycopg2 dotenv djangorestframework-camel-case django-rest-knox pillow </code></pre>
 

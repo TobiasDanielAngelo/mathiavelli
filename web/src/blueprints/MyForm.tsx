@@ -3,7 +3,6 @@ import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { daysOfWeek } from "../constants/constants";
 import { toOptions } from "../constants/helpers";
-import { useKeyPress } from "../constants/hooks";
 import { Field } from "../constants/interfaces";
 import { MyButton } from "./MyButton";
 import { MyCheckBox } from "./MyCheckbox";
@@ -15,6 +14,8 @@ import { MyInput } from "./MyInput";
 import { MyMultiSelector } from "./MyMultiSelector";
 import { MyTextArea } from "./MyTextArea";
 import { MyColorPicker } from "./MyColorPicker";
+import { useKeyPress } from "../constants/hooks";
+import { MyMultiDropdownSelector } from "./MyMultiDropdownSelector";
 
 export const MyForm = observer(
   (props: {
@@ -147,7 +148,7 @@ export const MyForm = observer(
                   }
                 />
               ) : t.type === "multi" ? (
-                <MyMultiSelector
+                <MyMultiDropdownSelector
                   label={t.label}
                   value={details[t.name]}
                   onChangeValue={(u) => onChangeValue(u, t.name)}
