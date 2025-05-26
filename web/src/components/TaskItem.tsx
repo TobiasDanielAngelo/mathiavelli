@@ -3,33 +3,19 @@ import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useStore } from "../api/Store";
-import { TaskInterface } from "../api/TaskStore";
+import { Task, TaskInterface } from "../api/TaskStore";
 import { ItemDetails } from "../blueprints/ItemDetails";
 import { MyConfirmModal } from "../blueprints/MyConfirmModal";
 import { MyModal } from "../blueprints/MyModal";
 import { TaskForm } from "./TaskForm";
-import { frequency } from "../constants/constants";
 
 export const TaskItem = observer(
-  (props: { item: TaskInterface; shownFields?: (keyof TaskInterface)[] }) => {
+  (props: { item: Task; shownFields?: (keyof TaskInterface)[] }) => {
     const { item, shownFields } = props;
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);
     const [msg, setMsg] = useState("");
-    const { taskStore, goalStore } = useStore();
-
-    const itemMap = [
-      {
-        key: "goal",
-        values: goalStore.items.map((s) => s.$),
-        label: "title",
-      },
-      {
-        key: "repeat",
-        values: frequency,
-        label: "",
-      },
-    ];
+    const { taskStore } = useStore();
 
     const onDelete = async () => {
       const resp = await taskStore.deleteItem(item?.id ?? -1);
@@ -65,7 +51,6 @@ export const TaskItem = observer(
             <ItemDetails
               item={item}
               shownFields={shownFields}
-              itemMap={itemMap}
               header={["dueDate"]}
               important={["title"]}
               body={[
@@ -74,7 +59,8 @@ export const TaskItem = observer(
                 "dateEnd",
                 "isCancelled",
                 "isCompleted",
-                "repeat",
+                "goalTitle",
+                "frequency",
               ]}
             />
             <div className="flex justify-end">

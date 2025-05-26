@@ -10,47 +10,14 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { observer } from "mobx-react-lite";
 import { Dispatch, SetStateAction, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../api/Store";
 import anon from "../assets/anon.jpg";
-import { toTitleCase } from "../constants/helpers";
 import { useKeyPress } from "../constants/hooks";
 import { Page } from "../constants/interfaces";
 import { MyDropdownMenu } from "./MyDropdownMenu";
 
 const drawerWidth = 240;
-
-export const NavBar = observer(
-  (props: { open: boolean; setOpen?: Dispatch<SetStateAction<boolean>> }) => {
-    const { open, setOpen } = props;
-
-    const location = useLocation();
-    const [loc, setLoc] = useState(location.pathname.split("/")[1]);
-
-    return (
-      <MyNavBar
-        title="Mathiavelli Self-HQ"
-        drawerOpen={open}
-        setDrawerOpen={setOpen}
-        location={loc}
-        setLocation={setLoc}
-        profileUrl={"#"}
-        paths={[
-          "/journals",
-          "/finances",
-          "/events",
-          "/goals",
-          "/health",
-          "/tasks",
-        ].map((s) => ({
-          title: toTitleCase(s),
-          link: s,
-          selected: s.replace("/", "") === loc.replace("/", ""),
-        }))}
-      />
-    );
-  }
-);
 
 export const ResponsiveDrawer = observer(
   (props: {

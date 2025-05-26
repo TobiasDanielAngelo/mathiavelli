@@ -1,5 +1,15 @@
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  Model,
+  _async,
+  _await,
+  getRoot,
+  model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
+import { Store } from "./Store";
+import { frequency } from "../constants/constants";
 
 const slug = "tasks";
 
@@ -35,6 +45,13 @@ export class Task extends Model({
 }) {
   update(details: TaskInterface) {
     Object.assign(this, details);
+  }
+  get goalTitle() {
+    const store = getRoot<Store>(this);
+    return store.goalStore.allItems.get(this.goal)?.title || "—";
+  }
+  get frequency() {
+    return frequency.find((_, ind) => ind + 1 === Number(this.repeat)) ?? "—";
   }
 }
 

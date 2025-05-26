@@ -2,7 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { JournalInterface } from "../api/JournalStore";
+import { Journal, JournalInterface } from "../api/JournalStore";
 import { useStore } from "../api/Store";
 import { ItemDetails } from "../blueprints/ItemDetails";
 import { MyConfirmModal } from "../blueprints/MyConfirmModal";
@@ -10,10 +10,7 @@ import { MyModal } from "../blueprints/MyModal";
 import { JournalForm } from "./JournalForm";
 
 export const JournalItem = observer(
-  (props: {
-    item: JournalInterface;
-    shownFields?: (keyof JournalInterface)[];
-  }) => {
+  (props: { item: Journal; shownFields?: (keyof JournalInterface)[] }) => {
     const { item, shownFields } = props;
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);

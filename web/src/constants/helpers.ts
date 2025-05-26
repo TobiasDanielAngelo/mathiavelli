@@ -1,5 +1,6 @@
 import moment from "moment";
 import { Option } from "./interfaces";
+import { KV } from "../blueprints/ItemDetails";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -242,4 +243,18 @@ export const isDateValue = (val: any) => {
   return (
     typeof val === "string" && !isNaN(Date.parse(val)) && val.length >= 10 // crude ISO check
   );
+};
+
+export const formatValue = (value: any, key: string, prices?: string[]) => {
+  if (prices?.includes(key)) return toMoney(value);
+  if (typeof value === "boolean") {
+    return value ? "✅ Yes" : "❌ No";
+  }
+  if (
+    (String(key).toLowerCase().includes("date") && value) ||
+    isDateValue(value)
+  ) {
+    return moment(value).format("MMM D, YYYY h:mm A");
+  }
+  return value?.toString() || "—";
 };

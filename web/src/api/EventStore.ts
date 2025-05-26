@@ -1,5 +1,14 @@
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  Model,
+  _async,
+  _await,
+  getRoot,
+  model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
+import { Store } from "./Store";
 
 const slug = "events";
 
@@ -29,6 +38,11 @@ export class Event extends Model({
 }) {
   update(details: EventInterface) {
     Object.assign(this, details);
+  }
+
+  get tagNames() {
+    const store = getRoot<Store>(this);
+    return this.tags.map((s) => store.tagStore.allItems.get(s)?.name ?? "");
   }
 }
 

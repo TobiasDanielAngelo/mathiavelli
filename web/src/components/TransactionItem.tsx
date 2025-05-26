@@ -3,7 +3,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useStore } from "../api/Store";
-import { TransactionInterface } from "../api/TransactionStore";
+import { Transaction, TransactionInterface } from "../api/TransactionStore";
 import { ItemDetails } from "../blueprints/ItemDetails";
 import { MyConfirmModal } from "../blueprints/MyConfirmModal";
 import { MyModal } from "../blueprints/MyModal";
@@ -11,14 +11,14 @@ import { TransactionForm } from "./TransactionForm";
 
 export const TransactionItem = observer(
   (props: {
-    item: TransactionInterface;
+    item: Transaction;
     shownFields?: (keyof TransactionInterface)[];
   }) => {
     const { item, shownFields } = props;
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);
     const [msg, setMsg] = useState("");
-    const { transactionStore, categoryStore, accountStore } = useStore();
+    const { transactionStore } = useStore();
 
     const onDelete = async () => {
       const resp = await transactionStore.deleteItem(item.id ?? -1);
@@ -28,24 +28,6 @@ export const TransactionItem = observer(
       }
       setVisible1(false);
     };
-
-    const itemMap = [
-      {
-        key: "category",
-        values: categoryStore.items.map((s) => s.$),
-        label: "title",
-      },
-      {
-        key: "transmitter",
-        values: accountStore.items.map((s) => s.$),
-        label: "name",
-      },
-      {
-        key: "receiver",
-        values: accountStore.items.map((s) => s.$),
-        label: "name",
-      },
-    ];
 
     return (
       <div className="m-1 border-gray-700 rounded-lg p-5 border">
@@ -72,10 +54,9 @@ export const TransactionItem = observer(
             <ItemDetails
               item={item}
               shownFields={shownFields}
-              itemMap={itemMap}
               header={["id", "datetimeTransacted"]}
               important={["amount"]}
-              body={["category", "transmitter", "receiver", "description"]}
+              body={["categoryName", "from", "to", "description"]}
               prices={["amount"]}
             />
             <div className="flex justify-end">

@@ -75,7 +75,7 @@ export const MyCalendar = (props: {
               }
               key={i}
               onClick={() => setDate(day.toDate())}
-              className={`text-right text-sm md:text-md md:text-lg items-right justify-between flex flex-row-reverse p-2 rounded cursor-pointer
+              className={`text-right text-sm md:text-md items-right justify-between flex flex-row-reverse p-1 md:p-2 rounded cursor-pointer
                 ${day.month() === currentDate.month() ? "" : "text-gray-500"}
                 ${isWeekend ? "text-red-500" : ""}
                 ${isToday ? "text-blue-500 font-bold" : ""}
@@ -88,7 +88,7 @@ export const MyCalendar = (props: {
                     day.endOf("day").subtract(1, "second").toDate()
                   )
                 )
-                .reduce((a, b) => a || b, false) && width > 512 ? (
+                .reduce((a, b) => a || b, false) && width > 1024 ? (
                 <EventIcon />
               ) : (
                 <></>

@@ -3,19 +3,19 @@ import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useStore } from "../api/Store";
-import { EventInterface } from "../api/EventStore";
+import { Event, EventInterface } from "../api/EventStore";
 import { ItemDetails } from "../blueprints/ItemDetails";
 import { MyConfirmModal } from "../blueprints/MyConfirmModal";
 import { MyModal } from "../blueprints/MyModal";
 import { EventForm } from "./EventForm";
 
 export const EventItem = observer(
-  (props: { item: EventInterface; shownFields?: (keyof EventInterface)[] }) => {
+  (props: { item: Event; shownFields?: (keyof EventInterface)[] }) => {
     const { item, shownFields } = props;
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);
     const [msg, setMsg] = useState("");
-    const { eventStore, tagStore } = useStore();
+    const { eventStore } = useStore();
 
     const onDelete = async () => {
       const resp = await eventStore.deleteItem(item.id ?? -1);
@@ -25,14 +25,6 @@ export const EventItem = observer(
       }
       setVisible1(false);
     };
-
-    const itemMap = [
-      {
-        key: "tags",
-        values: tagStore.items.map((s) => s.$),
-        label: "name",
-      },
-    ];
 
     return (
       <div className="m-1 border-gray-700 rounded-lg p-5 border">
@@ -59,10 +51,9 @@ export const EventItem = observer(
             <ItemDetails
               item={item}
               shownFields={shownFields}
-              itemMap={itemMap}
               header={["id"]}
               important={["title"]}
-              body={["description", "tags", "start"]}
+              body={["description", "start", "tagNames"]}
             />
             <div className="flex justify-end">
               <EditIcon

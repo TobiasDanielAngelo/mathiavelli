@@ -88,11 +88,7 @@ export const FinanceView = observer(() => {
         SideA={
           transactionStore.items.length ? (
             sortByKey(transactionStore.items, "datetimeTransacted").map((s) => (
-              <TransactionItem
-                item={s.$}
-                key={s.id}
-                shownFields={shownFields}
-              />
+              <TransactionItem item={s} key={s.id} shownFields={shownFields} />
             ))
           ) : (
             <div className="justify-center items-center flex flex-col text-blue-400">

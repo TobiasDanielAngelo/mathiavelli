@@ -113,12 +113,12 @@ export const GoalView = observer(() => {
       <MySpeedDial actions={actions} />
       <SideBySideView
         SideA={sortByKey(taskStore.items, "dateCreated").map((s) => (
-          <TaskItem item={s.$} key={s.id} shownFields={shownTaskFields} />
+          <TaskItem item={s} key={s.id} shownFields={shownTaskFields} />
         ))}
         SideB={mainGoals.map((mainGoal) => (
           <GoalItem
             key={mainGoal.id}
-            item={mainGoal.$}
+            item={mainGoal}
             border
             shownFields={shownGoalFields}
           />

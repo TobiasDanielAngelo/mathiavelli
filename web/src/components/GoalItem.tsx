@@ -3,7 +3,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { GoalInterface } from "../api/GoalStore";
+import { Goal, GoalInterface } from "../api/GoalStore";
 import { useStore } from "../api/Store";
 import { ItemDetails } from "../blueprints/ItemDetails";
 import { MyConfirmModal } from "../blueprints/MyConfirmModal";
@@ -14,7 +14,7 @@ import { ItemRow } from "../blueprints/ItemRow";
 
 export const GoalItem = observer(
   (props: {
-    item: GoalInterface;
+    item: Goal;
     border?: boolean;
     shownFields?: (keyof GoalInterface)[];
   }) => {
@@ -36,13 +36,6 @@ export const GoalItem = observer(
       }
       setVisible2(false);
     };
-    const itemMap = [
-      {
-        key: "parentGoal",
-        values: goalStore.items.map((s) => s.$),
-        label: "title",
-      },
-    ];
 
     return (
       <div
@@ -116,7 +109,6 @@ export const GoalItem = observer(
                 <ItemDetails
                   item={item}
                   shownFields={shownFields}
-                  itemMap={itemMap}
                   important={["title"]}
                   body={[
                     "description",
@@ -124,7 +116,7 @@ export const GoalItem = observer(
                     "dateEnd",
                     "isCancelled",
                     "isCompleted",
-                    "parentGoal",
+                    "parentGoalTitle",
                   ]}
                 />
               </div>
@@ -134,7 +126,7 @@ export const GoalItem = observer(
         {showChildren && subgoals.length > 0 && (
           <div className="ml-8 mt-2 space-y-2 border-l-2 border-gray-500 pl-2">
             {subgoals.map((sub) => (
-              <GoalItem key={sub.id} item={sub.$} shownFields={shownFields} />
+              <GoalItem key={sub.id} item={sub} shownFields={shownFields} />
             ))}
           </div>
         )}

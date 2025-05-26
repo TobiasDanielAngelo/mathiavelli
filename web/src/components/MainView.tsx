@@ -6,10 +6,10 @@ import { DashboardView } from "./DashboardView";
 import { EventView } from "./EventView";
 import { FinanceView } from "./FinanceView";
 import { GoalView } from "./GoalView";
-import { JournalView } from "./JournalView";
-import { NavBar } from "../blueprints/MyNavigation";
 import { HealthView } from "./HealthView";
-import { TaskView } from "./TaskView";
+import { JournalView } from "./JournalView";
+import { NavBar } from "./NavigationBar";
+import { TaskTableView } from "./TaskTableView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -65,12 +65,13 @@ export const MainView = observer(() => {
       <NavBar open={open} setOpen={setOpen} />
       <Routes>
         <Route path="" element={<DashboardView />} />
+        <Route path="dashboard" element={<DashboardView />} />
         <Route path="journals" element={<JournalView />} />
         <Route path="finances" element={<FinanceView />} />
         <Route path="events" element={<EventView />} />
         <Route path="goals" element={<GoalView />} />
         <Route path="health" element={<HealthView />} />
-        <Route path="tasks" element={<TaskView />} />
+        <Route path="tasks" element={<TaskTableView />} />
       </Routes>
     </div>
   );

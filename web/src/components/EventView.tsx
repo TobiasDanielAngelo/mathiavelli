@@ -84,7 +84,7 @@ export const EventView = observer(() => {
       <MySpeedDial actions={actions} />
       <SideBySideView
         SideA={sortByKey(eventStore.items, "createdAt").map((s) => (
-          <EventItem item={s.$} key={s.id} shownFields={shownFields} />
+          <EventItem item={s} key={s.id} shownFields={shownFields} />
         ))}
         SideB={<MyCalendar date={date} setDate={setDate} />}
         ratio={0.7}

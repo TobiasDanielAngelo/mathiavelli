@@ -107,7 +107,7 @@ export const JournalView = observer(() => {
         SideB={
           journalStore.items.length ? (
             sortByKey(journalStore.items, "datetimeCreated", true).map((s) => (
-              <JournalItem item={s.$} key={s.id} shownFields={shownFields} />
+              <JournalItem item={s} key={s.id} shownFields={shownFields} />
             ))
           ) : (
             <div className="justify-center items-center flex flex-col text-blue-400">

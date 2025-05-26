@@ -1,8 +1,7 @@
-import moment from "moment";
-import { isDateValue, toMoney } from "../constants/helpers";
 import { useState } from "react";
+import { formatValue } from "../constants/helpers";
 
-interface KV<U extends Record<string, any>> {
+export interface KV<U extends Record<string, any>> {
   key: string;
   values: U[];
   label: keyof U;
@@ -11,7 +10,6 @@ interface KV<U extends Record<string, any>> {
 interface ItemDetailsProps<T> {
   item: T;
   shownFields?: (keyof T)[];
-  itemMap?: KV<any>[];
   header?: (keyof T)[];
   important?: (keyof T)[];
   body?: (keyof T)[];
@@ -24,47 +22,9 @@ const sectionStyles: Record<string, string> = {
   Body: "text-gray-400 text-sm px-2",
 };
 
-const formatValue = (
-  value: any,
-  key: string,
-  kv: KV<any> | undefined,
-  prices: string[]
-) => {
-  if (prices.includes(key)) return toMoney(value);
-  if (kv) {
-    const lookup = (val: any) =>
-      kv.label === ""
-        ? kv.values.find((_, i) => i + 1 === Number(val))
-        : kv.values.find((v) => v.id === val)?.[kv.label] ?? "—";
-
-    return Array.isArray(value) ? value.map(lookup).join(", ") : lookup(value);
-  }
-  if (typeof value === "boolean") {
-    return (
-      <label className="flex items-center gap-1">
-        <input
-          type="checkbox"
-          checked={value}
-          readOnly
-          className="form-checkbox text-green-500"
-        />
-        <span>{value ? "Yes" : "No"}</span>
-      </label>
-    );
-  }
-  if (
-    (String(key).toLowerCase().includes("date") && value) ||
-    isDateValue(value)
-  ) {
-    return moment(value).format("MMM D, YYYY h:mm A");
-  }
-  return value?.toString() || "—";
-};
-
 export const ItemDetails = <T extends Record<string, any>>({
   item,
   shownFields = [],
-  itemMap = [],
   header = [],
   important = [],
   body = [],
@@ -83,7 +43,9 @@ export const ItemDetails = <T extends Record<string, any>>({
   ];
 
   const allSectionKeys = sections.flatMap((s) => s.keys);
-  const allItemKeys = Object.keys(item) as (keyof T)[];
+  const allItemKeys = Object.keys(item).filter(
+    (s) => !s.includes("$")
+  ) as (keyof T)[];
   const leftoverKeys = allItemKeys.filter(
     (key) => !allSectionKeys.includes(key)
   );
@@ -92,7 +54,6 @@ export const ItemDetails = <T extends Record<string, any>>({
 
   const renderRow = (key: keyof T, title: string) => {
     const value = item[key];
-    const kv = itemMap.find((s) => s.key === key);
     const keyTitle =
       key === "id"
         ? "ID"
@@ -106,7 +67,7 @@ export const ItemDetails = <T extends Record<string, any>>({
           <span className="w-[25%] text-right font-bold">{keyTitle}</span>
         )}
         <span className="w-[75%] whitespace-pre-wrap break-words">
-          {formatValue(value, String(key), kv, prices as string[])}
+          {formatValue(value, String(key), prices as string[])}
         </span>
       </div>
     );

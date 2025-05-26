@@ -1,17 +1,16 @@
+import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 import { useStore } from "../api/Store";
 import { Task, TaskInterface } from "../api/TaskStore";
-import { MyMultiDropdownSelector } from "../blueprints/MyMultiDropdownSelector";
-import { sortByKey, toTitleCase } from "../constants/helpers";
-import { TaskItem } from "./TaskItem";
 import { MyModal } from "../blueprints/MyModal";
-import { TaskForm } from "./TaskForm";
+import { MyMultiDropdownSelector } from "../blueprints/MyMultiDropdownSelector";
 import { MySpeedDial } from "../blueprints/MySpeedDial";
-import { SideBySideView } from "../blueprints/SideBySideView";
-import AddCardIcon from "@mui/icons-material/AddCard";
+import { MyTable } from "../blueprints/MyTable";
+import { formatValue, sortByKey, toTitleCase } from "../constants/helpers";
+import { TaskForm } from "./TaskForm";
 
-export const TaskView = observer(() => {
+export const TaskTableView = observer(() => {
   const { taskStore } = useStore();
   const [isVisible1, setVisible1] = useState(false);
   const [isVisible2, setVisible2] = useState(false);
@@ -45,6 +44,20 @@ export const TaskView = observer(() => {
     []
   );
 
+  const matrix = useMemo(() => {
+    const keys = Object.keys(new Task({}).$).filter((s) =>
+      shownFields.includes(s as keyof TaskInterface)
+    );
+    const header = keys.map((k) => toTitleCase(k));
+    const rows = sortByKey(taskStore.items, "dateCreated").map((item) =>
+      keys.map((key) => {
+        return formatValue(item[key as keyof TaskInterface], key);
+      })
+    );
+
+    return [header, ...rows];
+  }, [taskStore.items.length, shownFields.length]);
+
   return (
     <>
       <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
@@ -64,13 +77,7 @@ export const TaskView = observer(() => {
         />
       </MyModal>
       <MySpeedDial actions={actions} />
-      <SideBySideView
-        SideA={sortByKey(taskStore.items, "dateCreated").map((s) => (
-          <TaskItem item={s} key={s.id} shownFields={shownFields} />
-        ))}
-        SideB=""
-        ratio={0.7}
-      />
+      <MyTable matrix={matrix} />
     </>
   );
 });

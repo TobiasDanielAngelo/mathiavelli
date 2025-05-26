@@ -2,11 +2,13 @@ import {
   Model,
   _async,
   _await,
+  getRoot,
   model,
   modelAction,
   modelFlow,
   prop,
 } from "mobx-keystone";
+import { Store } from "./Store";
 
 const slug = "transactions";
 
@@ -32,6 +34,18 @@ export class Transaction extends Model({
 }) {
   update(details: TransactionInterface) {
     Object.assign(this, details);
+  }
+  get categoryName() {
+    const store = getRoot<Store>(this);
+    return store.categoryStore.allItems.get(this.category)?.title || "—";
+  }
+  get from() {
+    const store = getRoot<Store>(this);
+    return store.accountStore.allItems.get(this.transmitter)?.name || "—";
+  }
+  get to() {
+    const store = getRoot<Store>(this);
+    return store.accountStore.allItems.get(this.receiver)?.name || "—";
   }
 }
 

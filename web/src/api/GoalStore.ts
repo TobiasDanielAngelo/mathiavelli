@@ -1,5 +1,14 @@
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  Model,
+  _async,
+  _await,
+  getRoot,
+  model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
+import { Store } from "./Store";
 
 const slug = "goals";
 
@@ -32,6 +41,11 @@ export class Goal extends Model({
   update(details: GoalInterface) {
     Object.assign(this, details);
   }
+
+  get parentGoalTitle() {
+    const store = getRoot<Store>(this);
+    return store.goalStore.allItems.get(this.parentGoal ?? -1)?.title || "—";
+  }
 }
 
 @model("myApp/GoalStore")
@@ -40,9 +54,7 @@ export class GoalStore extends Model({
 }) {
   @computed
   get allItems() {
-    const map = new Map<number, Goal>();
-    this.items.forEach((item) => map.set(item.id, item));
-    return map;
+    return new Map(this.items.map((item) => [item.id, item]));
   }
 
   get allIDs() {
