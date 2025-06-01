@@ -33,7 +33,13 @@ export const AccountForm = (props: {
 
   const onClickCreate = async () => {
     setLoading(true);
-    const resp = await accountStore.addItem(details);
+    const resp = await accountStore.addItem({
+      ...details,
+      datetimeAdded: moment(
+        details.datetimeAdded,
+        "MMM D YYYY h:mm A"
+      ).toISOString(),
+    });
     setLoading(false);
 
     if (!resp.ok) {

@@ -9,7 +9,7 @@ import { GoalView } from "./GoalView";
 import { HealthView } from "./HealthView";
 import { JournalView } from "./JournalView";
 import { NavBar } from "./NavigationBar";
-import { TaskTableView } from "./TaskTableView";
+import { TaskView } from "./TaskComponents/TaskView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -25,7 +25,6 @@ export const MainView = observer(() => {
     eventStore,
     tagStore,
     goalStore,
-    taskStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -49,7 +48,7 @@ export const MainView = observer(() => {
       eventStore.fetchAll();
       tagStore.fetchAll();
       goalStore.fetchAll();
-      taskStore.fetchAll();
+      // taskStore.fetchAll();
     }
   };
 
@@ -71,7 +70,7 @@ export const MainView = observer(() => {
         <Route path="events" element={<EventView />} />
         <Route path="goals" element={<GoalView />} />
         <Route path="health" element={<HealthView />} />
-        <Route path="tasks" element={<TaskTableView />} />
+        <Route path="tasks" element={<TaskView />} />
       </Routes>
     </div>
   );

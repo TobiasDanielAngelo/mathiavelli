@@ -150,6 +150,8 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ),
+    "DEFAULT_PAGINATION_CLASS": "myapp.paginations.CustomPagination",
+    "PAGE_SIZE": 10,
     "COERCE_DECIMAL_TO_STRING": False,
 }
 

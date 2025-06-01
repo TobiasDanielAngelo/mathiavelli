@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { formatValue } from "../constants/helpers";
+import { formatValue, toTitleCase } from "../constants/helpers";
 
 export interface KV<U extends Record<string, any>> {
   key: string;
@@ -54,12 +54,7 @@ export const ItemDetails = <T extends Record<string, any>>({
 
   const renderRow = (key: keyof T, title: string) => {
     const value = item[key];
-    const keyTitle =
-      key === "id"
-        ? "ID"
-        : String(key)
-            .replace(/([A-Z])/g, " $1")
-            .replace(/^./, (str) => str.toUpperCase());
+    const keyTitle = key === "id" ? "ID" : toTitleCase(key as string);
 
     return (
       <div key={String(key)} className="flex gap-5">

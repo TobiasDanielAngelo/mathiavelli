@@ -1,16 +1,30 @@
 import { computed } from "mobx";
 import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  deleteItemRequest,
+  fetchItemsRequest,
+  postItemRequest,
+  updateItemRequest,
+} from "../constants/storeHelpers";
 
 const slug = "users";
 
-export interface UserInterface {
-  id?: number;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
-  isActive?: boolean;
-  isSuperuser?: boolean;
-}
+const props = {
+  id: prop<number>(-1),
+  username: prop<string>(""),
+  firstName: prop<string>(""),
+  lastName: prop<string>(""),
+  isActive: prop<boolean>(true),
+  isSuperuser: prop<boolean>(true),
+};
+
+export type UserInterface = {
+  [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
+    typeof prop<infer T>
+  >
+    ? T
+    : never;
+};
 
 export interface SignupInterface extends UserInterface {
   password?: string;
@@ -18,14 +32,7 @@ export interface SignupInterface extends UserInterface {
 }
 
 @model("myApp/User")
-export class User extends Model({
-  id: prop<number>(-1),
-  username: prop<string>(""),
-  firstName: prop<string>(""),
-  lastName: prop<string>(""),
-  isActive: prop<boolean>(true),
-  isSuperuser: prop<boolean>(true),
-}) {
+export class User extends Model(props) {
   update(details: UserInterface) {
     Object.assign(this, details);
   }
@@ -43,74 +50,114 @@ export class UserStore extends Model({
   currentLogger: prop<User>(() => new User({})),
 }) {
   @computed
+  get itemsSignature() {
+    const keys = Object.keys(new User({}).$) as (keyof UserInterface)[];
+    return this.items
+      .map((item) => keys.map((key) => String(item[key])).join("|"))
+      .join("::");
+  }
+
+  @computed
   get allItems() {
     const map = new Map<number, User>();
     this.items.forEach((item) => map.set(item.id, item));
     return map;
   }
 
-  get allIDs() {
-    return this.items.map((s) => s.id);
-  }
-
   @modelFlow
   fetchAll = _async(function* (this: UserStore, params?: string) {
-    let token: string;
-
-    token = localStorage.getItem("@userToken") ?? "";
-
-    let response: Response;
+    let result;
 
     try {
-      response = yield* _await(
-        fetch(
-          `${import.meta.env.VITE_BASE_URL}/${slug}/${params ? params : ""}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Token ${token}`,
-              "ngrok-skip-browser-warning": "any",
-            },
-          }
-        )
-      );
+      result = yield* _await(fetchItemsRequest<User>(slug, params));
     } catch (error) {
       alert(error);
       return { details: "Network Error", ok: false, data: null };
     }
 
-    if (!response.ok) {
-      let msg: any = yield* _await(response.json());
-      if (msg.nonFieldErrors || msg.detail) {
-        return {
-          details: msg,
-          ok: false,
-          data: null,
-        };
-      }
-      return { details: msg, ok: false, data: null };
+    if (!result.ok || !result.data) {
+      return result;
     }
 
-    let json: User[];
-    try {
-      const resp = yield* _await(response.json());
-
-      json = resp;
-    } catch (error) {
-      console.error("Parsing Error", error);
-      return { details: "Parsing Error", ok: false, data: null };
-    }
-
-    json.forEach((s) => {
-      if (!this.allIDs.includes(s.id)) {
+    result.data.forEach((s) => {
+      if (!this.items.map((s) => s.id).includes(s.id)) {
         this.items.push(new User(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
     });
 
-    return { details: "", ok: true, data: json };
+    return result;
+  });
+
+  @modelFlow
+  addItem = _async(function* (this: UserStore, details: UserInterface) {
+    let result;
+
+    try {
+      result = yield* _await(postItemRequest<UserInterface>(slug, details));
+    } catch (error) {
+      alert(error);
+      return { details: "Network Error", ok: false, data: null };
+    }
+
+    if (!result.ok || !result.data) {
+      return result;
+    }
+
+    const item = new User(result.data);
+    this.items.push(item);
+
+    return { details: "", ok: true, data: item };
+  });
+
+  @modelFlow
+  updateItem = _async(function* (
+    this: UserStore,
+    itemId: number,
+    details: UserInterface
+  ) {
+    let result;
+
+    try {
+      result = yield* _await(
+        updateItemRequest<UserInterface>(slug, itemId, details)
+      );
+    } catch (error) {
+      alert(error);
+      return { details: "Network Error", ok: false, data: null };
+    }
+
+    if (!result.ok || !result.data) {
+      return result;
+    }
+
+    this.allItems.get(result.data.id ?? -1)?.update(result.data);
+
+    return { details: "", ok: true, data: result.data };
+  });
+
+  @modelFlow
+  deleteItem = _async(function* (this: UserStore, itemId: number) {
+    let result;
+
+    try {
+      result = yield* _await(deleteItemRequest(slug, itemId));
+    } catch (error) {
+      alert(error);
+      return { details: "Network Error", ok: false, data: null };
+    }
+
+    if (!result.ok) {
+      return result;
+    }
+
+    const indexOfItem = this.items.findIndex((s) => s.id === itemId);
+    if (indexOfItem !== -1) {
+      this.items.splice(indexOfItem, 1);
+    }
+
+    return result;
   });
 
   @modelFlow
@@ -313,132 +360,4 @@ export class UserStore extends Model({
 
     return { details: "", ok: true, data: "" };
   });
-
-  @modelFlow
-  addItem = _async(function* (this: UserStore, details: SignupInterface) {
-    let data = new FormData();
-
-    for (let x in Object.keys(details)) {
-      if (
-        Object.keys(details)[x] !== "avatar" &&
-        !!details[Object.keys(details)[x] as keyof typeof details]
-      ) {
-        data.append(
-          Object.keys(details)[x],
-          `${details[Object.keys(details)[x] as keyof typeof details]}`
-        );
-      }
-    }
-
-    let response: Response;
-
-    try {
-      response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/signup`, {
-          method: "POST",
-          body: data,
-        })
-      );
-    } catch (error) {
-      alert(error);
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!response.ok) {
-      let msg: any = yield* _await(response.json());
-      if (msg.nonFieldErrors || msg.detail) {
-        return {
-          details: msg,
-          ok: false,
-          data: null,
-        };
-      }
-      return { details: msg, ok: false, data: null };
-    }
-
-    let json: User;
-    try {
-      const resp = yield* _await(response.json());
-      json = resp.user;
-    } catch (error) {
-      console.error("Parsing Error", error);
-      return { details: "Parsing Error", ok: false, data: null };
-    }
-
-    let item: User;
-
-    item = new User(json);
-
-    this.items.push(item);
-
-    return { details: "", ok: true, data: item };
-  });
-
-  @modelFlow
-  updateItem = _async(function* (
-    this: UserStore,
-    itemId: number,
-    details: UserInterface
-  ) {
-    let data = new FormData();
-
-    for (let x in Object.keys(details)) {
-      if (Object.keys(details)[x] !== "avatar") {
-        data.append(
-          Object.keys(details)[x],
-          `${details[Object.keys(details)[x] as keyof typeof details]}`
-        );
-      }
-    }
-
-    let token: string;
-
-    token = localStorage.getItem("@userToken") ?? "";
-
-    let response: Response;
-
-    try {
-      response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/${slug}/${itemId}/`, {
-          method: "PATCH",
-          body: data,
-          headers: {
-            Authorization: `Token ${token}`,
-            "ngrok-skip-browser-warning": "any",
-          },
-        })
-      );
-    } catch (error) {
-      alert(error);
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!response.ok) {
-      let msg: any = yield* _await(response.json());
-      if (msg.nonFieldErrors || msg.detail) {
-        return {
-          details: msg,
-          ok: false,
-          data: null,
-        };
-      }
-      return { details: msg, ok: false, data: null };
-    }
-
-    let json: User;
-    try {
-      const resp = yield* _await(response.json());
-      json = resp;
-    } catch (error) {
-      console.error("Parsing Error", error);
-      return { details: "Parsing Error", ok: false, data: null };
-    }
-
-    this.allItems.get(json.id)?.update(json);
-    if (this.currentLogger.id === json.id) this.currentLogger = json;
-
-    return { details: "", ok: true, data: json };
-  });
 }
-
-export const userStore = new UserStore({});

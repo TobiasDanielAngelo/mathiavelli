@@ -2,14 +2,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { useStore } from "../api/Store";
-import { Task, TaskInterface } from "../api/TaskStore";
-import { ItemDetails } from "../blueprints/ItemDetails";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
-import { MyModal } from "../blueprints/MyModal";
+import { useStore } from "../../api/Store";
+import { Task, TaskInterface } from "../../api/TaskStore";
+import { ItemDetails } from "../../blueprints/ItemDetails";
+import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
+import { MyModal } from "../../blueprints/MyModal";
 import { TaskForm } from "./TaskForm";
 
-export const TaskItem = observer(
+export const TaskCard = observer(
   (props: { item: Task; shownFields?: (keyof TaskInterface)[] }) => {
     const { item, shownFields } = props;
     const [isVisible1, setVisible1] = useState(false);

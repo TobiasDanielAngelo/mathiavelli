@@ -26,3 +26,15 @@ export type MySpeedDialProps = {
   onClick?: () => void;
   hidden?: boolean;
 };
+
+export type PaginatedResponse<T> = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+  currentPage: number;
+  totalPages: number;
+  ids: number[];
+};
+
+export type PaginatedDetails = Omit<PaginatedResponse<unknown>, "results">;

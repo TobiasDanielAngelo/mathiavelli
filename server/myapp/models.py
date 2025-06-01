@@ -157,17 +157,17 @@ class Goal(models.Model):
         return self.title
 
     def clean(self):
-        if self.date_start and self.date_end and self.date_start >= self.date_end:
+        if self.date_start and self.date_end and self.date_start > self.date_end:
             raise ValidationError("Start time must be before end time.")
 
 
 class Task(models.Model):
     FREQUENCY_CHOICES = [
-        ("1", "None"),
-        ("2", "Daily"),
-        ("3", "Weekly"),
-        ("4", "Monthly"),
-        ("5", "Yearly"),
+        (0, "None"),
+        (1, "Daily"),
+        (2, "Weekly"),
+        (3, "Monthly"),
+        (4, "Yearly"),
     ]
 
     title = models.CharField(max_length=255)
@@ -175,7 +175,7 @@ class Task(models.Model):
     goal = models.ForeignKey(
         Goal, null=True, blank=True, on_delete=models.SET_NULL, related_name="tasks"
     )
-    repeat = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default="NONE")
+    repeat = models.IntegerField(choices=FREQUENCY_CHOICES, default=0)
     due_date = models.DateField(null=True, blank=True)
     is_completed = models.BooleanField(default=False)
     date_completed = models.DateField(null=True, blank=True)
@@ -188,5 +188,5 @@ class Task(models.Model):
         return self.title
 
     def clean(self):
-        if self.date_start and self.date_end and self.date_start >= self.date_end:
+        if self.date_start and self.date_end and self.date_start > self.date_end:
             raise ValidationError("Start time must be before end time.")

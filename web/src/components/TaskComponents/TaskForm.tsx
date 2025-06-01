@@ -1,12 +1,12 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { TaskInterface } from "../api/TaskStore";
-import { useStore } from "../api/Store";
-import { MyForm } from "../blueprints/MyForm";
-import { Field } from "../constants/interfaces";
+import { TaskInterface } from "../../api/TaskStore";
+import { useStore } from "../../api/Store";
+import { MyForm } from "../../blueprints/MyForm";
+import { Field } from "../../constants/interfaces";
 import { observer } from "mobx-react-lite";
-import { toOptions } from "../constants/helpers";
-import { frequency } from "../constants/constants";
+import { toOptions } from "../../constants/helpers";
+import { frequency } from "../../constants/constants";
 
 export const TaskForm = observer(
   (props: { item?: TaskInterface; setVisible?: (t: boolean) => void }) => {

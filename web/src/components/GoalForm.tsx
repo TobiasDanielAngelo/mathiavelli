@@ -62,7 +62,9 @@ export const GoalForm = observer(
               goalStore.items.filter(
                 (s) =>
                   s.id !== item?.id &&
-                  !getDescendantIds(goalStore.items, item?.id).includes(s.id)
+                  !getDescendantIds(goalStore.items, item?.id ?? -1).includes(
+                    s.id
+                  )
               ),
               "title"
             ),

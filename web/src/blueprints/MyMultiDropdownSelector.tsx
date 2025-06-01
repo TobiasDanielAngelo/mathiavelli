@@ -9,6 +9,8 @@ export const MyMultiDropdownSelector = (props: {
   msg?: string;
   relative?: boolean;
   open?: boolean;
+  maxSelections?: number;
+  selectAll?: boolean;
 }) => {
   const {
     label,
@@ -18,15 +20,25 @@ export const MyMultiDropdownSelector = (props: {
     msg,
     relative,
     open,
+    maxSelections,
   } = props;
   const [isOpen, setOpen] = useState(open ?? false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [selectAll, setSelectAll] = useState(false);
 
   const onToggle = (id: number | string) => {
-    onChangeValue(
-      value.includes(id) ? value.filter((v) => v !== id) : [...value, id]
-    );
+    if (value.includes(id)) {
+      onChangeValue(value.filter((v) => v !== id));
+    } else {
+      if (!maxSelections || value.length < maxSelections) {
+        onChangeValue([...value, id]);
+      }
+    }
   };
+
+  useEffect(() => {
+    onChangeValue(selectAll ? options.map((s) => s.id) : []);
+  }, [selectAll, options.length]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -66,6 +78,15 @@ export const MyMultiDropdownSelector = (props: {
           className="mt-1 absolute z-10 left-0 right-0 border rounded-lg bg-white dark:bg-gray-900 shadow-lg max-h-60 overflow-y-auto"
           style={{ position: relative ? "relative" : "absolute" }}
         >
+          <label className="flex items-center gap-2 p-2 text-sm hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer text-white">
+            <input
+              type="checkbox"
+              checked={selectAll}
+              onChange={() => setSelectAll((t) => !t)}
+              className="form-checkbox text-blue-500"
+            />
+            Select All
+          </label>
           {options.map((opt) => (
             <label
               key={opt.id}

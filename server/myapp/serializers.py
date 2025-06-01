@@ -72,7 +72,7 @@ class GoalSerializer(serializers.ModelSerializer):
     def validate(self, data):
         start = data.get("date_start")
         end = data.get("date_end")
-        if start and end and start >= end:
+        if start and end and start > end:
             raise ValidationError(
                 {
                     "date_start": ["Start time must be before end time."],
@@ -90,7 +90,7 @@ class TaskSerializer(serializers.ModelSerializer):
     def validate(self, data):
         start = data.get("date_start")
         end = data.get("date_end")
-        if start and end and start >= end:
+        if start and end and start > end:
             raise ValidationError(
                 {
                     "date_start": ["Start time must be before end time."],

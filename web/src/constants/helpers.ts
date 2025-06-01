@@ -1,6 +1,7 @@
 import moment from "moment";
-import { Option } from "./interfaces";
 import { KV } from "../blueprints/ItemDetails";
+import { Option } from "./interfaces";
+import LZString from "lz-string";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -109,11 +110,11 @@ export const sortByKey = <T>(
 export const toOptions = <T>(items: T[], keyName?: keyof T): Option[] => {
   return items.map((item, index) => {
     if (typeof item === "string") {
-      return { id: index + 1, name: item };
+      return { id: index, name: item };
     } else {
       const obj = item as Record<string, any>;
       return {
-        id: obj.id ?? index + 1,
+        id: obj.id ?? index,
         name: obj[keyName as string] ?? "",
       };
     }
@@ -128,9 +129,7 @@ export const timeDifference = (start: Date | string, end?: Date | string) => {
 export const toTitleCase = (str?: string) => {
   return str
     ? str
-        .match(
-          /[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g
-        )
+        .match(/[A-Z]{2,}(?=[A-Z][a-z]+|\b)|[A-Z]?[a-z]+|[0-9]+|[A-Z]/g)
         ?.map((x) => x.charAt(0).toUpperCase() + x.slice(1))
         .join(" ") ?? ""
     : "";
@@ -193,6 +192,9 @@ export const camelCaseToWords = (s: string) => {
   return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
+export const camelToSnakeCase = (str: string) =>
+  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+
 export const createArrayFromN = (n: number) => {
   return Array.from(Array(n).keys());
 };
@@ -235,26 +237,66 @@ export const setBlankIfNeg1 = (str: string, val: number) => {
 export const cmToPx = (cm: number) => cm / 0.026458;
 
 export const getFirstTwoWords = (str: string) => {
-  const words = str.trim().split(/[\s,–—-]+/); // split by space, comma, dash variants
+  const words = str.trim().split(/[\s,–—-]+/);
   return words.length > 2 ? `${words[0]} ${words[1]}...` : str;
 };
 
-export const isDateValue = (val: any) => {
+export const isDatetimeValue = (val: any) => {
+  if (typeof val !== "string") return false;
+  const parsed = Date.parse(val);
+  // Ensure it's a valid date and includes time components
   return (
-    typeof val === "string" && !isNaN(Date.parse(val)) && val.length >= 10 // crude ISO check
+    !isNaN(parsed) && /\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(val) // date + time format
   );
 };
 
-export const formatValue = (value: any, key: string, prices?: string[]) => {
+export const isDateValue = (val: any) => {
+  if (typeof val !== "string") return false;
+  const parsed = Date.parse(val);
+  return (
+    !isNaN(parsed) && /^\d{4}-\d{2}-\d{2}$/.test(val) // exact date format: YYYY-MM-DD
+  );
+};
+
+export const formatValue = (
+  value: any,
+  key: string,
+  prices?: string[],
+  kv?: KV<any>
+) => {
+  if (kv) {
+    const lookup = (val: any) =>
+      kv.label === ""
+        ? kv.values.find((_, i) => i === val)
+        : kv.values.find((v) => v.id === val)?.[kv.label] ?? "—";
+
+    return Array.isArray(value) ? value.map(lookup).join(", ") : lookup(value);
+  }
   if (prices?.includes(key)) return toMoney(value);
   if (typeof value === "boolean") {
     return value ? "✅ Yes" : "❌ No";
   }
-  if (
-    (String(key).toLowerCase().includes("date") && value) ||
-    isDateValue(value)
-  ) {
+  if (isDatetimeValue(value)) {
     return moment(value).format("MMM D, YYYY h:mm A");
   }
+  if (isDateValue(value)) {
+    return moment(value).format("MMM D, YYYY");
+  }
+
   return value?.toString() || "—";
+};
+
+export function getModelSignature<T extends { [key: string]: any }>(
+  model: T,
+  keys: (keyof T)[]
+): string {
+  return keys.map((key) => String(model[key])).join("|");
+}
+
+export const cleanText = (input: string) => {
+  return input.replace(/[^a-zA-Z0-9]+/g, " ");
+};
+
+export const generateShortParam = (data: object) => {
+  return LZString.compressToEncodedURIComponent(JSON.stringify(data));
 };

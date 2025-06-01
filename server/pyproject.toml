@@ -16,7 +16,8 @@ dependencies = [
     "djangorestframework-camel-case (>=1.4.2,<2.0.0)",
     "django-rest-knox (>=5.0.2,<6.0.0)",
     "inflect (>=7.5.0,<8.0.0)",
-    "gunicorn (>=23.0.0,<24.0.0)"
+    "gunicorn (>=23.0.0,<24.0.0)",
+    "lzstring (>=1.0.4,<2.0.0)"
 ]
 
 

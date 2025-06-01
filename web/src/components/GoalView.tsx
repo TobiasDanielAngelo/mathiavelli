@@ -1,6 +1,7 @@
 import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import { Goal, GoalInterface } from "../api/GoalStore";
 import { useStore } from "../api/Store";
 import { Task, TaskInterface } from "../api/TaskStore";
 import { MyModal } from "../blueprints/MyModal";
@@ -10,9 +11,8 @@ import { SideBySideView } from "../blueprints/SideBySideView";
 import { sortByKey, toTitleCase } from "../constants/helpers";
 import { GoalForm } from "./GoalForm";
 import { GoalItem } from "./GoalItem";
-import { TaskForm } from "./TaskForm";
-import { TaskItem } from "./TaskItem";
-import { Goal, GoalInterface } from "../api/GoalStore";
+import { TaskCard } from "./TaskComponents/TaskCard";
+import { TaskForm } from "./TaskComponents/TaskForm";
 
 export const GoalView = observer(() => {
   const [isVisible1, setVisible1] = useState(false);
@@ -26,7 +26,7 @@ export const GoalView = observer(() => {
   const [shownGoalFields, setShownGoalFields] = useState<
     (keyof GoalInterface)[]
   >(Object.keys(new Goal({}).$) as (keyof GoalInterface)[]);
-  const mainGoals = goalStore.items.filter((g) => g.parentGoal == -1);
+  const mainGoals = goalStore.items.filter((g) => g.parentGoal == null);
 
   const actions = useMemo(
     () => [
@@ -113,7 +113,7 @@ export const GoalView = observer(() => {
       <MySpeedDial actions={actions} />
       <SideBySideView
         SideA={sortByKey(taskStore.items, "dateCreated").map((s) => (
-          <TaskItem item={s} key={s.id} shownFields={shownTaskFields} />
+          <TaskCard item={s} key={s.id} shownFields={shownTaskFields} />
         ))}
         SideB={mainGoals.map((mainGoal) => (
           <GoalItem
