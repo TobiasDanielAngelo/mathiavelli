@@ -19,11 +19,10 @@ def decode_query_param(encoded_param):
 
 class CustomModelViewSet(viewsets.ModelViewSet):
     permission_classes = [
-        AllowAny,
-        # IsAuthenticated,
-        # CustomDjangoModelPermission,
+        IsAuthenticated,
+        CustomDjangoModelPermission,
     ]
-    # authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,)
 
     def list(self, request, *args, **kwargs):
         params = self.request.query_params.copy()
