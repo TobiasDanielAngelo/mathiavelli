@@ -157,10 +157,13 @@ REST_FRAMEWORK = {
     "COERCE_DECIMAL_TO_STRING": False,
 }
 
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://raspberrypi.local",
+    "https://mathiavelli.com",
     "https://www.mathiavelli.com",
 ]
 
