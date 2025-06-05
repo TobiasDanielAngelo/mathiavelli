@@ -1,16 +1,17 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { EventInterface } from "../api/EventStore";
-import { useStore } from "../api/Store";
-import { MyForm } from "../blueprints/MyForm";
-import { Field } from "../constants/interfaces";
-import { toOptions } from "../constants/helpers";
+import { EventInterface } from "../../api/EventStore";
+import { useStore } from "../../api/Store";
+import { MyForm } from "../../blueprints/MyForm";
+import { Field } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
 
 export const EventForm = (props: {
   item?: EventInterface;
   setVisible?: (t: boolean) => void;
+  fetchFcn?: () => void;
 }) => {
-  const { item, setVisible } = props;
+  const { item, setVisible, fetchFcn } = props;
   const { eventStore, tagStore } = useStore();
   const [details, setDetails] = useState<EventInterface>({
     title: item?.title,
@@ -98,6 +99,7 @@ export const EventForm = (props: {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
@@ -116,6 +118,7 @@ export const EventForm = (props: {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
@@ -129,6 +132,7 @@ export const EventForm = (props: {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 

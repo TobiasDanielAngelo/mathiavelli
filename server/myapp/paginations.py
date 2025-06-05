@@ -15,6 +15,8 @@ class CustomPagination(PageNumberPagination):
             item.get("id") for item in data if isinstance(item, dict) and "id" in item
         ]
 
+        print(ids)
+
         return Response(
             {
                 "count": self.page.paginator.count,

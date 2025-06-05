@@ -20,11 +20,11 @@ export const TaskRow = observer((props: { item: Task }) => {
       setMsg(resp.details);
       return;
     }
-    setVisible1(false);
+    setVisible2(false);
   };
 
   return (
-    <div>
+    <div className="flex justify-evenly">
       <MyModal isVisible={isVisible1} setVisible={setVisible1}>
         <TaskForm item={item} setVisible={setVisible1} />
       </MyModal>

@@ -45,13 +45,26 @@ export class Transaction extends Model(props) {
     const store = getRoot<Store>(this);
     return store.categoryStore.allItems.get(this.category ?? -1)?.title || "—";
   }
-  get from() {
+  get transmitterName() {
     const store = getRoot<Store>(this);
     return store.accountStore.allItems.get(this.transmitter ?? -1)?.name || "—";
   }
-  get to() {
+  get receiverName() {
     const store = getRoot<Store>(this);
     return store.accountStore.allItems.get(this.receiver ?? -1)?.name || "—";
+  }
+
+  get $view() {
+    const store = getRoot<Store>(this);
+    return {
+      ...this.$,
+      categoryName:
+        store?.categoryStore?.allItems.get(this.category ?? -1)?.title || "—",
+      transmitterName:
+        store?.accountStore?.allItems.get(this.transmitter ?? -1)?.name || "—",
+      receiverName:
+        store?.accountStore?.allItems.get(this.receiver ?? -1)?.name || "—",
+    };
   }
 }
 

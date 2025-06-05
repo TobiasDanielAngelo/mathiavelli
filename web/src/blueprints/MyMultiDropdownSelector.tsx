@@ -10,7 +10,7 @@ export const MyMultiDropdownSelector = (props: {
   relative?: boolean;
   open?: boolean;
   maxSelections?: number;
-  selectAll?: boolean;
+  isAll?: boolean;
 }) => {
   const {
     label,
@@ -21,10 +21,11 @@ export const MyMultiDropdownSelector = (props: {
     relative,
     open,
     maxSelections,
+    isAll,
   } = props;
   const [isOpen, setOpen] = useState(open ?? false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [selectAll, setSelectAll] = useState(false);
+  const [selectAll, setSelectAll] = useState(isAll);
 
   const onToggle = (id: number | string) => {
     if (value.includes(id)) {
@@ -37,7 +38,7 @@ export const MyMultiDropdownSelector = (props: {
   };
 
   useEffect(() => {
-    onChangeValue(selectAll ? options.map((s) => s.id) : []);
+    onChangeValue(selectAll ? options.map((s) => s.id) : value);
   }, [selectAll, options.length]);
 
   useEffect(() => {

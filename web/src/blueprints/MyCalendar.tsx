@@ -1,17 +1,24 @@
 import EventIcon from "@mui/icons-material/Event";
 import moment from "moment";
 import { Dispatch, SetStateAction, useState } from "react";
-import { useStore } from "../api/Store";
 import { TwoDates } from "../constants/classes";
-import { GuidedDiv } from "./MyGuidedDiv";
 import { useWindowWidth } from "../constants/hooks";
+import { GuidedDiv } from "./MyGuidedDiv";
+
+type CalendarEvent = {
+  id: string | number;
+  title: string;
+  start: string;
+  end: string;
+};
 
 export const MyCalendar = (props: {
   date: Date;
   setDate: Dispatch<SetStateAction<Date>>;
+  events: CalendarEvent[];
+  renderEventContent?: (events: CalendarEvent[]) => React.ReactNode;
 }) => {
-  const { eventStore } = useStore();
-  const { date, setDate } = props;
+  const { date, setDate, events, renderEventContent } = props;
   const [view, setView] = useState("month");
   const [currentDate, setCurrentDate] = useState(moment());
   const width = useWindowWidth();
@@ -19,18 +26,23 @@ export const MyCalendar = (props: {
   const startDecade = Math.floor(currentDate.year() / 10) * 10;
 
   const handlePrev = () => {
-    if (view === "month")
-      setCurrentDate(moment(currentDate).subtract(1, "month"));
-    else if (view === "year")
-      setCurrentDate(moment(currentDate).subtract(1, "year"));
-    else setCurrentDate(moment(currentDate).subtract(10, "year"));
+    setCurrentDate(
+      view === "month"
+        ? moment(currentDate).subtract(1, "month")
+        : view === "year"
+        ? moment(currentDate).subtract(1, "year")
+        : moment(currentDate).subtract(10, "year")
+    );
   };
 
   const handleNext = () => {
-    if (view === "month") setCurrentDate(moment(currentDate).add(1, "month"));
-    else if (view === "year")
-      setCurrentDate(moment(currentDate).add(1, "year"));
-    else setCurrentDate(moment(currentDate).add(10, "year"));
+    setCurrentDate(
+      view === "month"
+        ? moment(currentDate).add(1, "month")
+        : view === "year"
+        ? moment(currentDate).add(1, "year")
+        : moment(currentDate).add(10, "year")
+    );
   };
 
   const renderMonthView = () => {
@@ -55,17 +67,21 @@ export const MyCalendar = (props: {
           const isToday = day.isSame(moment(), "day");
           const isSelected = day.isSame(date, "day");
           const isWeekend = day.day() === 0 || day.day() === 6;
-          const allEvents = eventStore.items?.filter((s) =>
-            new TwoDates(s.start, s.end).contains(
+
+          const dayEvents = events.filter((e) =>
+            new TwoDates(e.start, e.end).contains(
               day.endOf("day").subtract(1, "second").toDate()
             )
           );
+
           return (
             <GuidedDiv
+              key={i}
+              onClick={() => setDate(day.toDate())}
               title={
-                allEvents && allEvents.length > 0 ? (
+                dayEvents.length > 0 ? (
                   <div className="text-center">
-                    {allEvents?.map((s) => (
+                    {dayEvents.map((s) => (
                       <div key={s.id}>{s.title}</div>
                     ))}
                   </div>
@@ -73,8 +89,6 @@ export const MyCalendar = (props: {
                   ""
                 )
               }
-              key={i}
-              onClick={() => setDate(day.toDate())}
               className={`text-right text-sm md:text-md items-right justify-between flex flex-row-reverse p-1 md:p-2 rounded cursor-pointer
                 ${day.month() === currentDate.month() ? "" : "text-gray-500"}
                 ${isWeekend ? "text-red-500" : ""}
@@ -82,17 +96,12 @@ export const MyCalendar = (props: {
                 ${isSelected ? "bg-teal-300 text-black" : ""}`}
             >
               {day.date()}
-              {eventStore.items
-                ?.map((s) =>
-                  new TwoDates(s.start, s.end).contains(
-                    day.endOf("day").subtract(1, "second").toDate()
-                  )
-                )
-                .reduce((a, b) => a || b, false) && width > 1024 ? (
-                <EventIcon />
-              ) : (
-                <></>
-              )}
+
+              <div>
+                {renderEventContent && width > 1024
+                  ? renderEventContent(dayEvents)
+                  : dayEvents.length > 0 && width > 1024 && <EventIcon />}
+              </div>
             </GuidedDiv>
           );
         })}
@@ -100,47 +109,41 @@ export const MyCalendar = (props: {
     );
   };
 
-  const renderYearView = () => {
-    return (
-      <div className="grid grid-cols-3 gap-2">
-        {Array.from({ length: 12 }, (_, i) => (
-          <div
-            key={i}
-            onClick={() => {
-              setCurrentDate(moment(currentDate).month(i));
-              setView("month");
-            }}
-            className="p-4 text-center rounded shadow cursor-pointer hover:bg-gray-500"
-          >
-            {moment().month(i).format("MMM")}
-          </div>
-        ))}
-      </div>
-    );
-  };
+  const renderYearView = () => (
+    <div className="grid grid-cols-3 gap-2">
+      {Array.from({ length: 12 }, (_, i) => (
+        <div
+          key={i}
+          onClick={() => {
+            setCurrentDate(moment(currentDate).month(i));
+            setView("month");
+          }}
+          className="p-4 text-center rounded shadow cursor-pointer hover:bg-gray-500"
+        >
+          {moment().month(i).format("MMM")}
+        </div>
+      ))}
+    </div>
+  );
 
-  const renderDecadeView = () => {
-    return (
-      <div className="grid grid-cols-3 gap-5">
-        {Array.from({ length: 12 }, (_, i) => startDecade - 1 + i).map(
-          (year, i) => (
-            <div
-              key={i}
-              onClick={() => {
-                setCurrentDate(moment(currentDate).year(year));
-                setView("year");
-              }}
-              className={`p-4 text-center rounded cursor-pointer shadow ${
-                year === currentDate.year() ? "bg-blue-400" : ""
-              }`}
-            >
-              {year}
-            </div>
-          )
-        )}
-      </div>
-    );
-  };
+  const renderDecadeView = () => (
+    <div className="grid grid-cols-3 gap-5">
+      {Array.from({ length: 12 }, (_, i) => startDecade - 1 + i).map((year) => (
+        <div
+          key={year}
+          onClick={() => {
+            setCurrentDate(moment(currentDate).year(year));
+            setView("year");
+          }}
+          className={`p-4 text-center rounded cursor-pointer shadow ${
+            year === currentDate.year() ? "bg-blue-400" : ""
+          }`}
+        >
+          {year}
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="m-5 p-4 rounded-xl shadow-xl">

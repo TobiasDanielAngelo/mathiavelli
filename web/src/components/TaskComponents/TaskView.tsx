@@ -10,35 +10,40 @@ import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelecto
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { frequency } from "../../constants/constants";
-import { toTitleCase } from "../../constants/helpers";
+import { getUniqueIdsFromFK, toTitleCase } from "../../constants/helpers";
 import { PaginatedDetails } from "../../constants/interfaces";
 import { TaskCollection } from "./TaskCollection";
 import { TaskFilter } from "./TaskFilter";
 import { TaskForm } from "./TaskForm";
 import { TaskViewContext } from "./TaskProps";
 import { TaskTable } from "./TaskTable";
+import { useLocalStorageState } from "../../constants/hooks";
 
 export const TaskView = observer(() => {
   const { taskStore, goalStore } = useStore();
-  const [view, setView] = useState<"card" | "table">("table");
+  const [view, setView] = useState<"card" | "table">("card");
   const [isVisible1, setVisible1] = useState(false);
   const [isVisible2, setVisible2] = useState(false);
   const [isVisible3, setVisible3] = useState(false);
-  const [shownFields, setShownFields] = useState<(keyof TaskInterface)[]>(
-    Object.keys(new Task({}).$) as (keyof TaskInterface)[]
+  const [shownFields, setShownFields] = useLocalStorageState(
+    Object.keys(new Task({}).$view) as (keyof TaskInterface)[],
+    "shownFieldsTask"
   );
+
   const [params, setParams] = useSearchParams();
   const [pageDetails, setPageDetails] = useState<
     PaginatedDetails | undefined
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchAll = async () => {
+  const fetchTasks = async () => {
     const resp = await taskStore.fetchAll(queryString);
-    if (!resp.ok) {
+    if (!resp.ok || !resp.data) {
       return;
     }
     setPageDetails(resp.pageDetails);
+    const goals = getUniqueIdsFromFK(resp.data, "goal");
+    if (goals.length) goalStore.fetchAll(`id__in=${goals.join(",")}`);
   };
 
   const toggleView = () => {
@@ -99,7 +104,7 @@ export const TaskView = observer(() => {
           label: "",
         },
       ] as KV<any>[],
-    [goalStore.items, frequency]
+    [goalStore.items.length, frequency]
   );
 
   const actions = useMemo(
@@ -139,7 +144,7 @@ export const TaskView = observer(() => {
   );
 
   useEffect(() => {
-    fetchAll();
+    fetchTasks();
   }, [params]);
 
   const value = {
@@ -157,26 +162,26 @@ export const TaskView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <TaskForm setVisible={setVisible1} />
+          <TaskForm setVisible={setVisible1} fetchFcn={fetchTasks} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector
             label="Fields"
             value={shownFields}
             onChangeValue={(t) => setShownFields(t as (keyof TaskInterface)[])}
-            options={Object.keys(new Task({}).$).map((s) => ({
+            options={Object.keys(new Task({}).$view).map((s) => ({
               id: s,
               name: toTitleCase(s),
             }))}
             relative
             open
+            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>
-          <TaskFilter setVisible={setVisible3} />
+          <TaskFilter />
         </MyModal>
         {view === "card" ? <TaskCollection /> : <TaskTable />}
-
         <div
           className="fixed bottom-6 left-6 bg-blue-500 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer shadow-lg hover:bg-blue-600 transition-colors"
           onClick={toggleView}

@@ -21,10 +21,12 @@ export const NavBar = observer(
         profileUrl={"#"}
         paths={[
           "/tasks",
-          "/finances",
+          "/transactions",
+          "/accounts",
           "/journals",
           "/events",
           "/goals",
+          "/tags",
           "/health",
         ].map((s) => ({
           title: toTitleCase(s),

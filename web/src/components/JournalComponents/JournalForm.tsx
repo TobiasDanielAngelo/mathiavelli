@@ -1,19 +1,21 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { AccountInterface } from "../api/AccountStore";
-import { useStore } from "../api/Store";
-import { MyForm } from "../blueprints/MyForm";
-import { Field } from "../constants/interfaces";
+import { JournalInterface } from "../../api/JournalStore";
+import { useStore } from "../../api/Store";
+import { MyForm } from "../../blueprints/MyForm";
+import { Field } from "../../constants/interfaces";
 
-export const AccountForm = (props: {
-  item?: AccountInterface;
+export const JournalForm = (props: {
+  item?: JournalInterface;
   setVisible?: (t: boolean) => void;
+  fetchFcn?: () => void;
 }) => {
-  const { item, setVisible } = props;
-  const { accountStore } = useStore();
-  const [details, setDetails] = useState({
-    name: item?.name,
-    datetimeAdded: moment(item?.datetimeAdded).format("MMM D YYYY h:mm A"),
+  const { item, setVisible, fetchFcn } = props;
+  const { journalStore } = useStore();
+  const [details, setDetails] = useState<JournalInterface>({
+    title: item?.title,
+    description: item?.description,
+    datetimeCreated: moment(item?.datetimeCreated).format("MMM D, YYYY h:mm A"),
   });
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);
@@ -22,9 +24,23 @@ export const AccountForm = (props: {
     () => [
       [
         {
-          name: "name",
-          label: "Account Name",
+          name: "title",
+          label: "Title",
           type: "text",
+        },
+      ],
+      [
+        {
+          name: "description",
+          label: "Journal Entry",
+          type: "textarea",
+        },
+      ],
+      [
+        {
+          name: "datetimeCreated",
+          label: "Created",
+          type: "datetime",
         },
       ],
     ],
@@ -33,10 +49,10 @@ export const AccountForm = (props: {
 
   const onClickCreate = async () => {
     setLoading(true);
-    const resp = await accountStore.addItem({
+    const resp = await journalStore.addItem({
       ...details,
-      datetimeAdded: moment(
-        details.datetimeAdded,
+      datetimeCreated: moment(
+        details.datetimeCreated,
         "MMM D YYYY h:mm A"
       ).toISOString(),
     });
@@ -46,16 +62,17 @@ export const AccountForm = (props: {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
   const onClickEdit = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await accountStore.updateItem(item.id, {
+    const resp = await journalStore.updateItem(item.id, {
       ...details,
-      datetimeAdded: moment(
-        details.datetimeAdded,
+      datetimeCreated: moment(
+        details.datetimeCreated,
         "MMM D YYYY h:mm A"
       ).toISOString(),
     });
@@ -65,19 +82,20 @@ export const AccountForm = (props: {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
   const onClickDelete = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await accountStore.deleteItem(item.id);
+    const resp = await journalStore.deleteItem(item.id);
     setLoading(false);
-
     if (!resp.ok) {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
@@ -85,13 +103,13 @@ export const AccountForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Account" : "Account Creation Form"}
+        title={item ? "Edit Journal" : "Journal Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}
         hasDelete={!!item}
         onDelete={onClickDelete}
-        objectName="account"
+        objectName="entry"
         msg={msg}
         isLoading={isLoading}
       />

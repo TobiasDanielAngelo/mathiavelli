@@ -18,11 +18,24 @@ export const getOrdinal = (n: number) => {
   return ord;
 };
 
+/**
+ * Replaces multiple substrings in a string with a given replacement.
+ * Returns '-' if the final string is empty or only whitespace.
+ *
+ * @param {string} str - The input string.
+ * @param {string[]} find - Array of substrings to replace.
+ * @param {string} replace - Replacement string.
+ * @returns {string} - Modified string or '-' if empty.
+ *
+ * @example
+ * replaceCumulative("Hello, World!", [",", "!"], ""); // "Hello World"
+ * replaceCumulative("   ", [" "], "");                // "-"
+ */
 export const replaceCumulative = (
   str: string,
   find: string[],
   replace: string
-) => {
+): string => {
   for (var i = 0; i < find.length; i++)
     str = str.replace(new RegExp(find[i], "g"), replace);
   return str.replace(/\s/g, "") !== "" ? str : "-";
@@ -89,6 +102,18 @@ export const timeDifferenceTime = (startTime: string, endTime: string) => {
     : 0;
 };
 
+/**
+ * Sorts an array of objects by a specified key (assumed to be a date or date-like string).
+ *
+ * @template T - The type of objects in the array.
+ * @param {T[]} arr - The array to sort.
+ * @param {keyof T} keyName - The key to sort by.
+ * @param {boolean} [decreasing=false] - Whether to sort in descending order.
+ * @returns {T[]} - A new sorted array.
+ *
+ * @example
+ * sortByKey(users, "createdAt", true); // Sorts users by createdAt descending
+ */
 export const sortByKey = <T>(
   arr: T[],
   keyName: keyof T,
@@ -107,6 +132,21 @@ export const sortByKey = <T>(
   });
 };
 
+/**
+ * Converts an array of strings or objects into a standardized `Option[]` format.
+ *
+ * @template T - The item type (string or object).
+ * @param {T[]} items - The input array.
+ * @param {keyof T} [keyName] - The key to use as display name (only for object items).
+ * @returns {Option[]} - Array of options with `id` and `name`.
+ *
+ * @example
+ * toOptions(["Red", "Green"]);
+ * // [{ id: 0, name: "Red" }, { id: 1, name: "Green" }]
+ *
+ * toOptions(users, "username");
+ * // [{ id: 1, name: "johndoe" }, ...]
+ */
 export const toOptions = <T>(items: T[], keyName?: keyof T): Option[] => {
   return items.map((item, index) => {
     if (typeof item === "string") {
@@ -126,7 +166,19 @@ export const timeDifference = (start: Date | string, end?: Date | string) => {
   return moment(new Date(td)).utc(false).format("H[h] mm[m]");
 };
 
-export const toTitleCase = (str?: string) => {
+/**
+ * Converts a string to Title Case, preserving acronyms and numbers.
+ *
+ * @param {string} [str] - The input string.
+ * @returns {string} - The title-cased string.
+ *
+ * @example
+ * toTitleCase("helloWorld")        // "Hello World"
+ * toTitleCase("myURL123value")     // "My URL 123 Value"
+ * toTitleCase("user_id")           // "User Id"
+ * toTitleCase("")                  // ""
+ */
+export const toTitleCase = (str?: string): string => {
   return str
     ? str
         .match(/[A-Z]{2,}(?=[A-Z][a-z]+|\b)|[A-Z]?[a-z]+|[0-9]+|[A-Z]/g)
@@ -192,8 +244,15 @@ export const camelCaseToWords = (s: string) => {
   return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
-export const camelToSnakeCase = (str: string) =>
-  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+export const camelToSnakeCase = (str: string, dunder?: boolean) => {
+  const matches = [...str.matchAll(/[A-Z]/g)];
+  if (!matches.length) return str;
+
+  return str.replace(/[A-Z]/g, (letter, index) => {
+    const isLast = matches[matches.length - 1].index === index;
+    return `${dunder && isLast ? "__" : "_"}${letter.toLowerCase()}`;
+  });
+};
 
 export const createArrayFromN = (n: number) => {
   return Array.from(Array(n).keys());
@@ -218,13 +277,30 @@ export const getDatesFromSched = (
   });
 };
 
-export const intersectionArrStrs = (arr1: string[], arr2: string[]) => {
+/**
+ * Returns the intersection of two string arrays.
+ *
+ * @param {string[]} arr1 - First array of strings.
+ * @param {string[]} arr2 - Second array of strings.
+ * @returns {string[]} - Array of common strings found in both arrays.
+ */
+export const intersectionArrStrs = (
+  arr1: string[],
+  arr2: string[]
+): string[] => {
   const setA = new Set(arr1);
   return arr2.filter((value) => setA.has(value));
 };
 
-export const isQueryMatch = (str: string, query: string) => {
-  // let regex = /[^A-Za-z0-9]/
+/**
+ * Checks if all parts of the query exist in the target string (case-insensitive).
+ *
+ * @param {string} str - The target string to search in.
+ * @param {string} query - The search query, split by spaces or commas.
+ * @returns {boolean} - True if all query parts are found in the string.
+ */
+
+export const isQueryMatch = (str: string, query: string): boolean => {
   return query
     .split(/[ ,]+/)
     .every((v) => str.toLowerCase().includes(v.toLowerCase()));
@@ -286,6 +362,14 @@ export const formatValue = (
   return value?.toString() || "—";
 };
 
+/**
+ * Creates a string signature from selected keys of an object.
+ *
+ * @template T - The object type.
+ * @param {T} model - The object to extract values from.
+ * @param {(keyof T)[]} keys - Keys whose values will form the signature.
+ * @returns {string} - A pipe-separated string of the selected values.
+ */
 export function getModelSignature<T extends { [key: string]: any }>(
   model: T,
   keys: (keyof T)[]
@@ -293,10 +377,101 @@ export function getModelSignature<T extends { [key: string]: any }>(
   return keys.map((key) => String(model[key])).join("|");
 }
 
+export function getStoreSignature<T extends Record<string, any>>(
+  items: T[]
+): string {
+  return items
+    .map((item) =>
+      Object.keys(item)
+        .map((key) => String(item[key as keyof T]))
+        .join("|")
+    )
+    .join("::");
+}
+
+/**
+ * Cleans a string by replacing all non-alphanumeric characters with spaces.
+ *
+ * @param {string} input - The string to clean.
+ * @returns {string} - The cleaned string with only letters, numbers, and spaces.
+ */
 export const cleanText = (input: string) => {
   return input.replace(/[^a-zA-Z0-9]+/g, " ");
 };
 
+/**
+ * Compresses an object into a URI-safe, short string using LZString.
+ *
+ * @param {object} data - The data object to compress.
+ * @returns {string} - A URI-safe compressed string.
+ */
 export const generateShortParam = (data: object) => {
   return LZString.compressToEncodedURIComponent(JSON.stringify(data));
+};
+
+/**
+ * Decompresses and parses a URI-safe compressed string into an object.
+ *
+ * @param {string | null} param - The compressed string.
+ * @returns {Record<string, any>} - The decompressed object, or empty object on error.
+ */
+export const decodeShortParam = (param: string | null): Record<string, any> => {
+  try {
+    if (!param || typeof param !== "string") throw new Error("Invalid param");
+
+    const json = LZString.decompressFromEncodedURIComponent(param);
+    return json ? JSON.parse(json) : {};
+  } catch (e) {
+    console.error("Decoding failed:", e);
+    return {};
+  }
+};
+
+export const months = [
+  { short: "Jan", long: "January" },
+  { short: "Feb", long: "February" },
+  { short: "Mar", long: "March" },
+  { short: "Apr", long: "April" },
+  { short: "May", long: "May" },
+  { short: "Jun", long: "June" },
+  { short: "Jul", long: "July" },
+  { short: "Aug", long: "August" },
+  { short: "Sep", long: "September" },
+  { short: "Oct", long: "October" },
+  { short: "Nov", long: "November" },
+  { short: "Dec", long: "December" },
+];
+
+/**
+ * Returns the month name based on a month index (0–11).
+ *
+ * @param {number} monthNum - The month index (0 = January, 11 = December).
+ * @param {"short" | "long"} [type="short"] - Format of the month name.
+ * @returns {string} - The corresponding month name or "Invalid" if out of range.
+ */
+export function getMonthName(
+  monthNum: number,
+  type: "short" | "long" = "short"
+): string {
+  const index = monthNum;
+  if (index < 0 || index > 11) return "Invalid";
+  return months[index][type];
+}
+
+/**
+ * Extracts unique, non-null numeric values from a specified key in an array of objects.
+ *
+ * @template T - The object type in the array.
+ * @template K - The key of T to extract values from.
+ * @param {T[]} data - Array of objects to extract from.
+ * @param {K} key - The key whose values will be collected.
+ * @returns {number[]} - An array of unique numeric values (excluding undefined/null).
+ */
+export const getUniqueIdsFromFK = <T, K extends keyof T>(
+  data: T[],
+  key: K
+): number[] => {
+  return Array.from(new Set(data.map((item) => item[key] ?? -1))).filter(
+    (id) => id !== -1
+  ) as (T[K] extends number ? number : never)[];
 };

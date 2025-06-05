@@ -49,6 +49,15 @@ export class Goal extends Model(props) {
     const store = getRoot<Store>(this);
     return store.goalStore.allItems.get(this.parentGoal ?? -1)?.title || "—";
   }
+
+  get $view() {
+    const store = getRoot<Store>(this);
+    return {
+      ...this.$,
+      parentGoalTitle:
+        store?.goalStore?.allItems.get(this.parentGoal ?? -1)?.title || "—",
+    };
+  }
 }
 
 @model("myApp/GoalStore")

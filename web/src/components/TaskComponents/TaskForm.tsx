@@ -9,10 +9,14 @@ import { toOptions } from "../../constants/helpers";
 import { frequency } from "../../constants/constants";
 
 export const TaskForm = observer(
-  (props: { item?: TaskInterface; setVisible?: (t: boolean) => void }) => {
-    const { item, setVisible } = props;
+  (props: {
+    item?: TaskInterface;
+    setVisible?: (t: boolean) => void;
+    fetchFcn?: () => void;
+  }) => {
+    const { item, setVisible, fetchFcn } = props;
     const { taskStore, goalStore } = useStore();
-    const [details, setDetails] = useState({
+    const [details, setDetails] = useState<TaskInterface>({
       title: item?.title,
       description: item?.description,
       goal: item?.goal,
@@ -117,6 +121,7 @@ export const TaskForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 
@@ -140,6 +145,7 @@ export const TaskForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 
@@ -148,11 +154,11 @@ export const TaskForm = observer(
       setLoading(true);
       const resp = await taskStore.deleteItem(item.id);
       setLoading(false);
-
       if (!resp.ok) {
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 

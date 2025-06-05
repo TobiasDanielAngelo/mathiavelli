@@ -52,8 +52,17 @@ export class Task extends Model(props) {
     return store.goalStore.allItems.get(this.goal ?? -1)?.title || "—";
   }
 
-  get frequency() {
+  get repeatName() {
     return frequency.find((_, ind) => ind === this.repeat) ?? "—";
+  }
+
+  get $view() {
+    const store = getRoot<Store>(this);
+    return {
+      ...this.$,
+      goalTitle: store?.goalStore?.allItems.get(this.goal ?? -1)?.title || "—",
+      repeatName: this.repeatName,
+    };
   }
 }
 

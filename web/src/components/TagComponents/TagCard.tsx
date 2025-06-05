@@ -2,23 +2,23 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { useStore } from "../api/Store";
-import { Event, EventInterface } from "../api/EventStore";
-import { ItemDetails } from "../blueprints/ItemDetails";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
-import { MyModal } from "../blueprints/MyModal";
-import { EventForm } from "./EventForm";
+import { useStore } from "../../api/Store";
+import { Tag, TagInterface } from "../../api/TagStore";
+import { ItemDetails } from "../../blueprints/ItemDetails";
+import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
+import { MyModal } from "../../blueprints/MyModal";
+import { TagForm } from "./TagForm";
 
-export const EventItem = observer(
-  (props: { item: Event; shownFields?: (keyof EventInterface)[] }) => {
+export const TagCard = observer(
+  (props: { item: Tag; shownFields?: (keyof TagInterface)[] }) => {
     const { item, shownFields } = props;
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);
     const [msg, setMsg] = useState("");
-    const { eventStore } = useStore();
+    const { tagStore } = useStore();
 
     const onDelete = async () => {
-      const resp = await eventStore.deleteItem(item.id ?? -1);
+      const resp = await tagStore.deleteItem(item?.id ?? -1);
       if (!resp.ok) {
         setMsg(resp.details);
         return;
@@ -29,7 +29,7 @@ export const EventItem = observer(
     return (
       <div className="m-1 border-gray-700 rounded-lg p-5 border">
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
-          <EventForm item={item} setVisible={setVisible1} />
+          <TagForm item={item} setVisible={setVisible1} />
         </MyModal>
         <MyConfirmModal
           isVisible={isVisible2}
@@ -52,8 +52,7 @@ export const EventItem = observer(
               item={item}
               shownFields={shownFields}
               header={["id"]}
-              important={["title"]}
-              body={["description", "start", "tagNames"]}
+              important={["name"]}
             />
             <div className="flex justify-end">
               <EditIcon

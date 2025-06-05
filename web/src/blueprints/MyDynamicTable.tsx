@@ -1,0 +1,123 @@
+import { observer } from "mobx-react-lite";
+import { useMemo } from "react";
+import {
+  camelToSnakeCase,
+  formatValue,
+  getStoreSignature,
+  toTitleCase,
+} from "../constants/helpers";
+import { KV } from "./ItemDetails";
+import { MyTable } from "./MyTable";
+
+type MyDynamicTableProps<T extends Record<string, any>> = {
+  items: T[];
+  itemMap?: KV<any>[];
+  shownFields: (keyof T & string)[];
+  priceFields?: (keyof T & string)[];
+  pageIds: number[];
+  setParams: (updater: (params: URLSearchParams) => URLSearchParams) => void;
+  params: URLSearchParams;
+  PageBar: React.FC;
+  renderActions: (item: T) => React.ReactNode;
+};
+
+export const MyDynamicTable = observer(
+  <T extends Record<string, any>>({
+    items,
+    itemMap,
+    shownFields,
+    priceFields,
+    pageIds,
+    setParams,
+    params,
+    PageBar,
+    renderActions,
+  }: MyDynamicTableProps<T>) => {
+    const HeaderWithSort = ({ k }: { k: string }) => {
+      const orderByParams = params.getAll("order_by");
+      const snakeK = camelToSnakeCase(k);
+      const isActive = orderByParams.some((s) => s.replace("-", "") === snakeK);
+      const isDescending = orderByParams.includes(`-${snakeK}`);
+
+      const handleSortClick = () => {
+        setParams((t) => {
+          const newParams = new URLSearchParams(t);
+          const existingOrderBy = newParams.getAll("order_by");
+          let newOrderBy: string[] = [];
+
+          let currentState: "none" | "asc" | "desc" = "none";
+          existingOrderBy.forEach((field) => {
+            if (field === snakeK) currentState = "asc";
+            if (field === `-${snakeK}`) currentState = "desc";
+          });
+
+          if (currentState === "none") {
+            newOrderBy = [snakeK, ...existingOrderBy.slice(0, 1)];
+          } else if (currentState === "asc") {
+            newOrderBy = [
+              `-${snakeK}`,
+              ...existingOrderBy.filter((f) => f.replace("-", "") !== snakeK),
+            ];
+          } else {
+            newOrderBy = existingOrderBy.filter(
+              (f) => f.replace("-", "") !== snakeK
+            );
+          }
+
+          newParams.delete("order_by");
+          newOrderBy.forEach((field) => newParams.append("order_by", field));
+          newParams.set("page", "1");
+          return newParams;
+        });
+      };
+
+      return (
+        <div
+          className="items-center justify-center flex flex-row gap-2 cursor-pointer"
+          onClick={handleSortClick}
+        >
+          {toTitleCase(k)}
+          {isActive && <div>{isDescending ? "▾" : "▴"}</div>}
+        </div>
+      );
+    };
+
+    const matrix = useMemo(() => {
+      const header = [
+        ...shownFields.map((k) => <HeaderWithSort k={k} key={k} />),
+        "Actions",
+      ];
+      const rows = items
+        .filter((item) => pageIds.includes(item.id))
+        .sort((a, b) => {
+          return (pageIds.indexOf(a.id) ?? 0) - (pageIds.indexOf(b.id) ?? 0);
+        })
+        .map((item) => [
+          ...shownFields.map((key) => {
+            const kv = itemMap?.find((s) => s.key === key);
+            return formatValue(item[key], key, priceFields, kv);
+          }),
+          renderActions(item),
+        ]);
+
+      return [header, ...rows];
+    }, [
+      params,
+      getStoreSignature(items.map((s) => s.$)),
+      shownFields.length,
+      Number(pageIds.map(String).join("")),
+      itemMap,
+    ]);
+
+    return (
+      <div className="flex flex-1 flex-col min-h-[85vh] max-h-[85vh] w-5/6 justify-center m-auto">
+        <div className="sticky top-0">
+          <PageBar />
+        </div>
+        <div className="flex-1 overflow-scroll">
+          <MyTable matrix={matrix} />
+        </div>
+      </div>
+    );
+  }
+);

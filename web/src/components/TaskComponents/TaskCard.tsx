@@ -23,7 +23,7 @@ export const TaskCard = observer(
         setMsg(resp.details);
         return;
       }
-      setVisible1(false);
+      setVisible2(false);
     };
 
     return (
@@ -60,7 +60,7 @@ export const TaskCard = observer(
                 "isCancelled",
                 "isCompleted",
                 "goalTitle",
-                "frequency",
+                "repeatName",
               ]}
             />
             <div className="flex justify-end">

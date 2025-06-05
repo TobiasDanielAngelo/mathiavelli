@@ -2,14 +2,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { useStore } from "../api/Store";
-import { Transaction, TransactionInterface } from "../api/TransactionStore";
-import { ItemDetails } from "../blueprints/ItemDetails";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
-import { MyModal } from "../blueprints/MyModal";
-import { TransactionForm } from "./TransactionForm";
+import { useStore } from "../../api/Store";
+import { Transaction, TransactionInterface } from "../../api/TransactionStore";
+import { ItemDetails } from "../../blueprints/ItemDetails";
+import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
+import { MyModal } from "../../blueprints/MyModal";
+import { TransactionForm } from "../TransactionComponents/TransactionForm";
 
-export const TransactionItem = observer(
+export const TransactionCard = observer(
   (props: {
     item: Transaction;
     shownFields?: (keyof TransactionInterface)[];
@@ -18,15 +18,15 @@ export const TransactionItem = observer(
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);
     const [msg, setMsg] = useState("");
-    const { transactionStore } = useStore();
+    const { accountStore } = useStore();
 
     const onDelete = async () => {
-      const resp = await transactionStore.deleteItem(item.id ?? -1);
+      const resp = await accountStore.deleteItem(item?.id ?? -1);
       if (!resp.ok) {
         setMsg(resp.details);
         return;
       }
-      setVisible1(false);
+      setVisible2(false);
     };
 
     return (
@@ -56,7 +56,12 @@ export const TransactionItem = observer(
               shownFields={shownFields}
               header={["id", "datetimeTransacted"]}
               important={["amount"]}
-              body={["categoryName", "from", "to", "description"]}
+              body={[
+                "categoryName",
+                "transmitterName",
+                "receiverName",
+                "description",
+              ]}
               prices={["amount"]}
             />
             <div className="flex justify-end">

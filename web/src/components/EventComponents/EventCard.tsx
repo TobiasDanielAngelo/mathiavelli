@@ -2,34 +2,34 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Journal, JournalInterface } from "../api/JournalStore";
-import { useStore } from "../api/Store";
-import { ItemDetails } from "../blueprints/ItemDetails";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
-import { MyModal } from "../blueprints/MyModal";
-import { JournalForm } from "./JournalForm";
+import { useStore } from "../../api/Store";
+import { Event, EventInterface } from "../../api/EventStore";
+import { ItemDetails } from "../../blueprints/ItemDetails";
+import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
+import { MyModal } from "../../blueprints/MyModal";
+import { EventForm } from "./EventForm";
 
-export const JournalItem = observer(
-  (props: { item: Journal; shownFields?: (keyof JournalInterface)[] }) => {
+export const EventCard = observer(
+  (props: { item: Event; shownFields?: (keyof EventInterface)[] }) => {
     const { item, shownFields } = props;
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);
     const [msg, setMsg] = useState("");
-    const { journalStore } = useStore();
+    const { eventStore } = useStore();
 
     const onDelete = async () => {
-      const resp = await journalStore.deleteItem(item?.id ?? -1);
+      const resp = await eventStore.deleteItem(item?.id ?? -1);
       if (!resp.ok) {
         setMsg(resp.details);
         return;
       }
-      setVisible1(false);
+      setVisible2(false);
     };
 
     return (
       <div className="m-1 border-gray-700 rounded-lg p-5 border">
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
-          <JournalForm item={item} setVisible={setVisible1} />
+          <EventForm item={item} setVisible={setVisible1} />
         </MyModal>
         <MyConfirmModal
           isVisible={isVisible2}
@@ -51,9 +51,9 @@ export const JournalItem = observer(
             <ItemDetails
               item={item}
               shownFields={shownFields}
-              header={["datetimeCreated"]}
+              header={["id"]}
               important={["title"]}
-              body={["description"]}
+              body={["description", "start", "end", "tagNames"]}
             />
             <div className="flex justify-end">
               <EditIcon

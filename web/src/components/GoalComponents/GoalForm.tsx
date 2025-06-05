@@ -1,11 +1,11 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { GoalInterface } from "../api/GoalStore";
-import { useStore } from "../api/Store";
-import { MyForm } from "../blueprints/MyForm";
-import { Field } from "../constants/interfaces";
+import { GoalInterface } from "../../api/GoalStore";
+import { useStore } from "../../api/Store";
+import { MyForm } from "../../blueprints/MyForm";
+import { Field } from "../../constants/interfaces";
 import { observer } from "mobx-react-lite";
-import { toOptions } from "../constants/helpers";
+import { toOptions } from "../../constants/helpers";
 
 export const getDescendantIds = (
   allGoals: GoalInterface[],
@@ -21,8 +21,12 @@ export const getDescendantIds = (
 };
 
 export const GoalForm = observer(
-  (props: { item?: GoalInterface; setVisible?: (t: boolean) => void }) => {
-    const { item, setVisible } = props;
+  (props: {
+    item?: GoalInterface;
+    setVisible?: (t: boolean) => void;
+    fetchFcn?: () => void;
+  }) => {
+    const { item, setVisible, fetchFcn } = props;
     const { goalStore } = useStore();
     const [details, setDetails] = useState({
       title: item?.title,
@@ -124,6 +128,7 @@ export const GoalForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 
@@ -147,6 +152,7 @@ export const GoalForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 
@@ -160,6 +166,7 @@ export const GoalForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 

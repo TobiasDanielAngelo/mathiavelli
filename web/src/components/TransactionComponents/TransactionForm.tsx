@@ -1,10 +1,10 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { useStore } from "../api/Store";
-import { TransactionInterface } from "../api/TransactionStore";
-import { MyForm } from "../blueprints/MyForm";
-import { Field } from "../constants/interfaces";
-import { toOptions } from "../constants/helpers";
+import { useStore } from "../../api/Store";
+import { TransactionInterface } from "../../api/TransactionStore";
+import { MyForm } from "../../blueprints/MyForm";
+import { Field } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
 import { observer } from "mobx-react-lite";
 
 export const TransactionForm = observer(
@@ -93,7 +93,6 @@ export const TransactionForm = observer(
         setMsg(resp.details);
         return;
       }
-      transactionStore.fetchAll();
       setVisible && setVisible(false);
     };
 

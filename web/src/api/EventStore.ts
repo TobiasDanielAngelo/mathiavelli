@@ -48,6 +48,16 @@ export class Event extends Model(props) {
     const store = getRoot<Store>(this);
     return this.tags.map((s) => store.tagStore.allItems.get(s)?.name ?? "");
   }
+
+  get $view() {
+    const store = getRoot<Store>(this);
+    return {
+      ...this.$,
+      tagNames: this.tags.map(
+        (s) => store?.tagStore?.allItems.get(s)?.name ?? ""
+      ),
+    };
+  }
 }
 
 @model("myApp/EventStore")

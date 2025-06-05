@@ -1,31 +1,31 @@
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Goal, GoalInterface } from "../api/GoalStore";
-import { useStore } from "../api/Store";
-import { ItemDetails } from "../blueprints/ItemDetails";
-import { MyConfirmModal } from "../blueprints/MyConfirmModal";
-import { MyModal } from "../blueprints/MyModal";
-import { sortByKey } from "../constants/helpers";
+import { useStore } from "../../api/Store";
+import { Goal, GoalInterface } from "../../api/GoalStore";
+import { ItemDetails } from "../../blueprints/ItemDetails";
+import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import { MyModal } from "../../blueprints/MyModal";
 import { GoalForm } from "./GoalForm";
-import { ItemRow } from "../blueprints/ItemRow";
+import { sortByKey } from "../../constants/helpers";
+import { ItemRow } from "../../blueprints/ItemRow";
 
-export const GoalItem = observer(
+export const GoalCard = observer(
   (props: {
     item: Goal;
-    border?: boolean;
     shownFields?: (keyof GoalInterface)[];
+    border?: boolean;
   }) => {
-    const { item, border, shownFields } = props;
+    const { item, shownFields, border } = props;
     const [isVisible1, setVisible1] = useState(false);
     const [isVisible2, setVisible2] = useState(false);
     const [isVisible3, setVisible3] = useState(false);
-    const [showChildren, setShowChildren] = useState(true);
     const [msg, setMsg] = useState("");
     const { goalStore, taskStore } = useStore();
 
+    const [showChildren, setShowChildren] = useState(true);
     const subgoals = goalStore.items.filter((g) => g.parentGoal === item.id);
 
     const onDelete = async () => {
@@ -39,13 +39,12 @@ export const GoalItem = observer(
 
     return (
       <div
-        className="m-1 border-gray-700 rounded-lg p-2"
+        className="m-1 border-gray-700 rounded-lg p-5"
         style={{ borderWidth: border ? 1 : 0 }}
       >
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
           <GoalForm item={item} setVisible={setVisible1} />
         </MyModal>
-
         <MyConfirmModal
           isVisible={isVisible2}
           setVisible={setVisible2}
@@ -126,7 +125,7 @@ export const GoalItem = observer(
         {showChildren && subgoals.length > 0 && (
           <div className="ml-8 mt-2 space-y-2 border-l-2 border-gray-500 pl-2">
             {subgoals.map((sub) => (
-              <GoalItem key={sub.id} item={sub} shownFields={shownFields} />
+              <GoalCard key={sub.id} item={sub} shownFields={shownFields} />
             ))}
           </div>
         )}

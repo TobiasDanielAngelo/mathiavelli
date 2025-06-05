@@ -1,20 +1,20 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { JournalInterface } from "../api/JournalStore";
-import { useStore } from "../api/Store";
-import { MyForm } from "../blueprints/MyForm";
-import { Field } from "../constants/interfaces";
+import { AccountInterface } from "../../api/AccountStore";
+import { useStore } from "../../api/Store";
+import { MyForm } from "../../blueprints/MyForm";
+import { Field } from "../../constants/interfaces";
 
-export const JournalForm = (props: {
-  item?: JournalInterface;
+export const AccountForm = (props: {
+  item?: AccountInterface;
   setVisible?: (t: boolean) => void;
+  fetchFcn?: () => void;
 }) => {
-  const { item, setVisible } = props;
-  const { journalStore } = useStore();
-  const [details, setDetails] = useState({
-    title: item?.title,
-    description: item?.description,
-    datetimeCreated: moment(item?.datetimeCreated).format("MMM D, YYYY h:mm A"),
+  const { item, setVisible, fetchFcn } = props;
+  const { accountStore } = useStore();
+  const [details, setDetails] = useState<AccountInterface>({
+    name: item?.name,
+    datetimeAdded: moment(item?.datetimeAdded).format("MMM D YYYY h:mm A"),
   });
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);
@@ -23,23 +23,9 @@ export const JournalForm = (props: {
     () => [
       [
         {
-          name: "title",
-          label: "Title",
+          name: "name",
+          label: "Account Name",
           type: "text",
-        },
-      ],
-      [
-        {
-          name: "description",
-          label: "Journal Entry",
-          type: "textarea",
-        },
-      ],
-      [
-        {
-          name: "datetimeCreated",
-          label: "Created",
-          type: "datetime",
         },
       ],
     ],
@@ -48,23 +34,10 @@ export const JournalForm = (props: {
 
   const onClickCreate = async () => {
     setLoading(true);
-    const resp = await journalStore.addItem(details);
-    setLoading(false);
-
-    if (!resp.ok) {
-      setMsg(resp.details);
-      return;
-    }
-    setVisible && setVisible(false);
-  };
-
-  const onClickEdit = async () => {
-    if (!item?.id) return;
-    setLoading(true);
-    const resp = await journalStore.updateItem(item.id, {
+    const resp = await accountStore.addItem({
       ...details,
-      datetimeCreated: moment(
-        details.datetimeCreated,
+      datetimeAdded: moment(
+        details.datetimeAdded,
         "MMM D YYYY h:mm A"
       ).toISOString(),
     });
@@ -74,19 +47,43 @@ export const JournalForm = (props: {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
-  const onClickDelete = async () => {
+  const onClickEdit = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await journalStore.deleteItem(item.id);
+    const resp = await accountStore.updateItem(item.id, {
+      ...details,
+      datetimeAdded: moment(
+        details.datetimeAdded,
+        "MMM D YYYY h:mm A"
+      ).toISOString(),
+    });
     setLoading(false);
 
     if (!resp.ok) {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
+
+    setVisible && setVisible(false);
+  };
+
+  const onClickDelete = async () => {
+    if (!item?.id) return;
+    setLoading(true);
+    const resp = await accountStore.deleteItem(item.id);
+    setLoading(false);
+
+    if (!resp.ok) {
+      setMsg(resp.details);
+      return;
+    }
+    fetchFcn && fetchFcn();
+
     setVisible && setVisible(false);
   };
 
@@ -94,13 +91,13 @@ export const JournalForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Journal" : "Journal Creation Form"}
+        title={item ? "Edit Account" : "Account Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}
         hasDelete={!!item}
         onDelete={onClickDelete}
-        objectName="entry"
+        objectName="account"
         msg={msg}
         isLoading={isLoading}
       />
