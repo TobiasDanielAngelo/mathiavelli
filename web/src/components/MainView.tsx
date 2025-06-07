@@ -3,30 +3,32 @@ import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../api/Store";
 import { AccountView } from "./AccountComponents/AccountView";
+import { BuyListItemView } from "./BuyListItemComponents/BuyListItemView";
+import { CategoryView } from "./CategoryComponents/CategoryView";
 import { DashboardView } from "./DashboardView";
 import { EventView } from "./EventComponents/EventView";
 import { GoalView } from "./GoalComponents/GoalView";
 import { HealthView } from "./HealthView";
 import { JournalView } from "./JournalComponents/JournalView";
 import { NavBar } from "./NavigationBar";
+import { PayableView } from "./PayableComponents/PayableView";
+import { ReceivableView } from "./ReceivableComponents/ReceivableView";
 import { TagView } from "./TagComponents/TagView";
 import { TaskView } from "./TaskComponents/TaskView";
 import { TransactionView } from "./TransactionComponents/TransactionView";
-import { ReceivableView } from "./ReceivableComponents/ReceivableView";
-import { PayableView } from "./PayableComponents/PayableView";
-import { CategoryView } from "./CategoryComponents/CategoryView";
+import { PlatformView } from "./PlatformComponents/PlatformView";
+import { CredentialView } from "./CredentialComponents/CredentialView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
 
   const {
     userStore,
-    payableStore,
-    receivableStore,
     accountStore,
     categoryStore,
     goalStore,
     tagStore,
+    platformStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -41,6 +43,7 @@ export const MainView = observer(() => {
     if (!resp.ok) {
       navigate("/login");
     } else {
+      platformStore.fetchAll("page=all");
       accountStore.fetchAll("page=all");
       categoryStore.fetchAll("page=all");
       tagStore.fetchAll("page=all");
@@ -72,6 +75,9 @@ export const MainView = observer(() => {
         <Route path="payables" element={<PayableView />} />
         <Route path="health" element={<HealthView />} />
         <Route path="tasks" element={<TaskView />} />
+        <Route path="wishlist" element={<BuyListItemView />} />
+        <Route path="credentials" element={<CredentialView />} />
+        <Route path="platforms" element={<PlatformView />} />
       </Routes>
     </div>
   );

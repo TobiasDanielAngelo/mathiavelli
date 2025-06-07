@@ -11,6 +11,9 @@ import { ReceivableStore } from "./ReceivableStore";
 import { PayableStore } from "./PayableStore";
 import { EventStore } from "./EventStore";
 import { TagStore } from "./TagStore";
+import { BuyListItemStore } from "./BuyListItemStore";
+import { PlatformStore } from "./PlatformStore";
+import { CredentialStore } from "./CredentialStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -25,6 +28,9 @@ export class Store extends Model({
   tagStore: prop<TagStore>(),
   goalStore: prop<GoalStore>(),
   taskStore: prop<TaskStore>(),
+  buyListItemStore: prop<BuyListItemStore>(),
+  platformStore: prop<PlatformStore>(),
+  credentialStore: prop<CredentialStore>(),
 }) {}
 
 export const createStore = () =>
@@ -40,6 +46,9 @@ export const createStore = () =>
     tagStore: new TagStore({}),
     goalStore: new GoalStore({}),
     taskStore: new TaskStore({}),
+    buyListItemStore: new BuyListItemStore({}),
+    platformStore: new PlatformStore({}),
+    credentialStore: new CredentialStore({}),
   });
 
 export const StoreContext = createContext<Store | null>(null);

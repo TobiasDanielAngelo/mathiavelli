@@ -61,16 +61,6 @@ const renderField = (
           onChangeValue={(u) => onChangeValue(formatMultiValue(u.map(Number)))}
         />
       );
-    case "select":
-      return (
-        <MyMultiDropdownSelector
-          {...commonProps}
-          key={field.name}
-          options={toOptions(frequency)}
-          value={parseMultiValue(value)}
-          onChangeValue={(u) => onChangeValue(formatMultiValue(u.map(Number)))}
-        />
-      );
     case "date":
     case "time":
     case "datetime":

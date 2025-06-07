@@ -57,14 +57,17 @@ export const ItemDetails = observer(
     const renderRow = (key: keyof T, title: string) => {
       const value = item[key];
       const keyTitle = key === "id" ? "ID" : toTitleCase(key as string);
+      const body = formatValue(value, String(key), prices as string[]);
 
-      return (
+      return body === "—" ? (
+        <></>
+      ) : (
         <div key={String(key)} className="flex gap-5">
           {title === "Body" && (
             <span className="w-[30%] text-right font-bold">{keyTitle}</span>
           )}
           <span className="w-[70%] whitespace-pre-wrap break-words">
-            {formatValue(value, String(key), prices as string[])}
+            {body}
           </span>
         </div>
       );

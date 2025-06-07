@@ -24,8 +24,8 @@ const sections = [
     items: ["events", "tags"],
   },
   {
-    title: "Journals",
-    items: ["journals"],
+    title: "Personal",
+    items: ["journals", "wishlist", "credentials", "platforms"],
   },
   {
     title: "Health",

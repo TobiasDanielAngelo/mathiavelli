@@ -1,5 +1,15 @@
 export const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const frequency = ["None", "Daily", "Weekly", "Monthly", "Yearly"];
+export const priority = ["Low", "Medium", "High"];
+export const status = ["Pending", "Bought", "Cancelled"];
+export const authenticatorApps = [
+  "None",
+  "Google Authenticator",
+  "Authy",
+  "Microsoft Authenticator",
+  "1Password",
+  "Other",
+];
 
 export const lowerFirstLetter = (str: string) => {
   return str.charAt(0).toLowerCase() + str.slice(1);
