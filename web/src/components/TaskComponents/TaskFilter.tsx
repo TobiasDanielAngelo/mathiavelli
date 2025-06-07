@@ -15,7 +15,7 @@ export const TaskFilter = observer(() => {
         "dueDate",
       ]}
       relatedFields={["goalTitle"]}
-      excludeFields={["repeatName", "id"]}
+      excludeFields={["repeatName", "dateDuration", "id"]}
       optionFields={["repeat"]}
     />
   );

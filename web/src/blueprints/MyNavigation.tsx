@@ -104,20 +104,54 @@ export const ResponsiveDrawer = observer(
   }
 );
 
-const NavLink = (props: { page: Page }) => {
-  const { page } = props;
-
+const NavLink = ({
+  page,
+  setLocation,
+}: {
+  page: Page;
+  setLocation?: (path: string) => void;
+}) => {
   return (
-    <Link
-      to={page.link ?? ""}
-      className={
-        page.selected
-          ? "md:text-gray-300 font-bold"
-          : "md:text-blue-500 font-bold"
-      }
-    >
-      {page.title}
-    </Link>
+    <div className="relative group px-2 py-1">
+      {page.link ? (
+        <Link
+          to={page.link}
+          onClick={() => setLocation?.(page.link!)}
+          className={
+            page.selected
+              ? "md:text-gray-300 font-bold"
+              : "md:text-blue-500 font-bold"
+          }
+        >
+          {page.title}
+        </Link>
+      ) : (
+        <span
+          className={
+            page.selected
+              ? "md:text-gray-300 font-bold cursor-default"
+              : "md:text-blue-500 font-bold cursor-default"
+          }
+        >
+          {page.title}
+        </span>
+      )}
+
+      {page.children && page.children?.length > 0 && (
+        <div className="absolute top-full left-0 z-10 hidden group-hover:block bg-gray-800 rounded shadow-lg min-w-[150px] py-2">
+          {page.children.map((child, idx) => (
+            <Link
+              key={idx}
+              to={child.link ?? ""}
+              onClick={() => setLocation?.(child.link!)}
+              className="block px-4 py-2 text-sm text-white hover:bg-gray-100"
+            >
+              {child.title}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -149,12 +183,27 @@ export const MyNavBar = observer(
       navigate("/login");
     };
 
+    const leafPages = paths?.flatMap((p) => {
+      const leaves = p.children?.length
+        ? p.children.filter((c) => !c.children?.length)
+        : [];
+
+      // Include mainLink if present
+      if (p.link) {
+        leaves.push({
+          title: p.title,
+          link: p.link,
+        });
+      }
+      return leaves.length ? leaves : [p];
+    });
+
     return (
       <nav className="relative bg-white border-gray-200 dark:bg-gray-900">
         <ResponsiveDrawer
           open={drawerOpen}
           setOpen={setDrawerOpen}
-          paths={paths}
+          paths={leafPages}
           location={location}
           setLocation={setLocation}
         />
@@ -180,7 +229,7 @@ export const MyNavBar = observer(
                   key={ind}
                   className="hidden lg:block"
                 >
-                  <NavLink page={s} />
+                  <NavLink page={s} setLocation={setLocation} />
                 </div>
               ))}
               <div className="items-center content-center place-items-center place-content-center justify-center justify-items-center">
@@ -196,7 +245,7 @@ export const MyNavBar = observer(
                   setOpen={setOpen2}
                   open={open2}
                   pages={[
-                    ...(paths?.map((s) => ({
+                    ...(leafPages?.map((s) => ({
                       title: s.title,
                       selected: false,
                       onClick: () => {

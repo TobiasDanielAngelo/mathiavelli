@@ -27,63 +27,64 @@ export const EventForm = (props: {
   const [isLoading, setLoading] = useState(false);
 
   const rawFields = useMemo(
-    () => [
+    () =>
       [
-        {
-          name: "title",
-          label: "Title",
-          type: "text",
-        },
-      ],
-      [
-        {
-          name: "description",
-          label: `Description (${details.description?.length ?? 0}/300)`,
-          type: "textarea",
-        },
-      ],
-      [
-        {
-          name: "start",
-          label: "Date/Time Start",
-          type: "datetime",
-        },
-        {
-          name: "end",
-          label: "Date/Time End",
-          type: "datetime",
-        },
-      ],
-      [
-        {
-          name: "allDay",
-          label: "All Day?",
-          type: "check",
-        },
-        {
-          name: "location",
-          label: "Location",
-          type: "text",
-        },
-      ],
-      [
-        {
-          name: "createdAt",
-          label: "Created At",
-          type: "datetime",
-        },
-      ],
-      [
-        {
-          name: "tags",
-          label: "Tags",
-          type: "multi",
-          options: toOptions(tagStore.items, "name"),
-        },
-      ],
-    ],
+        [
+          {
+            name: "title",
+            label: "Title",
+            type: "text",
+          },
+        ],
+        [
+          {
+            name: "description",
+            label: `Description (${details.description?.length ?? 0}/300)`,
+            type: "textarea",
+          },
+        ],
+        [
+          {
+            name: "start",
+            label: "Date/Time Start",
+            type: "datetime",
+          },
+          {
+            name: "end",
+            label: "Date/Time End",
+            type: "datetime",
+          },
+        ],
+        [
+          {
+            name: "allDay",
+            label: "All Day?",
+            type: "check",
+          },
+          {
+            name: "location",
+            label: "Location",
+            type: "text",
+          },
+        ],
+        [
+          {
+            name: "createdAt",
+            label: "Created At",
+            type: "datetime",
+          },
+        ],
+        [
+          {
+            name: "tags",
+            label: "Tags",
+            type: "multi",
+            options: toOptions(tagStore.items, "name"),
+          },
+        ],
+      ] satisfies Field[][],
     [tagStore.items.length, details.description?.length]
-  ) as Field[][];
+  );
 
   const onClickCreate = async () => {
     setLoading(true);
@@ -140,7 +141,7 @@ export const EventForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Event" : "Event Creation Form"}
+        title={item?.id ? "Edit Event" : "Event Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}

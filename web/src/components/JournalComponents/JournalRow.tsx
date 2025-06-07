@@ -7,11 +7,11 @@ import { Journal } from "../../api/JournalStore";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { JournalForm } from "./JournalForm";
+import { useVisible } from "../../constants/hooks";
 
 export const JournalRow = observer((props: { item: Journal }) => {
   const { item } = props;
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
+  const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
   const [msg, setMsg] = useState("");
   const { journalStore } = useStore();
   const onDelete = async () => {

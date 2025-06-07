@@ -8,9 +8,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.exceptions import FieldDoesNotExist
 from .paginations import CustomPagination
 from django.db.models import Q
-import base64
 import json
 from lzstring import LZString
+import datetime
 
 
 def decode_query_param(encoded_param):
@@ -20,11 +20,10 @@ def decode_query_param(encoded_param):
 
 class CustomModelViewSet(viewsets.ModelViewSet):
     permission_classes = [
-        # IsAuthenticated,
-        # CustomDjangoModelPermission,
-        AllowAny
+        IsAuthenticated,
+        CustomDjangoModelPermission,
     ]
-    # authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,)
 
     def list(self, request, *args, **kwargs):
         params = self.request.query_params.copy()
@@ -89,7 +88,10 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         )
 
         if order_by:
-            queryset = queryset.order_by(*order_by)
+            try:
+                queryset = queryset.order_by(*order_by)
+            except Exception as e:
+                print("Order failed:", e)
         else:
             queryset = queryset.order_by("-id")
 
@@ -138,6 +140,28 @@ class TransactionViewSet(CustomModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
 
+    def perform_create(self, serializer):
+        receivable_id = self.request.data.get("receivable_id")
+        payable_id = self.request.data.get("payable_id")
+
+        transaction = serializer.save()
+
+        if receivable_id:
+            try:
+                receivable = Receivable.objects.get(pk=receivable_id)
+                receivable.payment.add(transaction)
+                receivable.check_and_close()
+            except Receivable.DoesNotExist:
+                raise serializers.ValidationError("Receivable not found")
+
+        if payable_id:
+            try:
+                payable = Payable.objects.get(pk=payable_id)
+                payable.payment.add(transaction)
+                payable.check_and_close()
+            except Payable.DoesNotExist:
+                raise serializers.ValidationError("Payable not found")
+
 
 class ReceivableViewSet(CustomModelViewSet):
     queryset = Receivable.objects.all()
@@ -163,7 +187,82 @@ class GoalViewSet(CustomModelViewSet):
     queryset = Goal.objects.all()
     serializer_class = GoalSerializer
 
+    def perform_update(self, serializer):
+        goal = serializer.save()
+
+        if goal.date_completed:
+            goal.date_completed = goal.date_completed or timezone.now().date()
+        else:
+            goal.date_completed = None
+
+        goal.save()
+
 
 class TaskViewSet(CustomModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+
+    def update_goal_completion_status(self, goal):
+        tasks = goal.tasks.filter(is_cancelled=False)
+
+        if tasks.exists() and all(task.is_completed for task in tasks):
+            goal.is_completed = True
+            goal.date_completed = timezone.now().date()
+        else:
+            goal.is_completed = False
+            goal.date_completed = None
+
+        goal.save()
+
+    def perform_create(self, serializer):
+        task = serializer.save()
+        self.create_or_update_event(task)
+
+    def perform_update(self, serializer):
+        task = serializer.save()
+
+        if task.is_completed or task.is_cancelled:
+            if hasattr(task, "event"):
+                task.event.delete()
+        else:
+            self.create_or_update_event(task)
+
+        if task.goal:
+            self.update_goal_completion_status(task.goal)
+
+    def perform_destroy(self, instance):
+        if hasattr(instance, "event"):
+            instance.event.delete()
+        instance.delete()
+
+    def create_or_update_event(self, task):
+        if not task.date_start or not task.date_end:
+            if hasattr(task, "event"):
+                task.event.delete()
+            return
+
+        start_dt = timezone.make_aware(
+            datetime.datetime.combine(task.date_start, datetime.time.min)
+        )
+        end_dt = timezone.make_aware(
+            datetime.datetime.combine(task.date_end, datetime.time.max)
+        )
+
+        event, created = Event.objects.get_or_create(
+            task=task,
+            defaults={
+                "title": task.title,
+                "description": task.description,
+                "start": start_dt,
+                "end": end_dt,
+                "all_day": True,
+            },
+        )
+
+        if not created:
+            event.title = task.title
+            event.description = task.description
+            event.start = start_dt
+            event.end = end_dt
+            event.all_day = True
+            event.save()

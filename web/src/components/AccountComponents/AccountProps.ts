@@ -10,6 +10,7 @@ interface AccountViewProps {
   setParams: SetURLSearchParams;
   pageDetails: PaginatedDetails | undefined;
   PageBar: React.FC;
+  fetchFcn: () => void;
 }
 
 export const AccountViewContext = createContext<AccountViewProps | null>(null);
@@ -20,3 +21,10 @@ export const useAccountView = () => {
     throw new Error("useAccountView must be used within AccountViewContext");
   return ctx;
 };
+
+export const AccountIdMap = {
+  Wallet: 1,
+  Coins: 2,
+  Operations: 3,
+  Initial: 4,
+} as const;

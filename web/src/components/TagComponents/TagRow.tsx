@@ -7,11 +7,11 @@ import { Tag } from "../../api/TagStore";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TagForm } from "./TagForm";
+import { useVisible } from "../../constants/hooks";
 
 export const TagRow = observer((props: { item: Tag }) => {
   const { item } = props;
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
+  const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
   const [msg, setMsg] = useState("");
   const { tagStore } = useStore();
   const onDelete = async () => {

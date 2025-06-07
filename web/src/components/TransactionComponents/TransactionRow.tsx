@@ -7,11 +7,11 @@ import { Transaction } from "../../api/TransactionStore";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TransactionForm } from "./TransactionForm";
+import { useVisible } from "../../constants/hooks";
 
 export const TransactionRow = observer((props: { item: Transaction }) => {
   const { item } = props;
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
+  const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
   const [msg, setMsg] = useState("");
   const { accountStore } = useStore();
   const onDelete = async () => {

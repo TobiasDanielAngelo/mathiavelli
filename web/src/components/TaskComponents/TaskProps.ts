@@ -12,6 +12,7 @@ interface TaskViewProps {
   pageDetails: PaginatedDetails | undefined;
   itemMap: KV<any>[];
   PageBar: React.FC;
+  fetchFcn: () => void;
 }
 
 export const TaskViewContext = createContext<TaskViewProps | null>(null);

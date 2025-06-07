@@ -7,11 +7,11 @@ import { Account } from "../../api/AccountStore";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { AccountForm } from "./AccountForm";
+import { useVisible } from "../../constants/hooks";
 
 export const AccountRow = observer((props: { item: Account }) => {
   const { item } = props;
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
+  const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
   const [msg, setMsg] = useState("");
   const { accountStore } = useStore();
   const onDelete = async () => {

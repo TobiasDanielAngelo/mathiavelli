@@ -76,6 +76,37 @@ export class TwoDates {
     this.end = d1 > d2 ? d1 : d2;
   }
 
+  get getRangeString(): string {
+    const s = this.start;
+    const e = this.end;
+
+    const sameYear = s.getFullYear() === e.getFullYear();
+    const sameMonth = sameYear && s.getMonth() === e.getMonth();
+    const sameDate = sameMonth && s.getDate() === e.getDate();
+
+    if (sameDate) {
+      return `${s.getDate()} ${s.toLocaleString("default", {
+        month: "short",
+      })} ${s.getFullYear()}`;
+    } else if (sameMonth) {
+      return `${s.getDate()}–${e.getDate()} ${s.toLocaleString("default", {
+        month: "short",
+      })} ${s.getFullYear()}`;
+    } else if (sameYear) {
+      return `${s.getDate()} ${s.toLocaleString("default", {
+        month: "short",
+      })} – ${e.getDate()} ${e.toLocaleString("default", {
+        month: "short",
+      })} ${s.getFullYear()}`;
+    } else {
+      return `${s.getDate()} ${s.toLocaleString("default", {
+        month: "short",
+      })} ${s.getFullYear()} – ${e.getDate()} ${e.toLocaleString("default", {
+        month: "short",
+      })} ${e.getFullYear()}`;
+    }
+  }
+
   get datesBetween() {
     const dateArr = [];
     let curr = new Date(this.start);

@@ -26,6 +26,9 @@ const props = {
   receiver: prop<number | null>(null),
   amount: prop<number>(0),
   datetimeTransacted: prop<string>(""),
+
+  receivableId: prop<number | null>(null),
+  payableId: prop<number | null>(null),
 };
 
 export type TransactionInterface = {

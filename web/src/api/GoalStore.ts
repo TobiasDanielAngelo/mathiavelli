@@ -15,6 +15,7 @@ import {
   updateItemRequest,
 } from "../constants/storeHelpers";
 import { Store } from "./Store";
+import { TwoDates } from "../constants/classes";
 
 const slug = "goals";
 
@@ -50,12 +51,17 @@ export class Goal extends Model(props) {
     return store.goalStore.allItems.get(this.parentGoal ?? -1)?.title || "—";
   }
 
+  get dateDuration() {
+    return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
+  }
+
   get $view() {
     const store = getRoot<Store>(this);
     return {
       ...this.$,
       parentGoalTitle:
         store?.goalStore?.allItems.get(this.parentGoal ?? -1)?.title || "—",
+      dateDuration: this.dateDuration,
     };
   }
 }

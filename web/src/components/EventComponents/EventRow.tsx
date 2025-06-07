@@ -7,11 +7,11 @@ import { Event } from "../../api/EventStore";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { EventForm } from "./EventForm";
+import { useVisible } from "../../constants/hooks";
 
 export const EventRow = observer((props: { item: Event }) => {
   const { item } = props;
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
+  const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
   const [msg, setMsg] = useState("");
   const { eventStore } = useStore();
   const onDelete = async () => {

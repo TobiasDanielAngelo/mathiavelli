@@ -16,14 +16,19 @@ import { EventFilter } from "./EventFilter";
 import { EventForm } from "./EventForm";
 import { EventViewContext } from "./EventProps";
 import { EventTable } from "./EventTable";
-import { useLocalStorageState } from "../../constants/hooks";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const EventView = observer(() => {
   const { eventStore, tagStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
-  const [isVisible3, setVisible3] = useState(false);
+  const {
+    isVisible1,
+    setVisible1,
+    isVisible2,
+    setVisible2,
+    isVisible3,
+    setVisible3,
+  } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(new Event({}).$view) as (keyof EventInterface)[],
     "shownFieldsEvent"
@@ -149,6 +154,7 @@ export const EventView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
+    fetchFcn: fetchEvents,
   };
 
   return (
@@ -169,7 +175,6 @@ export const EventView = observer(() => {
             }))}
             relative
             open
-            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>

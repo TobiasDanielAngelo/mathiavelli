@@ -38,8 +38,12 @@ export const MyMultiDropdownSelector = (props: {
   };
 
   useEffect(() => {
-    onChangeValue(selectAll ? options.map((s) => s.id) : value);
+    onChangeValue(selectAll ? options.map((s) => s.id) : []);
   }, [selectAll, options.length]);
+
+  useEffect(() => {
+    onChangeValue(selectAll ? options.map((s) => s.id) : value);
+  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

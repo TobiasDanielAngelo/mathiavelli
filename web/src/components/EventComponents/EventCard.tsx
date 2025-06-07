@@ -8,12 +8,12 @@ import { ItemDetails } from "../../blueprints/ItemDetails";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { EventForm } from "./EventForm";
+import { useVisible } from "../../constants/hooks";
 
 export const EventCard = observer(
   (props: { item: Event; shownFields?: (keyof EventInterface)[] }) => {
     const { item, shownFields } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
+    const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
     const { eventStore } = useStore();
 
@@ -53,7 +53,7 @@ export const EventCard = observer(
               shownFields={shownFields}
               header={["id"]}
               important={["title"]}
-              body={["description", "start", "end", "tagNames"]}
+              body={["description", "tagNames", "dateDuration"]}
             />
             <div className="flex justify-end">
               <EditIcon

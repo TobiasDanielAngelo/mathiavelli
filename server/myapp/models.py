@@ -46,7 +46,7 @@ class Transaction(models.Model):
         related_name="transaction_category",
         null=True,
     )
-    description = models.CharField(max_length=200, default="")
+    description = models.CharField(max_length=200, default="", blank=True)
     transmitter = models.ForeignKey(
         Account,
         on_delete=models.SET_NULL,
@@ -89,6 +89,15 @@ class Receivable(models.Model):
     def __str__(self):
         return f"{self.borrower_name} - {self.description}"
 
+    def payment_total(self):
+        return sum(p.amount for p in self.payment.all())
+
+    def check_and_close(self):
+        if self.payment_total() >= self.lent_amount and self.is_active:
+            self.is_active = False
+            self.datetime_closed = timezone.now()
+            self.save()
+
 
 class Payable(models.Model):
     payment = models.ManyToManyField(
@@ -109,6 +118,15 @@ class Payable(models.Model):
     def __str__(self):
         return f"{self.lender_name} - {self.description}"
 
+    def payment_total(self):
+        return sum(p.amount for p in self.payment.all())
+
+    def check_and_close(self):
+        if self.payment_total() >= self.borrowed_amount and self.is_active:
+            self.is_active = False
+            self.datetime_closed = timezone.now()
+            self.save()
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
@@ -116,24 +134,6 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Event(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
-    all_day = models.BooleanField(default=False)
-    location = models.CharField(max_length=255, blank=True)
-    tags = models.ManyToManyField(Tag, blank=True)
-    created_at = models.DateTimeField(default=timezone.now, null=True, blank=True)
-
-    def clean(self):
-        if self.start and self.end and self.start >= self.end:
-            raise ValidationError("Start time must be before end time.")
-
-    def __str__(self):
-        return f"{self.title} ({self.start} - {self.end})"
 
 
 class Goal(models.Model):
@@ -146,7 +146,6 @@ class Goal(models.Model):
         on_delete=models.CASCADE,
         related_name="subgoals",
     )
-    is_completed = models.BooleanField(default=False)
     date_completed = models.DateField(null=True, blank=True)
     date_start = models.DateField(null=True, blank=True)
     date_end = models.DateField(null=True, blank=True)
@@ -159,6 +158,10 @@ class Goal(models.Model):
     def clean(self):
         if self.date_start and self.date_end and self.date_start > self.date_end:
             raise ValidationError("Start time must be before end time.")
+
+    @property
+    def is_completed(self):
+        return self.date_completed is not None
 
 
 class Task(models.Model):
@@ -190,3 +193,24 @@ class Task(models.Model):
     def clean(self):
         if self.date_start and self.date_end and self.date_start > self.date_end:
             raise ValidationError("Start time must be before end time.")
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    all_day = models.BooleanField(default=False)
+    location = models.CharField(max_length=255, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    created_at = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    task = models.OneToOneField(
+        Task, on_delete=models.CASCADE, null=True, blank=True, related_name="event"
+    )
+
+    def clean(self):
+        if self.start and self.end and self.start >= self.end:
+            raise ValidationError("Start time must be before end time.")
+
+    def __str__(self):
+        return f"{self.title} ({self.start} - {self.end})"

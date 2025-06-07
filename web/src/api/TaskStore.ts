@@ -16,6 +16,7 @@ import {
   updateItemRequest,
 } from "../constants/storeHelpers";
 import { Store } from "./Store";
+import { TwoDates } from "../constants/classes";
 
 const slug = "tasks";
 
@@ -56,12 +57,17 @@ export class Task extends Model(props) {
     return frequency.find((_, ind) => ind === this.repeat) ?? "—";
   }
 
+  get dateDuration() {
+    return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
+  }
+
   get $view() {
     const store = getRoot<Store>(this);
     return {
       ...this.$,
       goalTitle: store?.goalStore?.allItems.get(this.goal ?? -1)?.title || "—",
       repeatName: this.repeatName,
+      dateDuration: this.dateDuration,
     };
   }
 }

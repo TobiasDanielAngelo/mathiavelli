@@ -9,7 +9,7 @@ export const EventFilter = observer(() => {
       title="Event Filters"
       dateFields={["createdAt", "start", "end"]}
       relatedFields={["tagNames"]}
-      excludeFields={["tags", "id"]}
+      excludeFields={["tags", "id", "dateDuration"]}
     />
   );
 });

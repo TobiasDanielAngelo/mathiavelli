@@ -17,14 +17,19 @@ import { GoalFilter } from "./GoalFilter";
 import { GoalForm } from "./GoalForm";
 import { GoalViewContext } from "./GoalProps";
 import { GoalTable } from "./GoalTable";
-import { useLocalStorageState } from "../../constants/hooks";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const GoalView = observer(() => {
   const { goalStore, taskStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
-  const [isVisible3, setVisible3] = useState(false);
+  const {
+    isVisible1,
+    setVisible1,
+    isVisible2,
+    setVisible2,
+    isVisible3,
+    setVisible3,
+  } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(new Goal({}).$view) as (keyof GoalInterface)[],
     "shownFieldsGoal"
@@ -151,6 +156,7 @@ export const GoalView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
+    fetchFcn: fetchGoals,
   };
 
   return (
@@ -171,7 +177,6 @@ export const GoalView = observer(() => {
             }))}
             relative
             open
-            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>

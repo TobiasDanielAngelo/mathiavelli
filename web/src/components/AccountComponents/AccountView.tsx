@@ -15,14 +15,19 @@ import { AccountFilter } from "./AccountFilter";
 import { AccountForm } from "./AccountForm";
 import { AccountViewContext } from "./AccountProps";
 import { AccountTable } from "./AccountTable";
-import { useLocalStorageState } from "../../constants/hooks";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const AccountView = observer(() => {
   const { accountStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
-  const [isVisible3, setVisible3] = useState(false);
+  const {
+    isVisible1,
+    setVisible1,
+    isVisible2,
+    setVisible2,
+    isVisible3,
+    setVisible3,
+  } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(new Account({}).$) as (keyof AccountInterface)[],
     "shownFieldsAccount"
@@ -132,6 +137,7 @@ export const AccountView = observer(() => {
     setParams,
     pageDetails,
     PageBar,
+    fetchFcn: fetchAccounts,
   };
 
   return (
@@ -154,7 +160,6 @@ export const AccountView = observer(() => {
             }))}
             relative
             open
-            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>

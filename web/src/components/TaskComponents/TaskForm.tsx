@@ -23,7 +23,9 @@ export const TaskForm = observer(
       isCompleted: item?.isCompleted,
       isCancelled: item?.isCancelled,
       repeat: item?.repeat,
-      dateCompleted: moment(item?.dateCompleted).format("MMM D, YYYY"),
+      dateCompleted: item?.dateCompleted
+        ? moment(item?.dateCompleted).format("MMM D, YYYY")
+        : null,
       dateStart: moment(item?.dateStart).format("MMM D, YYYY"),
       dateEnd: moment(item?.dateEnd).format("MMM D, YYYY"),
       dueDate: moment(item?.dueDate).format("MMM D, YYYY"),
@@ -32,83 +34,84 @@ export const TaskForm = observer(
     const [isLoading, setLoading] = useState(false);
 
     const rawFields = useMemo(
-      () => [
+      () =>
         [
-          {
-            name: "title",
-            label: "Title",
-            type: "text",
-          },
-        ],
-        [
-          {
-            name: "description",
-            label: "Description",
-            type: "textarea",
-          },
-        ],
-        [
-          {
-            name: "goal",
-            label: "Goal",
-            type: "select",
-            options: toOptions(goalStore.items, "title"),
-          },
-        ],
-        [
-          {
-            name: "isCompleted",
-            label: "Complete?",
-            type: "check",
-          },
-          {
-            name: "isCancelled",
-            label: "Cancel?",
-            type: "check",
-          },
-          {
-            name: "repeat",
-            label: "Frequency",
-            type: "select",
-            options: toOptions(frequency),
-          },
-        ],
+          [
+            {
+              name: "title",
+              label: "Title",
+              type: "text",
+            },
+          ],
+          [
+            {
+              name: "description",
+              label: "Description",
+              type: "textarea",
+            },
+          ],
+          [
+            {
+              name: "goal",
+              label: "Goal",
+              type: "select",
+              options: toOptions(goalStore.items, "title"),
+            },
+          ],
+          [
+            {
+              name: "isCompleted",
+              label: "Complete?",
+              type: "check",
+            },
+            {
+              name: "isCancelled",
+              label: "Cancel?",
+              type: "check",
+            },
+            {
+              name: "repeat",
+              label: "Frequency",
+              type: "select",
+              options: toOptions(frequency),
+            },
+          ],
 
-        [
-          {
-            name: "dateStart",
-            label: "Date Start",
-            type: "date",
-          },
-          {
-            name: "dateEnd",
-            label: "Date End",
-            type: "date",
-          },
-        ],
-        [
-          {
-            name: "dueDate",
-            label: "Due Date",
-            type: "date",
-          },
-          {
-            name: "dateCompleted",
-            label: "Date Completed",
-            type: "date",
-          },
-        ],
-      ],
+          [
+            {
+              name: "dateStart",
+              label: "Date Start",
+              type: "date",
+            },
+            {
+              name: "dateEnd",
+              label: "Date End",
+              type: "date",
+            },
+          ],
+          [
+            {
+              name: "dueDate",
+              label: "Due Date",
+              type: "date",
+            },
+            {
+              name: "dateCompleted",
+              label: "Date Completed",
+              type: "date",
+            },
+          ],
+        ] satisfies Field[][],
       [goalStore.items.length, item?.id]
-    ) as Field[][];
+    );
 
     const onClickCreate = async () => {
       setLoading(true);
       const resp = await taskStore.addItem({
         ...details,
-        dateCompleted: moment(details?.dateCompleted, "MMM D, YYYY").format(
-          "YYYY-MM-DD"
-        ),
+        dateCompleted: details?.dateCompleted
+          ? moment(details?.dateCompleted, "MMM D, YYYY").format("YYYY-MM-DD")
+          : null,
         dateStart: moment(details?.dateStart, "MMM D, YYYY").format(
           "YYYY-MM-DD"
         ),
@@ -130,9 +133,9 @@ export const TaskForm = observer(
       setLoading(true);
       const resp = await taskStore.updateItem(item.id, {
         ...details,
-        dateCompleted: moment(details?.dateCompleted, "MMM D, YYYY").format(
-          "YYYY-MM-DD"
-        ),
+        dateCompleted: details?.dateCompleted
+          ? moment(details?.dateCompleted, "MMM D, YYYY").format("YYYY-MM-DD")
+          : null,
         dateStart: moment(details?.dateStart, "MMM D, YYYY").format(
           "YYYY-MM-DD"
         ),
@@ -166,7 +169,7 @@ export const TaskForm = observer(
       <div className="items-center">
         <MyForm
           fields={rawFields}
-          title={item ? "Edit Task" : "Task Creation Form"}
+          title={item?.id ? "Edit Task" : "Task Creation Form"}
           details={details}
           setDetails={setDetails}
           onClickSubmit={item ? onClickEdit : onClickCreate}

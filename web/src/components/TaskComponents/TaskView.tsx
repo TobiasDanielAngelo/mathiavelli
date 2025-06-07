@@ -17,14 +17,19 @@ import { TaskFilter } from "./TaskFilter";
 import { TaskForm } from "./TaskForm";
 import { TaskViewContext } from "./TaskProps";
 import { TaskTable } from "./TaskTable";
-import { useLocalStorageState } from "../../constants/hooks";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const TaskView = observer(() => {
   const { taskStore, goalStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
-  const [isVisible3, setVisible3] = useState(false);
+  const {
+    isVisible1,
+    setVisible1,
+    isVisible2,
+    setVisible2,
+    isVisible3,
+    setVisible3,
+  } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(new Task({}).$view) as (keyof TaskInterface)[],
     "shownFieldsTask"
@@ -155,6 +160,7 @@ export const TaskView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
+    fetchFcn: fetchTasks,
   };
 
   return (
@@ -175,7 +181,6 @@ export const TaskView = observer(() => {
             }))}
             relative
             open
-            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>

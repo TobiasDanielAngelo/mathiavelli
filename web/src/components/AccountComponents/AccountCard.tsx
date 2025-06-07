@@ -8,12 +8,12 @@ import { ItemDetails } from "../../blueprints/ItemDetails";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { AccountForm } from "./AccountForm";
+import { useVisible } from "../../constants/hooks";
 
 export const AccountCard = observer(
   (props: { item: Account; shownFields?: (keyof AccountInterface)[] }) => {
     const { item, shownFields } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
+    const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
     const { accountStore } = useStore();
 

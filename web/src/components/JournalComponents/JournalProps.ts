@@ -10,6 +10,7 @@ interface JournalViewProps {
   setParams: SetURLSearchParams;
   pageDetails: PaginatedDetails | undefined;
   PageBar: React.FC;
+  fetchFcn: () => void;
 }
 
 export const JournalViewContext = createContext<JournalViewProps | null>(null);

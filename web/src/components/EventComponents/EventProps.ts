@@ -12,6 +12,7 @@ interface EventViewProps {
   pageDetails: PaginatedDetails | undefined;
   itemMap: KV<any>[];
   PageBar: React.FC;
+  fetchFcn: () => void;
 }
 
 export const EventViewContext = createContext<EventViewProps | null>(null);

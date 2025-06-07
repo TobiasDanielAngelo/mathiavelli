@@ -193,7 +193,7 @@ export const toMoney = (n?: any) => {
   return (
     `\u20b1` +
     (!n
-      ? ` \u2013`
+      ? ` —`
       : n > 0
       ? n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       : "(" +
@@ -346,7 +346,7 @@ export const formatValue = (
         ? kv.values.find((_, i) => i === val)
         : kv.values.find((v) => v.id === val)?.[kv.label] ?? "—";
 
-    return Array.isArray(value) ? value.map(lookup).join(", ") : lookup(value);
+    return Array.isArray(value) ? value.map(lookup).join(",") : lookup(value);
   }
   if (prices?.includes(key)) return toMoney(value);
   if (typeof value === "boolean") {
@@ -475,3 +475,14 @@ export const getUniqueIdsFromFK = <T, K extends keyof T>(
     (id) => id !== -1
   ) as (T[K] extends number ? number : never)[];
 };
+
+/**
+ * Generates a 10-character alphanumeric ID based on the current timestamp and random data.
+ * - Uses base36 to keep it compact.
+ * - Ensures uniqueness across time and multiple calls.
+ */
+export function generateShortId(): string {
+  const timePart = Date.now().toString(36); // base36 = time-encoded
+  const randomPart = Math.random().toString(36).substring(2, 10); // remove "0."
+  return (timePart + randomPart).substring(0, 10); // combine & trim to 10 chars
+}

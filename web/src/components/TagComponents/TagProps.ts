@@ -10,6 +10,7 @@ interface TagViewProps {
   setParams: SetURLSearchParams;
   pageDetails: PaginatedDetails | undefined;
   PageBar: React.FC;
+  fetchFcn: () => void;
 }
 
 export const TagViewContext = createContext<TagViewProps | null>(null);

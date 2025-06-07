@@ -2,14 +2,12 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "../../api/Store";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { EventCard } from "./EventCard";
+import { EventDashboard } from "./EventDashboard";
 import { useEventView } from "./EventProps";
-import { MyCalendar } from "../../blueprints/MyCalendar";
-import { useState } from "react";
 
 export const EventCollection = observer(() => {
   const { eventStore } = useStore();
   const { shownFields, pageDetails, PageBar } = useEventView();
-  const [date, setDate] = useState(new Date());
 
   return (
     <SideBySideView
@@ -32,9 +30,7 @@ export const EventCollection = observer(() => {
           <PageBar />
         </div>
       }
-      SideB={
-        <MyCalendar date={date} setDate={setDate} events={eventStore.items} />
-      }
+      SideB={<EventDashboard />}
       ratio={0.7}
     />
   );

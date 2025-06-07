@@ -12,6 +12,9 @@ import { NavBar } from "./NavigationBar";
 import { TagView } from "./TagComponents/TagView";
 import { TaskView } from "./TaskComponents/TaskView";
 import { TransactionView } from "./TransactionComponents/TransactionView";
+import { ReceivableView } from "./ReceivableComponents/ReceivableView";
+import { PayableView } from "./PayableComponents/PayableView";
+import { CategoryView } from "./CategoryComponents/CategoryView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -38,8 +41,6 @@ export const MainView = observer(() => {
     if (!resp.ok) {
       navigate("/login");
     } else {
-      payableStore.fetchAll();
-      receivableStore.fetchAll();
       accountStore.fetchAll("page=all");
       categoryStore.fetchAll("page=all");
       tagStore.fetchAll("page=all");
@@ -62,10 +63,13 @@ export const MainView = observer(() => {
         <Route path="dashboard" element={<DashboardView />} />
         <Route path="journals" element={<JournalView />} />
         <Route path="transactions" element={<TransactionView />} />
+        <Route path="categories" element={<CategoryView />} />
         <Route path="accounts" element={<AccountView />} />
         <Route path="events" element={<EventView />} />
         <Route path="tags" element={<TagView />} />
         <Route path="goals" element={<GoalView />} />
+        <Route path="receivables" element={<ReceivableView />} />
+        <Route path="payables" element={<PayableView />} />
         <Route path="health" element={<HealthView />} />
         <Route path="tasks" element={<TaskView />} />
       </Routes>

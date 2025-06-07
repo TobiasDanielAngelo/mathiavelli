@@ -15,14 +15,19 @@ import { TagFilter } from "./TagFilter";
 import { TagForm } from "./TagForm";
 import { TagViewContext } from "./TagProps";
 import { TagTable } from "./TagTable";
-import { useLocalStorageState } from "../../constants/hooks";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const TagView = observer(() => {
   const { tagStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
-  const [isVisible3, setVisible3] = useState(false);
+  const {
+    isVisible1,
+    setVisible1,
+    isVisible2,
+    setVisible2,
+    isVisible3,
+    setVisible3,
+  } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState<
     (keyof TagInterface)[]
   >(Object.keys(new Tag({}).$) as (keyof TagInterface)[], "shownFieldsTag");
@@ -131,6 +136,7 @@ export const TagView = observer(() => {
     setParams,
     pageDetails,
     PageBar,
+    fetchFcn: fetchTags,
   };
 
   return (
@@ -151,7 +157,6 @@ export const TagView = observer(() => {
             }))}
             relative
             open
-            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>

@@ -6,9 +6,10 @@ export interface Option {
 export type Page = {
   title: string;
   link?: string;
-  selected: boolean;
+  selected?: boolean;
   onClick?: () => void;
   hidden?: boolean;
+  children?: Page[];
 };
 
 export type Field = {

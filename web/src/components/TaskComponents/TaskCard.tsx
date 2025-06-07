@@ -8,12 +8,12 @@ import { ItemDetails } from "../../blueprints/ItemDetails";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TaskForm } from "./TaskForm";
+import { useVisible } from "../../constants/hooks";
 
 export const TaskCard = observer(
   (props: { item: Task; shownFields?: (keyof TaskInterface)[] }) => {
     const { item, shownFields } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
+    const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
     const { taskStore } = useStore();
 
@@ -61,6 +61,8 @@ export const TaskCard = observer(
                 "isCompleted",
                 "goalTitle",
                 "repeatName",
+                "dateCompleted",
+                "dateDuration",
               ]}
             />
             <div className="flex justify-end">

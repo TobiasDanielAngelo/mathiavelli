@@ -12,6 +12,7 @@ interface GoalViewProps {
   pageDetails: PaginatedDetails | undefined;
   itemMap: KV<any>[];
   PageBar: React.FC;
+  fetchFcn: () => void;
 }
 
 export const GoalViewContext = createContext<GoalViewProps | null>(null);

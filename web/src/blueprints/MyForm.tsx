@@ -1,23 +1,22 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
 import { daysOfWeek } from "../constants/constants";
 import { toOptions } from "../constants/helpers";
+import { useKeyPress, useVisible } from "../constants/hooks";
 import { Field } from "../constants/interfaces";
 import {
   MyButton,
   MyCheckBox,
+  MyColorPicker,
   MyConfirmModal,
   MyDateTimePicker,
   MyDropdownSelector,
   MyImageUploader,
   MyInput,
+  MyMultiDropdownSelector,
   MyMultiSelector,
   MyTextArea,
-  MyColorPicker,
-  MyMultiDropdownSelector,
 } from "./";
-import { useKeyPress } from "../constants/hooks";
 
 const getMsg = (msg: any, name: string) =>
   msg && !`${msg[name as keyof Object]}`.includes("undefined")
@@ -77,7 +76,14 @@ const renderField = (
         />
       );
     case "textarea":
-      return <MyTextArea key={key} {...commonProps} centered={t.centered} />;
+      return (
+        <MyTextArea
+          key={key}
+          {...commonProps}
+          value={details[t.name] ?? ""}
+          centered={t.centered}
+        />
+      );
     case "color":
       return <MyColorPicker key={key} {...commonProps} />;
     case "check":
@@ -92,7 +98,14 @@ const renderField = (
       );
     case "number":
     case "text":
-      return <MyInput key={key} {...commonProps} centered={t.centered} />;
+      return (
+        <MyInput
+          key={key}
+          {...commonProps}
+          value={details[t.name] ?? ""}
+          centered={t.centered}
+        />
+      );
     default:
       return (
         <div className="text-gray-300 items-center justify-center" key={key}>
@@ -127,13 +140,13 @@ export const MyForm = observer(
     isLoading?: boolean;
   }) => {
     useKeyPress(["Enter"], onClickSubmit);
-    const [isVisible1, setVisible1] = useState(false);
+    const { isVisible1, setVisible1 } = useVisible();
 
     const onChangeValue = (val: any, name: string) =>
       setDetails({ ...details, [name]: val });
 
     const onClickDelete = () => {
-      setVisible1(true);
+      setVisible1 && setVisible1(true);
     };
     const onClickConfirm = async () => {
       onDelete && (await onDelete());

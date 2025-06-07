@@ -23,21 +23,38 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TransactionSerializer(serializers.ModelSerializer):
+    receivableId = serializers.IntegerField(
+        required=False, allow_null=True, write_only=True
+    )
+    payableId = serializers.IntegerField(
+        required=False, allow_null=True, write_only=True
+    )
+
     class Meta:
         model = Transaction
         fields = "__all__"
 
 
 class ReceivableSerializer(serializers.ModelSerializer):
+    payment_total = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Receivable
         fields = "__all__"
 
+    def get_payment_total(self, obj):
+        return obj.payment.aggregate(total=models.Sum("amount"))["total"] or 0
+
 
 class PayableSerializer(serializers.ModelSerializer):
+    payment_total = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Payable
         fields = "__all__"
+
+    def get_payment_total(self, obj):
+        return obj.payment.aggregate(total=models.Sum("amount"))["total"] or 0
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -65,6 +82,10 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class GoalSerializer(serializers.ModelSerializer):
+    is_completed = serializers.SerializerMethodField()
+    # Optional: allow client to toggle completion via boolean
+    set_completed = serializers.BooleanField(write_only=True, required=False)
+
     class Meta:
         model = Goal
         fields = "__all__"
@@ -80,6 +101,16 @@ class GoalSerializer(serializers.ModelSerializer):
                 }
             )
         return data
+
+    def get_is_completed(self, obj):
+        return obj.date_completed is not None
+
+    def update(self, instance, validated_data):
+        if "set_completed" in validated_data:
+            completed = validated_data.pop("set_completed")
+            instance.date_completed = timezone.now().date() if completed else None
+
+        return super().update(instance, validated_data)
 
 
 class TaskSerializer(serializers.ModelSerializer):

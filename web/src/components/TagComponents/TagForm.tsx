@@ -19,24 +19,25 @@ export const TagForm = (props: {
   const [isLoading, setLoading] = useState(false);
 
   const rawFields = useMemo(
-    () => [
+    () =>
       [
-        {
-          name: "name",
-          label: "Tag Name",
-          type: "text",
-        },
-      ],
-      [
-        {
-          name: "color",
-          label: "Color",
-          type: "color",
-        },
-      ],
-    ],
+        [
+          {
+            name: "name",
+            label: "Tag Name",
+            type: "text",
+          },
+        ],
+        [
+          {
+            name: "color",
+            label: "Color",
+            type: "color",
+          },
+        ],
+      ] satisfies Field[][],
     []
-  ) as Field[][];
+  );
 
   const onClickCreate = async () => {
     setLoading(true);
@@ -85,7 +86,7 @@ export const TagForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Tag" : "Tag Creation Form"}
+        title={item?.id ? "Edit Tag" : "Tag Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}

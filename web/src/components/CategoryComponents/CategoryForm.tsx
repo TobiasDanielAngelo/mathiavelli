@@ -1,58 +1,61 @@
 import { useMemo, useState } from "react";
-import { useStore } from "../api/Store";
-import { TagInterface } from "../api/TagStore";
-import { MyForm } from "../blueprints/MyForm";
-import { Field } from "../constants/interfaces";
+import { useStore } from "../../api/Store";
+import { CategoryInterface } from "../../api/CategoryStore";
+import { MyForm } from "../../blueprints/MyForm";
+import { Field } from "../../constants/interfaces";
 
-export const TagForm = (props: {
-  item?: TagInterface;
+export const CategoryForm = (props: {
+  item?: CategoryInterface;
   setVisible?: (t: boolean) => void;
+  fetchFcn?: () => void;
 }) => {
-  const { item, setVisible } = props;
-  const { tagStore } = useStore();
+  const { item, setVisible, fetchFcn } = props;
+  const { categoryStore } = useStore();
   const [details, setDetails] = useState({
-    name: item?.name,
-    color: item?.color ?? "#d0021b",
+    title: item?.title,
+    logo: item?.logo,
   });
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);
 
   const rawFields = useMemo(
-    () => [
+    () =>
       [
-        {
-          name: "name",
-          label: "Tag Name",
-          type: "text",
-        },
-      ],
-      [
-        {
-          name: "color",
-          label: "Color",
-          type: "color",
-        },
-      ],
-    ],
+        [
+          {
+            name: "title",
+            label: "Title",
+            type: "text",
+          },
+        ],
+        [
+          {
+            name: "logo",
+            label: "Logo",
+            type: "text",
+          },
+        ],
+      ] satisfies Field[][],
     []
-  ) as Field[][];
+  );
 
   const onClickCreate = async () => {
     setLoading(true);
-    const resp = await tagStore.addItem(details);
+    const resp = await categoryStore.addItem(details);
     setLoading(false);
 
     if (!resp.ok) {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
   const onClickEdit = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await tagStore.updateItem(item.id, {
+    const resp = await categoryStore.updateItem(item.id, {
       ...details,
     });
     setLoading(false);
@@ -61,19 +64,21 @@ export const TagForm = (props: {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
   const onClickDelete = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await tagStore.deleteItem(item.id);
+    const resp = await categoryStore.deleteItem(item.id);
     setLoading(false);
 
     if (!resp.ok) {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible && setVisible(false);
   };
 
@@ -81,13 +86,13 @@ export const TagForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Tag" : "Tag Creation Form"}
+        title={item?.id ? "Edit Category" : "Category Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}
         hasDelete={!!item}
         onDelete={onClickDelete}
-        objectName="tag"
+        objectName="category"
         msg={msg}
         isLoading={isLoading}
       />

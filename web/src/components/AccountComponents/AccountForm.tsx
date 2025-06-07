@@ -20,17 +20,18 @@ export const AccountForm = (props: {
   const [isLoading, setLoading] = useState(false);
 
   const rawFields = useMemo(
-    () => [
+    () =>
       [
-        {
-          name: "name",
-          label: "Account Name",
-          type: "text",
-        },
-      ],
-    ],
+        [
+          {
+            name: "name",
+            label: "Account Name",
+            type: "text",
+          },
+        ],
+      ] satisfies Field[][],
     []
-  ) as Field[][];
+  );
 
   const onClickCreate = async () => {
     setLoading(true);
@@ -91,7 +92,7 @@ export const AccountForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Account" : "Account Creation Form"}
+        title={item?.id ? "Edit Account" : "Account Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}

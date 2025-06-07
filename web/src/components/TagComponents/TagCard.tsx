@@ -8,12 +8,12 @@ import { ItemDetails } from "../../blueprints/ItemDetails";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TagForm } from "./TagForm";
+import { useVisible } from "../../constants/hooks";
 
 export const TagCard = observer(
   (props: { item: Tag; shownFields?: (keyof TagInterface)[] }) => {
     const { item, shownFields } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
+    const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
     const { tagStore } = useStore();
 

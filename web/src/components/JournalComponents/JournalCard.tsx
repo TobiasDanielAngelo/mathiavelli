@@ -8,12 +8,12 @@ import { ItemDetails } from "../../blueprints/ItemDetails";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { JournalForm } from "./JournalForm";
+import { useVisible } from "../../constants/hooks";
 
 export const JournalCard = observer(
   (props: { item: Journal; shownFields?: (keyof JournalInterface)[] }) => {
     const { item, shownFields } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
+    const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
     const { journalStore } = useStore();
 

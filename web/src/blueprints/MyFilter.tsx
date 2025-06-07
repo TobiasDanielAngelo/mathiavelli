@@ -48,6 +48,7 @@ const renderField = (
           {...commonProps}
           key={field.name}
           onChangeValue={onChangeValue}
+          value={value ?? ""}
         />
       );
     case "check":
@@ -167,7 +168,8 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
   useKeyPress(["Enter"], onClickFilter);
 
   useEffect(() => {
-    setDetails(decodeShortParam(params.toString().replace("q=", "")));
+    if (params.keys.length)
+      setDetails(decodeShortParam(params.toString().replace("q=", "")));
   }, []);
 
   return (
@@ -218,7 +220,7 @@ export const GenericFilter = <T extends Record<string, any>>({
   relatedFields = [],
   optionFields = [],
 }: Props<T>) => {
-  const [shownFields, setShownFields] = useState<string[]>([
+  const [shownFields, setShownFields] = useState([
     ...Object.keys(view),
     ...optionFields.map((f) => f as string),
   ]);
@@ -325,7 +327,7 @@ export const GenericFilter = <T extends Record<string, any>>({
       label: `${toTitleCase(s as string)} Search`,
       type: "text",
     },
-  ]) as Field[][];
+  ]) satisfies Field[][];
 
   return (
     <div className="m-2">
@@ -341,7 +343,6 @@ export const GenericFilter = <T extends Record<string, any>>({
           name: toTitleCase(s),
         }))}
         relative
-        isAll
       />
       <MyFilter fields={[...fields, ...moreFields]} />
     </div>

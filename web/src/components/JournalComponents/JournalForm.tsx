@@ -21,31 +21,32 @@ export const JournalForm = (props: {
   const [isLoading, setLoading] = useState(false);
 
   const rawFields = useMemo(
-    () => [
+    () =>
       [
-        {
-          name: "title",
-          label: "Title",
-          type: "text",
-        },
-      ],
-      [
-        {
-          name: "description",
-          label: "Journal Entry",
-          type: "textarea",
-        },
-      ],
-      [
-        {
-          name: "datetimeCreated",
-          label: "Created",
-          type: "datetime",
-        },
-      ],
-    ],
+        [
+          {
+            name: "title",
+            label: "Title",
+            type: "text",
+          },
+        ],
+        [
+          {
+            name: "description",
+            label: "Journal Entry",
+            type: "textarea",
+          },
+        ],
+        [
+          {
+            name: "datetimeCreated",
+            label: "Created",
+            type: "datetime",
+          },
+        ],
+      ] satisfies Field[][],
     []
-  ) as Field[][];
+  );
 
   const onClickCreate = async () => {
     setLoading(true);
@@ -103,7 +104,7 @@ export const JournalForm = (props: {
     <div className="items-center">
       <MyForm
         fields={rawFields}
-        title={item ? "Edit Journal" : "Journal Creation Form"}
+        title={item?.id ? "Edit Journal" : "Journal Creation Form"}
         details={details}
         setDetails={setDetails}
         onClickSubmit={item ? onClickEdit : onClickCreate}

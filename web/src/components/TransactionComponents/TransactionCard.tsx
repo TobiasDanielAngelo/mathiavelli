@@ -8,6 +8,7 @@ import { ItemDetails } from "../../blueprints/ItemDetails";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TransactionForm } from "../TransactionComponents/TransactionForm";
+import { useVisible } from "../../constants/hooks";
 
 export const TransactionCard = observer(
   (props: {
@@ -15,13 +16,12 @@ export const TransactionCard = observer(
     shownFields?: (keyof TransactionInterface)[];
   }) => {
     const { item, shownFields } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
+    const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
-    const { accountStore } = useStore();
+    const { transactionStore } = useStore();
 
     const onDelete = async () => {
-      const resp = await accountStore.deleteItem(item?.id ?? -1);
+      const resp = await transactionStore.deleteItem(item?.id ?? -1);
       if (!resp.ok) {
         setMsg(resp.details);
         return;

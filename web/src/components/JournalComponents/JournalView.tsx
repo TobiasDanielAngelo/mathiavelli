@@ -15,14 +15,19 @@ import { JournalFilter } from "./JournalFilter";
 import { JournalForm } from "./JournalForm";
 import { JournalViewContext } from "./JournalProps";
 import { JournalTable } from "./JournalTable";
-import { useLocalStorageState } from "../../constants/hooks";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const JournalView = observer(() => {
   const { journalStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
-  const [isVisible3, setVisible3] = useState(false);
+  const {
+    isVisible1,
+    setVisible1,
+    isVisible2,
+    setVisible2,
+    isVisible3,
+    setVisible3,
+  } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(new Journal({}).$) as (keyof JournalInterface)[],
     "shownFieldsJournal"
@@ -133,6 +138,7 @@ export const JournalView = observer(() => {
     setParams,
     pageDetails,
     PageBar,
+    fetchFcn: fetchJournals,
   };
 
   return (
@@ -155,7 +161,6 @@ export const JournalView = observer(() => {
             }))}
             relative
             open
-            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>

@@ -7,11 +7,11 @@ import { Task } from "../../api/TaskStore";
 import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TaskForm } from "./TaskForm";
+import { useVisible } from "../../constants/hooks";
 
 export const TaskRow = observer((props: { item: Task }) => {
   const { item } = props;
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
+  const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
   const [msg, setMsg] = useState("");
   const { taskStore } = useStore();
   const onDelete = async () => {

@@ -11,8 +11,9 @@ export const TransactionForm = observer(
   (props: {
     item?: TransactionInterface;
     setVisible?: (t: boolean) => void;
+    fetchFcn?: () => void;
   }) => {
-    const { item, setVisible } = props;
+    const { item, setVisible, fetchFcn } = props;
     const { transactionStore, accountStore, categoryStore } = useStore();
     const [details, setDetails] = useState({
       category: item?.category,
@@ -23,60 +24,65 @@ export const TransactionForm = observer(
       datetimeTransacted: moment(item?.datetimeTransacted).format(
         "MMM D YYYY h:mm A"
       ),
+      receivableId: item?.receivableId || null,
+      payableId: item?.payableId || null,
     });
     const [msg, setMsg] = useState<Object>();
     const [isLoading, setLoading] = useState(false);
 
     const rawFields = useMemo(
-      () => [
+      () =>
         [
-          {
-            name: "category",
-            label: "Category",
-            type: "select",
-            options: toOptions(categoryStore.items, "title"),
-          },
-          {
-            name: "amount",
-            label: "Amount",
-            type: "number",
-          },
-        ],
-        [
-          {
-            name: "description",
-            label: "Description",
-            type: "text",
-          },
-        ],
-        [
-          {
-            name: "transmitter",
-            label: "From...",
-            type: "select",
-            options: toOptions(
-              accountStore.items.filter((s) => s.$.id !== details?.receiver),
-              "name"
-            ),
-          },
-          {
-            name: "receiver",
-            label: "To...",
-            type: "select",
-            options: toOptions(
-              accountStore.items.filter((s) => s.$.id !== details?.transmitter),
-              "name"
-            ),
-          },
-        ],
-      ],
+          [
+            {
+              name: "category",
+              label: "Category",
+              type: "select",
+              options: toOptions(categoryStore.items, "title"),
+            },
+            {
+              name: "amount",
+              label: "Amount",
+              type: "number",
+            },
+          ],
+          [
+            {
+              name: "description",
+              label: "Description",
+              type: "text",
+            },
+          ],
+          [
+            {
+              name: "transmitter",
+              label: "From...",
+              type: "select",
+              options: toOptions(
+                accountStore.items.filter((s) => s.$.id !== details?.receiver),
+                "name"
+              ),
+            },
+            {
+              name: "receiver",
+              label: "To...",
+              type: "select",
+              options: toOptions(
+                accountStore.items.filter(
+                  (s) => s.$.id !== details?.transmitter
+                ),
+                "name"
+              ),
+            },
+          ],
+        ] satisfies Field[][],
       [
         accountStore.items.length,
         categoryStore.items.length,
         details?.transmitter,
         details?.receiver,
       ]
-    ) as Field[][];
+    );
 
     const onClickCreate = async () => {
       setLoading(true);
@@ -93,6 +99,7 @@ export const TransactionForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 
@@ -112,6 +119,7 @@ export const TransactionForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 
@@ -125,6 +133,7 @@ export const TransactionForm = observer(
         setMsg(resp.details);
         return;
       }
+      fetchFcn && fetchFcn();
       setVisible && setVisible(false);
     };
 
@@ -132,10 +141,10 @@ export const TransactionForm = observer(
       <div className="items-center">
         <MyForm
           fields={rawFields}
-          title={item ? "Edit Transaction" : "Transaction Creation Form"}
+          title={item?.id ? "Edit Transaction" : "Transaction Creation Form"}
           details={details}
           setDetails={setDetails}
-          onClickSubmit={item ? onClickEdit : onClickCreate}
+          onClickSubmit={item?.id ? onClickEdit : onClickCreate}
           hasDelete={!!item}
           onDelete={onClickDelete}
           objectName="transaction"

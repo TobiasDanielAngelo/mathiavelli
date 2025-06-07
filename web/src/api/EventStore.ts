@@ -15,6 +15,7 @@ import {
   updateItemRequest,
 } from "../constants/storeHelpers";
 import { Store } from "./Store";
+import { TwoDates } from "../constants/classes";
 
 const slug = "events";
 
@@ -28,6 +29,7 @@ const props = {
   location: prop<string>(""),
   tags: prop<number[]>(() => []),
   createdAt: prop<string>(""),
+  task: prop<number | null>(null),
 };
 
 export type EventInterface = {
@@ -49,6 +51,10 @@ export class Event extends Model(props) {
     return this.tags.map((s) => store.tagStore.allItems.get(s)?.name ?? "");
   }
 
+  get dateDuration() {
+    return new TwoDates(this.start, this.end).getRangeString;
+  }
+
   get $view() {
     const store = getRoot<Store>(this);
     return {
@@ -56,6 +62,7 @@ export class Event extends Model(props) {
       tagNames: this.tags.map(
         (s) => store?.tagStore?.allItems.get(s)?.name ?? ""
       ),
+      dateDuration: this.dateDuration,
     };
   }
 }

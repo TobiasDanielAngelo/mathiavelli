@@ -1,24 +1,34 @@
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  Model,
+  _async,
+  _await,
+  getRoot,
+  model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import { Store } from "./Store";
 
 const slug = "payables";
 
 const props = {
   id: prop<number>(-1),
   payment: prop<number[]>(() => []),
-  borrowerName: prop<string>(""),
-  lentAmount: prop<number>(0),
+  lenderName: prop<string>(""),
+  borrowedAmount: prop<number>(0),
   description: prop<string>(""),
   datetimeOpened: prop<string>(""),
   datetimeDue: prop<string>(""),
   datetimeClosed: prop<string>(""),
   isActive: prop<boolean>(true),
+  paymentTotal: prop<number>(0),
 };
 
 export type PayableInterface = {
@@ -33,6 +43,22 @@ export type PayableInterface = {
 export class Payable extends Model(props) {
   update(details: PayableInterface) {
     Object.assign(this, details);
+  }
+  get paymentDescription() {
+    const store = getRoot<Store>(this);
+    return this.payment.map(
+      (s) => store.transactionStore.allItems.get(s)?.description ?? ""
+    );
+  }
+
+  get $view() {
+    const store = getRoot<Store>(this);
+    return {
+      ...this.$,
+      paymentDescription: this.payment.map(
+        (s) => store?.transactionStore?.allItems.get(s)?.description ?? ""
+      ),
+    };
   }
 }
 

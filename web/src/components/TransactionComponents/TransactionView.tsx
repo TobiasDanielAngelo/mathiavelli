@@ -17,15 +17,21 @@ import { TransactionFilter } from "./TransactionFilter";
 import { TransactionForm } from "./TransactionForm";
 import { TransactionViewContext } from "./TransactionProps";
 import { TransactionTable } from "./TransactionTable";
-import { useLocalStorageState } from "../../constants/hooks";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const TransactionView = observer(() => {
   const { transactionStore, categoryStore, accountStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [isVisible1, setVisible1] = useState(false);
-  const [isVisible2, setVisible2] = useState(false);
-  const [isVisible3, setVisible3] = useState(false);
-  const [isVisible4, setVisible4] = useState(false);
+  const {
+    isVisible1,
+    setVisible1,
+    isVisible2,
+    setVisible2,
+    isVisible3,
+    setVisible3,
+    isVisible4,
+    setVisible4,
+  } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(new Transaction({}).$view) as (keyof TransactionInterface)[],
     "shownFieldsTransaction"
@@ -169,6 +175,7 @@ export const TransactionView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
+    fetchFcn: fetchTransactions,
   };
 
   return (
@@ -176,7 +183,10 @@ export const TransactionView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <TransactionForm setVisible={setVisible1} />
+          <TransactionForm
+            setVisible={setVisible1}
+            fetchFcn={fetchTransactions}
+          />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector
@@ -191,7 +201,6 @@ export const TransactionView = observer(() => {
             }))}
             relative
             open
-            isAll
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>

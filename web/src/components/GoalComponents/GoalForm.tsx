@@ -32,9 +32,9 @@ export const GoalForm = observer(
       title: item?.title,
       description: item?.description,
       parentGoal: item?.parentGoal,
-      isCompleted: item?.isCompleted,
-      isCancelled: item?.isCancelled,
-      dateCompleted: moment(item?.dateCompleted).format("MMM D, YYYY"),
+      dateCompleted: item?.dateCompleted
+        ? moment(item?.dateCompleted).format("MMM D, YYYY")
+        : null,
       dateStart: moment(item?.dateStart).format("MMM D, YYYY"),
       dateEnd: moment(item?.dateEnd).format("MMM D, YYYY"),
     });
@@ -42,81 +42,69 @@ export const GoalForm = observer(
     const [isLoading, setLoading] = useState(false);
 
     const rawFields = useMemo(
-      () => [
+      () =>
         [
-          {
-            name: "title",
-            label: "Title",
-            type: "text",
-          },
-        ],
-        [
-          {
-            name: "description",
-            label: "Description",
-            type: "textarea",
-          },
-        ],
-        [
-          {
-            name: "parentGoal",
-            label: "Parent Goal",
-            type: "select",
-            options: toOptions(
-              goalStore.items.filter(
-                (s) =>
-                  s.id !== item?.id &&
-                  !getDescendantIds(goalStore.items, item?.id ?? -1).includes(
-                    s.id
-                  )
+          [
+            {
+              name: "title",
+              label: "Title",
+              type: "text",
+            },
+          ],
+          [
+            {
+              name: "description",
+              label: "Description",
+              type: "textarea",
+            },
+          ],
+          [
+            {
+              name: "parentGoal",
+              label: "Parent Goal",
+              type: "select",
+              options: toOptions(
+                goalStore.items.filter(
+                  (s) =>
+                    s.id !== item?.id &&
+                    !getDescendantIds(goalStore.items, item?.id ?? -1).includes(
+                      s.id
+                    )
+                ),
+                "title"
               ),
-              "title"
-            ),
-          },
-        ],
-        [
-          {
-            name: "isCompleted",
-            label: "Complete?",
-            type: "check",
-          },
-          {
-            name: "isCancelled",
-            label: "Cancel?",
-            type: "check",
-          },
-        ],
-
-        [
-          {
-            name: "dateStart",
-            label: "Date Start",
-            type: "date",
-          },
-          {
-            name: "dateEnd",
-            label: "Date End",
-            type: "date",
-          },
-        ],
-        [
-          {
-            name: "dateCompleted",
-            label: "Date Completed",
-            type: "date",
-          },
-        ],
-      ],
+            },
+          ],
+          [
+            {
+              name: "dateStart",
+              label: "Date Start",
+              type: "date",
+            },
+            {
+              name: "dateEnd",
+              label: "Date End",
+              type: "date",
+            },
+          ],
+          [
+            {
+              name: "dateCompleted",
+              label: "Date Completed",
+              type: "date",
+            },
+          ],
+        ] satisfies Field[][],
       [goalStore.items.length, item?.id]
-    ) as Field[][];
+    );
 
     const onClickCreate = async () => {
       setLoading(true);
       const resp = await goalStore.addItem({
         ...details,
-        dateCompleted: moment(details?.dateCompleted, "MMM D, YYYY").format(
-          "YYYY-MM-DD"
-        ),
+        dateCompleted: details?.dateCompleted
+          ? moment(details?.dateCompleted, "MMM D, YYYY").format("YYYY-MM-DD")
+          : null,
         dateStart: moment(details?.dateStart, "MMM D, YYYY").format(
           "YYYY-MM-DD"
         ),
@@ -138,9 +126,9 @@ export const GoalForm = observer(
       const resp = await goalStore.updateItem(item.id, {
         ...details,
         parentGoal: details.parentGoal == -1 ? null : details.parentGoal,
-        dateCompleted: moment(details?.dateCompleted, "MMM D, YYYY").format(
-          "YYYY-MM-DD"
-        ),
+        dateCompleted: details?.dateCompleted
+          ? moment(details?.dateCompleted, "MMM D, YYYY").format("YYYY-MM-DD")
+          : null,
         dateStart: moment(details?.dateStart, "MMM D, YYYY").format(
           "YYYY-MM-DD"
         ),
@@ -174,7 +162,7 @@ export const GoalForm = observer(
       <div className="items-center">
         <MyForm
           fields={rawFields}
-          title={item ? "Edit Goal" : "Goal Creation Form"}
+          title={item?.id ? "Edit Goal" : "Goal Creation Form"}
           details={details}
           setDetails={setDetails}
           onClickSubmit={item ? onClickEdit : onClickCreate}

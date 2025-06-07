@@ -11,6 +11,7 @@ import { MyModal } from "../../blueprints/MyModal";
 import { GoalForm } from "./GoalForm";
 import { sortByKey } from "../../constants/helpers";
 import { ItemRow } from "../../blueprints/ItemRow";
+import { useVisible } from "../../constants/hooks";
 
 export const GoalCard = observer(
   (props: {
@@ -19,9 +20,14 @@ export const GoalCard = observer(
     border?: boolean;
   }) => {
     const { item, shownFields, border } = props;
-    const [isVisible1, setVisible1] = useState(false);
-    const [isVisible2, setVisible2] = useState(false);
-    const [isVisible3, setVisible3] = useState(false);
+    const {
+      isVisible1,
+      setVisible1,
+      isVisible2,
+      setVisible2,
+      isVisible3,
+      setVisible3,
+    } = useVisible();
     const [msg, setMsg] = useState("");
     const { goalStore, taskStore } = useStore();
 
@@ -111,11 +117,9 @@ export const GoalCard = observer(
                   important={["title"]}
                   body={[
                     "description",
-                    "dateStart",
-                    "dateEnd",
-                    "isCancelled",
+                    "dateDuration",
                     "isCompleted",
-                    "parentGoalTitle",
+                    "isCancelled",
                   ]}
                 />
               </div>
