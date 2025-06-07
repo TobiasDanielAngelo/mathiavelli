@@ -183,6 +183,21 @@ class EventViewSet(CustomModelViewSet):
     serializer_class = EventSerializer
 
 
+class BuyListItemViewSet(CustomModelViewSet):
+    queryset = BuyListItem.objects.all()
+    serializer_class = BuyListItemSerializer
+
+
+class PlatformViewSet(CustomModelViewSet):
+    queryset = Platform.objects.all()
+    serializer_class = PlatformSerializer
+
+
+class CredentialViewSet(CustomModelViewSet):
+    queryset = Credential.objects.all()
+    serializer_class = CredentialSerializer
+
+
 class GoalViewSet(CustomModelViewSet):
     queryset = Goal.objects.all()
     serializer_class = GoalSerializer

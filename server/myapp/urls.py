@@ -13,13 +13,19 @@ router = DefaultRouter()
 
 inflector = inflect.engine()
 
+
+def camel_to_kebab(name: str) -> str:
+    return re.sub(r"(?<!^)(?=[A-Z])", "-", name).lower()
+
+
 for attr_name in dir(vs_module):
     viewset = getattr(vs_module, attr_name)
 
     if isinstance(viewset, type) and issubclass(viewset, ViewSetMixin):
         base = re.sub(r"ViewSet$", "", attr_name)
-        route = inflector.plural(base.lower())
         if base != "CustomModel":
+            kebab = camel_to_kebab(base)
+            route = inflector.plural(kebab)
             router.register(route, viewset, basename=route)
 
 urlpatterns = [

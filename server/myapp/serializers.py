@@ -22,6 +22,24 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class BuyListItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BuyListItem
+        fields = "__all__"
+
+
+class PlatformSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Platform
+        fields = "__all__"
+
+
+class CredentialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Credential
+        fields = "__all__"
+
+
 class TransactionSerializer(serializers.ModelSerializer):
     receivableId = serializers.IntegerField(
         required=False, allow_null=True, write_only=True

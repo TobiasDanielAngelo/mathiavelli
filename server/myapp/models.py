@@ -214,3 +214,82 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.start} - {self.end})"
+
+
+class BuyListItem(models.Model):
+    PRIORITY_CHOICES = [
+        (0, "Low"),
+        (1, "Medium"),
+        (2, "High"),
+    ]
+
+    STATUS_CHOICES = [
+        (0, "Pending"),
+        (1, "Bought"),
+        (2, "Canceled"),
+    ]
+
+    name = models.CharField(max_length=255)
+    estimated_price = models.DecimalField(max_digits=10, decimal_places=2)
+    added_at = models.DateTimeField(auto_now_add=True)
+    planned_date = models.DateField(null=True, blank=True)
+    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+
+    def __str__(self):
+        return f"{self.description} (Priority: {self.get_priority_display()}, Status: {self.get_status_display()}) - ${self.estimated_price}"
+
+
+class Platform(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+AUTHENTICATOR_CHOICES = [
+    (0, "None"),
+    (1, "Google Authenticator"),
+    (2, "Authy"),
+    (3, "Microsoft Authenticator"),
+    (4, "1Password"),
+    (5, "Other"),
+]
+
+
+class Credential(models.Model):
+
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    billing_accounts = models.ManyToManyField(Account, blank=True)
+
+    username = models.CharField(max_length=150, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    password = models.CharField(max_length=255, blank=True, null=True)
+
+    backup_codes = models.TextField(blank=True, null=True)
+    pin = models.CharField(max_length=20, blank=True, null=True)
+    account_number = models.CharField(max_length=100, blank=True, null=True)
+
+    associated_email = models.EmailField(blank=True, null=True)
+    recovery_email = models.EmailField(blank=True, null=True)
+    recovery_phone = models.CharField(max_length=30, blank=True, null=True)
+
+    login_method = models.CharField(max_length=50, blank=True, null=True)
+    date_created = models.DateField(blank=True, null=True)
+    profile_url = models.URLField(blank=True, null=True)
+
+    authenticator_app = models.IntegerField(choices=AUTHENTICATOR_CHOICES, default=0)
+    custom_authenticator = models.CharField(max_length=100, blank=True, null=True)
+    authenticator_email = models.EmailField(blank=True, null=True)
+
+    notes = models.TextField(blank=True, null=True)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def display_authenticator(self):
+        if self.authenticator_app == 5:
+            return self.custom_authenticator or "Other"
+        return dict(AUTHENTICATOR_CHOICES).get(self.authenticator_app, "Unknown")
+
+    def __str__(self):
+        main_id = self.username or self.email or "unknown"
+        return f"{self.platform.name} - {main_id}"
