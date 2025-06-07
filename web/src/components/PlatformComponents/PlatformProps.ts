@@ -23,3 +23,16 @@ export const usePlatformView = () => {
     throw new Error("usePlatformView must be used within PlatformViewContext");
   return ctx;
 };
+
+export const PlatformIdMap = {
+  Google: 1,
+  GitHub: 2,
+  Facebook: 3,
+  Twitter: 4,
+  Microsoft: 5,
+  Apple: 6,
+  Amazon: 7,
+  Netflix: 8,
+  Steam: 9,
+  Spotify: 10,
+} as const;
