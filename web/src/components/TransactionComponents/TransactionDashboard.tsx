@@ -1,10 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useStore } from "../../api/Store";
-import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
-import { useTransactionView } from "./TransactionProps";
-import { toMoney } from "../../constants/helpers";
 import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
+import { toMoney } from "../../constants/helpers";
+import { useTransactionView } from "./TransactionProps";
 
 export const TransactionDashboard = observer(() => {
   const { transactionAnalyticsStore } = useStore();

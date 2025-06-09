@@ -1,3 +1,5 @@
+import { observer } from "mobx-react-lite";
+import { useEffect, useMemo, useState } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -8,12 +10,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { MyCustomTooltip } from "./MyCustomToolTip";
+import { getStoreSignature } from "../../constants/helpers";
 import { KV } from "../ItemDetails";
-import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
-import { getStoreSignature, toOptions } from "../../constants/helpers";
 import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
+import { MyCustomTooltip } from "./MyCustomToolTip";
 
 function moveKeysToFront(obj: Record<string, any>, keys: string[]) {
   const reordered: Record<string, any> = {};
