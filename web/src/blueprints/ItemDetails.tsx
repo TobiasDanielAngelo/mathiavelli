@@ -60,7 +60,7 @@ export const ItemDetails = observer(
       const body = formatValue(value, String(key), prices as string[]);
 
       return body === "—" ? (
-        <></>
+        <div key={String(key)}></div>
       ) : (
         <div key={String(key)} className="flex gap-5">
           {title === "Body" && (

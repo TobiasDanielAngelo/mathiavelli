@@ -14,6 +14,7 @@ import { TagStore } from "./TagStore";
 import { BuyListItemStore } from "./BuyListItemStore";
 import { PlatformStore } from "./PlatformStore";
 import { CredentialStore } from "./CredentialStore";
+import { TransactionAnalyticsStore } from "../analytics/TransactionAnalyticsStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -31,6 +32,8 @@ export class Store extends Model({
   buyListItemStore: prop<BuyListItemStore>(),
   platformStore: prop<PlatformStore>(),
   credentialStore: prop<CredentialStore>(),
+
+  transactionAnalyticsStore: prop<TransactionAnalyticsStore>(),
 }) {}
 
 export const createStore = () =>
@@ -49,6 +52,7 @@ export const createStore = () =>
     buyListItemStore: new BuyListItemStore({}),
     platformStore: new PlatformStore({}),
     credentialStore: new CredentialStore({}),
+    transactionAnalyticsStore: new TransactionAnalyticsStore({}),
   });
 
 export const StoreContext = createContext<Store | null>(null);

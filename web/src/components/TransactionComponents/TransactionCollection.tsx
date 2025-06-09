@@ -3,6 +3,7 @@ import { useStore } from "../../api/Store";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { TransactionCard } from "../TransactionComponents/TransactionCard";
 import { useTransactionView } from "./TransactionProps";
+import { TransactionDashboard } from "./TransactionDashboard";
 
 export const TransactionCollection = observer(() => {
   const { transactionStore } = useStore();
@@ -33,7 +34,7 @@ export const TransactionCollection = observer(() => {
           <PageBar />
         </div>
       }
-      SideB=""
+      SideB={<TransactionDashboard />}
       ratio={0.7}
     />
   );

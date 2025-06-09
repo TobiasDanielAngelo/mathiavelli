@@ -312,9 +312,9 @@ export const setBlankIfNeg1 = (str: string, val: number) => {
 
 export const cmToPx = (cm: number) => cm / 0.026458;
 
-export const getFirstTwoWords = (str: string) => {
+export const getFirstWords = (str: string, len = 1) => {
   const words = str.trim().split(/[\s,–—-]+/);
-  return words.length > 2 ? `${words[0]} ${words[1]}...` : str;
+  return words.length > len ? words.slice(0, len).join(" ") + "..." : str;
 };
 
 export const isDatetimeValue = (val: any) => {

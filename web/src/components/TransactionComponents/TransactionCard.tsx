@@ -9,6 +9,7 @@ import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TransactionForm } from "../TransactionComponents/TransactionForm";
 import { useVisible } from "../../constants/hooks";
+import { useTransactionView } from "./TransactionProps";
 
 export const TransactionCard = observer(
   (props: {
@@ -19,6 +20,7 @@ export const TransactionCard = observer(
     const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
     const { transactionStore } = useStore();
+    const { fetchFcn } = useTransactionView();
 
     const onDelete = async () => {
       const resp = await transactionStore.deleteItem(item?.id ?? -1);
@@ -32,7 +34,11 @@ export const TransactionCard = observer(
     return (
       <div className="m-1 border-gray-700 rounded-lg p-5 border">
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
-          <TransactionForm item={item} setVisible={setVisible1} />
+          <TransactionForm
+            item={item}
+            setVisible={setVisible1}
+            fetchFcn={fetchFcn}
+          />
         </MyModal>
         <MyConfirmModal
           isVisible={isVisible2}

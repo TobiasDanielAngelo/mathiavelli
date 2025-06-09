@@ -75,6 +75,13 @@ export const TransactionForm = observer(
               ),
             },
           ],
+          [
+            {
+              name: "datetimeTransacted",
+              label: "Transact Date",
+              type: "datetime",
+            },
+          ],
         ] satisfies Field[][],
       [
         accountStore.items.length,

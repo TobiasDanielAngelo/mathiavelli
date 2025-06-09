@@ -35,7 +35,6 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         if encoded:
             try:
                 decoded_params = decode_query_param(encoded)
-                print(decoded_params)
                 params = decoded_params
             except Exception as e:
                 print("Decoding failed:", e)

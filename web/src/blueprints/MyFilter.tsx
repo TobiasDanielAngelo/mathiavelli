@@ -3,7 +3,6 @@ import { observer } from "mobx-react-lite";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { frequency } from "../constants/constants";
 import {
   camelToSnakeCase,
   decodeShortParam,

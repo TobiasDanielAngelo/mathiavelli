@@ -8,10 +8,12 @@ import { MyConfirmModal } from "../../blueprints/MyConfirmModal";
 import { MyModal } from "../../blueprints/MyModal";
 import { TransactionForm } from "./TransactionForm";
 import { useVisible } from "../../constants/hooks";
+import { useTransactionView } from "./TransactionProps";
 
 export const TransactionRow = observer((props: { item: Transaction }) => {
   const { item } = props;
   const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
+  const { fetchFcn } = useTransactionView();
   const [msg, setMsg] = useState("");
   const { accountStore } = useStore();
   const onDelete = async () => {
@@ -20,13 +22,18 @@ export const TransactionRow = observer((props: { item: Transaction }) => {
       setMsg(resp.details);
       return;
     }
+    fetchFcn && fetchFcn();
     setVisible2(false);
   };
 
   return (
     <div className="flex justify-evenly">
       <MyModal isVisible={isVisible1} setVisible={setVisible1}>
-        <TransactionForm item={item} setVisible={setVisible1} />
+        <TransactionForm
+          item={item}
+          setVisible={setVisible1}
+          fetchFcn={fetchFcn}
+        />
       </MyModal>
       <MyConfirmModal
         isVisible={isVisible2}

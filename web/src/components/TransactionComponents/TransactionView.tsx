@@ -20,7 +20,12 @@ import { TransactionTable } from "./TransactionTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 
 export const TransactionView = observer(() => {
-  const { transactionStore, categoryStore, accountStore } = useStore();
+  const {
+    transactionStore,
+    categoryStore,
+    accountStore,
+    transactionAnalyticsStore,
+  } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
   const {
     isVisible1,
@@ -49,6 +54,7 @@ export const TransactionView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
+    transactionAnalyticsStore.fetchAll(queryString);
   };
 
   const toggleView = () => {
@@ -105,6 +111,11 @@ export const TransactionView = observer(() => {
         },
         {
           key: "receiver",
+          values: accountStore.items,
+          label: "name",
+        },
+        {
+          key: "account",
           values: accountStore.items,
           label: "name",
         },
