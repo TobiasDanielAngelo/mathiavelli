@@ -1,31 +1,17 @@
+import { observer } from "mobx-react-lite";
 import {
   Bar,
   BarChart,
   CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { COLORS, MyTrendChartProps, useTrendChart } from ".";
+import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
 import { MyCustomTooltip } from "./MyCustomToolTip";
-
-const data = [
-  {
-    name: "January",
-    product1: 300,
-    product2: 400,
-  },
-  {
-    name: "February",
-    product1: 500,
-    product2: 200,
-  },
-  {
-    name: "March",
-    product1: 200,
-    product2: 300,
-  },
-];
 
 /**
  * BarChart Component
@@ -47,17 +33,53 @@ const data = [
  * - Budget breakdowns
  */
 
-export const MyBarChart = () => {
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data}>
-        <CartesianGrid strokeDasharray={"5 10"} />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip content={<MyCustomTooltip />} />
-        <Bar dataKey="product1" fill="gray" />
-        <Bar dataKey="product2" fill="darkblue" />
-      </BarChart>
-    </ResponsiveContainer>
-  );
-};
+export const MyBarChart = observer(
+  <T extends Record<string, any>>({
+    data,
+    width = "100%",
+    height = "85%",
+    colors = COLORS,
+    traceKey,
+    xKey,
+    yKey,
+    itemMap,
+    formatter,
+    excludedFromTotal,
+    selectionLabel,
+  }: MyTrendChartProps<T>) => {
+    const { allTraceKeys, transformedData, shownFields, setShownFields } =
+      useTrendChart(data, traceKey, xKey, yKey, itemMap, excludedFromTotal);
+
+    return (
+      <div className="w-full h-full">
+        <MyMultiDropdownSelector
+          value={shownFields}
+          onChangeValue={(t) => setShownFields(t as string[])}
+          options={allTraceKeys.map((s) => ({ id: s, name: s }))}
+          label={selectionLabel ?? "Items"}
+          isAll
+        />
+        <ResponsiveContainer width={width} height={height}>
+          <BarChart data={transformedData}>
+            <CartesianGrid strokeDasharray={"5 10"} />
+            <Legend />
+            <XAxis dataKey={xKey as string} />
+            <YAxis />
+            <Tooltip content={<MyCustomTooltip />} formatter={formatter} />
+            {allTraceKeys
+              .filter((s) => shownFields.includes(s))
+              .map((key, i) => (
+                <Bar
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  stroke={colors[i % colors.length]}
+                  fill={colors[i % colors.length]}
+                />
+              ))}
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+);

@@ -11,6 +11,47 @@ export const authenticatorApps = [
   "Other",
 ];
 
+export const jobStatuses = [
+  "Wishlist",
+  "Applied",
+  "Interview",
+  "Offer",
+  "Rejected",
+  "Accepted",
+];
+
+export const jobSources = [
+  "Walk-in",
+  "LinkedIn",
+  "Indeed",
+  "Glassdoor",
+  "JobStreet",
+  "Referral",
+  "Company Website",
+  "Facebook",
+  "Twitter / X",
+  "Other",
+];
+
+export const workSetups = ["On-site", "Remote", "Hybrid"];
+export const jobTypes = [
+  "Full-time",
+  "Part-time",
+  "Freelance",
+  "Contract",
+  "Internship",
+  "Temporary",
+];
+export const followUpResponses = [
+  "No Response",
+  "Initial Follow-up",
+  "Reminder Email",
+  "Thank You Note",
+  "Checking for Updates",
+  "Interview Scheduled",
+  "Got a Response",
+];
+
 export const lowerFirstLetter = (str: string) => {
   return str.charAt(0).toLowerCase() + str.slice(1);
 };

@@ -1,16 +1,12 @@
+import { observer } from "mobx-react-lite";
 import {
   RadialBar,
   RadialBarChart,
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { MyCircleChartProps, useCircleChart } from ".";
 import { MyCustomTooltip } from "./MyCustomToolTip";
-
-export const radialBarData = [
-  { name: "Food", value: 130 },
-  { name: "Transport", value: 98 },
-  { name: "Utilities", value: 86 },
-];
 
 /**
  * RadialBarChart Component
@@ -31,17 +27,32 @@ export const radialBarData = [
  * - Ranked comparisons (like pie but with bars)
  * - Dashboard KPIs
  */
-export const MyRadialBarChart = () => (
-  <ResponsiveContainer width="100%" height="100%">
-    <RadialBarChart
-      innerRadius="20%"
-      outerRadius="90%"
-      data={radialBarData}
-      startAngle={180}
-      endAngle={0}
-    >
-      <RadialBar dataKey="value" cornerRadius={10} fill="#8884d8" />
-      <Tooltip content={<MyCustomTooltip />} />
-    </RadialBarChart>
-  </ResponsiveContainer>
+export const MyRadialBarChart = observer(
+  <T extends Record<string, any>>({
+    data,
+    dataKey,
+    nameKey,
+    itemMap,
+  }: MyCircleChartProps<T>) => {
+    const { resolvedData } = useCircleChart(data, nameKey, dataKey, itemMap);
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <RadialBarChart
+          innerRadius="20%"
+          outerRadius="90%"
+          data={resolvedData}
+          startAngle={180}
+          endAngle={-180}
+        >
+          <RadialBar
+            dataKey={dataKey as string}
+            cornerRadius={10}
+            fill="#8884d8"
+            background
+          />
+          <Tooltip content={<MyCustomTooltip />} />
+        </RadialBarChart>
+      </ResponsiveContainer>
+    );
+  }
 );

@@ -1,8 +1,11 @@
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import { MySpeedDialProps } from "../constants/interfaces";
 
-export const MySpeedDial = (props: { actions?: MySpeedDialProps[] }) => {
-  const { actions } = props;
+export const MySpeedDial = (props: {
+  actions?: MySpeedDialProps[];
+  leftSide?: boolean;
+}) => {
+  const { actions, leftSide } = props;
   return (
     <SpeedDial
       hidden={
@@ -13,7 +16,8 @@ export const MySpeedDial = (props: { actions?: MySpeedDialProps[] }) => {
       sx={{
         position: "fixed",
         bottom: 25,
-        right: 25,
+        left: leftSide ? 25 : undefined,
+        right: leftSide ? undefined : 25,
         zIndex: 1,
       }}
       FabProps={{

@@ -18,6 +18,8 @@ import { TaskView } from "./TaskComponents/TaskView";
 import { TransactionView } from "./TransactionComponents/TransactionView";
 import { PlatformView } from "./PlatformComponents/PlatformView";
 import { CredentialView } from "./CredentialComponents/CredentialView";
+import { JobView } from "./JobComponents/JobView";
+import { FollowUpView } from "./FollowUpComponents/FollowUpView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -29,6 +31,7 @@ export const MainView = observer(() => {
     goalStore,
     tagStore,
     platformStore,
+    jobStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -48,6 +51,7 @@ export const MainView = observer(() => {
       categoryStore.fetchAll("page=all");
       tagStore.fetchAll("page=all");
       goalStore.fetchAll("is_completed=0&is_cancelled=0");
+      jobStore.fetchAll("status__lte=3");
     }
   };
 
@@ -78,6 +82,8 @@ export const MainView = observer(() => {
         <Route path="wishlist" element={<BuyListItemView />} />
         <Route path="credentials" element={<CredentialView />} />
         <Route path="platforms" element={<PlatformView />} />
+        <Route path="jobs" element={<JobView />} />
+        <Route path="follow-ups" element={<FollowUpView />} />
       </Routes>
     </div>
   );

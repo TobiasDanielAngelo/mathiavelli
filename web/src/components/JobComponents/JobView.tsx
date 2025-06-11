@@ -2,32 +2,31 @@ import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Job, JobInterface } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
-import { Transaction, TransactionInterface } from "../../api/TransactionStore";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
+import {
+  jobSources,
+  jobStatuses,
+  jobTypes,
+  workSetups,
+} from "../../constants/constants";
 import { toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { AccountForm } from "../AccountComponents/AccountForm";
-import { TransactionCollection } from "./TransactionCollection";
-import { TransactionFilter } from "./TransactionFilter";
-import { TransactionForm } from "./TransactionForm";
-import { TransactionViewContext } from "./TransactionProps";
-import { TransactionTable } from "./TransactionTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import { JobCollection } from "./JobCollection";
+import { JobFilter } from "./JobFilter";
+import { JobForm } from "./JobForm";
+import { JobViewContext } from "./JobProps";
+import { JobTable } from "./JobTable";
 
-export const TransactionView = observer(() => {
-  const {
-    transactionStore,
-    categoryStore,
-    accountStore,
-    transactionAnalyticsStore,
-  } = useStore();
+export const JobView = observer(() => {
+  const { jobStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [graph, setGraph] = useState<"pie" | "line">("pie");
   const {
     isVisible1,
     setVisible1,
@@ -35,12 +34,10 @@ export const TransactionView = observer(() => {
     setVisible2,
     isVisible3,
     setVisible3,
-    isVisible4,
-    setVisible4,
   } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(new Transaction({}).$view) as (keyof TransactionInterface)[],
-    "shownFieldsTransaction"
+    Object.keys(new Job({}).$view) as (keyof JobInterface)[],
+    "shownFieldsJob"
   );
 
   const [params, setParams] = useSearchParams();
@@ -49,21 +46,16 @@ export const TransactionView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchTransactions = async () => {
-    const resp = await transactionStore.fetchAll(queryString);
+  const fetchJobs = async () => {
+    const resp = await jobStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
     }
     setPageDetails(resp.pageDetails);
-    transactionAnalyticsStore.fetchAll(`graph=${graph}`);
   };
 
   const toggleView = () => {
     setView((prev) => (prev === "card" ? "table" : "card"));
-  };
-
-  const toggleGraph = () => {
-    setGraph((prev) => (prev === "line" ? "pie" : "line"));
   };
 
   const onClickPrev = () => {
@@ -110,27 +102,27 @@ export const TransactionView = observer(() => {
     () =>
       [
         {
-          key: "transmitter",
-          values: accountStore.items,
-          label: "name",
+          key: "status",
+          values: jobStatuses,
+          label: "",
         },
         {
-          key: "receiver",
-          values: accountStore.items,
-          label: "name",
+          key: "source",
+          values: jobSources,
+          label: "",
         },
         {
-          key: "account",
-          values: accountStore.items,
-          label: "name",
+          key: "workSetup",
+          values: workSetups,
+          label: "",
         },
         {
-          key: "category",
-          values: categoryStore.items,
-          label: "title",
+          key: "jobType",
+          values: jobTypes,
+          label: "",
         },
       ] as KV<any>[],
-    [transactionStore.items.length, categoryStore.items.length]
+    []
   );
 
   const actions = useMemo(
@@ -139,10 +131,10 @@ export const TransactionView = observer(() => {
         icon: (
           <div className="flex flex-col items-center">
             <AddCardIcon fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">TRX</div>
+            <div className="text-xs text-gray-500 font-bold">APPLY</div>
           </div>
         ),
-        name: "Add a Transaction",
+        name: "Add a Job",
         onClick: () => setVisible1(true),
       },
       {
@@ -165,52 +157,12 @@ export const TransactionView = observer(() => {
         name: "Filters",
         onClick: () => setVisible3(true),
       },
-      {
-        icon: (
-          <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">ACCT</div>
-          </div>
-        ),
-        name: "Add an Transaction",
-        onClick: () => setVisible4(true),
-      },
     ],
     []
   );
 
-  const views = useMemo(
-    () => [
-      {
-        icon: (
-          <div className="flex flex-col items-center">
-            {view === "card" ? "📊" : "🗂️"}
-            <div className="text-xs text-gray-500 font-bold">
-              {view === "card" ? "CARD" : "TABLE"}
-            </div>
-          </div>
-        ),
-        name: "Toggle View",
-        onClick: toggleView,
-      },
-      {
-        icon: (
-          <div className="flex flex-col items-center text-3xl">
-            {graph === "pie" ? `\u25d4` : "\u{1F4C8}"}
-            <div className="text-xs text-gray-500 font-bold">
-              {graph === "pie" ? `PIE` : "TREND"}
-            </div>
-          </div>
-        ),
-        name: "Toggle Graphs",
-        onClick: toggleGraph,
-      },
-    ],
-    [view, graph]
-  );
-
   useEffect(() => {
-    fetchTransactions();
+    fetchJobs();
   }, [params]);
 
   const value = {
@@ -221,29 +173,22 @@ export const TransactionView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
-    graph,
-    fetchFcn: fetchTransactions,
+    fetchFcn: fetchJobs,
   };
 
   return (
-    <TransactionViewContext.Provider value={value}>
+    <JobViewContext.Provider value={value}>
       <div className="relative">
         <MySpeedDial actions={actions} />
-        <MySpeedDial actions={views} leftSide />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <TransactionForm
-            setVisible={setVisible1}
-            fetchFcn={fetchTransactions}
-          />
+          <JobForm setVisible={setVisible1} fetchFcn={fetchJobs} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector
             label="Fields"
             value={shownFields}
-            onChangeValue={(t) =>
-              setShownFields(t as (keyof TransactionInterface)[])
-            }
-            options={Object.keys(new Transaction({}).$view).map((s) => ({
+            onChangeValue={(t) => setShownFields(t as (keyof JobInterface)[])}
+            options={Object.keys(new Job({}).$view).map((s) => ({
               id: s,
               name: toTitleCase(s),
             }))}
@@ -252,13 +197,17 @@ export const TransactionView = observer(() => {
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>
-          <TransactionFilter />
+          <JobFilter />
         </MyModal>
-        <MyModal isVisible={isVisible4} setVisible={setVisible4} disableClose>
-          <AccountForm setVisible={setVisible4} />
-        </MyModal>
-        {view === "card" ? <TransactionCollection /> : <TransactionTable />}
+        {view === "card" ? <JobCollection /> : <JobTable />}
+        <div
+          className="fixed bottom-6 left-6 bg-blue-500 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer shadow-lg hover:bg-blue-600 transition-colors"
+          onClick={toggleView}
+          title="Toggle View"
+        >
+          {view === "card" ? "📊" : "🗂️"}
+        </div>
       </div>
-    </TransactionViewContext.Provider>
+    </JobViewContext.Provider>
   );
 });

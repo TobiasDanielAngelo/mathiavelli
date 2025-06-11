@@ -40,6 +40,18 @@ class CredentialSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = "__all__"
+
+
+class FollowUperializer(serializers.ModelSerializer):
+    class Meta:
+        model = FollowUp
+        fields = "__all__"
+
+
 class TransactionSerializer(serializers.ModelSerializer):
     receivableId = serializers.IntegerField(
         required=False, allow_null=True, write_only=True

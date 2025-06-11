@@ -293,3 +293,88 @@ class Credential(models.Model):
     def __str__(self):
         main_id = self.username or self.email or "unknown"
         return f"{self.platform.name} - {main_id}"
+
+
+class Job(models.Model):
+    STATUS_CHOICES = [
+        (0, "Wishlist"),
+        (1, "Applied"),
+        (2, "Interview"),
+        (3, "Offer"),
+        (4, "Rejected"),
+        (5, "Accepted"),
+    ]
+
+    SOURCE_CHOICES = [
+        (0, "Walk-in"),
+        (1, "LinkedIn"),
+        (2, "Indeed"),
+        (3, "Glassdoor"),
+        (4, "JobStreet"),
+        (5, "Referral"),
+        (6, "Company Website"),
+        (7, "Facebook"),
+        (8, "Twitter / X"),
+        (9, "Other"),
+    ]
+
+    WORK_SETUP_CHOICES = [
+        (0, "On-site"),
+        (1, "Remote"),
+        (2, "Hybrid"),
+    ]
+
+    JOB_TYPE_CHOICES = [
+        (0, "Full-time"),
+        (1, "Part-time"),
+        (2, "Freelance"),
+        (3, "Contract"),
+        (4, "Internship"),
+        (5, "Temporary"),
+    ]
+
+    title = models.CharField(max_length=200)
+    company = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, blank=True)
+    link = models.URLField(blank=True)
+    source = models.IntegerField(choices=SOURCE_CHOICES, default=0)
+    salary = models.CharField(max_length=100, blank=True)
+    deadline = models.DateField(null=True, blank=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    applied_date = models.DateField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    work_setup = models.IntegerField(
+        choices=WORK_SETUP_CHOICES,
+        default=0,
+    )
+    job_type = models.IntegerField(
+        choices=JOB_TYPE_CHOICES,
+        default=0,
+    )
+
+    def __str__(self):
+        return f"{self.title} @ {self.company}"
+
+
+class FollowUp(models.Model):
+    FOLLOWUP_STATUS_CHOICES = [
+        (0, "No Response"),
+        (1, "Initial Follow-up"),
+        (2, "Reminder Email"),
+        (3, "Thank You Note"),
+        (4, "Checking for Updates"),
+        (5, "Interview Scheduled"),
+        (6, "Got a Response"),
+    ]
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="followups")
+    date = models.DateField()
+    message = models.TextField(blank=True)
+    status = models.IntegerField(default=0)
+    reply = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Follow-up on {self.date} for {self.job}"

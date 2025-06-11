@@ -2,32 +2,26 @@ import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { FollowUp, FollowUpInterface } from "../../api/FollowUpStore";
 import { useStore } from "../../api/Store";
-import { Transaction, TransactionInterface } from "../../api/TransactionStore";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { AccountForm } from "../AccountComponents/AccountForm";
-import { TransactionCollection } from "./TransactionCollection";
-import { TransactionFilter } from "./TransactionFilter";
-import { TransactionForm } from "./TransactionForm";
-import { TransactionViewContext } from "./TransactionProps";
-import { TransactionTable } from "./TransactionTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import { FollowUpCollection } from "./FollowUpCollection";
+import { FollowUpFilter } from "./FollowUpFilter";
+import { FollowUpForm } from "./FollowUpForm";
+import { FollowUpViewContext } from "./FollowUpProps";
+import { FollowUpTable } from "./FollowUpTable";
+import { followUpResponses } from "../../constants/constants";
 
-export const TransactionView = observer(() => {
-  const {
-    transactionStore,
-    categoryStore,
-    accountStore,
-    transactionAnalyticsStore,
-  } = useStore();
+export const FollowUpView = observer(() => {
+  const { followUpStore, jobStore } = useStore();
   const [view, setView] = useState<"card" | "table">("card");
-  const [graph, setGraph] = useState<"pie" | "line">("pie");
   const {
     isVisible1,
     setVisible1,
@@ -35,12 +29,10 @@ export const TransactionView = observer(() => {
     setVisible2,
     isVisible3,
     setVisible3,
-    isVisible4,
-    setVisible4,
   } = useVisible();
   const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(new Transaction({}).$view) as (keyof TransactionInterface)[],
-    "shownFieldsTransaction"
+    Object.keys(new FollowUp({}).$view) as (keyof FollowUpInterface)[],
+    "shownFieldsFollowUp"
   );
 
   const [params, setParams] = useSearchParams();
@@ -49,21 +41,16 @@ export const TransactionView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchTransactions = async () => {
-    const resp = await transactionStore.fetchAll(queryString);
+  const fetchFollowUps = async () => {
+    const resp = await followUpStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
     }
     setPageDetails(resp.pageDetails);
-    transactionAnalyticsStore.fetchAll(`graph=${graph}`);
   };
 
   const toggleView = () => {
     setView((prev) => (prev === "card" ? "table" : "card"));
-  };
-
-  const toggleGraph = () => {
-    setGraph((prev) => (prev === "line" ? "pie" : "line"));
   };
 
   const onClickPrev = () => {
@@ -110,27 +97,17 @@ export const TransactionView = observer(() => {
     () =>
       [
         {
-          key: "transmitter",
-          values: accountStore.items,
-          label: "name",
+          key: "job",
+          values: jobStore.items,
+          label: "company",
         },
         {
-          key: "receiver",
-          values: accountStore.items,
-          label: "name",
-        },
-        {
-          key: "account",
-          values: accountStore.items,
-          label: "name",
-        },
-        {
-          key: "category",
-          values: categoryStore.items,
-          label: "title",
+          key: "status",
+          values: followUpResponses,
+          label: "",
         },
       ] as KV<any>[],
-    [transactionStore.items.length, categoryStore.items.length]
+    [jobStore.items.length]
   );
 
   const actions = useMemo(
@@ -139,10 +116,10 @@ export const TransactionView = observer(() => {
         icon: (
           <div className="flex flex-col items-center">
             <AddCardIcon fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">TRX</div>
+            <div className="text-xs text-gray-500 font-bold">ADD</div>
           </div>
         ),
-        name: "Add a Transaction",
+        name: "Add a FollowUp",
         onClick: () => setVisible1(true),
       },
       {
@@ -165,52 +142,12 @@ export const TransactionView = observer(() => {
         name: "Filters",
         onClick: () => setVisible3(true),
       },
-      {
-        icon: (
-          <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">ACCT</div>
-          </div>
-        ),
-        name: "Add an Transaction",
-        onClick: () => setVisible4(true),
-      },
     ],
     []
   );
 
-  const views = useMemo(
-    () => [
-      {
-        icon: (
-          <div className="flex flex-col items-center">
-            {view === "card" ? "📊" : "🗂️"}
-            <div className="text-xs text-gray-500 font-bold">
-              {view === "card" ? "CARD" : "TABLE"}
-            </div>
-          </div>
-        ),
-        name: "Toggle View",
-        onClick: toggleView,
-      },
-      {
-        icon: (
-          <div className="flex flex-col items-center text-3xl">
-            {graph === "pie" ? `\u25d4` : "\u{1F4C8}"}
-            <div className="text-xs text-gray-500 font-bold">
-              {graph === "pie" ? `PIE` : "TREND"}
-            </div>
-          </div>
-        ),
-        name: "Toggle Graphs",
-        onClick: toggleGraph,
-      },
-    ],
-    [view, graph]
-  );
-
   useEffect(() => {
-    fetchTransactions();
+    fetchFollowUps();
   }, [params]);
 
   const value = {
@@ -221,29 +158,24 @@ export const TransactionView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
-    graph,
-    fetchFcn: fetchTransactions,
+    fetchFcn: fetchFollowUps,
   };
 
   return (
-    <TransactionViewContext.Provider value={value}>
+    <FollowUpViewContext.Provider value={value}>
       <div className="relative">
         <MySpeedDial actions={actions} />
-        <MySpeedDial actions={views} leftSide />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <TransactionForm
-            setVisible={setVisible1}
-            fetchFcn={fetchTransactions}
-          />
+          <FollowUpForm setVisible={setVisible1} fetchFcn={fetchFollowUps} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector
             label="Fields"
             value={shownFields}
             onChangeValue={(t) =>
-              setShownFields(t as (keyof TransactionInterface)[])
+              setShownFields(t as (keyof FollowUpInterface)[])
             }
-            options={Object.keys(new Transaction({}).$view).map((s) => ({
+            options={Object.keys(new FollowUp({}).$view).map((s) => ({
               id: s,
               name: toTitleCase(s),
             }))}
@@ -252,13 +184,17 @@ export const TransactionView = observer(() => {
           />
         </MyModal>
         <MyModal isVisible={isVisible3} setVisible={setVisible3} disableClose>
-          <TransactionFilter />
+          <FollowUpFilter />
         </MyModal>
-        <MyModal isVisible={isVisible4} setVisible={setVisible4} disableClose>
-          <AccountForm setVisible={setVisible4} />
-        </MyModal>
-        {view === "card" ? <TransactionCollection /> : <TransactionTable />}
+        {view === "card" ? <FollowUpCollection /> : <FollowUpTable />}
+        <div
+          className="fixed bottom-6 left-6 bg-blue-500 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer shadow-lg hover:bg-blue-600 transition-colors"
+          onClick={toggleView}
+          title="Toggle View"
+        >
+          {view === "card" ? "📊" : "🗂️"}
+        </div>
       </div>
-    </TransactionViewContext.Provider>
+    </FollowUpViewContext.Provider>
   );
 });

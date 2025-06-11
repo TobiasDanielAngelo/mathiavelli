@@ -28,6 +28,10 @@ const sections = [
     items: ["journals", "wishlist", "credentials", "platforms"],
   },
   {
+    title: "Career",
+    items: ["jobs", "follow-ups"],
+  },
+  {
     title: "Health",
     items: ["health"],
   },

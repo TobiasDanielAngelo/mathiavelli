@@ -1,13 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../api/Store";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { TransactionCard } from "../TransactionComponents/TransactionCard";
-import { TransactionDashboard } from "./TransactionDashboard";
-import { useTransactionView } from "./TransactionProps";
+import { FollowUpCard } from "./FollowUpCard";
+import { useFollowUpView } from "./FollowUpProps";
 
-export const TransactionCollection = observer(() => {
-  const { transactionStore } = useStore();
-  const { shownFields, pageDetails, PageBar } = useTransactionView();
+export const FollowUpCollection = observer(() => {
+  const { followUpStore } = useStore();
+  const { shownFields, pageDetails, PageBar } = useFollowUpView();
 
   return (
     <SideBySideView
@@ -15,7 +14,7 @@ export const TransactionCollection = observer(() => {
         <div className="flex flex-col min-h-[85vh]">
           <PageBar />
           <div className="flex-1">
-            {transactionStore.items
+            {followUpStore.items
               .filter((s) => pageDetails?.ids?.includes(s.id))
               .sort((a, b) => {
                 return (
@@ -24,17 +23,13 @@ export const TransactionCollection = observer(() => {
                 );
               })
               .map((s) => (
-                <TransactionCard
-                  item={s}
-                  key={s.id}
-                  shownFields={shownFields}
-                />
+                <FollowUpCard item={s} key={s.id} shownFields={shownFields} />
               ))}
           </div>
           <PageBar />
         </div>
       }
-      SideB={<TransactionDashboard />}
+      SideB=""
       ratio={0.7}
     />
   );

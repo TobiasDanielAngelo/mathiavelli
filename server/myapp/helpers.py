@@ -1,87 +1,15 @@
 from datetime import datetime, timedelta
 from django.utils import timezone
-import random
-
-
-def non_to_val(x):
-    if x is None:
-        return ""
-    else:
-        return x
-
-
-def date_range_slicer(
-    start_date: datetime,
-    stop_date: datetime | str,
-    user: int,
-    payout: int,
-    start_id: int,
-    end_id: int,
-):
-    mytz = timezone.get_current_timezone()
-    if type(stop_date) is str:
-        return [
-            {
-                "start_dt": start_date,
-                "end_dt": "",
-                "duration": 0,
-                "is_night": (
-                    False
-                    if start_date.time().hour < 22 or start_date.time().hour > 6
-                    else True
-                ),
-                "user": int(user),
-                "payout": int(payout),
-                "start_id": int(start_id),
-                "end_id": -1,
-            }
-        ]
-    start_date = start_date.astimezone(mytz)
-    stop_date = stop_date.astimezone(mytz)
-    date_ranges = []
-    if start_date >= stop_date:
-        return []
-    while start_date < stop_date:
-        hr = start_date.time().hour
-        adder = 0
-        if hr >= 0 and hr < 6:
-            adder = 6
-        elif hr >= 6 and hr < 22:
-            adder = 22
-        else:
-            adder = 24
-        next_date = datetime(
-            start_date.year, start_date.month, start_date.day, tzinfo=mytz
-        ) + timedelta(hours=adder)
-        if next_date < stop_date:
-            date_ranges.append(
-                {
-                    "start_dt": start_date,
-                    "end_dt": next_date,
-                    "duration": (next_date - start_date).total_seconds() / 3600,
-                    "is_night": True if adder == 6 or adder == 24 else False,
-                    "user": int(user),
-                    "payout": int(payout),
-                    "start_id": int(start_id),
-                    "end_id": int(end_id),
-                }
-            )
-            start_date = next_date
-        else:
-            date_ranges.append(
-                {
-                    "start_dt": start_date,
-                    "end_dt": stop_date,
-                    "duration": (stop_date - start_date).total_seconds() / 3600,
-                    "is_night": True if adder == 6 or adder == 24 else False,
-                    "user": int(user),
-                    "payout": int(payout),
-                    "start_id": int(start_id),
-                    "end_id": int(end_id),
-                }
-            )
-            break
-    return date_ranges
+from django.db.models.functions import (
+    ExtractYear,
+    ExtractMonth,
+    ExtractDay,
+    ExtractWeek,
+    ExtractWeekDay,
+    ExtractQuarter,
+)
+from django.db.models import CharField, F, Value, Func
+from django.db.models.functions import Concat, Cast, Right
 
 
 def obj_list_to_obj_val(**list):
@@ -89,3 +17,50 @@ def obj_list_to_obj_val(**list):
     for key, value in list.items():
         obj_val[key] = value[0]
     return obj_val
+
+
+# List of annotations (name, function)
+date_annotations = [
+    ("year", ExtractYear),
+    ("month", ExtractMonth),
+    ("day", ExtractDay),
+    ("week", ExtractWeek),
+    ("weekday", ExtractWeekDay),
+    ("quarter", ExtractQuarter),
+]
+
+
+def annotate_period(qs, datetime_key, *fields):
+    for name, func in date_annotations:
+        qs = qs.annotate(**{name: func(datetime_key)})
+    return qs.annotate(period=Period(*fields))
+
+
+class LPAD(Func):
+    function = "LPAD"
+    arity = 3  # needs 3 arguments: value, length, pad_char
+
+
+def Period(*fields, separator="-"):
+    parts = []
+    for i, f in enumerate(fields):
+        if f == "quarter":
+            parts.append(Value("Q"))
+            parts.append(Cast(F(f), output_field=CharField()))
+        elif f == "week":
+            parts.append(Value("W"))
+            padded = Right(Concat(Value("00"), Cast(F(f), output_field=CharField())), 2)
+            parts.append(padded)
+        elif f == "weekday":
+            parts.append(Value("D"))
+            parts.append(Cast(F(f), output_field=CharField()))
+        elif f in ["month", "day"]:
+            padded = Right(Concat(Value("00"), Cast(F(f), output_field=CharField())), 2)
+            parts.append(padded)
+        else:
+            parts.append(Cast(F(f), output_field=CharField()))
+
+        if i < len(fields) - 1:
+            parts.append(Value(separator))
+
+    return Concat(*parts, output_field=CharField())

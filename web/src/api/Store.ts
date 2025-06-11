@@ -1,20 +1,22 @@
 import { model, Model, prop } from "mobx-keystone";
-import { GoalStore } from "./GoalStore";
-import { TaskStore } from "./TaskStore";
 import { createContext, useContext } from "react";
-import { UserStore } from "./UserStore";
-import { JournalStore } from "./JournalStore";
-import { AccountStore } from "./AccountStore";
-import { CategoryStore } from "./CategoryStore";
-import { TransactionStore } from "./TransactionStore";
-import { ReceivableStore } from "./ReceivableStore";
-import { PayableStore } from "./PayableStore";
-import { EventStore } from "./EventStore";
-import { TagStore } from "./TagStore";
-import { BuyListItemStore } from "./BuyListItemStore";
-import { PlatformStore } from "./PlatformStore";
-import { CredentialStore } from "./CredentialStore";
 import { TransactionAnalyticsStore } from "../analytics/TransactionAnalyticsStore";
+import { AccountStore } from "./AccountStore";
+import { BuyListItemStore } from "./BuyListItemStore";
+import { CategoryStore } from "./CategoryStore";
+import { CredentialStore } from "./CredentialStore";
+import { EventStore } from "./EventStore";
+import { FollowUpStore } from "./FollowUpStore";
+import { GoalStore } from "./GoalStore";
+import { JobStore } from "./JobStore";
+import { JournalStore } from "./JournalStore";
+import { PayableStore } from "./PayableStore";
+import { PlatformStore } from "./PlatformStore";
+import { ReceivableStore } from "./ReceivableStore";
+import { TagStore } from "./TagStore";
+import { TaskStore } from "./TaskStore";
+import { TransactionStore } from "./TransactionStore";
+import { UserStore } from "./UserStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -32,6 +34,8 @@ export class Store extends Model({
   buyListItemStore: prop<BuyListItemStore>(),
   platformStore: prop<PlatformStore>(),
   credentialStore: prop<CredentialStore>(),
+  jobStore: prop<JobStore>(),
+  followUpStore: prop<FollowUpStore>(),
 
   transactionAnalyticsStore: prop<TransactionAnalyticsStore>(),
 }) {}
@@ -52,6 +56,9 @@ export const createStore = () =>
     buyListItemStore: new BuyListItemStore({}),
     platformStore: new PlatformStore({}),
     credentialStore: new CredentialStore({}),
+    jobStore: new JobStore({}),
+    followUpStore: new FollowUpStore({}),
+
     transactionAnalyticsStore: new TransactionAnalyticsStore({}),
   });
 

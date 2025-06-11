@@ -1,39 +1,19 @@
 import { observer } from "mobx-react-lite";
 import {
+  Area,
+  AreaChart,
+  CartesianGrid,
   Legend,
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 import { COLORS, MyTrendChartProps, useTrendChart } from ".";
 import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
 import { MyCustomTooltip } from "./MyCustomToolTip";
 
-/**
- * RadarChart Component
- *
- * Compares multiple dimensions (e.g., KPI scores).
- *
- * Data shape:
- * [
- *   { subject: string; A: number },
- *   ...
- * ]
- *
- * Props:
- * - data: metric set per subject
- * - dataKey: metric field
- *
- * Best for:
- * - Performance profiles
- * - Category scoring
- */
-
-export const MyRadarChart = observer(
+export const MyAreaChart = observer(
   <T extends Record<string, any>>({
     data,
     width = "100%",
@@ -49,6 +29,7 @@ export const MyRadarChart = observer(
   }: MyTrendChartProps<T>) => {
     const { allTraceKeys, transformedData, shownFields, setShownFields } =
       useTrendChart(data, traceKey, xKey, yKey, itemMap, excludedFromTotal);
+
     return (
       <div className="w-full h-full">
         <MyMultiDropdownSelector
@@ -59,16 +40,16 @@ export const MyRadarChart = observer(
           isAll
         />
         <ResponsiveContainer width={width} height={height}>
-          <RadarChart data={transformedData}>
-            <PolarGrid strokeDasharray={"5 10"} />
-            <PolarRadiusAxis />
-            <PolarAngleAxis dataKey={xKey as string} />
+          <AreaChart data={transformedData}>
+            <CartesianGrid strokeDasharray={"5 10"} />
             <Legend />
+            <XAxis dataKey={xKey as string} />
+            <YAxis />
             <Tooltip content={<MyCustomTooltip />} formatter={formatter} />
             {allTraceKeys
               .filter((s) => shownFields.includes(s))
               .map((key, i) => (
-                <Radar
+                <Area
                   key={key}
                   type="monotone"
                   dataKey={key}
@@ -76,7 +57,7 @@ export const MyRadarChart = observer(
                   fill={colors[i % colors.length]}
                 />
               ))}
-          </RadarChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     );

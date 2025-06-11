@@ -1,31 +1,17 @@
+import { observer } from "mobx-react-lite";
 import {
   Area,
   AreaChart,
   CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { COLORS, MyTrendChartProps, useTrendChart } from ".";
+import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
 import { MyCustomTooltip } from "./MyCustomToolTip";
-
-const data = [
-  {
-    name: "January",
-    product1: 300,
-    product2: 400,
-  },
-  {
-    name: "February",
-    product1: 500,
-    product2: 200,
-  },
-  {
-    name: "March",
-    product1: 200,
-    product2: 300,
-  },
-];
 
 /**
  * AreaChart Component
@@ -46,29 +32,53 @@ const data = [
  * - Cumulative insights
  * - Revenue trends
  */
-export const MyAreaChart = () => {
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data}>
-        <CartesianGrid strokeDasharray={"5 10"} />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip content={<MyCustomTooltip />} />
-        <Area
-          type="monotone"
-          dataKey="product1"
-          stroke="brown"
-          fill="gold"
-          stackId={2}
+
+export const MyAreaChart = observer(
+  <T extends Record<string, any>>({
+    data,
+    width = "100%",
+    height = "85%",
+    colors = COLORS,
+    traceKey,
+    xKey,
+    yKey,
+    itemMap,
+    formatter,
+    excludedFromTotal,
+    selectionLabel,
+  }: MyTrendChartProps<T>) => {
+    const { allTraceKeys, transformedData, shownFields, setShownFields } =
+      useTrendChart(data, traceKey, xKey, yKey, itemMap, excludedFromTotal);
+
+    return (
+      <div className="w-full h-full">
+        <MyMultiDropdownSelector
+          value={shownFields}
+          onChangeValue={(t) => setShownFields(t as string[])}
+          options={allTraceKeys.map((s) => ({ id: s, name: s }))}
+          label={selectionLabel ?? "Items"}
+          isAll
         />
-        <Area
-          type="monotone"
-          dataKey="product2"
-          stroke="blue"
-          fill="darkblue"
-          stackId={1}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
-  );
-};
+        <ResponsiveContainer width={width} height={height}>
+          <AreaChart data={transformedData}>
+            <CartesianGrid strokeDasharray={"5 10"} />
+            <Legend />
+            <XAxis dataKey={xKey as string} />
+            <YAxis />
+            <Tooltip content={<MyCustomTooltip />} formatter={formatter} />
+            {allTraceKeys
+              .filter((s) => shownFields.includes(s))
+              .map((key, i) => (
+                <Area
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  stroke={colors[i % colors.length]}
+                />
+              ))}
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+);

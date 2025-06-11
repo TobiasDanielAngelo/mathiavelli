@@ -197,6 +197,16 @@ class CredentialViewSet(CustomModelViewSet):
     serializer_class = CredentialSerializer
 
 
+class JobViewSet(CustomModelViewSet):
+    queryset = Job.objects.all()
+    serializer_class = JobSerializer
+
+
+class FollowUpViewSet(CustomModelViewSet):
+    queryset = FollowUp.objects.all()
+    serializer_class = FollowUperializer
+
+
 class GoalViewSet(CustomModelViewSet):
     queryset = Goal.objects.all()
     serializer_class = GoalSerializer

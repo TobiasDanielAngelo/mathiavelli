@@ -2,7 +2,7 @@ import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { SetURLSearchParams } from "react-router-dom";
 import { TransactionInterface } from "../../api/TransactionStore";
 import { KV } from "../../blueprints/ItemDetails";
-import { PaginatedDetails } from "../../constants/interfaces";
+import { Graph, PaginatedDetails } from "../../constants/interfaces";
 
 interface TransactionViewProps {
   shownFields: (keyof TransactionInterface)[];
@@ -13,6 +13,7 @@ interface TransactionViewProps {
   itemMap: KV<any>[];
   PageBar: React.FC;
   fetchFcn: () => void;
+  graph: Graph;
 }
 
 export const TransactionViewContext =

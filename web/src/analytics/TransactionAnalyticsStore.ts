@@ -1,5 +1,13 @@
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  Model,
+  _async,
+  _await,
+  model,
+  modelAction,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
 import { fetchItemsRequest } from "../constants/storeHelpers";
 
 const slug = "analytics/transactions";
@@ -70,6 +78,8 @@ export class TransactionAnalyticsStore extends Model({
       return result;
     }
 
+    this.resetItems();
+
     result.data.forEach((s) => {
       if (!this.items.map((s) => s.id).includes(s.id)) {
         this.items.push(new TransactionAnalytics(s));
@@ -80,4 +90,9 @@ export class TransactionAnalyticsStore extends Model({
 
     return result;
   });
+
+  @modelAction
+  resetItems = function (this: TransactionAnalyticsStore) {
+    this.items = [];
+  };
 }
