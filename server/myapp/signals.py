@@ -9,22 +9,22 @@ def create_default_accounts(sender, **kwargs):
         return
 
     defaults = [
-        (Account, 1, {"name": "Wallet"}),
-        (Account, 2, {"name": "Coins"}),
-        (Account, 3, {"name": "Operations"}),
-        (Account, 4, {"name": "Initial"}),
-        (Category, 1, {"title": "Receivable Payment"}),
-        (Category, 2, {"title": "Payable Payment"}),
-        (Platform, 1, {"name": "Google"}),
-        (Platform, 2, {"name": "GitHub"}),
-        (Platform, 3, {"name": "Facebook"}),
-        (Platform, 4, {"name": "Twitter"}),
-        (Platform, 5, {"name": "Microsoft"}),
-        (Platform, 6, {"name": "Apple"}),
-        (Platform, 7, {"name": "Amazon"}),
-        (Platform, 8, {"name": "Netflix"}),
-        (Platform, 9, {"name": "Steam"}),
-        (Platform, 10, {"name": "Spotify"}),
+        (Account, 1000001, {"name": "Wallet"}),
+        (Account, 1000002, {"name": "Coins"}),
+        (Account, 1000003, {"name": "Operations"}),
+        (Account, 1000004, {"name": "Initial"}),
+        (Category, 1000001, {"title": "Receivable Payment"}),
+        (Category, 1000002, {"title": "Payable Payment"}),
+        (Platform, 1000001, {"name": "Google"}),
+        (Platform, 1000002, {"name": "GitHub"}),
+        (Platform, 1000003, {"name": "Facebook"}),
+        (Platform, 1000004, {"name": "Twitter"}),
+        (Platform, 1000005, {"name": "Microsoft"}),
+        (Platform, 1000006, {"name": "Apple"}),
+        (Platform, 1000007, {"name": "Amazon"}),
+        (Platform, 1000008, {"name": "Netflix"}),
+        (Platform, 1000009, {"name": "Steam"}),
+        (Platform, 10000010, {"name": "Spotify"}),
     ]
 
     for model, id, fields in defaults:

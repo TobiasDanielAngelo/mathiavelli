@@ -162,6 +162,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:3000",
     "http://raspberrypi.local",
     "https://mathiavelli.com",
     "https://www.mathiavelli.com",
