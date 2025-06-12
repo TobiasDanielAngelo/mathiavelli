@@ -25,6 +25,6 @@ export const useCategoryView = () => {
 };
 
 export const CategoryIdMap = {
-  "Receivable Payment": 1,
-  "Payable Payment": 2,
+  "Receivable Payment": 1000001,
+  "Payable Payment": 1000002,
 } as const;

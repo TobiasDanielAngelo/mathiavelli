@@ -25,14 +25,14 @@ export const usePlatformView = () => {
 };
 
 export const PlatformIdMap = {
-  Google: 1,
-  GitHub: 2,
-  Facebook: 3,
-  Twitter: 4,
-  Microsoft: 5,
-  Apple: 6,
-  Amazon: 7,
-  Netflix: 8,
-  Steam: 9,
-  Spotify: 10,
+  Google: 1000001,
+  GitHub: 1000002,
+  Facebook: 1000003,
+  Twitter: 1000004,
+  Microsoft: 1000005,
+  Apple: 1000006,
+  Amazon: 1000007,
+  Netflix: 1000008,
+  Steam: 1000009,
+  Spotify: 1000010,
 } as const;

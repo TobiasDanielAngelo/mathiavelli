@@ -23,8 +23,8 @@ export const useAccountView = () => {
 };
 
 export const AccountIdMap = {
-  Wallet: 1,
-  Coins: 2,
-  Operations: 3,
-  Initial: 4,
+  Wallet: 1000001,
+  Coins: 1000002,
+  Operations: 1000003,
+  Initial: 1000004,
 } as const;

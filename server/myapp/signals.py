@@ -24,7 +24,7 @@ def create_default_accounts(sender, **kwargs):
         (Platform, 1000007, {"name": "Amazon"}),
         (Platform, 1000008, {"name": "Netflix"}),
         (Platform, 1000009, {"name": "Steam"}),
-        (Platform, 10000010, {"name": "Spotify"}),
+        (Platform, 1000010, {"name": "Spotify"}),
     ]
 
     for model, id, fields in defaults:
