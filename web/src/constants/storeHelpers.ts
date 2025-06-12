@@ -13,9 +13,16 @@ async function request<T>(
 ): Promise<{ details: any; ok: boolean; data: T | null }> {
   const token = getToken();
 
+  const input = new URLSearchParams(options.params);
+  const filtered = new URLSearchParams();
+
+  for (const [key, value] of input.entries()) {
+    if (value.trim()) filtered.append(key, value);
+  }
+
   let url = `${import.meta.env.VITE_BASE_URL}/${endpoint}/`;
   if (options.itemId) url += `${options.itemId}/`;
-  if (options.params) url += `?${options.params}`;
+  if (options.params) url += `?${filtered.toString()}`;
 
   const headers: Record<string, string> = {
     "Content-type": "application/json",
