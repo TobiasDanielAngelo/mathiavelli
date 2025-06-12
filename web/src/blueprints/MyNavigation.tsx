@@ -44,7 +44,7 @@ export const ResponsiveDrawer = observer(
           open={open}
           onClose={setOpen && (() => setOpen(false))}
         >
-          <div className="dark:bg-gray-900 dark:text-gray-400 h-full">
+          <div className="dark:bg-gray-900 dark:text-gray-400">
             <Toolbar />
             <List>
               <ListItem disablePadding>
