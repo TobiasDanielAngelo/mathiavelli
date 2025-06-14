@@ -51,7 +51,7 @@ export const TransactionView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchTransactions = async () => {
+  const fetchFcn = async () => {
     const resp = await transactionStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -135,49 +135,29 @@ export const TransactionView = observer(() => {
     [
       transactionStore.items.length,
       categoryStore.items.length,
-      accountStore.items,
+      accountStore.items.length,
     ]
   );
 
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">TRX</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="TRX" />,
         name: "Add a Transaction",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">ACCT</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="ACCT" />,
         name: "Add an Transaction",
         onClick: () => setVisible4(true),
       },
@@ -188,26 +168,22 @@ export const TransactionView = observer(() => {
   const views = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            {view === "card" ? "📊" : "🗂️"}
-            <div className="text-xs text-gray-500 font-bold">
-              {view === "card" ? "CARD" : "TABLE"}
-            </div>
-          </div>
-        ),
+        icon:
+          view === "card" ? (
+            <MyIcon icon="Padding" label="CARD" />
+          ) : (
+            <MyIcon icon="TableChart" label="TABLE" />
+          ),
         name: "Toggle View",
         onClick: toggleView,
       },
       {
-        icon: (
-          <div className="flex flex-col items-center text-3xl">
-            {graph === "pie" ? `\u25d4` : "\u{1F4C8}"}
-            <div className="text-xs text-gray-500 font-bold">
-              {graph === "pie" ? `PIE` : "TREND"}
-            </div>
-          </div>
-        ),
+        icon:
+          graph === "pie" ? (
+            <MyIcon icon="PieChart" label="PIE" />
+          ) : (
+            <MyIcon icon="Timeline" label="TREND" />
+          ),
         name: "Toggle Graphs",
         onClick: toggleGraph,
       },
@@ -216,7 +192,7 @@ export const TransactionView = observer(() => {
   );
 
   useEffect(() => {
-    fetchTransactions();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -228,7 +204,7 @@ export const TransactionView = observer(() => {
     itemMap,
     PageBar,
     graph,
-    fetchFcn: fetchTransactions,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -237,10 +213,7 @@ export const TransactionView = observer(() => {
         <MySpeedDial actions={actions} />
         <MySpeedDial actions={views} leftSide />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <TransactionForm
-            setVisible={setVisible1}
-            fetchFcn={fetchTransactions}
-          />
+          <TransactionForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

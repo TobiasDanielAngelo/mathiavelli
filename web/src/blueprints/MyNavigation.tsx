@@ -114,7 +114,9 @@ const NavLink = ({
       {page.link ? (
         <Link
           to={page.link}
-          onClick={() => setLocation?.(page.link!)}
+          onClick={() => {
+            setLocation?.(page.link!);
+          }}
           className={
             page.selected
               ? "md:text-gray-300 font-bold"
@@ -141,7 +143,9 @@ const NavLink = ({
             <Link
               key={idx}
               to={child.link ?? ""}
-              onClick={() => setLocation?.(child.link!)}
+              onClick={() => {
+                setLocation?.(child.link!);
+              }}
               className="block px-4 py-2 text-sm text-white hover:bg-gray-100"
             >
               {child.title}
@@ -223,11 +227,7 @@ export const MyNavBar = observer(
           <div className="md:w-auto" id="navbar-default">
             <ul className="font-medium flex flex-col items-center justify-center md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               {paths?.map((s, ind) => (
-                <div
-                  onClick={() => setLocation && s.link && setLocation(s.link)}
-                  key={ind}
-                  className="hidden lg:block"
-                >
+                <div key={ind} className="hidden lg:block">
                   <NavLink page={s} setLocation={setLocation} />
                 </div>
               ))}

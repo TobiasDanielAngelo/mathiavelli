@@ -155,6 +155,7 @@ export const FollowUpTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <FollowUpRow item={item} />}
+      priceFields={FollowUpFields.prices}
     />
   );
 });

@@ -42,7 +42,7 @@ export const ReceivableView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchReceivables = async () => {
+  const fetchFcn = async () => {
     const resp = await receivableStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -112,32 +112,17 @@ export const ReceivableView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">RECV</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="RECV" />,
         name: "Add a Receivable",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
@@ -146,7 +131,7 @@ export const ReceivableView = observer(() => {
   );
 
   useEffect(() => {
-    fetchReceivables();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -157,7 +142,7 @@ export const ReceivableView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
-    fetchFcn: fetchReceivables,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -165,10 +150,7 @@ export const ReceivableView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <ReceivableForm
-            setVisible={setVisible1}
-            fetchFcn={fetchReceivables}
-          />
+          <ReceivableForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

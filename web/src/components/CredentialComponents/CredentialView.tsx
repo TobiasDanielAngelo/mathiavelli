@@ -46,7 +46,7 @@ export const CredentialView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchCredentials = async () => {
+  const fetchFcn = async () => {
     const resp = await credentialStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -128,32 +128,17 @@ export const CredentialView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">CRED.</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="CRED." />,
         name: "Add a Credential",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
@@ -162,7 +147,7 @@ export const CredentialView = observer(() => {
   );
 
   useEffect(() => {
-    fetchCredentials();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -173,7 +158,7 @@ export const CredentialView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
-    fetchFcn: fetchCredentials,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -181,10 +166,7 @@ export const CredentialView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <CredentialForm
-            setVisible={setVisible1}
-            fetchFcn={fetchCredentials}
-          />
+          <CredentialForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

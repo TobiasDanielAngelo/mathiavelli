@@ -156,6 +156,7 @@ export const PlatformTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <PlatformRow item={item} />}
+      priceFields={PlatformFields.prices}
     />
   );
 });

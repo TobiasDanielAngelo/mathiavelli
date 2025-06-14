@@ -39,7 +39,7 @@ export const TagView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchTags = async () => {
+  const fetchFcn = async () => {
     const resp = await tagStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -94,32 +94,17 @@ export const TagView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">TAG</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="TAG" />,
         name: "Add a Tag",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
@@ -128,7 +113,7 @@ export const TagView = observer(() => {
   );
 
   useEffect(() => {
-    fetchTags();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -138,7 +123,7 @@ export const TagView = observer(() => {
     setParams,
     pageDetails,
     PageBar,
-    fetchFcn: fetchTags,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -146,7 +131,7 @@ export const TagView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <TagForm setVisible={setVisible1} fetchFcn={fetchTags} />
+          <TagForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

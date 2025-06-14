@@ -3,7 +3,7 @@ import { SetURLSearchParams } from "react-router-dom";
 import { Graph, PaginatedDetails } from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
 
-interface GenericViewProps<T> {
+export interface GenericViewProps<T> {
   shownFields: (keyof T)[];
   setShownFields: Dispatch<SetStateAction<(keyof T)[]>>;
   params: URLSearchParams;

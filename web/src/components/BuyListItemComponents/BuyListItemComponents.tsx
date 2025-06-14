@@ -167,6 +167,7 @@ export const BuyListItemTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <BuyListItemRow item={item} />}
+      priceFields={BuyListItemFields.prices}
     />
   );
 });

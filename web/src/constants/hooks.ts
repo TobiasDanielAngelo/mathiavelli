@@ -59,11 +59,11 @@ export function useLocalStorageState<T>(defaultValue: T, key: string) {
   return [state, setState] as const;
 }
 
-type VisibleMap = Record<number, boolean>;
+export type VisibleMap = Record<number, boolean>;
 type Index = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
-type UseVisibleMapReturn = {
-  visible: VisibleMap;
+export type UseVisibleMapReturn = {
+  isVisible: VisibleMap;
   toggleVisible: (key: number) => void;
   setVisible: (key: number, value: boolean) => void;
 } & {
@@ -96,7 +96,7 @@ export function useVisible(): UseVisibleMapReturn {
   const initialMap = Object.fromEntries(
     indices.map((i) => [i, false])
   ) as VisibleMap;
-  const [visible, setVisibleState] = useState<VisibleMap>(initialMap);
+  const [isVisible, setVisibleState] = useState<VisibleMap>(initialMap);
 
   const toggleVisible = (key: Index) =>
     setVisibleState((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -117,11 +117,11 @@ export function useVisible(): UseVisibleMapReturn {
   );
 
   const isVisibleMap = Object.fromEntries(
-    indices.map((i) => [`isVisible${i}`, visible[i]])
+    indices.map((i) => [`isVisible${i}`, isVisible[i]])
   );
 
   return {
-    visible,
+    isVisible,
     toggleVisible,
     setVisible,
     ...individualSetters,

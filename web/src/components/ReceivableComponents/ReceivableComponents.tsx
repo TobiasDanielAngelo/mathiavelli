@@ -216,6 +216,7 @@ export const ReceivableTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <ReceivableRow item={item} />}
+      priceFields={ReceivableFields.prices}
     />
   );
 });

@@ -42,7 +42,7 @@ export const EventView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchEvents = async () => {
+  const fetchFcn = async () => {
     const resp = await eventStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -111,32 +111,17 @@ export const EventView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">EVENT</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="EVENT" />,
         name: "Add a Event",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
@@ -145,7 +130,7 @@ export const EventView = observer(() => {
   );
 
   useEffect(() => {
-    fetchEvents();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -156,7 +141,7 @@ export const EventView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
-    fetchFcn: fetchEvents,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -164,7 +149,7 @@ export const EventView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <EventForm setVisible={setVisible1} fetchFcn={fetchEvents} />
+          <EventForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

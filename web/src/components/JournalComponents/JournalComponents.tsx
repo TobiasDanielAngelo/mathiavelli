@@ -169,6 +169,7 @@ export const JournalTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <JournalRow item={item} />}
+      priceFields={JournalFields.prices}
     />
   );
 });

@@ -41,7 +41,7 @@ export const GoalView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchGoals = async () => {
+  const fetchFcn = async () => {
     const resp = await goalStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -112,32 +112,17 @@ export const GoalView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">GOAL</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="GOAL" />,
         name: "Add a Goal",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
@@ -146,7 +131,7 @@ export const GoalView = observer(() => {
   );
 
   useEffect(() => {
-    fetchGoals();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -157,7 +142,7 @@ export const GoalView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
-    fetchFcn: fetchGoals,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -165,7 +150,7 @@ export const GoalView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <GoalForm setVisible={setVisible1} fetchFcn={fetchGoals} />
+          <GoalForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

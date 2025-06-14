@@ -206,6 +206,7 @@ export const EventTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <EventRow item={item} />}
+      priceFields={EventFields.prices}
     />
   );
 });

@@ -206,6 +206,7 @@ export const JobTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <JobRow item={item} />}
+      priceFields={JobFields.prices}
     />
   );
 });

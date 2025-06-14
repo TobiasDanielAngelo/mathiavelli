@@ -44,6 +44,7 @@ export const MyGenericCard = observer(
         setMsg(resp.details ?? "Error");
         return;
       }
+      fetchFcn();
       setVisible2(false);
     };
 

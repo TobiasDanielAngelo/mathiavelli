@@ -6,6 +6,9 @@ import {
   TransactionFields,
   TransactionInterface,
 } from "../../api/TransactionStore";
+import { KV } from "../../blueprints/ItemDetails";
+import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
+import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
@@ -19,8 +22,6 @@ import {
   toOptions,
 } from "../../constants/helpers";
 import { Field } from "../../constants/interfaces";
-import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
-import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 
 export const {
   Context: TransactionViewContext,
@@ -125,50 +126,52 @@ export const TransactionCard = observer((props: { item: Transaction }) => {
   );
 });
 
-export const TransactionDashboard = observer(() => {
-  const { transactionAnalyticsStore } = useStore();
-  const { itemMap, graph } = useTransactionView();
+export const TransactionDashboard = observer(
+  (props: { itemMap?: KV<any>[]; graph?: string }) => {
+    const { transactionAnalyticsStore } = useStore();
+    const { itemMap, graph } = props;
 
-  const fetchTransactionAnalytics = async () => {
-    const resp = await transactionAnalyticsStore.fetchAll(`graph=${graph}`);
-    if (!resp.ok || !resp.data) {
-      return;
-    }
-  };
+    const fetchTransactionAnalytics = async () => {
+      const resp = await transactionAnalyticsStore.fetchAll(`graph=${graph}`);
+      if (!resp.ok || !resp.data) {
+        return;
+      }
+    };
 
-  useEffect(() => {
-    fetchTransactionAnalytics();
-  }, [graph]);
+    useEffect(() => {
+      fetchTransactionAnalytics();
+    }, [graph]);
 
-  return (
-    <>
-      {graph === "pie" ? (
-        <MyPieChart
-          data={transactionAnalyticsStore.items}
-          nameKey="category"
-          dataKey="total"
-          itemMap={itemMap}
-          formatter={(value: number, name: string) => [toMoney(value), name]}
-        />
-      ) : (
-        <MyLineChart
-          data={transactionAnalyticsStore.items}
-          traceKey="account"
-          xKey="period"
-          yKey="total"
-          formatter={(value: number, name: string) => [toMoney(value), name]}
-          itemMap={itemMap}
-          excludedFromTotal={["Operations"]}
-          selectionLabel="Accounts"
-        />
-      )}
-    </>
-  );
-});
+    return (
+      <>
+        {graph === "pie" ? (
+          <MyPieChart
+            data={transactionAnalyticsStore.items}
+            nameKey="category"
+            dataKey="total"
+            itemMap={itemMap}
+            formatter={(value: number, name: string) => [toMoney(value), name]}
+          />
+        ) : (
+          <MyLineChart
+            data={transactionAnalyticsStore.items}
+            traceKey="account"
+            xKey="period"
+            yKey="total"
+            formatter={(value: number, name: string) => [toMoney(value), name]}
+            itemMap={itemMap}
+            excludedFromTotal={["Operations"]}
+            selectionLabel="Accounts"
+          />
+        )}
+      </>
+    );
+  }
+);
 
 export const TransactionCollection = observer(() => {
   const { transactionStore } = useStore();
-  const { pageDetails, PageBar } = useTransactionView();
+  const { pageDetails, PageBar, itemMap, graph } = useTransactionView();
 
   return (
     <SideBySideView
@@ -187,7 +190,7 @@ export const TransactionCollection = observer(() => {
           <PageBar />
         </div>
       }
-      SideB={<TransactionDashboard />}
+      SideB={<TransactionDashboard itemMap={itemMap} graph={graph} />}
       ratio={0.7}
     />
   );
@@ -233,6 +236,7 @@ export const TransactionTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <TransactionRow item={item} />}
+      priceFields={TransactionFields.prices}
     />
   );
 });

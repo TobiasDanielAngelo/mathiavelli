@@ -49,7 +49,7 @@ export const JobView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchJobs = async () => {
+  const fetchFcn = async () => {
     const resp = await jobStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -131,32 +131,17 @@ export const JobView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">APPLY</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="APPLY" />,
         name: "Add a Job",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
@@ -165,7 +150,7 @@ export const JobView = observer(() => {
   );
 
   useEffect(() => {
-    fetchJobs();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -176,7 +161,7 @@ export const JobView = observer(() => {
     pageDetails,
     itemMap,
     PageBar,
-    fetchFcn: fetchJobs,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -184,7 +169,7 @@ export const JobView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <JobForm setVisible={setVisible1} fetchFcn={fetchJobs} />
+          <JobForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

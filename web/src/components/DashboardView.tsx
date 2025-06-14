@@ -1,6 +1,9 @@
-import { observer } from "mobx-react-lite";
 import EventIcon from "@mui/icons-material/Event";
-import { PropsWithChildren } from "react";
+import { observer } from "mobx-react-lite";
+import { PropsWithChildren, useMemo } from "react";
+import { useStore } from "../api/Store";
+import { KV } from "../blueprints/ItemDetails";
+import { TransactionDashboard } from "./TransactionComponents/TransactionComponents";
 
 export const DashboardCard = (
   props: PropsWithChildren<{
@@ -32,10 +35,43 @@ export const DashboardCard = (
   );
 };
 export const DashboardView = observer(() => {
+  const { transactionStore, categoryStore, accountStore } = useStore();
+  const itemMap = useMemo(
+    () =>
+      [
+        {
+          key: "transmitter",
+          values: accountStore.items,
+          label: "name",
+        },
+        {
+          key: "receiver",
+          values: accountStore.items,
+          label: "name",
+        },
+        {
+          key: "account",
+          values: accountStore.items,
+          label: "name",
+        },
+        {
+          key: "category",
+          values: categoryStore.items,
+          label: "title",
+        },
+      ] as KV<any>[],
+    [
+      transactionStore.items.length,
+      categoryStore.items.length,
+      accountStore.items.length,
+    ]
+  );
+
   return (
     <div className="m-2">
       <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-5 mb-3">
-        {[...Array(20)].map((_, i) => (
+        <TransactionDashboard graph="pie" itemMap={itemMap} />
+        {[...Array(1)].map((_, i) => (
           <DashboardCard key={i} title="Summary" stats={i} change={i}>
             <EventIcon fontSize="large" />
           </DashboardCard>

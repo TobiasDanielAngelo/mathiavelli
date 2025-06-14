@@ -195,6 +195,7 @@ export const GoalTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <GoalRow item={item} />}
+      priceFields={GoalFields.prices}
     />
   );
 });

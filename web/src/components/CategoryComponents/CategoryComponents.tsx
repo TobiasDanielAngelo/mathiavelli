@@ -170,6 +170,7 @@ export const CategoryTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <CategoryRow item={item} />}
+      priceFields={CategoryFields.prices}
     />
   );
 });

@@ -146,6 +146,7 @@ export const AccountTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <AccountRow item={item} />}
+      priceFields={AccountFields.prices}
     />
   );
 });

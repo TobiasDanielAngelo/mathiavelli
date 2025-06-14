@@ -215,6 +215,7 @@ export const TaskTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <TaskRow item={item} />}
+      priceFields={TaskFields.prices}
     />
   );
 });

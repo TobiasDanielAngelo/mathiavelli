@@ -42,7 +42,7 @@ export const CategoryView = observer(() => {
   >();
   const queryString = new URLSearchParams(params).toString();
 
-  const fetchCategories = async () => {
+  const fetchFcn = async () => {
     const resp = await categoryStore.fetchAll(queryString);
     if (!resp.ok || !resp.data) {
       return;
@@ -97,32 +97,17 @@ export const CategoryView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">CATEG.</div>
-          </div>
-        ),
+        icon: <MyIcon icon="NoteAdd" fontSize="large" label="CATEG." />,
         name: "Add a Category",
         onClick: () => setVisible1(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FIELDS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="ViewList" fontSize="large" label="FIELDS" />,
         name: "Show Fields",
         onClick: () => setVisible2(true),
       },
       {
-        icon: (
-          <div className="flex flex-col items-center">
-            <MyIcon icon="AddCard" fontSize="large" />
-            <div className="text-xs text-gray-500 font-bold">FILTERS</div>
-          </div>
-        ),
+        icon: <MyIcon icon="FilterListAlt" fontSize="large" label="FILTERS" />,
         name: "Filters",
         onClick: () => setVisible3(true),
       },
@@ -131,7 +116,7 @@ export const CategoryView = observer(() => {
   );
 
   useEffect(() => {
-    fetchCategories();
+    fetchFcn();
   }, [params]);
 
   const value = {
@@ -141,7 +126,7 @@ export const CategoryView = observer(() => {
     setParams,
     pageDetails,
     PageBar,
-    fetchFcn: fetchCategories,
+    fetchFcn: fetchFcn,
   };
 
   return (
@@ -149,7 +134,7 @@ export const CategoryView = observer(() => {
       <div className="relative">
         <MySpeedDial actions={actions} />
         <MyModal isVisible={isVisible1} setVisible={setVisible1} disableClose>
-          <CategoryForm setVisible={setVisible1} fetchFcn={fetchCategories} />
+          <CategoryForm setVisible={setVisible1} fetchFcn={fetchFcn} />
         </MyModal>
         <MyModal isVisible={isVisible2} setVisible={setVisible2} disableClose>
           <MyMultiDropdownSelector

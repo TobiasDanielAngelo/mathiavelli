@@ -215,6 +215,7 @@ export const PayableTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <PayableRow item={item} />}
+      priceFields={PayableFields.prices}
     />
   );
 });

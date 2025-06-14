@@ -213,6 +213,7 @@ export const CredentialTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <CredentialRow item={item} />}
+      priceFields={CredentialFields.prices}
     />
   );
 });

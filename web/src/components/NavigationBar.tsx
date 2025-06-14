@@ -1,7 +1,8 @@
 import { observer } from "mobx-react-lite";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { MyNavBar } from "../blueprints/MyNavigation";
+import { toTitleCase } from "../constants/helpers";
 
 const sections = [
   {
@@ -45,6 +46,12 @@ export const NavBar = observer(
     const [loc, setLoc] = useState(location.pathname.split("/")[1]);
 
     const current = loc.replace("/", "");
+    useEffect(() => {
+      document.title =
+        current.length > 0
+          ? "HQ - " + toTitleCase(current)
+          : "Mathiavelli Self-HQ";
+    }, [current]);
 
     const nav = sections.map(({ title, items, mainLink }) => {
       const allPaths = [...items, ...(mainLink ? [mainLink] : [])];

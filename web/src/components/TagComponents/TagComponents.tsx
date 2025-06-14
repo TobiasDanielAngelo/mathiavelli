@@ -152,6 +152,7 @@ export const TagTable = observer(() => {
       setParams={setParams}
       PageBar={PageBar}
       renderActions={(item) => <TagRow item={item} />}
+      priceFields={TagFields.prices}
     />
   );
 });
