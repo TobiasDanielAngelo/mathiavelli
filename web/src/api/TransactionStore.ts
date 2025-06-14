@@ -1,4 +1,3 @@
-import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -8,6 +7,7 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
+import { computed } from "mobx";
 import {
   deleteItemRequest,
   fetchItemsRequest,
@@ -39,34 +39,50 @@ export type TransactionInterface = {
     : never;
 };
 
+export const TransactionFields: Record<string, (keyof TransactionInterface)[]> =
+  {
+    datetime: ["datetimeTransacted"] as const,
+    date: [] as const,
+    prices: ["amount"] as const,
+  };
+
 @model("myApp/Transaction")
 export class Transaction extends Model(props) {
   update(details: TransactionInterface) {
     Object.assign(this, details);
   }
-  get categoryName() {
-    const store = getRoot<Store>(this);
-    return store.categoryStore.allItems.get(this.category ?? -1)?.title || "—";
+
+  get categoryTitle() {
+    return (
+      getRoot<Store>(this)?.categoryStore?.allItems.get(this.category ?? -1)
+        ?.title || "—"
+    );
   }
   get transmitterName() {
-    const store = getRoot<Store>(this);
-    return store.accountStore.allItems.get(this.transmitter ?? -1)?.name || "—";
+    return (
+      getRoot<Store>(this)?.accountStore?.allItems.get(this.transmitter ?? -1)
+        ?.name || "—"
+    );
   }
   get receiverName() {
-    const store = getRoot<Store>(this);
-    return store.accountStore.allItems.get(this.receiver ?? -1)?.name || "—";
+    return (
+      getRoot<Store>(this)?.accountStore?.allItems.get(this.receiver ?? -1)
+        ?.name || "—"
+    );
   }
 
   get $view() {
-    const store = getRoot<Store>(this);
     return {
       ...this.$,
-      categoryName:
-        store?.categoryStore?.allItems.get(this.category ?? -1)?.title || "—",
+      categoryTitle:
+        getRoot<Store>(this)?.categoryStore?.allItems.get(this.category ?? -1)
+          ?.title || "—",
       transmitterName:
-        store?.accountStore?.allItems.get(this.transmitter ?? -1)?.name || "—",
+        getRoot<Store>(this)?.accountStore?.allItems.get(this.transmitter ?? -1)
+          ?.name || "—",
       receiverName:
-        store?.accountStore?.allItems.get(this.receiver ?? -1)?.name || "—",
+        getRoot<Store>(this)?.accountStore?.allItems.get(this.receiver ?? -1)
+          ?.name || "—",
     };
   }
 }

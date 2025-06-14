@@ -1,23 +1,24 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useStore } from "../../api/Store";
-import { Task, TaskInterface } from "../../api/TaskStore";
+import { FREQUENCY_CHOICES, Task, TaskInterface } from "../../api/TaskStore";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
-import { frequency } from "../../constants/constants";
 import { getUniqueIdsFromFK, toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { TaskCollection } from "./TaskCollection";
-import { TaskFilter } from "./TaskFilter";
-import { TaskForm } from "./TaskForm";
-import { TaskViewContext } from "./TaskProps";
-import { TaskTable } from "./TaskTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import {
+  TaskCollection,
+  TaskFilter,
+  TaskForm,
+  TaskTable,
+  TaskViewContext,
+} from "./TaskComponents";
 
 export const TaskView = observer(() => {
   const { taskStore, goalStore } = useStore();
@@ -105,11 +106,11 @@ export const TaskView = observer(() => {
         },
         {
           key: "repeat",
-          values: frequency,
+          values: FREQUENCY_CHOICES,
           label: "",
         },
       ] as KV<any>[],
-    [goalStore.items.length, frequency]
+    [goalStore.items.length]
   );
 
   const actions = useMemo(
@@ -117,7 +118,7 @@ export const TaskView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">TASK</div>
           </div>
         ),
@@ -127,7 +128,7 @@ export const TaskView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -137,7 +138,7 @@ export const TaskView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

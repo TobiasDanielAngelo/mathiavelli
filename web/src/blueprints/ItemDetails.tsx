@@ -8,7 +8,7 @@ export interface KV<U extends Record<string, any>> {
   label: keyof U;
 }
 
-interface ItemDetailsProps<T> {
+export interface ItemDetailsProps<T> {
   item: T;
   shownFields?: (keyof T)[];
   header?: (keyof T)[];

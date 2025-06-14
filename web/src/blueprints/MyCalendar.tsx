@@ -1,10 +1,10 @@
-import EventIcon from "@mui/icons-material/Event";
 import { observer } from "mobx-react-lite";
 import moment from "moment";
 import { Dispatch, SetStateAction, useState } from "react";
 import { TwoDates } from "../constants/classes";
 import { useWindowWidth } from "../constants/hooks";
 import { GuidedDiv } from "./MyGuidedDiv";
+import { MyIcon } from "./MyIcon";
 
 type CalendarEvent = {
   id: string | number;
@@ -102,7 +102,8 @@ export const MyCalendar = observer(
                 <div>
                   {renderEventContent && width > 1024
                     ? renderEventContent(dayEvents)
-                    : dayEvents.length > 0 && width > 1024 && <EventIcon />}
+                    : dayEvents.length > 0 &&
+                      width > 1024 && <MyIcon icon="Event" />}
                 </div>
               </GuidedDiv>
             );

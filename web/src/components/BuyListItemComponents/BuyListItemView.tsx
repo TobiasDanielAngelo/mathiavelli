@@ -1,23 +1,29 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { BuyListItem, BuyListItemInterface } from "../../api/BuyListItemStore";
+import {
+  BuyListItem,
+  BuyListItemInterface,
+  PRIORITY_CHOICES,
+} from "../../api/BuyListItemStore";
+import { STATUS_CHOICES } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
-import { priority, status } from "../../constants/constants";
 import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { PaginatedDetails } from "../../constants/interfaces";
-import { BuyListItemCollection } from "./BuyListItemCollection";
-import { BuyListItemFilter } from "./BuyListItemFilter";
-import { BuyListItemForm } from "./BuyListItemForm";
-import { BuyListItemViewContext } from "./BuyListItemProps";
-import { BuyListItemTable } from "./BuyListItemTable";
+import {
+  BuyListItemCollection,
+  BuyListItemFilter,
+  BuyListItemForm,
+  BuyListItemTable,
+  BuyListItemViewContext,
+} from "./BuyListItemComponents";
 
 export const BuyListItemView = observer(() => {
   const { buyListItemStore } = useStore();
@@ -98,16 +104,16 @@ export const BuyListItemView = observer(() => {
       [
         {
           key: "status",
-          values: status,
+          values: STATUS_CHOICES,
           label: "",
         },
         {
           key: "priority",
-          values: priority,
+          values: PRIORITY_CHOICES,
           label: "",
         },
       ] as KV<any>[],
-    [status, priority]
+    []
   );
 
   const actions = useMemo(
@@ -115,7 +121,7 @@ export const BuyListItemView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">WISH</div>
           </div>
         ),
@@ -125,7 +131,7 @@ export const BuyListItemView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -135,7 +141,7 @@ export const BuyListItemView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

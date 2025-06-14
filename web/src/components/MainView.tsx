@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../api/Store";
-import { AccountView } from "./AccountComponents/AccountView";
 import { BuyListItemView } from "./BuyListItemComponents/BuyListItemView";
 import { CategoryView } from "./CategoryComponents/CategoryView";
 import { DashboardView } from "./DashboardView";
@@ -20,6 +19,7 @@ import { PlatformView } from "./PlatformComponents/PlatformView";
 import { CredentialView } from "./CredentialComponents/CredentialView";
 import { JobView } from "./JobComponents/JobView";
 import { FollowUpView } from "./FollowUpComponents/FollowUpView";
+import { AccountView } from "./AccountComponents/AccountView";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);

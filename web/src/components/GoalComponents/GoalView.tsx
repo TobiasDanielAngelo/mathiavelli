@@ -1,23 +1,24 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Goal, GoalInterface } from "../../api/GoalStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
-import { frequency } from "../../constants/constants";
 import { getUniqueIdsFromFK, toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { GoalCollection } from "./GoalCollection";
-import { GoalFilter } from "./GoalFilter";
-import { GoalForm } from "./GoalForm";
-import { GoalViewContext } from "./GoalProps";
-import { GoalTable } from "./GoalTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import {
+  GoalCollection,
+  GoalFilter,
+  GoalForm,
+  GoalTable,
+  GoalViewContext,
+} from "./GoalComponents";
 
 export const GoalView = observer(() => {
   const { goalStore, taskStore } = useStore();
@@ -105,7 +106,7 @@ export const GoalView = observer(() => {
           label: "title",
         },
       ] as KV<any>[],
-    [goalStore.items.length, frequency]
+    [goalStore.items.length]
   );
 
   const actions = useMemo(
@@ -113,7 +114,7 @@ export const GoalView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">GOAL</div>
           </div>
         ),
@@ -123,7 +124,7 @@ export const GoalView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -133,7 +134,7 @@ export const GoalView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

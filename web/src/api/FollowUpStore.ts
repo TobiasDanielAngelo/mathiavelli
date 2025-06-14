@@ -1,11 +1,20 @@
+import {
+  Model,
+  _async,
+  _await,
+  getRoot,
+  model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import { Store } from "./Store";
 
 const slug = "follow-ups";
 
@@ -14,9 +23,19 @@ const props = {
   job: prop<number | null>(null),
   date: prop<string>(""),
   message: prop<string>(""),
-  status: prop<number | null>(null),
+  status: prop<number>(0),
   reply: prop<string>(""),
 };
+
+export const FOLLOWUP_STATUS_CHOICES = [
+  "No Response",
+  "Initial Follow-up",
+  "Reminder Email",
+  "Thank You Note",
+  "Checking for Updates",
+  "Interview Scheduled",
+  "Got a Response",
+];
 
 export type FollowUpInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
@@ -26,15 +45,35 @@ export type FollowUpInterface = {
     : never;
 };
 
+export const FollowUpFields: Record<string, (keyof FollowUpInterface)[]> = {
+  datetime: [] as const,
+  date: ["date"] as const,
+  prices: [] as const,
+};
+
 @model("myApp/FollowUp")
 export class FollowUp extends Model(props) {
   update(details: FollowUpInterface) {
     Object.assign(this, details);
   }
 
+  get jobTitle() {
+    return (
+      getRoot<Store>(this)?.jobStore?.allItems.get(this.job ?? -1)?.title || "—"
+    );
+  }
+  get statusName() {
+    return FOLLOWUP_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—";
+  }
+
   get $view() {
     return {
       ...this.$,
+      jobTitle:
+        getRoot<Store>(this)?.jobStore?.allItems.get(this.job ?? -1)?.title ||
+        "—",
+      statusName:
+        FOLLOWUP_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—",
     };
   }
 }

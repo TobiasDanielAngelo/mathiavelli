@@ -1,4 +1,3 @@
-import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -8,6 +7,7 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
+import { computed } from "mobx";
 import {
   deleteItemRequest,
   fetchItemsRequest,
@@ -24,12 +24,11 @@ const props = {
   title: prop<string>(""),
   description: prop<string>(""),
   parentGoal: prop<number | null>(null),
-  isCompleted: prop<boolean>(false),
-  isCancelled: prop<boolean>(false),
   dateCompleted: prop<string>(""),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
   dateCreated: prop<string>(""),
+  isCancelled: prop<boolean>(false),
 };
 
 export type GoalInterface = {
@@ -40,27 +39,34 @@ export type GoalInterface = {
     : never;
 };
 
+export const GoalFields: Record<string, (keyof GoalInterface)[]> = {
+  datetime: ["dateCreated"] as const,
+  date: ["dateCompleted", "dateStart", "dateEnd"] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Goal")
 export class Goal extends Model(props) {
   update(details: GoalInterface) {
     Object.assign(this, details);
   }
 
-  get parentGoalTitle() {
-    const store = getRoot<Store>(this);
-    return store.goalStore.allItems.get(this.parentGoal ?? -1)?.title || "—";
-  }
-
   get dateDuration() {
     return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
   }
+  get parentGoalTitle() {
+    return (
+      getRoot<Store>(this)?.goalStore?.allItems.get(this.parentGoal ?? -1)
+        ?.title || "—"
+    );
+  }
 
   get $view() {
-    const store = getRoot<Store>(this);
     return {
       ...this.$,
       parentGoalTitle:
-        store?.goalStore?.allItems.get(this.parentGoal ?? -1)?.title || "—",
+        getRoot<Store>(this)?.goalStore?.allItems.get(this.parentGoal ?? -1)
+          ?.title || "—",
       dateDuration: this.dateDuration,
     };
   }

@@ -2,6 +2,7 @@ import moment from "moment";
 import { KV } from "../blueprints/ItemDetails";
 import { Option } from "./interfaces";
 import LZString from "lz-string";
+import { GoalInterface } from "../api/GoalStore";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -486,3 +487,26 @@ export function generateShortId(): string {
   const randomPart = Math.random().toString(36).substring(2, 10); // remove "0."
   return (timePart + randomPart).substring(0, 10); // combine & trim to 10 chars
 }
+
+export function sortAndFilterByIds<T>(
+  items: T[],
+  ids: (number | string)[],
+  getId: (item: T) => number | string
+): T[] {
+  return items
+    .filter((item) => ids.includes(getId(item)))
+    .sort((a, b) => ids.indexOf(getId(a)) - ids.indexOf(getId(b)));
+}
+
+export const getDescendantIds = (
+  allGoals: GoalInterface[],
+  goalId?: number
+): number[] => {
+  const directChildren = allGoals
+    .filter((g) => g.parentGoal === goalId)
+    .map((s) => s.id) as number[];
+  const allDescendants = directChildren.flatMap((c) =>
+    getDescendantIds(allGoals, c)
+  );
+  return [...directChildren, ...allDescendants];
+};

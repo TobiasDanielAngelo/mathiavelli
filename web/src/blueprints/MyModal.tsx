@@ -1,8 +1,8 @@
-import CloseIcon from "@mui/icons-material/Close";
 import { Dialog } from "@mui/material";
 import { useClickAway } from "@uidotdev/usehooks";
 import { Dispatch, PropsWithChildren, SetStateAction } from "react";
 import { useKeyPress } from "../constants/hooks";
+import { MyIcon } from "./MyIcon";
 
 export const MyModal = (
   props: PropsWithChildren<{
@@ -53,10 +53,7 @@ export const MyModal = (
               {subTitle}
             </div>
           </div>
-          <CloseIcon
-            className="text-gray-400 cursor-pointer"
-            onClick={() => setVisible(false)}
-          />
+          <MyIcon icon="Close" onClick={() => setVisible(false)} />
         </div>
         <div className="min-w-[300px] max-w-[80vw] min-h-[100px] p-3">
           {children}

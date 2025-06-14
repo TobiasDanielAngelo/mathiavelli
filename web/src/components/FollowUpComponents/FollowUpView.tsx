@@ -1,10 +1,14 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { FollowUp, FollowUpInterface } from "../../api/FollowUpStore";
+import {
+  FollowUp,
+  FOLLOWUP_STATUS_CHOICES,
+  FollowUpInterface,
+} from "../../api/FollowUpStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
@@ -12,12 +16,13 @@ import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { PaginatedDetails } from "../../constants/interfaces";
-import { FollowUpCollection } from "./FollowUpCollection";
-import { FollowUpFilter } from "./FollowUpFilter";
-import { FollowUpForm } from "./FollowUpForm";
-import { FollowUpViewContext } from "./FollowUpProps";
-import { FollowUpTable } from "./FollowUpTable";
-import { followUpResponses } from "../../constants/constants";
+import {
+  FollowUpCollection,
+  FollowUpFilter,
+  FollowUpForm,
+  FollowUpTable,
+  FollowUpViewContext,
+} from "./FollowUpComponents";
 
 export const FollowUpView = observer(() => {
   const { followUpStore, jobStore } = useStore();
@@ -103,7 +108,7 @@ export const FollowUpView = observer(() => {
         },
         {
           key: "status",
-          values: followUpResponses,
+          values: FOLLOWUP_STATUS_CHOICES,
           label: "",
         },
       ] as KV<any>[],
@@ -115,7 +120,7 @@ export const FollowUpView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">ADD</div>
           </div>
         ),
@@ -125,7 +130,7 @@ export const FollowUpView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -135,7 +140,7 @@ export const FollowUpView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

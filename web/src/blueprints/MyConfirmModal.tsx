@@ -1,6 +1,6 @@
-import CheckIcon from "@mui/icons-material/Check";
-import { MyModal } from "./MyModal";
 import { Dispatch, SetStateAction } from "react";
+import { MyIcon } from "./MyIcon";
+import { MyModal } from "./MyModal";
 
 export const MyConfirmModal = (props: {
   isVisible: boolean;
@@ -66,7 +66,7 @@ export const MyConfirmModal = (props: {
         ) : (
           <></>
         )}
-        <CheckIcon className="text-gray-400 cursor-pointer" />
+        <MyIcon icon="Check" />
       </div>
     </MyModal>
   );

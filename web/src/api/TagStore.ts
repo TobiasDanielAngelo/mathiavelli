@@ -23,10 +23,22 @@ export type TagInterface = {
     : never;
 };
 
+export const TagFields: Record<string, (keyof TagInterface)[]> = {
+  datetime: [] as const,
+  date: [] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Tag")
 export class Tag extends Model(props) {
   update(details: TagInterface) {
     Object.assign(this, details);
+  }
+
+  get $view() {
+    return {
+      ...this.$,
+    };
   }
 }
 

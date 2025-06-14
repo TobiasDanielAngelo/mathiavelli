@@ -1,4 +1,3 @@
-import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -8,7 +7,7 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
-import { frequency } from "../constants/constants";
+import { computed } from "mobx";
 import {
   deleteItemRequest,
   fetchItemsRequest,
@@ -25,15 +24,23 @@ const props = {
   title: prop<string>(""),
   description: prop<string>(""),
   goal: prop<number | null>(null),
+  repeat: prop<number>(0),
+  dueDate: prop<string>(""),
   isCompleted: prop<boolean>(false),
-  isCancelled: prop<boolean>(false),
   dateCompleted: prop<string>(""),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
   dateCreated: prop<string>(""),
-  dueDate: prop<string>(""),
-  repeat: prop<number | null>(null),
+  isCancelled: prop<boolean>(false),
 };
+
+export const FREQUENCY_CHOICES = [
+  "None",
+  "Daily",
+  "Weekly",
+  "Monthly",
+  "Yearly",
+];
 
 export type TaskInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
@@ -43,30 +50,39 @@ export type TaskInterface = {
     : never;
 };
 
+export const TaskFields: Record<string, (keyof TaskInterface)[]> = {
+  datetime: ["dateCreated"] as const,
+  date: ["dueDate", "dateCompleted", "dateStart", "dateEnd"] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Task")
 export class Task extends Model(props) {
   update(details: TaskInterface) {
     Object.assign(this, details);
   }
+
   get goalTitle() {
-    const store = getRoot<Store>(this);
-    return store.goalStore.allItems.get(this.goal ?? -1)?.title || "—";
+    return (
+      getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.title ||
+      "—"
+    );
   }
-
   get repeatName() {
-    return frequency.find((_, ind) => ind === this.repeat) ?? "—";
+    return FREQUENCY_CHOICES.find((_, ind) => ind === this.repeat) ?? "—";
   }
-
   get dateDuration() {
     return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
   }
 
   get $view() {
-    const store = getRoot<Store>(this);
     return {
       ...this.$,
-      goalTitle: store?.goalStore?.allItems.get(this.goal ?? -1)?.title || "—",
-      repeatName: this.repeatName,
+      goalTitle:
+        getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.title ||
+        "—",
+      repeatName:
+        FREQUENCY_CHOICES.find((_, ind) => ind === this.repeat) ?? "—",
       dateDuration: this.dateDuration,
     };
   }

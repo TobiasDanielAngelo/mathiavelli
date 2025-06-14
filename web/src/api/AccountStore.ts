@@ -1,11 +1,12 @@
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 import { computed } from "mobx";
+import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+
 const slug = "accounts";
 
 const props = {
@@ -22,10 +23,22 @@ export type AccountInterface = {
     : never;
 };
 
+export const AccountFields: Record<string, (keyof AccountInterface)[]> = {
+  datetime: ["datetimeAdded"] as const,
+  date: [] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Account")
 export class Account extends Model(props) {
   update(details: AccountInterface) {
     Object.assign(this, details);
+  }
+
+  get $view() {
+    return {
+      ...this.$,
+    };
   }
 }
 

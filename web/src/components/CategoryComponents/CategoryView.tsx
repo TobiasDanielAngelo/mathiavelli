@@ -1,6 +1,6 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { useSearchParams } from "react-router-dom";
 import { Category, CategoryInterface } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
@@ -9,13 +9,15 @@ import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelecto
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { CategoryCollection } from "./CategoryCollection";
-import { CategoryFilter } from "./CategoryFilter";
-import { CategoryForm } from "./CategoryForm";
-import { CategoryViewContext } from "./CategoryProps";
-import { CategoryTable } from "./CategoryTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import {
+  CategoryCollection,
+  CategoryFilter,
+  CategoryForm,
+  CategoryTable,
+  CategoryViewContext,
+} from "./CategoryComponents";
 
 export const CategoryView = observer(() => {
   const { categoryStore } = useStore();
@@ -97,7 +99,7 @@ export const CategoryView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">CATEG.</div>
           </div>
         ),
@@ -107,7 +109,7 @@ export const CategoryView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -117,7 +119,7 @@ export const CategoryView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

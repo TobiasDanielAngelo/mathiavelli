@@ -1,23 +1,28 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Credential, CredentialInterface } from "../../api/CredentialStore";
+import { MyIcon } from "../../blueprints/MyIcon";
+import {
+  AUTHENTICATOR_CHOICES,
+  Credential,
+  CredentialInterface,
+} from "../../api/CredentialStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
-import { authenticatorApps } from "../../constants/constants";
 import { getUniqueIdsFromFK, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { PaginatedDetails } from "../../constants/interfaces";
-import { CredentialCollection } from "./CredentialCollection";
-import { CredentialFilter } from "./CredentialFilter";
-import { CredentialForm } from "./CredentialForm";
-import { CredentialViewContext } from "./CredentialProps";
-import { CredentialTable } from "./CredentialTable";
+import {
+  CredentialCollection,
+  CredentialFilter,
+  CredentialForm,
+  CredentialTable,
+  CredentialViewContext,
+} from "./CredentialComponents";
 
 export const CredentialView = observer(() => {
   const { credentialStore, platformStore, accountStore } = useStore();
@@ -113,11 +118,11 @@ export const CredentialView = observer(() => {
         },
         {
           key: "authenticatorApp",
-          values: authenticatorApps,
+          values: AUTHENTICATOR_CHOICES,
           label: "",
         },
       ] as KV<any>[],
-    [platformStore.items.length, authenticatorApps, accountStore.items.length]
+    [platformStore.items.length, accountStore.items.length]
   );
 
   const actions = useMemo(
@@ -125,7 +130,7 @@ export const CredentialView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">CRED.</div>
           </div>
         ),
@@ -135,7 +140,7 @@ export const CredentialView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -145,7 +150,7 @@ export const CredentialView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

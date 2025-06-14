@@ -1,6 +1,5 @@
 import { Dispatch, PropsWithChildren, SetStateAction, useState } from "react";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { MyIcon } from "./MyIcon";
 import { MySearch } from "./MySearch";
 
 export const MyFilters = (
@@ -23,12 +22,7 @@ export const MyFilters = (
         >
           {!open ? (
             <div className="pr-5 pt-5">
-              <FilterAltIcon
-                sx={{
-                  fontSize: "40px",
-                  color: "gray",
-                }}
-              />
+              <MyIcon icon="FilterAlt" fontSize="large" />
               <div
                 className="bg-red-400 rounded-full text-white -mt-3 text-sm ml-5"
                 hidden={!active || active === 0}
@@ -37,14 +31,7 @@ export const MyFilters = (
               </div>
             </div>
           ) : (
-            <VisibilityOffIcon
-              fontSize="large"
-              sx={{
-                fontSize: "40px",
-                color: "gray",
-              }}
-              className="pr-2 pt-2"
-            />
+            <MyIcon icon="VisibilityOff" fontSize="large" />
           )}
         </div>
       </div>

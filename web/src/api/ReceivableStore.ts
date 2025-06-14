@@ -1,4 +1,3 @@
-import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -8,6 +7,7 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
+import { computed } from "mobx";
 import {
   deleteItemRequest,
   fetchItemsRequest,
@@ -20,14 +20,14 @@ const slug = "receivables";
 
 const props = {
   id: prop<number>(-1),
-  payment: prop<number[]>(() => []),
+  payment: prop<number[] | null>(null),
   borrowerName: prop<string>(""),
   lentAmount: prop<number>(0),
   description: prop<string>(""),
   datetimeOpened: prop<string>(""),
   datetimeDue: prop<string>(""),
   datetimeClosed: prop<string>(""),
-  isActive: prop<boolean>(true),
+  isActive: prop<boolean>(false),
   paymentTotal: prop<number>(0),
 };
 
@@ -39,6 +39,12 @@ export type ReceivableInterface = {
     : never;
 };
 
+export const ReceivableFields: Record<string, (keyof ReceivableInterface)[]> = {
+  datetime: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
+  date: [] as const,
+  prices: ["lentAmount"] as const,
+};
+
 @model("myApp/Receivable")
 export class Receivable extends Model(props) {
   update(details: ReceivableInterface) {
@@ -46,18 +52,20 @@ export class Receivable extends Model(props) {
   }
 
   get paymentDescription() {
-    const store = getRoot<Store>(this);
-    return this.payment.map(
-      (s) => store.transactionStore.allItems.get(s)?.description ?? ""
+    return this.payment?.map(
+      (s) =>
+        getRoot<Store>(this)?.transactionStore?.allItems.get(s)?.description ??
+        ""
     );
   }
 
   get $view() {
-    const store = getRoot<Store>(this);
     return {
       ...this.$,
-      paymentDescription: this.payment.map(
-        (s) => store?.transactionStore?.allItems.get(s)?.description ?? ""
+      paymentDescription: this.payment?.map(
+        (s) =>
+          getRoot<Store>(this)?.transactionStore?.allItems.get(s)
+            ?.description ?? ""
       ),
     };
   }

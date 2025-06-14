@@ -15,32 +15,40 @@ import {
   updateItemRequest,
 } from "../constants/storeHelpers";
 import { Store } from "./Store";
-import { authenticatorApps } from "../constants/constants";
 
 const slug = "credentials";
 
 const props = {
   id: prop<number>(-1),
   platform: prop<number | null>(null),
-  billingAccounts: prop<number[]>(() => []),
-  username: prop<string>(""),
+  billingAccounts: prop<number[] | null>(null),
   email: prop<string>(""),
-  password: prop<string>(""),
-  backupCodes: prop<string>(""),
-  pin: prop<string>(""),
-  accountNumber: prop<string>(""),
-  associatedEmail: prop<string>(""),
   recoveryEmail: prop<string>(""),
-  recoveryPhone: prop<string>(""),
-  loginMethod: prop<string>(""),
-  dateCreated: prop<string>(""),
-  profileUrl: prop<string>(""),
-  authenticatorApp: prop<number>(0),
-  customAuthenticator: prop<string>(""),
+  associatedEmail: prop<string>(""),
   authenticatorEmail: prop<string>(""),
+  profileUrl: prop<string>(""),
+  pin: prop<string>(""),
+  loginMethod: prop<string>(""),
+  recoveryPhone: prop<string>(""),
+  password: prop<string>(""),
+  username: prop<string>(""),
+  accountNumber: prop<string>(""),
+  customAuthenticator: prop<string>(""),
   notes: prop<string>(""),
+  backupCodes: prop<string>(""),
+  dateCreated: prop<string>(""),
+  authenticatorApp: prop<number>(0),
   addedAt: prop<string>(""),
 };
+
+export const AUTHENTICATOR_CHOICES = [
+  "None",
+  "Google Authenticator",
+  "Authy",
+  "Microsoft Authenticator",
+  "1Password",
+  "Other",
+];
 
 export type CredentialInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
@@ -50,6 +58,12 @@ export type CredentialInterface = {
     : never;
 };
 
+export const CredentialFields: Record<string, (keyof CredentialInterface)[]> = {
+  datetime: ["addedAt"] as const,
+  date: ["dateCreated"] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Credential")
 export class Credential extends Model(props) {
   update(details: CredentialInterface) {
@@ -57,25 +71,34 @@ export class Credential extends Model(props) {
   }
 
   get platformName() {
-    const store = getRoot<Store>(this);
-    return store.platformStore.allItems.get(this.platform ?? -1)?.name || "—";
+    return (
+      getRoot<Store>(this)?.platformStore?.allItems.get(this.platform ?? -1)
+        ?.name || "—"
+    );
   }
-
+  get billingAccountsName() {
+    return this.billingAccounts?.map(
+      (s) => getRoot<Store>(this)?.accountStore?.allItems.get(s)?.name ?? ""
+    );
+  }
   get authenticatorAppName() {
     return (
-      authenticatorApps.find((_, ind) => ind === this.authenticatorApp) ?? "—"
+      AUTHENTICATOR_CHOICES.find((_, ind) => ind === this.authenticatorApp) ??
+      "—"
     );
   }
 
   get $view() {
-    const store = getRoot<Store>(this);
-
     return {
       ...this.$,
       platformName:
-        store?.platformStore?.allItems.get(this.platform ?? -1)?.name || "—",
+        getRoot<Store>(this)?.platformStore?.allItems.get(this.platform ?? -1)
+          ?.name || "—",
+      billingAccountsName: this.billingAccounts?.map(
+        (s) => getRoot<Store>(this)?.accountStore?.allItems.get(s)?.name ?? ""
+      ),
       authenticatorAppName:
-        authenticatorApps.find((_, ind) => ind === this.authenticatorApp) ??
+        AUTHENTICATOR_CHOICES.find((_, ind) => ind === this.authenticatorApp) ??
         "—",
     };
   }

@@ -12,12 +12,16 @@ const slug = "buy-list-items";
 const props = {
   id: prop<number>(-1),
   name: prop<string>(""),
+  description: prop<string>(""),
   estimatedPrice: prop<number>(0),
   addedAt: prop<string>(""),
   plannedDate: prop<string>(""),
-  priority: prop<number | null>(null),
-  status: prop<number | null>(null),
+  priority: prop<number>(0),
+  status: prop<number>(0),
 };
+
+export const PRIORITY_CHOICES = ["Low", "Medium", "High"];
+export const WISHLIST_STATUS_CHOICES = ["Pending", "Bought", "Canceled"];
 
 export type BuyListItemInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
@@ -27,14 +31,33 @@ export type BuyListItemInterface = {
     : never;
 };
 
+export const BuyListItemFields: Record<string, (keyof BuyListItemInterface)[]> =
+  {
+    datetime: ["addedAt"] as const,
+    date: ["plannedDate"] as const,
+    prices: ["estimatedPrice"] as const,
+  };
+
 @model("myApp/BuyListItem")
 export class BuyListItem extends Model(props) {
   update(details: BuyListItemInterface) {
     Object.assign(this, details);
   }
+
+  get priorityName() {
+    return PRIORITY_CHOICES.find((_, ind) => ind === this.priority) ?? "—";
+  }
+  get statusName() {
+    return WISHLIST_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—";
+  }
+
   get $view() {
     return {
       ...this.$,
+      priorityName:
+        PRIORITY_CHOICES.find((_, ind) => ind === this.priority) ?? "—",
+      statusName:
+        WISHLIST_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—",
     };
   }
 }

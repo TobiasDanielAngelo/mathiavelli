@@ -64,6 +64,17 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = "__all__"
 
+    def validate(self, data):
+        transmitter = data.get("transmitter")
+        receiver = data.get("receiver")
+
+        if transmitter and receiver and transmitter == receiver:
+            raise serializers.ValidationError(
+                "Transmitter and receiver must be different."
+            )
+
+        return data
+
 
 class ReceivableSerializer(serializers.ModelSerializer):
     payment_total = serializers.IntegerField(read_only=True)

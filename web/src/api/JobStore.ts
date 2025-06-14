@@ -6,12 +6,6 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
-import {
-  jobSources,
-  jobStatuses,
-  jobTypes,
-  workSetups,
-} from "../constants/constants";
 
 const slug = "jobs";
 
@@ -23,15 +17,45 @@ const props = {
   link: prop<string>(""),
   salary: prop<string>(""),
   deadline: prop<string>(""),
-  source: prop<number | null>(null),
-  status: prop<number | null>(null),
-  workSetup: prop<number | null>(null),
-  jobType: prop<number | null>(null),
   appliedDate: prop<string>(""),
   notes: prop<string>(""),
   createdAt: prop<string>(""),
   updatedAt: prop<string>(""),
+  source: prop<number>(0),
+  status: prop<number>(0),
+  workSetup: prop<number>(0),
+  jobType: prop<number>(0),
 };
+
+export const STATUS_CHOICES = [
+  "Wishlist",
+  "Applied",
+  "Interview",
+  "Offer",
+  "Rejected",
+  "Accepted",
+];
+export const SOURCE_CHOICES = [
+  "Walk-in",
+  "LinkedIn",
+  "Indeed",
+  "Glassdoor",
+  "JobStreet",
+  "Referral",
+  "Company Website",
+  "Facebook",
+  "Twitter / X",
+  "Other",
+];
+export const WORK_SETUP_CHOICES = ["On-site", "Remote", "Hybrid"];
+export const JOB_TYPE_CHOICES = [
+  "Full-time",
+  "Part-time",
+  "Freelance",
+  "Contract",
+  "Internship",
+  "Temporary",
+];
 
 export type JobInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
@@ -41,31 +65,40 @@ export type JobInterface = {
     : never;
 };
 
+export const JobFields: Record<string, (keyof JobInterface)[]> = {
+  datetime: ["createdAt", "updatedAt"] as const,
+  date: ["deadline", "appliedDate"] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Job")
 export class Job extends Model(props) {
   update(details: JobInterface) {
     Object.assign(this, details);
   }
+
   get sourceName() {
-    return jobSources.find((_, ind) => ind === this.source) ?? "—";
+    return SOURCE_CHOICES.find((_, ind) => ind === this.source) ?? "—";
   }
   get statusName() {
-    return jobStatuses.find((_, ind) => ind === this.status) ?? "—";
+    return STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—";
   }
   get workSetupName() {
-    return workSetups.find((_, ind) => ind === this.workSetup) ?? "—";
+    return WORK_SETUP_CHOICES.find((_, ind) => ind === this.workSetup) ?? "—";
   }
   get jobTypeName() {
-    return jobTypes.find((_, ind) => ind === this.jobType) ?? "—";
+    return JOB_TYPE_CHOICES.find((_, ind) => ind === this.jobType) ?? "—";
   }
 
   get $view() {
     return {
       ...this.$,
-      sourceName: this.sourceName,
-      statusName: this.statusName,
-      workSetupName: this.workSetupName,
-      jobTypeName: this.jobTypeName,
+      sourceName: SOURCE_CHOICES.find((_, ind) => ind === this.source) ?? "—",
+      statusName: STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—",
+      workSetupName:
+        WORK_SETUP_CHOICES.find((_, ind) => ind === this.workSetup) ?? "—",
+      jobTypeName:
+        JOB_TYPE_CHOICES.find((_, ind) => ind === this.jobType) ?? "—",
     };
   }
 }

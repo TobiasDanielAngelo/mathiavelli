@@ -1,21 +1,23 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Platform, PlatformInterface } from "../../api/PlatformStore";
 import { useStore } from "../../api/Store";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { PlatformCollection } from "./PlatformCollection";
-import { PlatformFilter } from "./PlatformFilter";
-import { PlatformForm } from "./PlatformForm";
-import { PlatformViewContext } from "./PlatformProps";
-import { PlatformTable } from "./PlatformTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import {
+  PlatformCollection,
+  PlatformFilter,
+  PlatformForm,
+  PlatformTable,
+  PlatformViewContext,
+} from "./PlatformComponents";
 
 export const PlatformView = observer(() => {
   const { platformStore } = useStore();
@@ -97,7 +99,7 @@ export const PlatformView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">PLATF</div>
           </div>
         ),
@@ -107,7 +109,7 @@ export const PlatformView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -117,7 +119,7 @@ export const PlatformView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

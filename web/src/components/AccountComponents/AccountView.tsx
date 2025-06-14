@@ -1,6 +1,6 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { useSearchParams } from "react-router-dom";
 import { Account, AccountInterface } from "../../api/AccountStore";
 import { useStore } from "../../api/Store";
@@ -9,13 +9,15 @@ import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelecto
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { AccountCollection } from "./AccountCollection";
-import { AccountFilter } from "./AccountFilter";
-import { AccountForm } from "./AccountForm";
-import { AccountViewContext } from "./AccountProps";
-import { AccountTable } from "./AccountTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import {
+  AccountCollection,
+  AccountFilter,
+  AccountForm,
+  AccountTable,
+  AccountViewContext,
+} from "./AccountComponents";
 
 export const AccountView = observer(() => {
   const { accountStore } = useStore();
@@ -95,7 +97,7 @@ export const AccountView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">ACCT</div>
           </div>
         ),
@@ -105,7 +107,7 @@ export const AccountView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -115,7 +117,7 @@ export const AccountView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

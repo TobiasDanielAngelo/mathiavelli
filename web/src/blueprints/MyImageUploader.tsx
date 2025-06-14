@@ -1,5 +1,5 @@
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useState } from "react";
+import { MyIcon } from "./MyIcon";
 
 export const MyImageUploader = (props: {
   value?: File;
@@ -23,7 +23,7 @@ export const MyImageUploader = (props: {
           <img src={image} className="rounded-full object-cover h-32 w-32" />
         ) : (
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <CloudUploadIcon fontSize="large" color="action" />
+            <MyIcon icon="CloudUpload" fontSize="large" color="action" />
             <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
               <span className="font-semibold">Click to upload</span>
             </p>

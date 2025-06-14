@@ -12,9 +12,17 @@ const slug = "categories";
 const props = {
   id: prop<number>(-1),
   title: prop<string>(""),
-  nature: prop<string>(""),
+  nature: prop<number>(0),
   logo: prop<string>(""),
 };
+
+export const CATEGORY_CHOICES = [
+  "Expense",
+  "Income",
+  "Transfer",
+  "Payable",
+  "Receivable",
+];
 
 export type CategoryInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
@@ -24,10 +32,27 @@ export type CategoryInterface = {
     : never;
 };
 
+export const CategoryFields: Record<string, (keyof CategoryInterface)[]> = {
+  datetime: [] as const,
+  date: [] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Category")
 export class Category extends Model(props) {
   update(details: CategoryInterface) {
     Object.assign(this, details);
+  }
+
+  get natureName() {
+    return CATEGORY_CHOICES.find((_, ind) => ind === this.nature) ?? "—";
+  }
+
+  get $view() {
+    return {
+      ...this.$,
+      natureName: CATEGORY_CHOICES.find((_, ind) => ind === this.nature) ?? "—",
+    };
   }
 }
 

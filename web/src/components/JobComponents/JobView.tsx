@@ -1,28 +1,31 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Job, JobInterface } from "../../api/JobStore";
+import {
+  Job,
+  JOB_TYPE_CHOICES,
+  JobInterface,
+  SOURCE_CHOICES,
+  STATUS_CHOICES,
+  WORK_SETUP_CHOICES,
+} from "../../api/JobStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
-import {
-  jobSources,
-  jobStatuses,
-  jobTypes,
-  workSetups,
-} from "../../constants/constants";
 import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { PaginatedDetails } from "../../constants/interfaces";
-import { JobCollection } from "./JobCollection";
-import { JobFilter } from "./JobFilter";
-import { JobForm } from "./JobForm";
-import { JobViewContext } from "./JobProps";
-import { JobTable } from "./JobTable";
+import {
+  JobCollection,
+  JobFilter,
+  JobForm,
+  JobTable,
+  JobViewContext,
+} from "./JobComponents";
 
 export const JobView = observer(() => {
   const { jobStore } = useStore();
@@ -103,22 +106,22 @@ export const JobView = observer(() => {
       [
         {
           key: "status",
-          values: jobStatuses,
+          values: STATUS_CHOICES,
           label: "",
         },
         {
           key: "source",
-          values: jobSources,
+          values: SOURCE_CHOICES,
           label: "",
         },
         {
           key: "workSetup",
-          values: workSetups,
+          values: WORK_SETUP_CHOICES,
           label: "",
         },
         {
           key: "jobType",
-          values: jobTypes,
+          values: JOB_TYPE_CHOICES,
           label: "",
         },
       ] as KV<any>[],
@@ -130,7 +133,7 @@ export const JobView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">APPLY</div>
           </div>
         ),
@@ -140,7 +143,7 @@ export const JobView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -150,7 +153,7 @@ export const JobView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),

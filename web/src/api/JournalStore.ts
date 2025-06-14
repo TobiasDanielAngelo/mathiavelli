@@ -24,10 +24,22 @@ export type JournalInterface = {
     : never;
 };
 
+export const JournalFields: Record<string, (keyof JournalInterface)[]> = {
+  datetime: ["datetimeCreated"] as const,
+  date: [] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Journal")
 export class Journal extends Model(props) {
   update(details: JournalInterface) {
     Object.assign(this, details);
+  }
+
+  get $view() {
+    return {
+      ...this.$,
+    };
   }
 }
 

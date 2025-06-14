@@ -16,7 +16,7 @@ export const MyMultiDropdownSelector = (props: {
     label,
     options = [],
     onChangeValue,
-    value,
+    value = [],
     msg,
     relative,
     open,

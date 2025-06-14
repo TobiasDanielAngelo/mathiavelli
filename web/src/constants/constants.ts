@@ -1,55 +1,11 @@
-export const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-export const frequency = ["None", "Daily", "Weekly", "Monthly", "Yearly"];
-export const priority = ["Low", "Medium", "High"];
-export const status = ["Pending", "Bought", "Cancelled"];
-export const authenticatorApps = [
-  "None",
-  "Google Authenticator",
-  "Authy",
-  "Microsoft Authenticator",
-  "1Password",
-  "Other",
-];
-
-export const jobStatuses = [
-  "Wishlist",
-  "Applied",
-  "Interview",
-  "Offer",
-  "Rejected",
-  "Accepted",
-];
-
-export const jobSources = [
-  "Walk-in",
-  "LinkedIn",
-  "Indeed",
-  "Glassdoor",
-  "JobStreet",
-  "Referral",
-  "Company Website",
-  "Facebook",
-  "Twitter / X",
-  "Other",
-];
-
-export const workSetups = ["On-site", "Remote", "Hybrid"];
-export const jobTypes = [
-  "Full-time",
-  "Part-time",
-  "Freelance",
-  "Contract",
-  "Internship",
-  "Temporary",
-];
-export const followUpResponses = [
-  "No Response",
-  "Initial Follow-up",
-  "Reminder Email",
-  "Thank You Note",
-  "Checking for Updates",
-  "Interview Scheduled",
-  "Got a Response",
+export const DAYS_OF_WEEK_CHOICES = [
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
 ];
 
 export const lowerFirstLetter = (str: string) => {

@@ -1,90 +1,69 @@
 from django.db import models
-from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from . import fields
 
 
 class Journal(models.Model):
-    """Represents a user-submitted journal entry with optional status tracking."""
-
-    title = models.CharField(max_length=40, blank=True, default="")
-    description = models.CharField(max_length=1000, blank=True, default="")
-    datetime_created = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    title = fields.ShortCharField()
+    description = fields.LongCharField()
+    datetime_created = fields.DefaultNowField()
 
 
 class Account(models.Model):
-    name = models.CharField(max_length=20, default="")
-    datetime_added = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    name = fields.ShortCharField()
+    datetime_added = fields.DefaultNowField()
 
     def __str__(self):
         return f"{self.pk} - {self.name}"
 
 
 class Category(models.Model):
+    CATEGORY_CHOICES = [
+        (0, "Expense"),
+        (1, "Income"),
+        (2, "Transfer"),
+        (3, "Payable"),
+        (4, "Receivable"),
+    ]
+
     class Meta:
         verbose_name_plural = "categories"
 
-    CategoryChoices = (
-        ("1", "Expense"),
-        ("2", "Income"),
-        ("3", "Transfer"),
-        ("4", "Payable"),
-        ("5", "Receivable"),
-    )
-    title = models.CharField(max_length=30, default="", unique=True)
-    nature = models.CharField(choices=CategoryChoices, max_length=20, default="3")
-    logo = models.CharField(max_length=30, default="star")
+    title = fields.ShortCharField()
+    nature = fields.ChoiceIntegerField(CATEGORY_CHOICES)
+    logo = fields.ShortCharField()
 
     def __str__(self):
         return f"{self.title}"
 
 
 class Transaction(models.Model):
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.SET_NULL,
-        related_name="transaction_category",
-        null=True,
-    )
-    description = models.CharField(max_length=200, default="", blank=True)
-    transmitter = models.ForeignKey(
-        Account,
-        on_delete=models.SET_NULL,
-        related_name="transaction_transmitter",
-        blank=True,
-        null=True,
-    )
-    receiver = models.ForeignKey(
-        Account,
-        on_delete=models.SET_NULL,
-        related_name="transaction_receiver",
-        blank=True,
-        null=True,
-    )
-    amount = models.DecimalField(default=0, decimal_places=2, max_digits=10)
-    datetime_transacted = models.DateTimeField(
-        default=timezone.now, null=True, blank=True
-    )
+    category = fields.SetNullOptionalForeignKey(Category)
+    description = fields.MediumCharField()
+    transmitter = fields.SetNullOptionalForeignKey(Account)
+    receiver = fields.SetNullOptionalForeignKey(Account)
+    amount = fields.AmountField()
+    datetime_transacted = fields.DefaultNowField()
 
     def __str__(self):
         return f"{self.description}"
 
+    def clean(self):
+        super().clean()
+        if self.transmitter and self.receiver and self.transmitter == self.receiver:
+            raise ValidationError("Transmitter and receiver must be different.")
+
 
 class Receivable(models.Model):
-    payment = models.ManyToManyField(
-        Transaction,
-        blank=True,
-        related_name="payment_receivable",
-    )
-    borrower_name = models.CharField(max_length=30, default="", blank=True)
-    lent_amount = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0
-    )
-    description = models.CharField(max_length=100, default="", blank=True)
-    datetime_opened = models.DateTimeField(default=timezone.now, null=True, blank=True)
-    datetime_due = models.DateTimeField(blank=True, null=True)
-    datetime_closed = models.DateTimeField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    payment = fields.OptionalManyToManyField(Transaction)
+    borrower_name = fields.ShortCharField()
+    lent_amount = fields.AmountField()
+    description = fields.MediumCharField()
+    datetime_opened = fields.DefaultNowField()
+    datetime_due = fields.OptionalDateTimeField()
+    datetime_closed = fields.OptionalDateTimeField()
+    is_active = fields.DefaultBooleanField(True)
 
     def __str__(self):
         return f"{self.borrower_name} - {self.description}"
@@ -100,20 +79,14 @@ class Receivable(models.Model):
 
 
 class Payable(models.Model):
-    payment = models.ManyToManyField(
-        Transaction,
-        blank=True,
-        related_name="payment_payable",
-    )
-    lender_name = models.CharField(max_length=30, default="", blank=True)
-    datetime_opened = models.DateTimeField(default=timezone.now, null=True, blank=True)
-    datetime_due = models.DateTimeField(blank=True, null=True)
-    description = models.CharField(max_length=100, default="", blank=True)
-    datetime_closed = models.DateTimeField(blank=True, null=True)
-    borrowed_amount = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0
-    )
-    is_active = models.BooleanField(default=True)
+    payment = fields.OptionalManyToManyField(Transaction)
+    lender_name = fields.ShortCharField()
+    datetime_opened = fields.DefaultNowField()
+    datetime_due = fields.OptionalDateTimeField()
+    description = fields.MediumCharField()
+    datetime_closed = fields.OptionalDateTimeField()
+    borrowed_amount = fields.AmountField()
+    is_active = fields.DefaultBooleanField(True)
 
     def __str__(self):
         return f"{self.lender_name} - {self.description}"
@@ -129,28 +102,22 @@ class Payable(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50)
-    color = models.CharField(max_length=7, default="#ffffff")
+    name = fields.ShortCharField()
+    color = fields.ColorField()
 
     def __str__(self):
         return self.name
 
 
 class Goal(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    parent_goal = models.ForeignKey(
-        "self",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="subgoals",
-    )
-    date_completed = models.DateField(null=True, blank=True)
-    date_start = models.DateField(null=True, blank=True)
-    date_end = models.DateField(null=True, blank=True)
-    date_created = models.DateTimeField(default=timezone.now, null=True, blank=True)
-    is_cancelled = models.BooleanField(default=False)
+    title = fields.ShortCharField()
+    description = fields.MediumCharField()
+    parent_goal = fields.CascadeOptionalForeignKey("self")
+    date_completed = fields.OptionalDateField()
+    date_start = fields.OptionalDateField()
+    date_end = fields.OptionalDateField()
+    date_created = fields.AutoCreatedAtField()
+    is_cancelled = fields.DefaultBooleanField(False)
 
     def __str__(self):
         return self.title
@@ -173,19 +140,17 @@ class Task(models.Model):
         (4, "Yearly"),
     ]
 
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    goal = models.ForeignKey(
-        Goal, null=True, blank=True, on_delete=models.SET_NULL, related_name="tasks"
-    )
-    repeat = models.IntegerField(choices=FREQUENCY_CHOICES, default=0)
-    due_date = models.DateField(null=True, blank=True)
-    is_completed = models.BooleanField(default=False)
-    date_completed = models.DateField(null=True, blank=True)
-    date_start = models.DateField(null=True, blank=True)
-    date_end = models.DateField(null=True, blank=True)
-    date_created = models.DateTimeField(default=timezone.now, null=True, blank=True)
-    is_cancelled = models.BooleanField(default=False)
+    title = fields.ShortCharField()
+    description = fields.MediumCharField()
+    goal = fields.SetNullOptionalForeignKey(Goal)
+    repeat = fields.ChoiceIntegerField(FREQUENCY_CHOICES)
+    due_date = fields.OptionalDateField()
+    is_completed = fields.DefaultBooleanField(False)
+    date_completed = fields.OptionalDateField()
+    date_start = fields.OptionalDateField()
+    date_end = fields.OptionalDateField()
+    date_created = fields.AutoCreatedAtField()
+    is_cancelled = fields.DefaultBooleanField(False)
 
     def __str__(self):
         return self.title
@@ -196,17 +161,15 @@ class Task(models.Model):
 
 
 class Event(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
-    all_day = models.BooleanField(default=False)
-    location = models.CharField(max_length=255, blank=True)
-    tags = models.ManyToManyField(Tag, blank=True)
-    created_at = models.DateTimeField(default=timezone.now, null=True, blank=True)
-    task = models.OneToOneField(
-        Task, on_delete=models.CASCADE, null=True, blank=True, related_name="event"
-    )
+    title = fields.ShortCharField()
+    description = fields.MediumCharField()
+    start = fields.OptionalDateTimeField()
+    end = fields.OptionalDateTimeField()
+    all_day = fields.DefaultBooleanField(False)
+    location = fields.ShortCharField()
+    tags = fields.OptionalManyToManyField(Tag)
+    created_at = fields.AutoCreatedAtField()
+    task = fields.OptionalOneToOneField(Task)
 
     def clean(self):
         if self.start and self.end and self.start >= self.end:
@@ -223,72 +186,60 @@ class BuyListItem(models.Model):
         (2, "High"),
     ]
 
-    STATUS_CHOICES = [
+    WISHLIST_STATUS_CHOICES = [
         (0, "Pending"),
         (1, "Bought"),
         (2, "Canceled"),
     ]
 
-    name = models.CharField(max_length=255)
-    estimated_price = models.DecimalField(max_digits=10, decimal_places=2)
-    added_at = models.DateTimeField(auto_now_add=True)
-    planned_date = models.DateField(null=True, blank=True)
-    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
-    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    name = fields.ShortCharField()
+    description = fields.MediumCharField()
+    estimated_price = fields.AmountField()
+    added_at = fields.AutoCreatedAtField()
+    planned_date = fields.OptionalDateField()
+    priority = fields.ChoiceIntegerField(PRIORITY_CHOICES)
+    status = fields.ChoiceIntegerField(WISHLIST_STATUS_CHOICES)
 
     def __str__(self):
         return f"{self.description} (Priority: {self.get_priority_display()}, Status: {self.get_status_display()}) - ${self.estimated_price}"
 
 
 class Platform(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = fields.ShortCharField()
 
     def __str__(self):
         return self.name
 
 
-AUTHENTICATOR_CHOICES = [
-    (0, "None"),
-    (1, "Google Authenticator"),
-    (2, "Authy"),
-    (3, "Microsoft Authenticator"),
-    (4, "1Password"),
-    (5, "Other"),
-]
-
-
 class Credential(models.Model):
+    AUTHENTICATOR_CHOICES = [
+        (0, "None"),
+        (1, "Google Authenticator"),
+        (2, "Authy"),
+        (3, "Microsoft Authenticator"),
+        (4, "1Password"),
+        (5, "Other"),
+    ]
 
-    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
-    billing_accounts = models.ManyToManyField(Account, blank=True)
-
-    username = models.CharField(max_length=150, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    password = models.CharField(max_length=255, blank=True, null=True)
-
-    backup_codes = models.TextField(blank=True, null=True)
-    pin = models.CharField(max_length=20, blank=True, null=True)
-    account_number = models.CharField(max_length=100, blank=True, null=True)
-
-    associated_email = models.EmailField(blank=True, null=True)
-    recovery_email = models.EmailField(blank=True, null=True)
-    recovery_phone = models.CharField(max_length=30, blank=True, null=True)
-
-    login_method = models.CharField(max_length=50, blank=True, null=True)
-    date_created = models.DateField(blank=True, null=True)
-    profile_url = models.URLField(blank=True, null=True)
-
-    authenticator_app = models.IntegerField(choices=AUTHENTICATOR_CHOICES, default=0)
-    custom_authenticator = models.CharField(max_length=100, blank=True, null=True)
-    authenticator_email = models.EmailField(blank=True, null=True)
-
-    notes = models.TextField(blank=True, null=True)
-    added_at = models.DateTimeField(auto_now_add=True)
-
-    def display_authenticator(self):
-        if self.authenticator_app == 5:
-            return self.custom_authenticator or "Other"
-        return dict(AUTHENTICATOR_CHOICES).get(self.authenticator_app, "Unknown")
+    platform = fields.CascadeRequiredForeignKey(Platform)
+    billing_accounts = fields.OptionalManyToManyField(Account)
+    email = fields.OptionalEmailField()
+    recovery_email = fields.OptionalEmailField()
+    associated_email = fields.OptionalEmailField()
+    authenticator_email = fields.OptionalEmailField()
+    profile_url = fields.OptionalURLField()
+    pin = fields.ShortCharField()
+    login_method = fields.ShortCharField()
+    recovery_phone = fields.ShortCharField()
+    password = fields.MediumCharField()
+    username = fields.MediumCharField()
+    account_number = fields.MediumCharField()
+    custom_authenticator = fields.MediumCharField()
+    notes = fields.LongCharField()
+    backup_codes = fields.LongCharField()
+    date_created = fields.OptionalDateField()
+    authenticator_app = fields.ChoiceIntegerField(AUTHENTICATOR_CHOICES)
+    added_at = fields.AutoCreatedAtField()
 
     def __str__(self):
         main_id = self.username or self.email or "unknown"
@@ -333,28 +284,22 @@ class Job(models.Model):
         (5, "Temporary"),
     ]
 
-    title = models.CharField(max_length=200)
-    company = models.CharField(max_length=200)
-    location = models.CharField(max_length=200, blank=True)
-    link = models.URLField(blank=True)
-    source = models.IntegerField(choices=SOURCE_CHOICES, default=0)
-    salary = models.CharField(max_length=100, blank=True)
-    deadline = models.DateField(null=True, blank=True)
-    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
-    applied_date = models.DateField(null=True, blank=True)
-    notes = models.TextField(blank=True)
+    title = fields.ShortCharField()
+    company = fields.ShortCharField()
+    location = fields.MediumCharField()
+    link = fields.OptionalURLField()
+    salary = fields.MediumCharField()
+    deadline = fields.OptionalDateField()
+    applied_date = fields.OptionalDateField()
+    notes = fields.LongCharField()
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = fields.AutoCreatedAtField()
+    updated_at = fields.AutoUpdatedAtField()
 
-    work_setup = models.IntegerField(
-        choices=WORK_SETUP_CHOICES,
-        default=0,
-    )
-    job_type = models.IntegerField(
-        choices=JOB_TYPE_CHOICES,
-        default=0,
-    )
+    source = fields.ChoiceIntegerField(SOURCE_CHOICES)
+    status = fields.ChoiceIntegerField(STATUS_CHOICES)
+    work_setup = fields.ChoiceIntegerField(WORK_SETUP_CHOICES)
+    job_type = fields.ChoiceIntegerField(JOB_TYPE_CHOICES)
 
     def __str__(self):
         return f"{self.title} @ {self.company}"
@@ -370,11 +315,11 @@ class FollowUp(models.Model):
         (5, "Interview Scheduled"),
         (6, "Got a Response"),
     ]
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="followups")
-    date = models.DateField()
-    message = models.TextField(blank=True)
-    status = models.IntegerField(default=0)
-    reply = models.TextField(blank=True)
+    job = fields.CascadeRequiredForeignKey(Job)
+    date = fields.OptionalDateField()
+    message = fields.LongCharField()
+    status = fields.ChoiceIntegerField(FOLLOWUP_STATUS_CHOICES)
+    reply = fields.LongCharField()
 
     def __str__(self):
         return f"Follow-up on {self.date} for {self.job}"

@@ -1,4 +1,3 @@
-import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -8,6 +7,7 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
+import { computed } from "mobx";
 import {
   deleteItemRequest,
   fetchItemsRequest,
@@ -27,7 +27,7 @@ const props = {
   end: prop<string>(""),
   allDay: prop<boolean>(false),
   location: prop<string>(""),
-  tags: prop<number[]>(() => []),
+  tags: prop<number[] | null>(null),
   createdAt: prop<string>(""),
   task: prop<number | null>(null),
 };
@@ -40,15 +40,22 @@ export type EventInterface = {
     : never;
 };
 
+export const EventFields: Record<string, (keyof EventInterface)[]> = {
+  datetime: ["start", "end", "createdAt"] as const,
+  date: [] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Event")
 export class Event extends Model(props) {
   update(details: EventInterface) {
     Object.assign(this, details);
   }
 
-  get tagNames() {
-    const store = getRoot<Store>(this);
-    return this.tags.map((s) => store.tagStore.allItems.get(s)?.name ?? "");
+  get tagsName() {
+    return this.tags?.map(
+      (s) => getRoot<Store>(this)?.tagStore?.allItems.get(s)?.name ?? ""
+    );
   }
 
   get dateDuration() {
@@ -56,11 +63,10 @@ export class Event extends Model(props) {
   }
 
   get $view() {
-    const store = getRoot<Store>(this);
     return {
       ...this.$,
-      tagNames: this.tags.map(
-        (s) => store?.tagStore?.allItems.get(s)?.name ?? ""
+      tagsName: this.tags?.map(
+        (s) => getRoot<Store>(this)?.tagStore?.allItems.get(s)?.name ?? ""
       ),
       dateDuration: this.dateDuration,
     };

@@ -1,6 +1,3 @@
-import InsertChartIcon from "@mui/icons-material/InsertChart";
-import MenuIcon from "@mui/icons-material/Menu";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import { Toolbar } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -16,6 +13,7 @@ import anon from "../assets/anon.jpg";
 import { useKeyPress } from "../constants/hooks";
 import { Page } from "../constants/interfaces";
 import { MyDropdownMenu } from "./MyDropdownMenu";
+import { MyIcon } from "./MyIcon";
 
 const drawerWidth = 240;
 
@@ -56,7 +54,7 @@ export const ResponsiveDrawer = observer(
                   }}
                 >
                   <ListItemIcon>
-                    <InboxIcon color="primary" />
+                    <MyIcon icon="Inbox" color="primary" />
                   </ListItemIcon>
                   <ListItemText primary={"Dashboard"} secondary={""} />
                 </ListItemButton>
@@ -71,7 +69,7 @@ export const ResponsiveDrawer = observer(
                     }}
                   >
                     <ListItemIcon>
-                      <InboxIcon color="primary" />
+                      <MyIcon icon="Inbox" color="primary" />
                     </ListItemIcon>
                     <ListItemText primary={s.title} secondary={""} />
                   </ListItemButton>
@@ -90,7 +88,7 @@ export const ResponsiveDrawer = observer(
                     }}
                   >
                     <ListItemIcon>
-                      <InboxIcon color="primary" />
+                      <MyIcon icon="Inbox" color="primary" />
                     </ListItemIcon>
                     <ListItemText primary={s} secondary={""} />
                   </ListItemButton>
@@ -210,7 +208,8 @@ export const MyNavBar = observer(
         <div className="flex flex-wrap items-center justify-between mx-auto p-4">
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
             <Link to={"/"}>
-              <InsertChartIcon
+              <MyIcon
+                icon="InsertChart"
                 fontSize="large"
                 className="text-gray-700 dark:text-gray-100 hover:text-green-700 hover:scale-125 [&:not(hover)]:transition-all hover:transition-all ease-in-out hover:animate-pulse"
                 onClick={() => setLocation && setLocation("/")}
@@ -267,7 +266,7 @@ export const MyNavBar = observer(
                   className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                   onClick={setDrawerOpen && (() => setDrawerOpen((t) => !t))}
                 >
-                  <MenuIcon />
+                  <MyIcon icon="Menu" />
                 </div>
               </li>
             </ul>

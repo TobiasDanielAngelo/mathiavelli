@@ -9,4 +9,4 @@ export { MyMultiSelector } from "./MyMultiSelector";
 export { MyTextArea } from "./MyTextArea";
 export { MyColorPicker } from "./MyColorPicker";
 export { MyMultiDropdownSelector } from "./MyMultiDropdownSelector";
-export { MyDynamicTable } from "./MyDynamicTable";
+export { MyGenericTable } from "./MyGenericComponents/MyGenericTable";

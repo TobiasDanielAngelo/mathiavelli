@@ -1,4 +1,3 @@
-import PrintIcon from "@mui/icons-material/Print";
 import {
   Dispatch,
   PropsWithChildren,
@@ -7,6 +6,7 @@ import {
   useState,
 } from "react";
 import { usePDF } from "react-to-pdf";
+import { MyIcon } from "./MyIcon";
 import { MyModal } from "./MyModal";
 
 export const MyPrintModal = (
@@ -45,9 +45,9 @@ export const MyPrintModal = (
         {children}
       </div>
       <div className="flex justify-end">
-        <PrintIcon
+        <MyIcon
+          icon="Print"
           onClick={() => toPDF()}
-          className="cursor-pointer"
           color="action"
           fontSize="large"
         />

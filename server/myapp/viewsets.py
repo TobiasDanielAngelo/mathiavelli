@@ -230,10 +230,8 @@ class TaskViewSet(CustomModelViewSet):
         tasks = goal.tasks.filter(is_cancelled=False)
 
         if tasks.exists() and all(task.is_completed for task in tasks):
-            goal.is_completed = True
             goal.date_completed = timezone.now().date()
         else:
-            goal.is_completed = False
             goal.date_completed = None
 
         goal.save()

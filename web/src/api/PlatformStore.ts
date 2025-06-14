@@ -1,11 +1,12 @@
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 import { computed } from "mobx";
+import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+
 const slug = "platforms";
 
 const props = {
@@ -21,10 +22,22 @@ export type PlatformInterface = {
     : never;
 };
 
+export const PlatformFields: Record<string, (keyof PlatformInterface)[]> = {
+  datetime: [] as const,
+  date: [] as const,
+  prices: [] as const,
+};
+
 @model("myApp/Platform")
 export class Platform extends Model(props) {
   update(details: PlatformInterface) {
     Object.assign(this, details);
+  }
+
+  get $view() {
+    return {
+      ...this.$,
+    };
   }
 }
 

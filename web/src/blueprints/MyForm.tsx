@@ -1,8 +1,7 @@
-import DeleteIcon from "@mui/icons-material/Delete";
 import { observer } from "mobx-react-lite";
-import { daysOfWeek } from "../constants/constants";
+import { DAYS_OF_WEEK_CHOICES } from "../constants/constants";
 import { toOptions } from "../constants/helpers";
-import { useKeyPress, useVisible } from "../constants/hooks";
+import { useKeyPress, useVisible, useWindowWidth } from "../constants/hooks";
 import { Field } from "../constants/interfaces";
 import {
   MyButton,
@@ -17,6 +16,7 @@ import {
   MyMultiSelector,
   MyTextArea,
 } from "./";
+import { MyIcon } from "./MyIcon";
 
 const getMsg = (msg: any, name: string) =>
   msg && !`${msg[name as keyof Object]}`.includes("undefined")
@@ -64,7 +64,7 @@ const renderField = (
         <MyMultiSelector
           key={key}
           {...commonProps}
-          options={toOptions(daysOfWeek)}
+          options={toOptions(DAYS_OF_WEEK_CHOICES)}
         />
       );
     case "multi":
@@ -141,6 +141,7 @@ export const MyForm = observer(
   }) => {
     useKeyPress(["Enter"], onClickSubmit);
     const { isVisible1, setVisible1 } = useVisible();
+    const width = useWindowWidth();
 
     const onChangeValue = (val: any, name: string) =>
       setDetails({ ...details, [name]: val });
@@ -169,7 +170,9 @@ export const MyForm = observer(
             className="grid md:gap-6"
             key={rowIdx}
             style={{
-              gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${
+                width > 800 ? row.length : 1
+              }, minmax(0, 1fr))`,
             }}
           >
             {row.map((t, colIdx) =>
@@ -188,11 +191,7 @@ export const MyForm = observer(
         <div className="flex flex-row-reverse justify-between items-center">
           <MyButton onClick={onClickSubmit} isLoading={isLoading} />
           {hasDelete && (
-            <DeleteIcon
-              fontSize="large"
-              className="text-gray-600 dark:text-gray-400"
-              onClick={onClickDelete}
-            />
+            <MyIcon icon="Delete" fontSize="large" onClick={onClickDelete} />
           )}
         </div>
       </div>

@@ -1,23 +1,25 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useStore } from "../../api/Store";
 import { Transaction, TransactionInterface } from "../../api/TransactionStore";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { toTitleCase } from "../../constants/helpers";
-import { PaginatedDetails } from "../../constants/interfaces";
-import { AccountForm } from "../AccountComponents/AccountForm";
-import { TransactionCollection } from "./TransactionCollection";
-import { TransactionFilter } from "./TransactionFilter";
-import { TransactionForm } from "./TransactionForm";
-import { TransactionViewContext } from "./TransactionProps";
-import { TransactionTable } from "./TransactionTable";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { PaginatedDetails } from "../../constants/interfaces";
+import { AccountForm } from "../AccountComponents/AccountComponents";
+import {
+  TransactionCollection,
+  TransactionFilter,
+  TransactionForm,
+  TransactionTable,
+  TransactionViewContext,
+} from "./TransactionComponents";
 
 export const TransactionView = observer(() => {
   const {
@@ -130,7 +132,11 @@ export const TransactionView = observer(() => {
           label: "title",
         },
       ] as KV<any>[],
-    [transactionStore.items.length, categoryStore.items.length]
+    [
+      transactionStore.items.length,
+      categoryStore.items.length,
+      accountStore.items,
+    ]
   );
 
   const actions = useMemo(
@@ -138,7 +144,7 @@ export const TransactionView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">TRX</div>
           </div>
         ),
@@ -148,7 +154,7 @@ export const TransactionView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -158,7 +164,7 @@ export const TransactionView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),
@@ -168,7 +174,7 @@ export const TransactionView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">ACCT</div>
           </div>
         ),

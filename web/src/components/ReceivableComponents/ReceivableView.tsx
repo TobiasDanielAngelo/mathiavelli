@@ -1,10 +1,10 @@
-import AddCardIcon from "@mui/icons-material/AddCard";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Receivable, ReceivableInterface } from "../../api/ReceivableStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
 import { MyMultiDropdownSelector } from "../../blueprints/MyMultiDropdownSelector";
 import { MyPageBar } from "../../blueprints/MyPageBar";
@@ -12,11 +12,13 @@ import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { getUniqueIdsFromFK, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { PaginatedDetails } from "../../constants/interfaces";
-import { ReceivableCollection } from "./ReceivableCollection";
-import { ReceivableFilter } from "./ReceivableFilter";
-import { ReceivableForm } from "./ReceivableForm";
-import { ReceivableViewContext } from "./ReceivableProps";
-import { ReceivableTable } from "./ReceivableTable";
+import {
+  ReceivableCollection,
+  ReceivableFilter,
+  ReceivableForm,
+  ReceivableTable,
+  ReceivableViewContext,
+} from "./ReceivableComponents";
 
 export const ReceivableView = observer(() => {
   const { receivableStore, transactionStore } = useStore();
@@ -112,7 +114,7 @@ export const ReceivableView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">RECV</div>
           </div>
         ),
@@ -122,7 +124,7 @@ export const ReceivableView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FIELDS</div>
           </div>
         ),
@@ -132,7 +134,7 @@ export const ReceivableView = observer(() => {
       {
         icon: (
           <div className="flex flex-col items-center">
-            <AddCardIcon fontSize="large" />
+            <MyIcon icon="AddCard" fontSize="large" />
             <div className="text-xs text-gray-500 font-bold">FILTERS</div>
           </div>
         ),
