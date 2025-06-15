@@ -9,6 +9,13 @@ class AmountField(models.DecimalField):
         super().__init__(*args, **kwargs)
 
 
+class DecimalField(models.DecimalField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("max_digits", 10)
+        kwargs.setdefault("decimal_places", 3)
+        super().__init__(*args, **kwargs)
+
+
 class LongCharField(models.CharField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("max_length", 1023)

@@ -288,3 +288,28 @@ class TaskViewSet(CustomModelViewSet):
             event.end = end_dt
             event.all_day = True
             event.save()
+
+
+class WeighInViewSet(CustomModelViewSet):
+    queryset = WeighIn.objects.all()
+    serializer_class = WeighInSerializer
+
+
+class BodyFatViewSet(CustomModelViewSet):
+    queryset = BodyFat.objects.all()
+    serializer_class = BodyFatSerializer
+
+
+class WaistMeasurementViewSet(CustomModelViewSet):
+    queryset = WaistMeasurement.objects.all()
+    serializer_class = WaistMeasurementSerializer
+
+
+class MealViewSet(CustomModelViewSet):
+    queryset = Meal.objects.all()
+    serializer_class = MealSerializer
+
+
+class WorkoutViewSet(CustomModelViewSet):
+    queryset = Workout.objects.all()
+    serializer_class = WorkoutSerializer
