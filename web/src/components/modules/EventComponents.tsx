@@ -1,30 +1,27 @@
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Event, EventFields, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
+import { MyCalendar } from "../../blueprints/MyCalendar";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
-import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  sortAndFilterByIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { MyLockedCard } from "../../blueprints/MyLockedCard";
-import { MyCalendar } from "../../blueprints/MyCalendar";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { KV } from "../../blueprints/ItemDetails";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import {
   ActionModalDef,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
+import { MyLockedCard } from "../../blueprints/MyLockedCard";
+import { SideBySideView } from "../../blueprints/SideBySideView";
+import { toOptions, toTitleCase } from "../../constants/helpers";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -158,19 +155,12 @@ export const EventCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              eventStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <EventCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={EventCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={eventStore.items}
+        />
       }
       SideB={<EventDashboard />}
       ratio={0.7}

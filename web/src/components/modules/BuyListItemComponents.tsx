@@ -8,9 +8,12 @@ import {
   PRIORITY_CHOICES,
   WISHLIST_STATUS_CHOICES,
 } from "../../api/BuyListItemStore";
+import { STATUS_CHOICES } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
 import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
@@ -21,15 +24,9 @@ import {
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  sortAndFilterByIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
+import { toOptions, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { STATUS_CHOICES } from "../../api/JobStore";
-import { KV } from "../../blueprints/ItemDetails";
 
 export const {
   Context: BuyListItemViewContext,
@@ -121,19 +118,12 @@ export const BuyListItemCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              buyListItemStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <BuyListItemCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={BuyListItemCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={buyListItemStore.items}
+        />
       }
       SideB=""
       ratio={0.7}

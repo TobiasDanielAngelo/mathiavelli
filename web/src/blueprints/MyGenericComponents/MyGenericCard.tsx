@@ -50,7 +50,7 @@ export const MyGenericCard = observer(
     };
 
     return (
-      <div className="m-1 border-gray-700 rounded-lg p-5 border">
+      <div className="m-3 border-gray-700 rounded-lg p-5 border">
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
           <FormComponent
             item={item}

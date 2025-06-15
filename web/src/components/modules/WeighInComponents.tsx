@@ -1,11 +1,16 @@
 import { observer } from "mobx-react-lite";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useStore } from "../../api/Store";
 import {
   WeighIn,
   WeighInFields,
   WeighInInterface,
 } from "../../api/WeighInStore";
-import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
@@ -16,13 +21,9 @@ import {
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { sortAndFilterByIds, toTitleCase } from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { MyMultiDropdownSelector } from "../../blueprints";
+import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { useMemo, useState } from "react";
-import { KV } from "../../blueprints/ItemDetails";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: WeighInViewContext, useGenericView: useWeighInView } =
   createGenericViewContext<WeighInInterface>();
@@ -92,19 +93,12 @@ export const WeighInCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              weighInStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <WeighInCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={WeighInCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={weighInStore.items}
+        />
       }
       SideB=""
       ratio={0.7}

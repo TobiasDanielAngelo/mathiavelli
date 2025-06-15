@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Job,
   JOB_TYPE_CHOICES,
@@ -10,27 +11,23 @@ import {
   WORK_SETUP_CHOICES,
 } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
-import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  sortAndFilterByIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { KV } from "../../blueprints/ItemDetails";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import {
   ActionModalDef,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
+import { SideBySideView } from "../../blueprints/SideBySideView";
+import { toOptions, toTitleCase } from "../../constants/helpers";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: JobViewContext, useGenericView: useJobView } =
   createGenericViewContext<JobInterface>();
@@ -159,19 +156,12 @@ export const JobCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              jobStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <JobCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={JobCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={jobStore.items}
+        />
       }
       SideB={<JobDashboard />}
       ratio={0.7}

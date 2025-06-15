@@ -1,28 +1,29 @@
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Platform,
   PlatformFields,
   PlatformInterface,
 } from "../../api/PlatformStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
-import { SideBySideView } from "../../blueprints/SideBySideView";
-import { sortAndFilterByIds, toTitleCase } from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
 import {
   ActionModalDef,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
-import { MyMultiDropdownSelector } from "../../blueprints";
-import { KV } from "../../blueprints/ItemDetails";
+import { SideBySideView } from "../../blueprints/SideBySideView";
+import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: PlatformViewContext, useGenericView: usePlatformView } =
   createGenericViewContext<PlatformInterface>();
@@ -104,19 +105,12 @@ export const PlatformCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              platformStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <PlatformCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={PlatformCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={platformStore.items}
+        />
       }
       SideB={<PlatformDashboard />}
       ratio={0.7}

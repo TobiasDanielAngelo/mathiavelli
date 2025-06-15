@@ -153,7 +153,9 @@ export const MyCalendar = observer(
     return (
       <div className="m-5 p-4 rounded-xl shadow-xl">
         <div className="flex justify-between items-center mb-4">
-          <div onClick={handlePrev}>&lt;</div>
+          <div onClick={handlePrev}>
+            <MyIcon icon="KeyboardArrowLeft" fontSize="large" />
+          </div>
           <div
             onClick={() =>
               setView(
@@ -166,7 +168,9 @@ export const MyCalendar = observer(
             {view === "year" && currentDate.format("YYYY")}
             {view === "decade" && `${startDecade} - ${startDecade + 9}`}
           </div>
-          <div onClick={handleNext}>&gt;</div>
+          <div onClick={handleNext}>
+            <MyIcon icon="KeyboardArrowRight" fontSize="large" />
+          </div>
         </div>
 
         {view === "month" && renderMonthView()}

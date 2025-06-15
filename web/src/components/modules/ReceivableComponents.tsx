@@ -1,40 +1,40 @@
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Receivable,
   ReceivableFields,
   ReceivableInterface,
 } from "../../api/ReceivableStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import {
   IAction,
   MyGenericCard,
 } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
-import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  generateShortId,
-  sortAndFilterByIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { MyModal } from "../../blueprints/MyModal";
-import { CategoryIdMap } from "./CategoryComponents";
-import { TransactionForm } from "./TransactionComponents";
-import { AccountIdMap } from "./AccountComponents";
-import { useSearchParams } from "react-router-dom";
-import { KV } from "../../blueprints/ItemDetails";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import {
   ActionModalDef,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
+import { MyModal } from "../../blueprints/MyModal";
+import { SideBySideView } from "../../blueprints/SideBySideView";
+import {
+  generateShortId,
+  toOptions,
+  toTitleCase,
+} from "../../constants/helpers";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { AccountIdMap } from "./AccountComponents";
+import { CategoryIdMap } from "./CategoryComponents";
+import { TransactionForm } from "./TransactionComponents";
 
 export const {
   Context: ReceivableViewContext,
@@ -164,19 +164,12 @@ export const ReceivableCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              receivableStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <ReceivableCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={ReceivableCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={receivableStore.items}
+        />
       }
       SideB={<ReceivableDashboard />}
       ratio={0.7}

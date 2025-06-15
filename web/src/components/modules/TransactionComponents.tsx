@@ -1,35 +1,31 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useStore } from "../../api/Store";
 import {
   Transaction,
   TransactionFields,
   TransactionInterface,
 } from "../../api/TransactionStore";
+import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
-import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  sortAndFilterByIds,
-  toMoney,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import {
   ActionModalDef,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
+import { SideBySideView } from "../../blueprints/SideBySideView";
+import { toMoney, toOptions, toTitleCase } from "../../constants/helpers";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 import { AccountForm } from "./AccountComponents";
 
 export const {
@@ -185,19 +181,12 @@ export const TransactionCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              transactionStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <TransactionCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={TransactionCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={transactionStore.items}
+        />
       }
       SideB={<TransactionDashboard itemMap={itemMap} graph={graph} />}
       ratio={0.7}

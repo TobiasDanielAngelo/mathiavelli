@@ -1,25 +1,32 @@
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Payable,
   PayableFields,
   PayableInterface,
 } from "../../api/PayableStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import {
   IAction,
   MyGenericCard,
 } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
+import {
+  ActionModalDef,
+  MyGenericView,
+} from "../../blueprints/MyGenericComponents/MyGenericView";
 import { MyModal } from "../../blueprints/MyModal";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import {
   generateShortId,
-  sortAndFilterByIds,
   toOptions,
   toTitleCase,
 } from "../../constants/helpers";
@@ -28,13 +35,6 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 import { AccountIdMap } from "./AccountComponents";
 import { CategoryIdMap } from "./CategoryComponents";
 import { TransactionForm } from "./TransactionComponents";
-import { useSearchParams } from "react-router-dom";
-import { KV } from "../../blueprints/ItemDetails";
-import { MyMultiDropdownSelector } from "../../blueprints";
-import {
-  ActionModalDef,
-  MyGenericView,
-} from "../../blueprints/MyGenericComponents/MyGenericView";
 
 export const { Context: PayableViewContext, useGenericView: usePayableView } =
   createGenericViewContext<PayableInterface>();
@@ -163,19 +163,12 @@ export const PayableCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              payableStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <PayableCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={PayableCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={payableStore.items}
+        />
       }
       SideB={<PayableDashboard />}
       ratio={0.7}

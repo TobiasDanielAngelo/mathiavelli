@@ -52,7 +52,7 @@ export const MyGenericRecursiveCard = observer(
 
     return (
       <div
-        className="m-1 border-gray-700 rounded-lg p-5"
+        className="m-3 border-gray-700 rounded-lg p-5"
         style={{ borderWidth: border ? 1 : 0 }}
       >
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>

@@ -1,25 +1,25 @@
 import { observer } from "mobx-react-lite";
-import { Tag, TagFields } from "../../api/TagStore";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useStore } from "../../api/Store";
-import { SideBySideView } from "../../blueprints/SideBySideView";
-import { sortAndFilterByIds, toTitleCase } from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { Tag, TagFields, TagInterface } from "../../api/TagStore";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
+import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
-import { TagInterface } from "../../api/TagStore";
-import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
-import { useMemo, useState } from "react";
 import {
   ActionModalDef,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
-import { MyMultiDropdownSelector } from "../../blueprints";
-import { KV } from "../../blueprints/ItemDetails";
+import { SideBySideView } from "../../blueprints/SideBySideView";
+import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: TagViewContext, useGenericView: useTagView } =
   createGenericViewContext<TagInterface>();
@@ -101,19 +101,12 @@ export const TagCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              tagStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <TagCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={TagCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={tagStore.items}
+        />
       }
       SideB=""
       ratio={0.7}

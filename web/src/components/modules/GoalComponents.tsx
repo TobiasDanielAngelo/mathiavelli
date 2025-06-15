@@ -1,29 +1,29 @@
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Goal, GoalFields, GoalInterface } from "../../api/GoalStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRecursiveCard } from "../../blueprints/MyGenericComponents/MyGenericRecursiveCard";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
-import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  getDescendantIds,
-  sortAndFilterByIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { KV } from "../../blueprints/ItemDetails";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import {
   ActionModalDef,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
+import { SideBySideView } from "../../blueprints/SideBySideView";
+import {
+  getDescendantIds,
+  toOptions,
+  toTitleCase,
+} from "../../constants/helpers";
+import { useLocalStorageState, useVisible } from "../../constants/hooks";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: GoalViewContext, useGenericView: useGoalView } =
   createGenericViewContext<GoalInterface>();
@@ -133,6 +133,7 @@ export const GoalCard = observer((props: { item: Goal }) => {
       fetchFcn={fetchFcn}
       items={goalStore.items}
       parentKey={"parentGoal"}
+      border
     />
   );
 });
@@ -144,19 +145,12 @@ export const GoalCollection = observer(() => {
   return (
     <SideBySideView
       SideB={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              goalStore.items.filter((s) => s.parentGoal == null),
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <GoalCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={GoalCard}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={goalStore.items.filter((s) => s.parentGoal == null)}
+        />
       }
       SideA=""
       ratio={0.7}
