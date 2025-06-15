@@ -147,10 +147,10 @@ export const MyForm = observer(
       setDetails({ ...details, [name]: val });
 
     const onClickDelete = () => {
-      setVisible1 && setVisible1(true);
+      setVisible1?.(true);
     };
     const onClickConfirm = async () => {
-      onDelete && (await onDelete());
+      await onDelete?.();
     };
 
     return (

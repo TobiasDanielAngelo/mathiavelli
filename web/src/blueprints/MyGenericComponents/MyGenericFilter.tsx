@@ -152,14 +152,17 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
     setParams("q=" + generateShortParam(filtered));
   };
 
-  const onClickReset = () => setDetails(getInitialDetails(fields));
-
+  const onClickReset = () => {
+    setDetails(getInitialDetails(fields));
+    setParams("");
+  };
   useKeyPress(["Enter"], onClickFilter);
 
   useEffect(() => {
-    if (params.keys.length)
+    if (params.size) {
       setDetails(decodeShortParam(params.toString().replace("q=", "")));
-  }, []);
+    }
+  }, [params.size]);
 
   return (
     <div className="max-w-xl mx-auto p-2 dark:bg-gray-900 text-gray-200">

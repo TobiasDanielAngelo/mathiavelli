@@ -25,7 +25,7 @@ export const MyTextArea = (props: {
 
   const onChangeCorrect = (t: string) => {
     let newVal = corrector ? corrector(t) : t;
-    onChangeValue && onChangeValue(newVal);
+    onChangeValue?.(newVal);
   };
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);

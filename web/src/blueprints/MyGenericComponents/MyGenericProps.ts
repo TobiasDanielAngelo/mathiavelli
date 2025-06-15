@@ -1,7 +1,8 @@
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { SetURLSearchParams } from "react-router-dom";
-import { Graph, PaginatedDetails } from "../../constants/interfaces";
+import { PaginatedDetails } from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
+import { GraphType } from "./MyGenericView";
 
 export interface GenericViewProps<T> {
   shownFields: (keyof T)[];
@@ -11,8 +12,8 @@ export interface GenericViewProps<T> {
   pageDetails: PaginatedDetails | undefined;
   PageBar: React.FC;
   fetchFcn: () => void;
-  itemMap?: KV<any>[];
-  graph?: Graph;
+  itemMap: KV<any>[];
+  graph?: GraphType;
 }
 
 export function createGenericViewContext<T>() {

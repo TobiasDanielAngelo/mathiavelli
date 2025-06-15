@@ -1,55 +1,59 @@
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SaveIcon from "@mui/icons-material/Save";
-import AddCardIcon from "@mui/icons-material/AddCard";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import EventIcon from "@mui/icons-material/Event";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import InsertChartIcon from "@mui/icons-material/InsertChart";
-import MenuIcon from "@mui/icons-material/Menu";
-import PaymentIcon from "@mui/icons-material/Payment";
-import PrintIcon from "@mui/icons-material/Print";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import FilterListAltIcon from "@mui/icons-material/FilterListAlt";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import PieChartIcon from "@mui/icons-material/PieChart";
-import ViewListIcon from "@mui/icons-material/ViewList";
-import TableChartIcon from "@mui/icons-material/TableChart";
-import TimelineIcon from "@mui/icons-material/Timeline";
-import PaddingIcon from "@mui/icons-material/Padding";
-import BarChartIcon from "@mui/icons-material/BarChart";
+import Edit from "@mui/icons-material/Edit";
+import Delete from "@mui/icons-material/Delete";
+import Save from "@mui/icons-material/Save";
+import AddCard from "@mui/icons-material/AddCard";
+import Check from "@mui/icons-material/Check";
+import Close from "@mui/icons-material/Close";
+import CloudUpload from "@mui/icons-material/CloudUpload";
+import Event from "@mui/icons-material/Event";
+import FilterAlt from "@mui/icons-material/FilterAlt";
+import Inbox from "@mui/icons-material/MoveToInbox";
+import InsertChart from "@mui/icons-material/InsertChart";
+import Menu from "@mui/icons-material/Menu";
+import Payment from "@mui/icons-material/Payment";
+import Print from "@mui/icons-material/Print";
+import RestartAlt from "@mui/icons-material/RestartAlt";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import FilterListAlt from "@mui/icons-material/FilterListAlt";
+import NoteAdd from "@mui/icons-material/NoteAdd";
+import PieChart from "@mui/icons-material/PieChart";
+import ViewList from "@mui/icons-material/ViewList";
+import TableChart from "@mui/icons-material/TableChart";
+import Timeline from "@mui/icons-material/Timeline";
+import Padding from "@mui/icons-material/Padding";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import BarChart from "@mui/icons-material/BarChart";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
 // 1. Map icons to names
 const iconMap = {
-  Edit: EditIcon,
-  Delete: DeleteIcon,
-  Save: SaveIcon,
-  AddCard: AddCardIcon,
-  Check: CheckIcon,
-  Close: CloseIcon,
-  CloudUpload: CloudUploadIcon,
-  Event: EventIcon,
-  FilterAlt: FilterAltIcon,
-  Inbox: InboxIcon,
-  InsertChart: InsertChartIcon,
-  Menu: MenuIcon,
-  Payment: PaymentIcon,
-  Print: PrintIcon,
-  RestartAlt: RestartAltIcon,
-  VisibilityOff: VisibilityOffIcon,
-  FilterListAlt: FilterListAltIcon,
-  ViewList: ViewListIcon,
-  NoteAdd: NoteAddIcon,
-  PieChart: PieChartIcon,
-  Timeline: TimelineIcon,
-  TableChart: TableChartIcon,
-  Padding: PaddingIcon,
-  BarChart: BarChartIcon,
+  Edit,
+  Delete,
+  Save,
+  AddCard,
+  Check,
+  Close,
+  CloudUpload,
+  Event,
+  FilterAlt,
+  Inbox,
+  InsertChart,
+  Menu,
+  Payment,
+  Print,
+  RestartAlt,
+  VisibilityOff,
+  FilterListAlt,
+  ViewList,
+  NoteAdd,
+  PieChart,
+  Timeline,
+  TableChart,
+  Padding,
+  BarChart,
+  ExpandMore,
+  ExpandLess,
 } as const;
 
 // 2. Derive type from keys

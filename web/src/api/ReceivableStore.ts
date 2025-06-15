@@ -42,7 +42,7 @@ export type ReceivableInterface = {
 export const ReceivableFields: Record<string, (keyof ReceivableInterface)[]> = {
   datetime: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
   date: [] as const,
-  prices: ["lentAmount"] as const,
+  prices: ["lentAmount", "paymentTotal"] as const,
 };
 
 @model("myApp/Receivable")

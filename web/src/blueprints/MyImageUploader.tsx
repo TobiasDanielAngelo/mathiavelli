@@ -11,7 +11,7 @@ export const MyImageUploader = (props: {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      onChangeValue && onChangeValue(e.target.files[0]);
+      onChangeValue?.(e.target.files[0]);
       setImage(URL.createObjectURL(e.target.files[0]));
     }
   };

@@ -36,6 +36,7 @@ export const MyGenericCard = observer(
     moreActions,
   }: MyGenericCardProps<T>) => {
     const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
+    const [showMore, setShowMore] = useState(false);
     const [msg, setMsg] = useState("");
 
     const onDelete = async () => {
@@ -83,6 +84,8 @@ export const MyGenericCard = observer(
               important={important}
               body={body}
               prices={prices}
+              showMore={showMore}
+              setShowMore={setShowMore}
             />
 
             <div className="flex justify-between flex-row-reverse">
@@ -99,6 +102,10 @@ export const MyGenericCard = observer(
                   key={ind}
                 />
               ))}
+              <MyIcon
+                icon={showMore ? "ExpandLess" : "ExpandMore"}
+                onClick={() => setShowMore((t) => !t)}
+              />
             </div>
           </div>
         </div>

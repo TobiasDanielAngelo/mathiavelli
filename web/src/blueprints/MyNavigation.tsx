@@ -29,7 +29,7 @@ export const ResponsiveDrawer = observer(
     const navigate = useNavigate();
     const { userStore } = useStore();
 
-    useKeyPress(["q", "Shift"], () => setOpen && setOpen(false));
+    useKeyPress(["q", "Shift"], () => setOpen?.(false));
 
     return (
       <div style={{ display: "flex" }}>
@@ -48,9 +48,9 @@ export const ResponsiveDrawer = observer(
               <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => {
-                    setLocation && setLocation("/");
+                    setLocation?.("/");
                     navigate("/");
-                    setOpen && setOpen(false);
+                    setOpen?.(false);
                   }}
                 >
                   <ListItemIcon>
@@ -65,7 +65,7 @@ export const ResponsiveDrawer = observer(
                     onClick={() => {
                       setLocation && s.link && setLocation(s.link);
                       navigate(s?.link ?? "/");
-                      setOpen && setOpen(false);
+                      setOpen?.(false);
                     }}
                   >
                     <ListItemIcon>
@@ -81,10 +81,10 @@ export const ResponsiveDrawer = observer(
                 <ListItem key={ind} disablePadding>
                   <ListItemButton
                     onClick={() => {
-                      setLocation && setLocation("/");
+                      setLocation?.("/");
                       userStore.logoutUser();
                       navigate("/login");
-                      setOpen && setOpen(false);
+                      setOpen?.(false);
                     }}
                   >
                     <ListItemIcon>
@@ -216,7 +216,7 @@ export const MyNavBar = observer(
                 icon="InsertChart"
                 fontSize="large"
                 className="text-gray-700 dark:text-gray-100 hover:text-green-700 hover:scale-125 [&:not(hover)]:transition-all hover:transition-all ease-in-out hover:animate-pulse"
-                onClick={() => setLocation && setLocation("/")}
+                onClick={() => setLocation?.("/")}
               />
             </Link>
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">

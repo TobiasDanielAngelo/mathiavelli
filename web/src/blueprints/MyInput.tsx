@@ -1,14 +1,14 @@
 export const MyInput = (props: {
-  hidden?: boolean
-  label?: string
-  value?: string
-  onChangeValue?: (t: string) => void
-  corrector?: (t: string) => string
-  pattern?: string
-  centered?: boolean
-  isPassword?: boolean
-  optional?: boolean
-  msg?: string
+  hidden?: boolean;
+  label?: string;
+  value?: string;
+  onChangeValue?: (t: string) => void;
+  corrector?: (t: string) => string;
+  pattern?: string;
+  centered?: boolean;
+  isPassword?: boolean;
+  optional?: boolean;
+  msg?: string;
 }) => {
   const {
     hidden,
@@ -21,21 +21,21 @@ export const MyInput = (props: {
     isPassword,
     optional,
     msg,
-  } = props
+  } = props;
 
   const onChangeCorrect = (t: string) => {
-    let newVal = corrector ? corrector(t) : t
-    onChangeValue && onChangeValue(newVal)
-  }
+    let newVal = corrector ? corrector(t) : t;
+    onChangeValue?.(newVal);
+  };
 
   return hidden ? (
     <></>
   ) : (
     <div className="relative z-0 w-full mt-3 group">
       <input
-        type={isPassword ? 'password' : undefined}
+        type={isPassword ? "password" : undefined}
         name={label}
-        style={{ textAlign: centered ? 'center' : undefined }}
+        style={{ textAlign: centered ? "center" : undefined }}
         className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
         placeholder=" "
         pattern={pattern}
@@ -50,5 +50,5 @@ export const MyInput = (props: {
         {msg}
       </label>
     </div>
-  )
-}
+  );
+};

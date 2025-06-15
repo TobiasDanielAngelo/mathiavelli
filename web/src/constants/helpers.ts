@@ -228,7 +228,7 @@ export const handleKeyDown = (
   keys: string[],
   callback?: () => void
 ) => {
-  if (keys.includes(e.key)) callback && callback();
+  if (keys.includes(e.key)) callback?.();
 };
 
 export const rounded = (t: number, numDigits?: number) =>

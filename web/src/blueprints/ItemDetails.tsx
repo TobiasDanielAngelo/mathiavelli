@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { formatValue, toTitleCase } from "../constants/helpers";
 import { observer } from "mobx-react-lite";
+import { Dispatch, SetStateAction } from "react";
+import { formatValue, toTitleCase } from "../constants/helpers";
 
 export interface KV<U extends Record<string, any>> {
   key: string;
@@ -15,12 +15,14 @@ export interface ItemDetailsProps<T> {
   important?: (keyof T)[];
   body?: (keyof T)[];
   prices?: (keyof T)[];
+  showMore?: boolean;
+  setShowMore?: Dispatch<SetStateAction<boolean>>;
 }
 
 const sectionStyles: Record<string, string> = {
-  Header: "text-sm text-gray-400",
-  Important: "font-bold text-xl text-white px-3 rounded",
-  Body: "text-gray-400 text-sm px-2",
+  Header: "text-sm text-gray-400 flex flex-row",
+  Important: "font-bold text-3xl text-white px-3 rounded",
+  Body: "text-gray-400 text-lg px-7",
 };
 
 export const ItemDetails = observer(
@@ -31,9 +33,8 @@ export const ItemDetails = observer(
     important = [],
     body = [],
     prices = [],
+    showMore,
   }: ItemDetailsProps<T>) => {
-    const [showMore, setShowMore] = useState(false);
-
     const sections = [
       { title: "Header", keys: header },
       { title: "Important", keys: important },
@@ -52,7 +53,7 @@ export const ItemDetails = observer(
       (key) => !allSectionKeys.includes(key)
     );
     const shownKeys = shownFields.filter((key) => allSectionKeys.includes(key));
-    const hiddenKeys = allSectionKeys.filter((key) => !shownKeys.includes(key));
+    // const hiddenKeys = allSectionKeys.filter((key) => !shownKeys.includes(key));
 
     const renderRow = (key: keyof T, title: string) => {
       const value = item[key];
@@ -62,13 +63,11 @@ export const ItemDetails = observer(
       return body === "—" ? (
         <div key={String(key)}></div>
       ) : (
-        <div key={String(key)} className="flex gap-5">
+        <div key={String(key)} className="flex flex-col xs:flex-row">
           {title === "Body" && (
-            <span className="w-[30%] text-right font-bold">{keyTitle}</span>
+            <span className="pt-2 text-xs font-bold">{keyTitle}</span>
           )}
-          <span className="w-[70%] whitespace-pre-wrap break-words">
-            {body}
-          </span>
+          <span className="pl-3 whitespace-pre-wrap break-words">{body}</span>
         </div>
       );
     };
@@ -85,15 +84,6 @@ export const ItemDetails = observer(
               leftoverKeys.map((key) => renderRow(key, title))}
           </div>
         ))}
-
-        {hiddenKeys.length + leftoverKeys.length > 0 && (
-          <div
-            className="text-blue-500 font-bold text-sm cursor-pointer m-2"
-            onClick={() => setShowMore(!showMore)}
-          >
-            {showMore ? "Show Less" : ". . . Show More"}
-          </div>
-        )}
       </>
     );
   }

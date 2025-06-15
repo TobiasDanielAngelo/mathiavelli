@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { createStore, StoreContext } from "./api/Store";
-import { LoginView } from "./components/LoginView";
-import { MainView } from "./components/MainView";
+import { LoginView } from "./components/main/LoginView";
+import { MainView } from "./components/main/MainView";
 import "./App.css";
 
 function App() {

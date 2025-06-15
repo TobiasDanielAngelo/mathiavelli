@@ -18,7 +18,7 @@ export const MyTag = (props: {
       <GuidedDiv
         className="text-white"
         title={`${label ?? ''}${title ? ' - ' + title : ''}`}>
-        {label && label.length > 15 ? `${label?.substring(0, 15)}...` : label}
+        {label?..length > 15 ? `${label?.substring(0, 15)}...` : label}
       </GuidedDiv>
     </div>
   )

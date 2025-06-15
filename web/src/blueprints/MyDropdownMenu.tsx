@@ -7,7 +7,7 @@ export const MyDropdownMenu = (props: {
   pages?: Page[];
 }) => {
   const { open, pages, setOpen } = props;
-  const ref = useClickAway<HTMLDivElement>(() => setOpen && setOpen(false));
+  const ref = useClickAway<HTMLDivElement>(() => setOpen?.(false));
 
   return (
     <div

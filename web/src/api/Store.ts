@@ -17,6 +17,11 @@ import { TagStore } from "./TagStore";
 import { TaskStore } from "./TaskStore";
 import { TransactionStore } from "./TransactionStore";
 import { UserStore } from "./UserStore";
+import { WeighInStore } from "./WeighInStore";
+import { BodyFatStore } from "./BodyFatStore";
+import { WaistMeasurementStore } from "./WaistMeasurementStore";
+import { MealStore } from "./MealStore";
+import { WorkoutStore } from "./WorkoutStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -36,7 +41,11 @@ export class Store extends Model({
   credentialStore: prop<CredentialStore>(),
   jobStore: prop<JobStore>(),
   followUpStore: prop<FollowUpStore>(),
-
+  weighInStore: prop<WeighInStore>(),
+  bodyFatStore: prop<BodyFatStore>(),
+  waistMeasurementStore: prop<WaistMeasurementStore>(),
+  mealStore: prop<MealStore>(),
+  workoutStore: prop<WorkoutStore>(),
   transactionAnalyticsStore: prop<TransactionAnalyticsStore>(),
 }) {}
 
@@ -58,7 +67,11 @@ export const createStore = () =>
     credentialStore: new CredentialStore({}),
     jobStore: new JobStore({}),
     followUpStore: new FollowUpStore({}),
-
+    weighInStore: new WeighInStore({}),
+    bodyFatStore: new BodyFatStore({}),
+    waistMeasurementStore: new WaistMeasurementStore({}),
+    mealStore: new MealStore({}),
+    workoutStore: new WorkoutStore({}),
     transactionAnalyticsStore: new TransactionAnalyticsStore({}),
   });
 
