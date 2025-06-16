@@ -227,7 +227,7 @@ class TaskViewSet(CustomModelViewSet):
     serializer_class = TaskSerializer
 
     def update_goal_completion_status(self, goal):
-        tasks = goal.tasks.filter(is_cancelled=False)
+        tasks = goal.task_goal.filter(is_cancelled=False)
 
         if tasks.exists() and all(task.is_completed for task in tasks):
             goal.date_completed = timezone.now().date()
@@ -313,3 +313,13 @@ class MealViewSet(CustomModelViewSet):
 class WorkoutViewSet(CustomModelViewSet):
     queryset = Workout.objects.all()
     serializer_class = WorkoutSerializer
+
+
+class InventoryCategoryViewSet(CustomModelViewSet):
+    queryset = InventoryCategory.objects.all()
+    serializer_class = InventoryCategorySerializer
+
+
+class PersonalItemViewSet(CustomModelViewSet):
+    queryset = PersonalItem.objects.all()
+    serializer_class = PersonalItemSerializer

@@ -120,3 +120,15 @@ class MealAdmin(admin.ModelAdmin):
 class WorkoutAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.fields]
+
+
+@admin.register(InventoryCategory)
+class InventoryCategoryAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+
+
+@admin.register(PersonalItem)
+class PersonalItemAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]

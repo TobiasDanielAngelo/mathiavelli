@@ -143,6 +143,7 @@ class Task(models.Model):
     title = fields.ShortCharField()
     description = fields.MediumCharField()
     goal = fields.SetNullOptionalForeignKey(Goal)
+    importance = fields.LimitedDecimalField(0, 10)
     repeat = fields.ChoiceIntegerField(FREQUENCY_CHOICES)
     due_date = fields.OptionalDateField()
     is_completed = fields.DefaultBooleanField(False)
@@ -158,6 +159,9 @@ class Task(models.Model):
     def clean(self):
         if self.date_start and self.date_end and self.date_start > self.date_end:
             raise ValidationError("Start time must be before end time.")
+
+    class Meta:
+        unique_together = ("due_date", "importance")
 
 
 class Event(models.Model):
@@ -369,3 +373,18 @@ class Workout(models.Model):
     duration_minutes = fields.DecimalField()
     calories_burned = fields.DecimalField()
     date = fields.DefaultNowField()
+
+
+class InventoryCategory(models.Model):
+    name = fields.ShortCharField()
+
+
+class PersonalItem(models.Model):
+    name = fields.ShortCharField()
+    category = fields.SetNullOptionalForeignKey(InventoryCategory)
+    location = fields.ShortCharField()
+    quantity = fields.LimitedDecimalField(1)
+    acquired_date = fields.OptionalDateField()
+    worth = fields.AmountField()
+    notes = fields.LongCharField()
+    is_important = fields.DefaultBooleanField(False)

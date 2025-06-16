@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class AmountField(models.DecimalField):
@@ -266,3 +267,42 @@ class OptionalURLField(models.URLField):
         kwargs.setdefault("null", True)
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
+
+
+class LimitedDecimalField(models.DecimalField):
+    """
+    A DecimalField with optional min/max value constraints using positional arguments.
+
+    Usage:
+        LimitedDecimalField(0, 10)       # min=0, max=10
+        LimitedDecimalField(None, 10)    # max=10 only
+        LimitedDecimalField(5)           # min=5 only
+        LimitedDecimalField()            # no limits
+
+    Automatically adds MinValueValidator and MaxValueValidator based on arguments.
+    Defaults to max_digits=10 and decimal_places=2 if not provided.
+    """
+
+    def __init__(self, *args, **kwargs):
+        validators = kwargs.pop("validators", [])
+
+        # Handle positional limits
+        min_value = None
+        max_value = None
+        if len(args) == 1:
+            min_value = args[0]
+        elif len(args) == 2:
+            min_value, max_value = args
+
+        if min_value is not None:
+            validators.append(MinValueValidator(min_value))
+        if max_value is not None:
+            validators.append(MaxValueValidator(max_value))
+
+        kwargs["validators"] = validators
+
+        # Sensible defaults for DecimalField
+        kwargs.setdefault("max_digits", 10)
+        kwargs.setdefault("decimal_places", 2)
+
+        super().__init__(**kwargs)

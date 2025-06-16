@@ -169,7 +169,6 @@ class TaskSerializer(serializers.ModelSerializer):
                     "date_end": ["End time must be after start time."],
                 }
             )
-        return data
 
 
 class LoginSerializer(serializers.Serializer):
@@ -282,4 +281,16 @@ class MealSerializer(serializers.ModelSerializer):
 class WorkoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workout
+        fields = "__all__"
+
+
+class InventoryCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InventoryCategory
+        fields = "__all__"
+
+
+class PersonalItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonalItem
         fields = "__all__"
