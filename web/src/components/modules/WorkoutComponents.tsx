@@ -74,6 +74,7 @@ export const WorkoutForm = ({
         delete: workoutStore.deleteItem,
       }}
       datetimeFields={WorkoutFields.datetime}
+      dateFields={WorkoutFields.date}
     />
   );
 };

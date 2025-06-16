@@ -6,6 +6,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 
 const slug = "platforms";
 
@@ -67,7 +68,11 @@ export class PlatformStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<Platform>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -93,7 +98,11 @@ export class PlatformStore extends Model({
     try {
       result = yield* _await(postItemRequest<PlatformInterface>(slug, details));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -120,7 +129,11 @@ export class PlatformStore extends Model({
         updateItemRequest<PlatformInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -140,7 +153,11 @@ export class PlatformStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

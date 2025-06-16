@@ -6,6 +6,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 
 const slug = "users";
 
@@ -71,7 +72,11 @@ export class UserStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<User>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -97,7 +102,11 @@ export class UserStore extends Model({
     try {
       result = yield* _await(postItemRequest<UserInterface>(slug, details));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -124,7 +133,11 @@ export class UserStore extends Model({
         updateItemRequest<UserInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -144,7 +157,11 @@ export class UserStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -180,7 +197,11 @@ export class UserStore extends Model({
         })
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -229,7 +250,11 @@ export class UserStore extends Model({
         })
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -282,7 +307,11 @@ export class UserStore extends Model({
         })
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -328,7 +357,11 @@ export class UserStore extends Model({
         })
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

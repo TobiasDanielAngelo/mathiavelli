@@ -71,6 +71,7 @@ export const TagForm = ({
         delete: tagStore.deleteItem,
       }}
       datetimeFields={TagFields.datetime}
+      dateFields={TagFields.date}
     />
   );
 };

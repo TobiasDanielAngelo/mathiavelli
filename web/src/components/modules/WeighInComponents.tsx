@@ -24,6 +24,7 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { Field, PaginatedDetails } from "../../constants/interfaces";
+import MyTimelineChart from "../../blueprints/MyCharts/MyTimelineChart";
 
 export const { Context: WeighInViewContext, useGenericView: useWeighInView } =
   createGenericViewContext<WeighInInterface>();
@@ -63,6 +64,7 @@ export const WeighInForm = ({
         delete: weighInStore.deleteItem,
       }}
       datetimeFields={WeighInFields.datetime}
+      dateFields={WeighInFields.date}
     />
   );
 };
@@ -86,6 +88,10 @@ export const WeighInCard = observer((props: { item: WeighIn }) => {
   );
 });
 
+export const WeighInDashboard = observer(() => {
+  return <MyTimelineChart />;
+});
+
 export const WeighInCollection = observer(() => {
   const { weighInStore } = useStore();
   const { pageDetails, PageBar } = useWeighInView();
@@ -100,7 +106,7 @@ export const WeighInCollection = observer(() => {
           items={weighInStore.items}
         />
       }
-      SideB=""
+      SideB={<WeighInDashboard />}
       ratio={0.7}
     />
   );

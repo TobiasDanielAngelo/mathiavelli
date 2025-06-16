@@ -1,44 +1,21 @@
-import {
-  Model,
-  _async,
-  _await,
-  getRoot,
-  model,
-  modelFlow,
-  prop,
-} from "mobx-keystone";
 import { computed } from "mobx";
+import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import Swal from "sweetalert2";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
-import Swal from "sweetalert2";
-import { Store } from "./Store";
 
-const slug = "follow-ups";
+const slug = "inventory-categories";
 
 const props = {
   id: prop<number>(-1),
-  job: prop<number | null>(null),
-  date: prop<string>(""),
-  message: prop<string>(""),
-  status: prop<number>(0),
-  reply: prop<string>(""),
+  name: prop<string>(""),
 };
 
-export const FOLLOWUP_STATUS_CHOICES = [
-  "No Response",
-  "Initial Follow-up",
-  "Reminder Email",
-  "Thank You Note",
-  "Checking for Updates",
-  "Interview Scheduled",
-  "Got a Response",
-];
-
-export type FollowUpInterface = {
+export type InventoryCategoryInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
     typeof prop<infer T>
   >
@@ -46,46 +23,37 @@ export type FollowUpInterface = {
     : never;
 };
 
-export const FollowUpFields: Record<string, (keyof FollowUpInterface)[]> = {
+export const InventoryCategoryFields: Record<
+  string,
+  (keyof InventoryCategoryInterface)[]
+> = {
   datetime: [] as const,
-  date: ["date"] as const,
+  date: [] as const,
   prices: [] as const,
 };
 
-@model("myApp/FollowUp")
-export class FollowUp extends Model(props) {
-  update(details: FollowUpInterface) {
+@model("myApp/InventoryCategory")
+export class InventoryCategory extends Model(props) {
+  update(details: InventoryCategoryInterface) {
     Object.assign(this, details);
-  }
-
-  get jobTitle() {
-    return (
-      getRoot<Store>(this)?.jobStore?.allItems.get(this.job ?? -1)?.title || "—"
-    );
-  }
-  get statusName() {
-    return FOLLOWUP_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—";
   }
 
   get $view() {
     return {
       ...this.$,
-      jobTitle:
-        getRoot<Store>(this)?.jobStore?.allItems.get(this.job ?? -1)?.title ||
-        "—",
-      statusName:
-        FOLLOWUP_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—",
     };
   }
 }
 
-@model("myApp/FollowUpStore")
-export class FollowUpStore extends Model({
-  items: prop<FollowUp[]>(() => []),
+@model("myApp/InventoryCategoryStore")
+export class InventoryCategoryStore extends Model({
+  items: prop<InventoryCategory[]>(() => []),
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new FollowUp({}).$) as (keyof FollowUpInterface)[];
+    const keys = Object.keys(
+      new InventoryCategory({}).$
+    ) as (keyof InventoryCategoryInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");
@@ -93,23 +61,24 @@ export class FollowUpStore extends Model({
 
   @computed
   get allItems() {
-    const map = new Map<number, FollowUp>();
+    const map = new Map<number, InventoryCategory>();
     this.items.forEach((item) => map.set(item.id, item));
     return map;
   }
 
   @modelFlow
-  fetchAll = _async(function* (this: FollowUpStore, params?: string) {
+  fetchAll = _async(function* (this: InventoryCategoryStore, params?: string) {
     let result;
 
     try {
-      result = yield* _await(fetchItemsRequest<FollowUp>(slug, params));
+      result = yield* _await(
+        fetchItemsRequest<InventoryCategory>(slug, params)
+      );
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -119,7 +88,7 @@ export class FollowUpStore extends Model({
 
     result.data.forEach((s) => {
       if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new FollowUp(s));
+        this.items.push(new InventoryCategory(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
@@ -129,17 +98,21 @@ export class FollowUpStore extends Model({
   });
 
   @modelFlow
-  addItem = _async(function* (this: FollowUpStore, details: FollowUpInterface) {
+  addItem = _async(function* (
+    this: InventoryCategoryStore,
+    details: InventoryCategoryInterface
+  ) {
     let result;
 
     try {
-      result = yield* _await(postItemRequest<FollowUpInterface>(slug, details));
+      result = yield* _await(
+        postItemRequest<InventoryCategoryInterface>(slug, details)
+      );
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -147,7 +120,7 @@ export class FollowUpStore extends Model({
       return result;
     }
 
-    const item = new FollowUp(result.data);
+    const item = new InventoryCategory(result.data);
     this.items.push(item);
 
     return { details: "", ok: true, data: item };
@@ -155,22 +128,21 @@ export class FollowUpStore extends Model({
 
   @modelFlow
   updateItem = _async(function* (
-    this: FollowUpStore,
+    this: InventoryCategoryStore,
     itemId: number,
-    details: FollowUpInterface
+    details: InventoryCategoryInterface
   ) {
     let result;
 
     try {
       result = yield* _await(
-        updateItemRequest<FollowUpInterface>(slug, itemId, details)
+        updateItemRequest<InventoryCategoryInterface>(slug, itemId, details)
       );
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -184,7 +156,7 @@ export class FollowUpStore extends Model({
   });
 
   @modelFlow
-  deleteItem = _async(function* (this: FollowUpStore, itemId: number) {
+  deleteItem = _async(function* (this: InventoryCategoryStore, itemId: number) {
     let result;
 
     try {
@@ -194,7 +166,6 @@ export class FollowUpStore extends Model({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

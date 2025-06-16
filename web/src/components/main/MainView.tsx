@@ -25,6 +25,8 @@ import { WeighInView } from "../modules/WeighInComponents";
 import { MealView } from "../modules/MealComponents";
 import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { BodyFatView } from "../modules/BodyFatComponents";
+import { InventoryCategoryView } from "../modules/InventoryCategoryComponents";
+import { PersonalItemView } from "../modules/PersonalItemComponents";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -37,6 +39,8 @@ export const MainView = observer(() => {
     tagStore,
     platformStore,
     jobStore,
+    taskStore,
+    inventoryCategoryStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -55,8 +59,10 @@ export const MainView = observer(() => {
       accountStore.fetchAll("page=all");
       categoryStore.fetchAll("page=all");
       tagStore.fetchAll("page=all");
-      goalStore.fetchAll("is_completed=0&is_cancelled=0");
-      jobStore.fetchAll("status__lte=3");
+      inventoryCategoryStore.fetchAll("page=all");
+      goalStore.fetchAll("page=all&is_completed=0&is_cancelled=0");
+      jobStore.fetchAll("page=all&status__lte=3");
+      taskStore.fetchAll("page=all&is_completed=0&is_cancelled=0");
     }
   };
 
@@ -94,6 +100,11 @@ export const MainView = observer(() => {
         <Route path="meals" element={<MealView />} />
         <Route path="weigh-ins" element={<WeighInView />} />
         <Route path="workouts" element={<WorkoutView />} />
+        <Route
+          path="inventory-categories"
+          element={<InventoryCategoryView />}
+        />
+        <Route path="personal-items" element={<PersonalItemView />} />
       </Routes>
     </div>
   );

@@ -26,7 +26,14 @@ const sections = [
   },
   {
     title: "Personal",
-    items: ["journals", "wishlist", "credentials", "platforms"],
+    items: [
+      "journals",
+      "wishlist",
+      "credentials",
+      "platforms",
+      "personal-items",
+      "inventory-categories",
+    ],
   },
   {
     title: "Career",

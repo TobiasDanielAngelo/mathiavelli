@@ -107,6 +107,7 @@ export const TransactionForm = ({
         delete: transactionStore.deleteItem,
       }}
       datetimeFields={TransactionFields.datetime}
+      dateFields={TransactionFields.date}
     />
   );
 };

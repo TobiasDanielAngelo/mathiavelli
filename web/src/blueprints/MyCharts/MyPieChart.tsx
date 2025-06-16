@@ -51,7 +51,7 @@ export const MyPieChart = observer(
               fill="#8884d8"
               label={({ percent, name }) =>
                 percent > 0.01
-                  ? `${getFirstWords(String(name))} ${(percent * 100).toFixed(
+                  ? `${getFirstWords(String(name))}\n${(percent * 100).toFixed(
                       1
                     )}%`
                   : ""

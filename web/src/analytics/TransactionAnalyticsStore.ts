@@ -9,6 +9,7 @@ import {
   prop,
 } from "mobx-keystone";
 import { fetchItemsRequest } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 
 const slug = "analytics/transactions";
 
@@ -70,7 +71,11 @@ export class TransactionAnalyticsStore extends Model({
         fetchItemsRequest<TransactionAnalytics>(slug, params)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

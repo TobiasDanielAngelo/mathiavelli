@@ -14,31 +14,24 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
-import Swal from "sweetalert2";
 import { Store } from "./Store";
+import Swal from "sweetalert2";
 
-const slug = "follow-ups";
+const slug = "personal-items";
 
 const props = {
   id: prop<number>(-1),
-  job: prop<number | null>(null),
-  date: prop<string>(""),
-  message: prop<string>(""),
-  status: prop<number>(0),
-  reply: prop<string>(""),
+  name: prop<string>(""),
+  category: prop<number | null>(null),
+  location: prop<string>(""),
+  quantity: prop<number>(0),
+  acquiredDate: prop<string>(""),
+  worth: prop<number>(0),
+  notes: prop<string>(""),
+  isImportant: prop<boolean>(false),
 };
 
-export const FOLLOWUP_STATUS_CHOICES = [
-  "No Response",
-  "Initial Follow-up",
-  "Reminder Email",
-  "Thank You Note",
-  "Checking for Updates",
-  "Interview Scheduled",
-  "Got a Response",
-];
-
-export type FollowUpInterface = {
+export type PersonalItemInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
     typeof prop<infer T>
   >
@@ -46,46 +39,49 @@ export type FollowUpInterface = {
     : never;
 };
 
-export const FollowUpFields: Record<string, (keyof FollowUpInterface)[]> = {
+export const PersonalItemFields: Record<
+  string,
+  (keyof PersonalItemInterface)[]
+> = {
   datetime: [] as const,
-  date: ["date"] as const,
-  prices: [] as const,
+  date: ["acquiredDate"] as const,
+  prices: ["worth"] as const,
 };
 
-@model("myApp/FollowUp")
-export class FollowUp extends Model(props) {
-  update(details: FollowUpInterface) {
+@model("myApp/PersonalItem")
+export class PersonalItem extends Model(props) {
+  update(details: PersonalItemInterface) {
     Object.assign(this, details);
   }
 
-  get jobTitle() {
+  get categoryName() {
     return (
-      getRoot<Store>(this)?.jobStore?.allItems.get(this.job ?? -1)?.title || "—"
+      getRoot<Store>(this)?.inventoryCategoryStore?.allItems.get(
+        this.category ?? -1
+      )?.name || "—"
     );
-  }
-  get statusName() {
-    return FOLLOWUP_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—";
   }
 
   get $view() {
     return {
       ...this.$,
-      jobTitle:
-        getRoot<Store>(this)?.jobStore?.allItems.get(this.job ?? -1)?.title ||
-        "—",
-      statusName:
-        FOLLOWUP_STATUS_CHOICES.find((_, ind) => ind === this.status) ?? "—",
+      categoryName:
+        getRoot<Store>(this)?.inventoryCategoryStore?.allItems.get(
+          this.category ?? -1
+        )?.name || "—",
     };
   }
 }
 
-@model("myApp/FollowUpStore")
-export class FollowUpStore extends Model({
-  items: prop<FollowUp[]>(() => []),
+@model("myApp/PersonalItemStore")
+export class PersonalItemStore extends Model({
+  items: prop<PersonalItem[]>(() => []),
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new FollowUp({}).$) as (keyof FollowUpInterface)[];
+    const keys = Object.keys(
+      new PersonalItem({}).$
+    ) as (keyof PersonalItemInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");
@@ -93,23 +89,22 @@ export class FollowUpStore extends Model({
 
   @computed
   get allItems() {
-    const map = new Map<number, FollowUp>();
+    const map = new Map<number, PersonalItem>();
     this.items.forEach((item) => map.set(item.id, item));
     return map;
   }
 
   @modelFlow
-  fetchAll = _async(function* (this: FollowUpStore, params?: string) {
+  fetchAll = _async(function* (this: PersonalItemStore, params?: string) {
     let result;
 
     try {
-      result = yield* _await(fetchItemsRequest<FollowUp>(slug, params));
+      result = yield* _await(fetchItemsRequest<PersonalItem>(slug, params));
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -119,7 +114,7 @@ export class FollowUpStore extends Model({
 
     result.data.forEach((s) => {
       if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new FollowUp(s));
+        this.items.push(new PersonalItem(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
@@ -129,17 +124,21 @@ export class FollowUpStore extends Model({
   });
 
   @modelFlow
-  addItem = _async(function* (this: FollowUpStore, details: FollowUpInterface) {
+  addItem = _async(function* (
+    this: PersonalItemStore,
+    details: PersonalItemInterface
+  ) {
     let result;
 
     try {
-      result = yield* _await(postItemRequest<FollowUpInterface>(slug, details));
+      result = yield* _await(
+        postItemRequest<PersonalItemInterface>(slug, details)
+      );
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -147,7 +146,7 @@ export class FollowUpStore extends Model({
       return result;
     }
 
-    const item = new FollowUp(result.data);
+    const item = new PersonalItem(result.data);
     this.items.push(item);
 
     return { details: "", ok: true, data: item };
@@ -155,22 +154,21 @@ export class FollowUpStore extends Model({
 
   @modelFlow
   updateItem = _async(function* (
-    this: FollowUpStore,
+    this: PersonalItemStore,
     itemId: number,
-    details: FollowUpInterface
+    details: PersonalItemInterface
   ) {
     let result;
 
     try {
       result = yield* _await(
-        updateItemRequest<FollowUpInterface>(slug, itemId, details)
+        updateItemRequest<PersonalItemInterface>(slug, itemId, details)
       );
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -184,7 +182,7 @@ export class FollowUpStore extends Model({
   });
 
   @modelFlow
-  deleteItem = _async(function* (this: FollowUpStore, itemId: number) {
+  deleteItem = _async(function* (this: PersonalItemStore, itemId: number) {
     let result;
 
     try {
@@ -194,7 +192,6 @@ export class FollowUpStore extends Model({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

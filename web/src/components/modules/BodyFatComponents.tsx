@@ -63,6 +63,7 @@ export const BodyFatForm = ({
         delete: bodyFatStore.deleteItem,
       }}
       datetimeFields={BodyFatFields.datetime}
+      dateFields={BodyFatFields.date}
     />
   );
 };

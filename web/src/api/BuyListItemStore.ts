@@ -6,6 +6,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 
 const slug = "buy-list-items";
 
@@ -90,7 +91,11 @@ export class BuyListItemStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<BuyListItem>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -121,7 +126,11 @@ export class BuyListItemStore extends Model({
         postItemRequest<BuyListItemInterface>(slug, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -148,7 +157,11 @@ export class BuyListItemStore extends Model({
         updateItemRequest<BuyListItemInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -168,7 +181,11 @@ export class BuyListItemStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

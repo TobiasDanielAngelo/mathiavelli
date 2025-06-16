@@ -6,6 +6,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 
 const slug = "waist-measurements";
 
@@ -73,7 +74,11 @@ export class WaistMeasurementStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<WaistMeasurement>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -104,7 +109,11 @@ export class WaistMeasurementStore extends Model({
         postItemRequest<WaistMeasurementInterface>(slug, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -131,7 +140,11 @@ export class WaistMeasurementStore extends Model({
         updateItemRequest<WaistMeasurementInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -151,7 +164,11 @@ export class WaistMeasurementStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

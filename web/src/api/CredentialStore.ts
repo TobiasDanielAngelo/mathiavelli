@@ -14,6 +14,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 import { Store } from "./Store";
 
 const slug = "credentials";
@@ -132,7 +133,11 @@ export class CredentialStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<Credential>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -163,7 +168,11 @@ export class CredentialStore extends Model({
         postItemRequest<CredentialInterface>(slug, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -190,7 +199,11 @@ export class CredentialStore extends Model({
         updateItemRequest<CredentialInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -210,7 +223,11 @@ export class CredentialStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

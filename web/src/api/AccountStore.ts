@@ -6,6 +6,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 
 const slug = "accounts";
 
@@ -68,7 +69,10 @@ export class AccountStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<Account>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -94,7 +98,11 @@ export class AccountStore extends Model({
     try {
       result = yield* _await(postItemRequest<AccountInterface>(slug, details));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -121,7 +129,11 @@ export class AccountStore extends Model({
         updateItemRequest<AccountInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -141,7 +153,11 @@ export class AccountStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

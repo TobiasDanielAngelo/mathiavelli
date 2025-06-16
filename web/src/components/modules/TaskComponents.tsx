@@ -25,6 +25,7 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 
 export const { Context: TaskViewContext, useGenericView: useTaskView } =
   createGenericViewContext<TaskInterface>();
@@ -49,6 +50,13 @@ export const TaskForm = ({
           {
             name: "title",
             label: "Title",
+            type: "text",
+          },
+        ],
+        [
+          {
+            name: "importance",
+            label: "Importance (0-10)",
             type: "text",
           },
         ],
@@ -127,6 +135,7 @@ export const TaskForm = ({
         delete: taskStore.deleteItem,
       }}
       datetimeFields={TaskFields.datetime}
+      dateFields={TaskFields.date}
     />
   );
 };
@@ -144,6 +153,7 @@ export const TaskCard = observer((props: { item: Task }) => {
       important={["title"]}
       body={[
         "description",
+        "importance",
         "dateStart",
         "dateEnd",
         "isCancelled",
@@ -161,6 +171,24 @@ export const TaskCard = observer((props: { item: Task }) => {
   );
 });
 
+export const TaskDashboard = observer(() => {
+  const { taskStore } = useStore();
+  const tasks = taskStore.items
+    .filter((s) => !s.isCompleted && !s.isCancelled)
+    .map((s) => ({
+      id: s.id,
+      name: s.title,
+      importance: 10 * s.importance,
+      dueDate: new Date(s.dueDate),
+    }));
+
+  return (
+    <>
+      <MyEisenhowerChart items={tasks} />
+    </>
+  );
+});
+
 export const TaskCollection = observer(() => {
   const { taskStore } = useStore();
   const { pageDetails, PageBar } = useTaskView();
@@ -175,7 +203,7 @@ export const TaskCollection = observer(() => {
           items={taskStore.items}
         />
       }
-      SideB=""
+      SideB={<TaskDashboard />}
       ratio={0.7}
     />
   );

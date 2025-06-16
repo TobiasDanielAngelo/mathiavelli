@@ -14,6 +14,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 import { Store } from "./Store";
 import { TwoDates } from "../constants/classes";
 
@@ -98,7 +99,11 @@ export class GoalStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<Goal>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -124,7 +129,11 @@ export class GoalStore extends Model({
     try {
       result = yield* _await(postItemRequest<GoalInterface>(slug, details));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -151,7 +160,11 @@ export class GoalStore extends Model({
         updateItemRequest<GoalInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -171,7 +184,11 @@ export class GoalStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

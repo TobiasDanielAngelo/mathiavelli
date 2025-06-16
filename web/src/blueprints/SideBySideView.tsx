@@ -16,9 +16,9 @@ export const SideBySideView = observer(
 
     const width = useWindowWidth();
     return (
-      <div className="lg:flex-grow flex justify-center max-h-[85vh]">
+      <div className="lg:flex-grow py-5 flex justify-center max-h-[85vh]">
         <div
-          className="w-3/4 gap-2 pt-5 flex"
+          className="w-3/4 gap-2 flex"
           style={{
             flexDirection:
               width >= 1024 ? (reversed ? "row-reverse" : "row") : "column",
@@ -34,7 +34,7 @@ export const SideBySideView = observer(
             {SideA}
           </div>
           <div
-            className="lg:overflow-scroll m-2 border border-gray-500 rounded-lg p-2 items-center justify-center"
+            className="lg:overflow-scroll m-2 min-h-[40vh] border border-gray-500 rounded-lg p-5 items-center justify-center"
             style={{
               width: width >= 1024 ? widthB : "100%",
               display: width >= 1024 || SideB ? "block" : "none",

@@ -14,6 +14,7 @@ import {
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import Swal from "sweetalert2";
 import { Store } from "./Store";
 import { TwoDates } from "../constants/classes";
 
@@ -25,6 +26,7 @@ const props = {
   description: prop<string>(""),
   goal: prop<number | null>(null),
   repeat: prop<number>(0),
+  importance: prop<number>(0),
   dueDate: prop<string>(""),
   isCompleted: prop<boolean>(false),
   dateCompleted: prop<string>(""),
@@ -114,7 +116,11 @@ export class TaskStore extends Model({
     try {
       result = yield* _await(fetchItemsRequest<Task>(slug, params));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -140,7 +146,11 @@ export class TaskStore extends Model({
     try {
       result = yield* _await(postItemRequest<TaskInterface>(slug, details));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -167,7 +177,11 @@ export class TaskStore extends Model({
         updateItemRequest<TaskInterface>(slug, itemId, details)
       );
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -187,7 +201,11 @@ export class TaskStore extends Model({
     try {
       result = yield* _await(deleteItemRequest(slug, itemId));
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

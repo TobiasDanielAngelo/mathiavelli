@@ -26,6 +26,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import BarChart from "@mui/icons-material/BarChart";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Settings from "@mui/icons-material/Settings";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
 // 1. Map icons to names
@@ -58,6 +59,7 @@ const iconMap = {
   ExpandLess,
   KeyboardArrowLeft,
   KeyboardArrowRight,
+  Settings,
 } as const;
 
 // 2. Derive type from keys

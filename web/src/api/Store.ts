@@ -22,6 +22,8 @@ import { BodyFatStore } from "./BodyFatStore";
 import { WaistMeasurementStore } from "./WaistMeasurementStore";
 import { MealStore } from "./MealStore";
 import { WorkoutStore } from "./WorkoutStore";
+import { PersonalItemStore } from "./PersonalItemStore";
+import { InventoryCategoryStore } from "./InventoryCategoryStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -47,6 +49,8 @@ export class Store extends Model({
   mealStore: prop<MealStore>(),
   workoutStore: prop<WorkoutStore>(),
   transactionAnalyticsStore: prop<TransactionAnalyticsStore>(),
+  personalItemStore: prop<PersonalItemStore>(),
+  inventoryCategoryStore: prop<InventoryCategoryStore>(),
 }) {}
 
 export const createStore = () =>
@@ -73,6 +77,8 @@ export const createStore = () =>
     mealStore: new MealStore({}),
     workoutStore: new WorkoutStore({}),
     transactionAnalyticsStore: new TransactionAnalyticsStore({}),
+    personalItemStore: new PersonalItemStore({}),
+    inventoryCategoryStore: new InventoryCategoryStore({}),
   });
 
 export const StoreContext = createContext<Store | null>(null);

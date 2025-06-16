@@ -4,9 +4,10 @@ import { Page } from "../constants/interfaces";
 export const MyDropdownMenu = (props: {
   open?: boolean;
   setOpen?: (t: boolean) => void;
-  pages?: Page[];
+  actions?: Page[];
+  margin?: number;
 }) => {
-  const { open, pages, setOpen } = props;
+  const { open, actions, setOpen, margin } = props;
   const ref = useClickAway<HTMLDivElement>(() => setOpen?.(false));
 
   return (
@@ -14,10 +15,14 @@ export const MyDropdownMenu = (props: {
       ref={ref}
       className={`${
         !open ? "hidden" : ""
-      } absolute -mx-20 my-6 z-10 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700`}
+      } absolute -mx-20 my-3 z-10 max-h-[50vh] overflow-scroll text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700`}
+      style={{
+        marginRight: margin ? `-${margin}rem` : "-5rem",
+        marginLeft: margin ? `-${margin}rem` : "-5rem",
+      }}
     >
       <ul className="py-2">
-        {pages?.map((s, ind) => (
+        {actions?.map((s, ind) => (
           <li key={ind} onClick={s.onClick}>
             <a
               href={s.link}

@@ -73,6 +73,7 @@ export const MealForm = ({
         delete: mealStore.deleteItem,
       }}
       datetimeFields={MealFields.datetime}
+      dateFields={MealFields.date}
     />
   );
 };

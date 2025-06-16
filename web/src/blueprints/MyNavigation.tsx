@@ -243,7 +243,7 @@ export const MyNavBar = observer(
                 <MyDropdownMenu
                   setOpen={setOpen2}
                   open={open2}
-                  pages={[
+                  actions={[
                     ...(leafPages?.map((s) => ({
                       title: s.title,
                       selected: false,

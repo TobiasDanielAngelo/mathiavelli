@@ -65,6 +65,7 @@ export const WaistMeasurementForm = ({
         delete: waistMeasurementStore.deleteItem,
       }}
       datetimeFields={WaistMeasurementFields.datetime}
+      dateFields={WaistMeasurementFields.date}
     />
   );
 };

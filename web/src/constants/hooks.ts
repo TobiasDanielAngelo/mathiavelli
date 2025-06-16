@@ -128,3 +128,18 @@ export function useVisible(): UseVisibleMapReturn {
     ...isVisibleMap,
   } as UseVisibleMapReturn;
 }
+
+export const useIsUnhoverable = () => {
+  const [isUnhoverable, setIsUnhoverable] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(hover: none)");
+    const handler = (e: MediaQueryListEvent) => setIsUnhoverable(e.matches);
+
+    setIsUnhoverable(query.matches); // initial check
+    query.addEventListener("change", handler);
+    return () => query.removeEventListener("change", handler);
+  }, []);
+
+  return isUnhoverable;
+};

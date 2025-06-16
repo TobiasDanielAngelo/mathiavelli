@@ -69,6 +69,7 @@ export const AccountForm = ({
         delete: accountStore.deleteItem,
       }}
       datetimeFields={AccountFields.datetime}
+      dateFields={AccountFields.date}
     />
   );
 };

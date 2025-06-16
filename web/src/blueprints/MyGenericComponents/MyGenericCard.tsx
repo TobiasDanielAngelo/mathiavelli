@@ -1,8 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useVisible } from "../../constants/hooks";
+import { Page } from "../../constants/interfaces";
 import { ItemDetails, ItemDetailsProps } from "../ItemDetails";
 import { MyConfirmModal } from "../MyConfirmModal";
+import { MyDropdownMenu } from "../MyDropdownMenu";
 import { IconName, MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
 
@@ -35,7 +37,14 @@ export const MyGenericCard = observer(
     fetchFcn,
     moreActions,
   }: MyGenericCardProps<T>) => {
-    const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
+    const {
+      isVisible1,
+      setVisible1,
+      isVisible2,
+      setVisible2,
+      isVisible3,
+      setVisible3,
+    } = useVisible();
     const [showMore, setShowMore] = useState(false);
     const [msg, setMsg] = useState("");
 
@@ -49,8 +58,13 @@ export const MyGenericCard = observer(
       setVisible2(false);
     };
 
+    const actions = [
+      { onClick: () => setVisible1(true), title: "Edit" },
+      { onClick: () => setVisible2(true), title: "Delete" },
+    ] satisfies Page[];
+
     return (
-      <div className="m-3 border-gray-700 rounded-lg p-5 border">
+      <div className="m-3 border-gray-700 rounded-lg pt-3 px-2 border">
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
           <FormComponent
             item={item}
@@ -69,14 +83,6 @@ export const MyGenericCard = observer(
 
         <div className="flex justify-between">
           <div className="flex-1">
-            <div className="flex justify-end">
-              <MyIcon
-                icon="Close"
-                onClick={() => setVisible2(true)}
-                fontSize="small"
-              />
-            </div>
-
             <ItemDetails<T>
               item={item}
               shownFields={shownFields}
@@ -88,12 +94,20 @@ export const MyGenericCard = observer(
               setShowMore={setShowMore}
             />
 
-            <div className="flex justify-between flex-row-reverse">
-              <MyIcon
-                icon="Edit"
-                onClick={() => setVisible1(true)}
-                fontSize="small"
-              />
+            <div className="flex justify-between mt-2 flex-row-reverse">
+              <div className="relative">
+                <MyIcon
+                  icon="Settings"
+                  onClick={() => setVisible3(true)}
+                  fontSize="small"
+                />
+                <MyDropdownMenu
+                  setOpen={setVisible3}
+                  open={isVisible3}
+                  actions={actions}
+                  margin={9}
+                />
+              </div>
               {moreActions?.map((s, ind) => (
                 <MyIcon
                   icon={s.icon}
