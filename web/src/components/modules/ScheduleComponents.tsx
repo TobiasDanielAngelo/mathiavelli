@@ -107,7 +107,7 @@ export const ScheduleForm = ({
             options: range(1, 54).map((s) => ({ id: s, name: `${s}` })),
           },
           {
-            name: "bySetPos",
+            name: "bySetPosition",
             label: "By Set Position",
             type: "multi",
             options: range(-31, 32).map((s) => ({ id: s, name: `${s}` })),
@@ -191,7 +191,7 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
         "byMonth",
         "byMonthDay",
         "bySecond",
-        "bySetPos",
+        "bySetPosition",
         "byWeekDay",
         "byWeekNo",
         "count",

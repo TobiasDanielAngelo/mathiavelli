@@ -652,7 +652,7 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     byhour: schedule.byHour?.map(Number) ?? undefined,
     byminute: schedule.byMinute?.map(Number) ?? undefined,
     bysecond: schedule.bySecond?.map(Number) ?? undefined,
-    bysetpos: schedule.bySetPos?.map(Number) ?? undefined,
+    bySetPosition: schedule.bySetPosition?.map(Number) ?? undefined,
     count: Number(schedule.count) ?? 10,
     dtstart: toUTCForRRule(start),
     until: toUTCForRRule(end),

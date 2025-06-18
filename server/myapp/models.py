@@ -62,7 +62,7 @@ class Schedule(models.Model):
     by_hour = fields.ChoicesNumberArrayField(range(0, 24))
     by_minute = fields.ChoicesNumberArrayField(range(0, 60))
     by_second = fields.ChoicesNumberArrayField(range(0, 60))
-    by_set_pos = fields.ChoicesNumberArrayField(range(-31, 32))
+    by_set_position = fields.ChoicesNumberArrayField(range(-31, 32))
 
     count = fields.LimitedDecimalField(1)
     start_date = fields.OptionalDateField()

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate, hashers, password_validation
 from django.contrib.auth.models import User
 from .models import *
+from django.utils import timezone
 
 from dateutil.rrule import (
     rrule,
@@ -334,9 +335,15 @@ class ScheduleSerializer(serializers.ModelSerializer):
     def get_datetimes(self, obj):
         if not obj.start_date:
             return []
-
+        end_dt = None
         # Use start_time if available
-        start_dt = datetime.combine(obj.start_date, obj.start_time or time(0, 0))
+        start_dt = timezone.make_aware(
+            datetime.combine(obj.start_date, obj.start_time or time(0, 0))
+        )
+        if obj.end_date:
+            end_dt = timezone.make_aware(
+                datetime.combine(obj.end_date, obj.end_time or time(23, 59))
+            )
 
         rule_kwargs = {
             "freq": FREQ_MAP.get(obj.freq, DAILY),
@@ -347,7 +354,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
         # Optional rule fields
         if obj.count:
             rule_kwargs["count"] = int(obj.count)
-        if obj.end_date:
+        if end_dt:
             end_dt = datetime.combine(obj.end_date, obj.end_time or time(23, 59))
             rule_kwargs["until"] = end_dt
         if obj.by_week_day:
@@ -366,8 +373,8 @@ class ScheduleSerializer(serializers.ModelSerializer):
             rule_kwargs["byminute"] = obj.by_minute
         if obj.by_second:
             rule_kwargs["bysecond"] = obj.by_second
-        if obj.by_set_pos:
-            rule_kwargs["bysetpos"] = obj.by_set_pos
+        if obj.by_set_position:
+            rule_kwargs["bysetpos"] = obj.by_set_position
         if obj.week_start is not None:
             rule_kwargs["wkst"] = obj.week_start
 

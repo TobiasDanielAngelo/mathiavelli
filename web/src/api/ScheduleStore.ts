@@ -24,7 +24,7 @@ const props = {
   byHour: prop<number[]>(() => []),
   byMinute: prop<number[]>(() => []),
   bySecond: prop<number[]>(() => []),
-  bySetPos: prop<number[]>(() => []),
+  bySetPosition: prop<number[]>(() => []),
   count: prop<number>(0),
   startDate: prop<string>(""),
   endDate: prop<string>(""),
