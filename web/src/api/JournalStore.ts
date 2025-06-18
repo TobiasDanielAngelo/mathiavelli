@@ -28,6 +28,7 @@ export type JournalInterface = {
 export const JournalFields: Record<string, (keyof JournalInterface)[]> = {
   datetime: ["datetimeCreated"] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

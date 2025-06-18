@@ -25,7 +25,7 @@ const props = {
   title: prop<string>(""),
   description: prop<string>(""),
   goal: prop<number | null>(null),
-  repeat: prop<number>(0),
+  schedule: prop<number | null>(null),
   importance: prop<number>(0),
   dueDate: prop<string>(""),
   isCompleted: prop<boolean>(false),
@@ -55,6 +55,7 @@ export type TaskInterface = {
 export const TaskFields: Record<string, (keyof TaskInterface)[]> = {
   datetime: ["dateCreated"] as const,
   date: ["dueDate", "dateCompleted", "dateStart", "dateEnd"] as const,
+  time: [] as const,
   prices: [] as const,
 };
 
@@ -70,11 +71,15 @@ export class Task extends Model(props) {
       "—"
     );
   }
-  get repeatName() {
-    return FREQUENCY_CHOICES.find((_, ind) => ind === this.repeat) ?? "—";
-  }
+
   get dateDuration() {
     return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
+  }
+  get scheduleName() {
+    return (
+      getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
+        ?.name || "—"
+    );
   }
 
   get $view() {
@@ -83,8 +88,9 @@ export class Task extends Model(props) {
       goalTitle:
         getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.title ||
         "—",
-      repeatName:
-        FREQUENCY_CHOICES.find((_, ind) => ind === this.repeat) ?? "—",
+      scheduleName:
+        getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
+          ?.name || "—",
       dateDuration: this.dateDuration,
     };
   }

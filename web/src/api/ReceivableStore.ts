@@ -43,6 +43,7 @@ export type ReceivableInterface = {
 export const ReceivableFields: Record<string, (keyof ReceivableInterface)[]> = {
   datetime: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
   date: [] as const,
+  time: [] as const,
   prices: ["lentAmount", "paymentTotal"] as const,
 };
 

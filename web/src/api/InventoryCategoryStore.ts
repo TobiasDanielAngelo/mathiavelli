@@ -29,6 +29,7 @@ export const InventoryCategoryFields: Record<
 > = {
   datetime: [] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

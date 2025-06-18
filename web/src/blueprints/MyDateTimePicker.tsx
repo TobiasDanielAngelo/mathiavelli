@@ -28,10 +28,13 @@ export const MyDateTimePicker = (props: {
             !isDateOnly && !isTimeOnly ? "/" : " "
           }${!isDateOnly ? "Time" : ""}`}
       </label>
+
       <Datetime
         value={value}
-        onChange={(d) => onChangeValue(d as string)}
-        dateFormat={isTimeOnly ? false : dateFormat ?? "MMM D YYYY"}
+        onChange={(d) => {
+          onChangeValue(d as string);
+        }}
+        dateFormat={isTimeOnly ? false : dateFormat ?? "MMM D, YYYY"}
         timeFormat={isDateOnly ? false : "h:mm A"}
         // utc={true}
         inputProps={{

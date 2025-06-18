@@ -132,3 +132,21 @@ class InventoryCategoryAdmin(admin.ModelAdmin):
 class PersonalItemAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.fields]
+
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+
+
+@admin.register(Habit)
+class HabitAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+
+
+@admin.register(HabitLog)
+class HabitLogAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]

@@ -3,6 +3,21 @@ from django.contrib.auth import authenticate, hashers, password_validation
 from django.contrib.auth.models import User
 from .models import *
 
+from dateutil.rrule import (
+    rrule,
+    rruleset,
+    weekday,
+    YEARLY,
+    MONTHLY,
+    WEEKLY,
+    DAILY,
+    HOURLY,
+    MINUTELY,
+    SECONDLY,
+)
+from dateutil.parser import parse
+from datetime import datetime, time, timedelta
+
 
 class JournalSerializer(serializers.ModelSerializer):
     class Meta:
@@ -293,4 +308,84 @@ class InventoryCategorySerializer(serializers.ModelSerializer):
 class PersonalItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonalItem
+        fields = "__all__"
+
+
+FREQ_MAP = {
+    0: YEARLY,
+    1: MONTHLY,
+    2: WEEKLY,
+    3: DAILY,
+    4: HOURLY,
+    5: MINUTELY,
+    6: SECONDLY,
+}
+
+WEEKDAY_MAP = {"MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6}
+
+
+class ScheduleSerializer(serializers.ModelSerializer):
+    datetimes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Schedule
+        fields = "__all__"
+
+    def get_datetimes(self, obj):
+        if not obj.start_date:
+            return []
+
+        # Use start_time if available
+        start_dt = datetime.combine(obj.start_date, obj.start_time or time(0, 0))
+
+        rule_kwargs = {
+            "freq": FREQ_MAP.get(obj.freq, DAILY),
+            "dtstart": start_dt,
+            "interval": int(obj.interval or 1),
+        }
+
+        # Optional rule fields
+        if obj.count:
+            rule_kwargs["count"] = int(obj.count)
+        if obj.end_date:
+            end_dt = datetime.combine(obj.end_date, obj.end_time or time(23, 59))
+            rule_kwargs["until"] = end_dt
+        if obj.by_week_day:
+            rule_kwargs["byweekday"] = [WEEKDAY_MAP[d] for d in obj.by_week_day]
+        if obj.by_month_day:
+            rule_kwargs["bymonthday"] = obj.by_month_day
+        if obj.by_month:
+            rule_kwargs["bymonth"] = obj.by_month
+        if obj.by_year_day:
+            rule_kwargs["byyearday"] = obj.by_year_day
+        if obj.by_week_no:
+            rule_kwargs["byweekno"] = obj.by_week_no
+        if obj.by_hour:
+            rule_kwargs["byhour"] = obj.by_hour
+        if obj.by_minute:
+            rule_kwargs["byminute"] = obj.by_minute
+        if obj.by_second:
+            rule_kwargs["bysecond"] = obj.by_second
+        if obj.by_set_pos:
+            rule_kwargs["bysetpos"] = obj.by_set_pos
+        if obj.week_start is not None:
+            rule_kwargs["wkst"] = obj.week_start
+
+        # Generate occurrences (limit for safety)
+        try:
+            dates = list(rrule(**rule_kwargs))[:100]  # Limit to first 100 occurrences
+            return [dt.isoformat() for dt in dates]
+        except Exception as e:
+            return [f"Error: {str(e)}"]
+
+
+class HabitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Habit
+        fields = "__all__"
+
+
+class HabitLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HabitLog
         fields = "__all__"

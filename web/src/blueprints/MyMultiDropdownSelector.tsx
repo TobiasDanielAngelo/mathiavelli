@@ -42,7 +42,9 @@ export const MyMultiDropdownSelector = (props: {
   }, [selectAll, options.length]);
 
   useEffect(() => {
-    onChangeValue(selectAll ? options.map((s) => s.id) : value);
+    onChangeValue(
+      selectAll ? options.map((s) => s.id) : value === null ? [] : value
+    );
   }, []);
 
   useEffect(() => {
@@ -71,7 +73,7 @@ export const MyMultiDropdownSelector = (props: {
         className="cursor-pointer border bg-white dark:bg-gray-800 dark:border-gray-600 p-2 rounded-lg text-sm text-gray-700 dark:text-white flex justify-between items-center"
       >
         <span className="truncate">
-          {value.length === 0
+          {!value || value.length === 0
             ? `Select ${label}`
             : `${value.length} item${value.length > 1 ? "s" : ""} selected.`}
         </span>

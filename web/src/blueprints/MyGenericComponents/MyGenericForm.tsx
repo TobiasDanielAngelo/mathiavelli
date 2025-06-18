@@ -17,6 +17,7 @@ interface MyGenericFormProps<T> {
   };
   dateFields?: (keyof T)[];
   datetimeFields?: (keyof T)[];
+  timeFields?: (keyof T)[];
 }
 
 export function MyGenericForm<T>({
@@ -28,6 +29,7 @@ export function MyGenericForm<T>({
   storeFns,
   dateFields = [],
   datetimeFields = [],
+  timeFields = [],
 }: MyGenericFormProps<T>) {
   const title = item?.id
     ? `Edit ${toTitleCase(objectName)}`
@@ -43,24 +45,44 @@ export function MyGenericForm<T>({
       if (copy[k])
         copy[k] = moment(copy[k] as any).format("MMM D YYYY h:mm A") as any;
     });
+    timeFields.forEach((k) => {
+      if (copy[k])
+        copy[k] = moment(copy[k] as any, "HH:mm:ss").format("h:mm A") as any;
+    });
+
     return copy;
   };
 
   const transformTo = (raw: T): T => {
     const copy = { ...raw };
+
     dateFields.forEach((k) => {
-      if (copy[k])
-        copy[k] = moment(copy[k] as any, "MMM D, YYYY").format(
-          "YYYY-MM-DD"
-        ) as any;
+      const val = copy[k];
+      if (val === "") {
+        copy[k] = null as any;
+      } else if (val) {
+        copy[k] = moment(val as any, "MMM D, YYYY").format("YYYY-MM-DD") as any;
+      }
     });
+
     datetimeFields.forEach((k) => {
-      if (copy[k])
-        copy[k] = moment(
-          copy[k] as any,
-          "MMM D YYYY h:mm A"
-        ).toISOString() as any;
+      const val = copy[k];
+      if (val === "") {
+        copy[k] = null as any;
+      } else if (val) {
+        copy[k] = moment(val as any, "MMM D YYYY h:mm A").toISOString() as any;
+      }
     });
+
+    timeFields.forEach((k) => {
+      const val = copy[k];
+      if (val === "") {
+        copy[k] = null as any;
+      } else if (val) {
+        copy[k] = moment(val as any, "h:mm A").format("HH:mm:ss") as any;
+      }
+    });
+
     return copy;
   };
 

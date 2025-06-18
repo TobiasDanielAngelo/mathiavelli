@@ -62,6 +62,7 @@ export type CredentialInterface = {
 export const CredentialFields: Record<string, (keyof CredentialInterface)[]> = {
   datetime: ["addedAt"] as const,
   date: ["dateCreated"] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

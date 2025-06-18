@@ -27,6 +27,9 @@ import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { BodyFatView } from "../modules/BodyFatComponents";
 import { InventoryCategoryView } from "../modules/InventoryCategoryComponents";
 import { PersonalItemView } from "../modules/PersonalItemComponents";
+import { HabitView } from "../modules/HabitComponents";
+import { HabitLogView } from "../modules/HabitLogComponents";
+import { ScheduleView } from "../modules/ScheduleComponents";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -105,6 +108,9 @@ export const MainView = observer(() => {
           element={<InventoryCategoryView />}
         />
         <Route path="personal-items" element={<PersonalItemView />} />
+        <Route path="habits" element={<HabitView />} />
+        <Route path="habit-logs" element={<HabitLogView />} />
+        <Route path="schedules" element={<ScheduleView />} />
       </Routes>
     </div>
   );

@@ -1,8 +1,11 @@
+import LZString from "lz-string";
 import moment from "moment";
+import { Options, RRule, rrulestr, Weekday } from "rrule";
+import { GoalInterface } from "../api/GoalStore";
+import { Schedule, ScheduleInterface } from "../api/ScheduleStore";
 import { KV } from "../blueprints/ItemDetails";
 import { Option } from "./interfaces";
-import LZString from "lz-string";
-import { GoalInterface } from "../api/GoalStore";
+import { parse, format, isValid } from "date-fns";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -510,3 +513,177 @@ export const getDescendantIds = (
   );
   return [...directChildren, ...allDescendants];
 };
+
+const WEEKDAY_MAP: Record<string, Weekday> = {
+  MO: RRule.MO,
+  TU: RRule.TU,
+  WE: RRule.WE,
+  TH: RRule.TH,
+  FR: RRule.FR,
+  SA: RRule.SA,
+  SU: RRule.SU,
+};
+
+export function cleanObject<T extends Record<string, any>>(obj: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([_, v]) =>
+        v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0)
+    )
+  ) as Partial<T>;
+}
+
+/**
+ * Converts a local date to a UTC-equivalent Date for RRULE processing.
+ * Adjusts by the local timezone offset.
+ */
+export const toUTCForRRule = (date: Date | string | null): Date | null =>
+  !date
+    ? null
+    : moment(new Date(date))
+        .add(-new Date().getTimezoneOffset(), "minutes")
+        .toDate();
+
+function normalizeDate(dateStr: string | null | Date | undefined): string {
+  if (typeof dateStr !== "string") {
+    return format(dateStr as Date, "yyyy-MM-dd");
+  }
+  const formats = ["MMM d, yyyy", "yyyy-MM-dd"];
+  for (const fmt of formats) {
+    const parsed = parse(dateStr, fmt, new Date());
+    if (isValid(parsed)) return format(parsed, "yyyy-MM-dd");
+  }
+  return dateStr;
+}
+
+function normalizeTime(timeStr: string | null | Date | undefined): string {
+  if (typeof timeStr !== "string") {
+    return format(timeStr as Date, "HH:mm:ss");
+  }
+  const formats = ["h:mm a", "HH:mm:ss"];
+  for (const fmt of formats) {
+    const parsed = parse(timeStr, fmt, new Date());
+    if (isValid(parsed)) return format(parsed, "HH:mm:ss");
+  }
+  return format(timeStr, "HH:mm:ss");
+}
+
+export function isValidRRuleOptions(options: Partial<Options>): boolean {
+  const allowedFreq = [0, 1, 2, 3, 4, 5, 6]; // YEARLY to SECONDLY
+
+  if (!options) return false;
+
+  // FREQ is required
+  if (typeof options.freq !== "number" || !allowedFreq.includes(options.freq)) {
+    return false;
+  }
+
+  // DTSTART must be a valid Date
+  if (!(options.dtstart instanceof Date) || isNaN(options.dtstart.getTime())) {
+    return false;
+  }
+
+  // INTERVAL must be a positive number (optional)
+  if (
+    options.interval &&
+    (!Number.isInteger(options.interval) || options.interval <= 0)
+  ) {
+    return false;
+  }
+
+  // COUNT must be a positive integer (optional)
+  if (
+    options.count &&
+    (!Number.isInteger(options.count) || options.count <= 0)
+  ) {
+    return false;
+  }
+
+  // UNTIL must be a valid Date (optional)
+  if (
+    options.until &&
+    (!(options.until instanceof Date) || isNaN(options.until.getTime()))
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Converts a UTC date from RRULE back to local time.
+ * Adjusts by adding the local timezone offset.
+ */
+export const fromUTCForRRule = (date: Date | string): Date | null =>
+  !date
+    ? null
+    : moment(new Date(date))
+        .add(new Date().getTimezoneOffset(), "minutes")
+        .toDate();
+
+export function buildRRule(schedule: ScheduleInterface): RRule | null {
+  const start = !schedule.startDate
+    ? null
+    : !schedule.startTime
+    ? `${normalizeDate(schedule.startDate)}`
+    : `${normalizeDate(schedule.startDate)}T${normalizeTime(
+        schedule.startTime || "00:00"
+      )}`;
+
+  const end = !schedule.endDate
+    ? null
+    : !schedule.endTime
+    ? `${normalizeDate(schedule.endDate)}`
+    : `${normalizeDate(schedule.endDate)}T${normalizeTime(
+        schedule.endTime || "00:00"
+      )}`;
+
+  const ruleOptions = {
+    freq: Number(schedule.freq) ?? RRule.DAILY,
+    interval: Number(schedule.interval) || 1,
+    byweekday: schedule.byWeekDay
+      ?.map(Number)
+      ?.map((d) => WEEKDAY_MAP[d])
+      .filter(Boolean) as Weekday[],
+    bymonth: schedule.byMonth?.map(Number) ?? undefined,
+    bymonthday: schedule.byMonthDay?.map(Number) ?? undefined,
+    byyearday: schedule.byYearDay?.map(Number) ?? undefined,
+    byweekno: schedule.byWeekNo?.map(Number) ?? undefined,
+    byhour: schedule.byHour?.map(Number) ?? undefined,
+    byminute: schedule.byMinute?.map(Number) ?? undefined,
+    bysecond: schedule.bySecond?.map(Number) ?? undefined,
+    bysetpos: schedule.bySetPos?.map(Number) ?? undefined,
+    count: Number(schedule.count) ?? 10,
+    dtstart: toUTCForRRule(start),
+    until: toUTCForRRule(end),
+  };
+
+  if (!isValidRRuleOptions(ruleOptions)) return null;
+
+  try {
+    const rule = new RRule(cleanObject(ruleOptions) as Options);
+    return rule;
+  } catch (e) {
+    console.error("Failed to build RRule:", e, ruleOptions);
+    return null;
+  }
+}
+
+export function generateCollidingDates(sched: Schedule): (string | Date)[] {
+  const schedule = sched.$ ?? sched;
+  const rule = buildRRule(schedule);
+  if (!rule) return [];
+
+  const ruleStr = rule.toString();
+  console.log(rule.toString());
+  console.log(rrulestr(ruleStr).all());
+
+  return rule
+    .all()
+    .map(fromUTCForRRule)
+    .map((dt) => moment(dt).format("lll"));
+}
+
+export function range(a: number, b: number): number[] {
+  return Array.from({ length: b - a }, (_, i) => i + a);
+}

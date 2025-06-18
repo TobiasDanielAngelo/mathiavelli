@@ -1,34 +1,38 @@
+import {
+  Model,
+  _async,
+  _await,
+  getRoot,
+  model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
+import { Store } from "./Store";
 import Swal from "sweetalert2";
 
-const slug = "workouts";
+const slug = "habits";
 
 const props = {
   id: prop<number>(-1),
-  name: prop<string>(""),
-  category: prop<number>(0),
-  durationMinutes: prop<number>(0),
-  caloriesBurned: prop<number>(0),
-  date: prop<string>(""),
+  title: prop<string>(""),
+  description: prop<string>(""),
+  goal: prop<number | null>(null),
+  schedule: prop<number | null>(null),
+  thresholdPercent: prop<number>(0),
+  dateStart: prop<string>(""),
+  dateEnd: prop<string>(""),
+  isArchived: prop<boolean>(false),
+  dateCreated: prop<string>(""),
 };
 
-export const WORKOUT_CATEGORY_CHOICES = [
-  "Cardio",
-  "Upper Body",
-  "Lower Body",
-  "Core",
-  "Full Body",
-  "Other",
-];
-
-export type WorkoutInterface = {
+export type HabitInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
     typeof prop<infer T>
   >
@@ -36,41 +40,52 @@ export type WorkoutInterface = {
     : never;
 };
 
-export const WorkoutFields: Record<string, (keyof WorkoutInterface)[]> = {
-  datetime: ["date"] as const,
-  date: [] as const,
+export const HabitFields: Record<string, (keyof HabitInterface)[]> = {
+  datetime: ["dateCreated"] as const,
+  date: ["dateStart", "dateEnd"] as const,
   time: [] as const,
   prices: [] as const,
 };
 
-@model("myApp/Workout")
-export class Workout extends Model(props) {
-  update(details: WorkoutInterface) {
+@model("myApp/Habit")
+export class Habit extends Model(props) {
+  update(details: HabitInterface) {
     Object.assign(this, details);
   }
 
-  get categoryName() {
+  get goalName() {
     return (
-      WORKOUT_CATEGORY_CHOICES.find((_, ind) => ind === this.category) ?? "—"
+      getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.name ||
+      "—"
+    );
+  }
+  get scheduleName() {
+    return (
+      getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
+        ?.name || "—"
     );
   }
 
   get $view() {
     return {
       ...this.$,
-      categoryName:
-        WORKOUT_CATEGORY_CHOICES.find((_, ind) => ind === this.category) ?? "—",
+      goalName:
+        getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.name ||
+        "—",
+      scheduleName:
+        getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
+          ?.name || "—",
     };
   }
 }
 
-@model("myApp/WorkoutStore")
-export class WorkoutStore extends Model({
-  items: prop<Workout[]>(() => []),
+@model("myApp/HabitStore")
+export class HabitStore extends Model({
+  items: prop<Habit[]>(() => []),
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Workout({}).$) as (keyof WorkoutInterface)[];
+    const keys = Object.keys(new Habit({}).$) as (keyof HabitInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");
@@ -78,23 +93,22 @@ export class WorkoutStore extends Model({
 
   @computed
   get allItems() {
-    const map = new Map<number, Workout>();
+    const map = new Map<number, Habit>();
     this.items.forEach((item) => map.set(item.id, item));
     return map;
   }
 
   @modelFlow
-  fetchAll = _async(function* (this: WorkoutStore, params?: string) {
+  fetchAll = _async(function* (this: HabitStore, params?: string) {
     let result;
 
     try {
-      result = yield* _await(fetchItemsRequest<Workout>(slug, params));
+      result = yield* _await(fetchItemsRequest<Habit>(slug, params));
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -104,7 +118,7 @@ export class WorkoutStore extends Model({
 
     result.data.forEach((s) => {
       if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new Workout(s));
+        this.items.push(new Habit(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
@@ -114,17 +128,16 @@ export class WorkoutStore extends Model({
   });
 
   @modelFlow
-  addItem = _async(function* (this: WorkoutStore, details: WorkoutInterface) {
+  addItem = _async(function* (this: HabitStore, details: HabitInterface) {
     let result;
 
     try {
-      result = yield* _await(postItemRequest<WorkoutInterface>(slug, details));
+      result = yield* _await(postItemRequest<HabitInterface>(slug, details));
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -132,7 +145,7 @@ export class WorkoutStore extends Model({
       return result;
     }
 
-    const item = new Workout(result.data);
+    const item = new Habit(result.data);
     this.items.push(item);
 
     return { details: "", ok: true, data: item };
@@ -140,22 +153,21 @@ export class WorkoutStore extends Model({
 
   @modelFlow
   updateItem = _async(function* (
-    this: WorkoutStore,
+    this: HabitStore,
     itemId: number,
-    details: WorkoutInterface
+    details: HabitInterface
   ) {
     let result;
 
     try {
       result = yield* _await(
-        updateItemRequest<WorkoutInterface>(slug, itemId, details)
+        updateItemRequest<HabitInterface>(slug, itemId, details)
       );
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -169,7 +181,7 @@ export class WorkoutStore extends Model({
   });
 
   @modelFlow
-  deleteItem = _async(function* (this: WorkoutStore, itemId: number) {
+  deleteItem = _async(function* (this: HabitStore, itemId: number) {
     let result;
 
     try {
@@ -179,7 +191,6 @@ export class WorkoutStore extends Model({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

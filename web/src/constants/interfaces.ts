@@ -17,6 +17,7 @@ export type Field = {
   label: string;
   type: string;
   options?: Option[];
+  function?: (t: any) => any;
   centered?: boolean;
   infoType?: string;
 };

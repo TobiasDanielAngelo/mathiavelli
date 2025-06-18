@@ -36,6 +36,7 @@ export const BuyListItemFields: Record<string, (keyof BuyListItemInterface)[]> =
   {
     datetime: ["addedAt"] as const,
     date: ["plannedDate"] as const,
+    time: [] as const,
     prices: ["estimatedPrice"] as const,
   };
 

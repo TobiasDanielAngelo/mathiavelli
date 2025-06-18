@@ -27,6 +27,7 @@ export type BodyFatInterface = {
 export const BodyFatFields: Record<string, (keyof BodyFatInterface)[]> = {
   datetime: ["date"] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

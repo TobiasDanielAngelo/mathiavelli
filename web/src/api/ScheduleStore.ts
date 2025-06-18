@@ -1,34 +1,58 @@
 import { computed } from "mobx";
 import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import Swal from "sweetalert2";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "../constants/storeHelpers";
-import Swal from "sweetalert2";
+import { generateCollidingDates } from "../constants/helpers";
 
-const slug = "workouts";
+const slug = "schedules";
 
 const props = {
   id: prop<number>(-1),
   name: prop<string>(""),
-  category: prop<number>(0),
-  durationMinutes: prop<number>(0),
-  caloriesBurned: prop<number>(0),
-  date: prop<string>(""),
+  freq: prop<number>(0),
+  interval: prop<number>(0),
+  byWeekDay: prop<string[]>(() => []),
+  byMonthDay: prop<number[]>(() => []),
+  byMonth: prop<number[]>(() => []),
+  byYearDay: prop<number[]>(() => []),
+  byWeekNo: prop<number[]>(() => []),
+  byHour: prop<number[]>(() => []),
+  byMinute: prop<number[]>(() => []),
+  bySecond: prop<number[]>(() => []),
+  bySetPos: prop<number[]>(() => []),
+  count: prop<number>(0),
+  startDate: prop<string>(""),
+  endDate: prop<string>(""),
+  weekStart: prop<number>(0),
+  startTime: prop<string>(""),
+  endTime: prop<string>(""),
 };
 
-export const WORKOUT_CATEGORY_CHOICES = [
-  "Cardio",
-  "Upper Body",
-  "Lower Body",
-  "Core",
-  "Full Body",
-  "Other",
+export const FREQ_CHOICES = [
+  "Yearly",
+  "Monthly",
+  "Weekly",
+  "Daily",
+  "Hourly",
+  "Minutely",
+  "Secondly",
+];
+export const WEEKDAY_CHOICES = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
-export type WorkoutInterface = {
+export type ScheduleInterface = {
   [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
     typeof prop<infer T>
   >
@@ -36,41 +60,47 @@ export type WorkoutInterface = {
     : never;
 };
 
-export const WorkoutFields: Record<string, (keyof WorkoutInterface)[]> = {
-  datetime: ["date"] as const,
-  date: [] as const,
-  time: [] as const,
+export const ScheduleFields: Record<string, (keyof ScheduleInterface)[]> = {
+  datetime: [] as const,
+  date: ["startDate", "endDate"] as const,
+  time: ["startTime", "endTime"] as const,
   prices: [] as const,
 };
 
-@model("myApp/Workout")
-export class Workout extends Model(props) {
-  update(details: WorkoutInterface) {
+@model("myApp/Schedule")
+export class Schedule extends Model(props) {
+  update(details: ScheduleInterface) {
     Object.assign(this, details);
   }
 
-  get categoryName() {
-    return (
-      WORKOUT_CATEGORY_CHOICES.find((_, ind) => ind === this.category) ?? "—"
-    );
+  get freqName() {
+    return FREQ_CHOICES.find((_, ind) => ind === this.freq) ?? "—";
+  }
+  get weekStartName() {
+    return WEEKDAY_CHOICES.find((_, ind) => ind === this.weekStart) ?? "—";
   }
 
+  get collidingDates() {
+    return generateCollidingDates(this).join("\n");
+  }
   get $view() {
     return {
       ...this.$,
-      categoryName:
-        WORKOUT_CATEGORY_CHOICES.find((_, ind) => ind === this.category) ?? "—",
+      freqName: FREQ_CHOICES.find((_, ind) => ind === this.freq) ?? "—",
+      weekStartName:
+        WEEKDAY_CHOICES.find((_, ind) => ind === this.weekStart) ?? "—",
+      collidingDates: this.collidingDates,
     };
   }
 }
 
-@model("myApp/WorkoutStore")
-export class WorkoutStore extends Model({
-  items: prop<Workout[]>(() => []),
+@model("myApp/ScheduleStore")
+export class ScheduleStore extends Model({
+  items: prop<Schedule[]>(() => []),
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Workout({}).$) as (keyof WorkoutInterface)[];
+    const keys = Object.keys(new Schedule({}).$) as (keyof ScheduleInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");
@@ -78,23 +108,22 @@ export class WorkoutStore extends Model({
 
   @computed
   get allItems() {
-    const map = new Map<number, Workout>();
+    const map = new Map<number, Schedule>();
     this.items.forEach((item) => map.set(item.id, item));
     return map;
   }
 
   @modelFlow
-  fetchAll = _async(function* (this: WorkoutStore, params?: string) {
+  fetchAll = _async(function* (this: ScheduleStore, params?: string) {
     let result;
 
     try {
-      result = yield* _await(fetchItemsRequest<Workout>(slug, params));
+      result = yield* _await(fetchItemsRequest<Schedule>(slug, params));
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -104,7 +133,7 @@ export class WorkoutStore extends Model({
 
     result.data.forEach((s) => {
       if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new Workout(s));
+        this.items.push(new Schedule(s));
       } else {
         this.items.find((t) => t.id === s.id)?.update(s);
       }
@@ -114,17 +143,16 @@ export class WorkoutStore extends Model({
   });
 
   @modelFlow
-  addItem = _async(function* (this: WorkoutStore, details: WorkoutInterface) {
+  addItem = _async(function* (this: ScheduleStore, details: ScheduleInterface) {
     let result;
 
     try {
-      result = yield* _await(postItemRequest<WorkoutInterface>(slug, details));
+      result = yield* _await(postItemRequest<ScheduleInterface>(slug, details));
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -132,7 +160,7 @@ export class WorkoutStore extends Model({
       return result;
     }
 
-    const item = new Workout(result.data);
+    const item = new Schedule(result.data);
     this.items.push(item);
 
     return { details: "", ok: true, data: item };
@@ -140,22 +168,21 @@ export class WorkoutStore extends Model({
 
   @modelFlow
   updateItem = _async(function* (
-    this: WorkoutStore,
+    this: ScheduleStore,
     itemId: number,
-    details: WorkoutInterface
+    details: ScheduleInterface
   ) {
     let result;
 
     try {
       result = yield* _await(
-        updateItemRequest<WorkoutInterface>(slug, itemId, details)
+        updateItemRequest<ScheduleInterface>(slug, itemId, details)
       );
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 
@@ -169,7 +196,7 @@ export class WorkoutStore extends Model({
   });
 
   @modelFlow
-  deleteItem = _async(function* (this: WorkoutStore, itemId: number) {
+  deleteItem = _async(function* (this: ScheduleStore, itemId: number) {
     let result;
 
     try {
@@ -179,7 +206,6 @@ export class WorkoutStore extends Model({
         icon: "error",
         title: "Network Error",
       });
-      error;
       return { details: "Network Error", ok: false, data: null };
     }
 

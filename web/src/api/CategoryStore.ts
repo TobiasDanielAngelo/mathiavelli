@@ -36,6 +36,7 @@ export type CategoryInterface = {
 export const CategoryFields: Record<string, (keyof CategoryInterface)[]> = {
   datetime: [] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

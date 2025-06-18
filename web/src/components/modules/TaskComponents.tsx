@@ -2,14 +2,10 @@ import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useStore } from "../../api/Store";
-import {
-  FREQUENCY_CHOICES,
-  Task,
-  TaskFields,
-  TaskInterface,
-} from "../../api/TaskStore";
+import { Task, TaskFields, TaskInterface } from "../../api/TaskStore";
 import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
+import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -25,7 +21,6 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 
 export const { Context: TaskViewContext, useGenericView: useTaskView } =
   createGenericViewContext<TaskInterface>();
@@ -41,7 +36,7 @@ export const TaskForm = ({
   setVisible?: (t: boolean) => void;
   fetchFcn?: () => void;
 }) => {
-  const { taskStore, goalStore } = useStore();
+  const { taskStore, goalStore, scheduleStore } = useStore();
 
   const fields = useMemo(
     () =>
@@ -87,10 +82,10 @@ export const TaskForm = ({
             type: "check",
           },
           {
-            name: "repeat",
-            label: "Frequency",
+            name: "schedule",
+            label: "Schedule",
             type: "select",
-            options: toOptions(FREQUENCY_CHOICES),
+            options: toOptions(scheduleStore.items, "name"),
           },
         ],
 
@@ -119,7 +114,7 @@ export const TaskForm = ({
           },
         ],
       ] satisfies Field[][],
-    [goalStore.items.length, item?.id]
+    [goalStore.items.length, scheduleStore.items.length, item?.id]
   );
 
   return (
@@ -159,7 +154,7 @@ export const TaskCard = observer((props: { item: Task }) => {
         "isCancelled",
         "isCompleted",
         "goalTitle",
-        "repeatName",
+        "scheduleName",
         "dateCompleted",
         "dateDuration",
       ]}
@@ -256,7 +251,7 @@ export const TaskTable = observer(() => {
 });
 
 export const TaskView = observer(() => {
-  const { taskStore, goalStore } = useStore();
+  const { taskStore, goalStore, scheduleStore } = useStore();
   const { setVisible1, isVisible, setVisible } = useVisible();
   const [pageDetails, setPageDetails] = useState<
     PaginatedDetails | undefined
@@ -284,12 +279,12 @@ export const TaskView = observer(() => {
           label: "title",
         },
         {
-          key: "repeat",
-          values: FREQUENCY_CHOICES,
+          key: "schedule",
+          values: scheduleStore.items,
           label: "",
         },
       ] satisfies KV<any>[],
-    [goalStore.items.length]
+    [goalStore.items.length, scheduleStore.items.length]
   );
 
   const actionModalDefs = [

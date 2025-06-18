@@ -69,6 +69,7 @@ export type JobInterface = {
 export const JobFields: Record<string, (keyof JobInterface)[]> = {
   datetime: ["createdAt", "updatedAt"] as const,
   date: ["deadline", "appliedDate"] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

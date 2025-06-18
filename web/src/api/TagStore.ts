@@ -27,6 +27,7 @@ export type TagInterface = {
 export const TagFields: Record<string, (keyof TagInterface)[]> = {
   datetime: [] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

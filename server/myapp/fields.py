@@ -1,6 +1,10 @@
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
+from django import forms
+from datetime import datetime, time
+import re
 
 
 class AmountField(models.DecimalField):
@@ -151,6 +155,69 @@ class DefaultBooleanField(models.BooleanField):
         return name, path, args, kwargs
 
 
+class OptionalLimitedTimeField(models.TimeField):
+    """
+    A TimeField that:
+    - Accepts only 'h:mm AM/PM' format from user input
+    - Supports min_time/max_time as either time() or "h:mm AM/PM" strings
+
+    Usage:
+        CustomTimeField()  # no limits
+        CustomTimeField("8:00 AM", "5:00 PM")
+        CustomTimeField("8:00 AM")  # min only
+        CustomTimeField(None, "9:00 PM")  # max only
+    """
+
+    TIME_FORMAT = "%I:%M %p"  # '3:15 PM'
+    TIME_REGEX = re.compile(r"^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$", re.IGNORECASE)
+
+    def __init__(self, *args, **kwargs):
+        def parse(t):
+            if isinstance(t, str):
+                try:
+                    return datetime.strptime(t.strip().upper(), self.TIME_FORMAT).time()
+                except ValueError:
+                    raise ValueError(f"Invalid time format: '{t}'. Use 'h:mm AM/PM'")
+            return t
+
+        min_time = parse(args[0]) if len(args) >= 1 else None
+        max_time = parse(args[1]) if len(args) >= 2 else None
+
+        validators = kwargs.pop("validators", [])
+        if min_time:
+            validators.append(MinValueValidator(min_time))
+        if max_time:
+            validators.append(MaxValueValidator(max_time))
+
+        kwargs.setdefault("blank", True)
+        kwargs.setdefault("null", True)
+        kwargs["validators"] = validators
+
+        self.min_time = min_time
+        self.max_time = max_time
+
+        super().__init__(**kwargs)
+
+    def to_python(self, value):
+        if isinstance(value, time) or value is None:
+            return value
+
+        if isinstance(value, str):
+            value = value.strip().upper()
+            if not self.TIME_REGEX.match(value):
+                raise ValidationError(
+                    "Time must be in format h:mm AM/PM (e.g., 3:45 PM)"
+                )
+            try:
+                return datetime.strptime(value, self.TIME_FORMAT).time()
+            except ValueError:
+                raise ValidationError(
+                    "Invalid time format. Use h:mm AM/PM (e.g., 3:45 PM)"
+                )
+
+        return super().to_python(value)
+
+
 class ForeignKey(models.ForeignKey):
     """
     Base FK with auto related_name = <modelname>_<fieldname> (if not set).
@@ -271,38 +338,194 @@ class OptionalURLField(models.URLField):
 
 class LimitedDecimalField(models.DecimalField):
     """
-    A DecimalField with optional min/max value constraints using positional arguments.
+    A DecimalField with optional min, max, and default value via positional args.
 
     Usage:
-        LimitedDecimalField(0, 10)       # min=0, max=10
-        LimitedDecimalField(None, 10)    # max=10 only
-        LimitedDecimalField(5)           # min=5 only
-        LimitedDecimalField()            # no limits
-
-    Automatically adds MinValueValidator and MaxValueValidator based on arguments.
-    Defaults to max_digits=10 and decimal_places=2 if not provided.
+        LimitedDecimalField(0, 10, 5)     # min=0, max=10, default=5
+        LimitedDecimalField(None, 100, 50)
+        LimitedDecimalField(0, None, 1)
+        LimitedDecimalField(5)           # min=5, no max
     """
 
     def __init__(self, *args, **kwargs):
         validators = kwargs.pop("validators", [])
 
-        # Handle positional limits
+        # Defaults
         min_value = None
         max_value = None
+        default_value = None
+
+        # Unpack arguments
         if len(args) == 1:
             min_value = args[0]
         elif len(args) == 2:
             min_value, max_value = args
+        elif len(args) == 3:
+            min_value, max_value, default_value = args
+        elif len(args) > 3:
+            raise TypeError("LimitedDecimalField accepts up to 3 positional arguments.")
 
+        # Add validators
         if min_value is not None:
             validators.append(MinValueValidator(min_value))
         if max_value is not None:
             validators.append(MaxValueValidator(max_value))
 
-        kwargs["validators"] = validators
+        # Validate default is within range
+        if default_value is not None:
+            if (min_value is not None and default_value < min_value) or (
+                max_value is not None and default_value > max_value
+            ):
+                raise ValueError("Default value is out of bounds.")
+            kwargs.setdefault("default", default_value)
 
-        # Sensible defaults for DecimalField
+        kwargs["validators"] = validators
         kwargs.setdefault("max_digits", 10)
         kwargs.setdefault("decimal_places", 2)
 
         super().__init__(**kwargs)
+
+
+class BaseArrayField(models.JSONField):
+    def __init__(
+        self,
+        choices=None,
+        base_type=str,
+        min_items=None,
+        max_items=None,
+        **kwargs,
+    ):
+        kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", [])
+
+        self.base_type = base_type
+        self.min_items = min_items
+        self.max_items = max_items
+
+        if choices:
+            if all(isinstance(c, (list, tuple)) for c in choices):
+                self.choices = [(k, v) for k, v in choices]
+                self.valid_choices = [k for k, _ in choices]
+            else:
+                self.choices = [(c, c) for c in choices]
+                self.valid_choices = choices
+        else:
+            self.choices = None
+            self.valid_choices = []
+
+        super().__init__(**kwargs)
+        self.validators.append(self._validate_array)
+
+    def formfield(self, **kwargs):
+        if self.valid_choices:
+            return forms.MultipleChoiceField(
+                choices=[(c, c) for c in self.valid_choices],
+                widget=forms.SelectMultiple,
+                required=not self.blank,
+                **kwargs,
+            )
+        return forms.JSONField(required=not self.blank, **kwargs)
+
+    def to_python(self, value):
+        if isinstance(value, str):
+            try:
+                import json
+
+                value = json.loads(value)
+            except Exception:
+                pass
+        if isinstance(value, list):
+            try:
+                return [self.base_type(v) for v in value]
+            except Exception:
+                return value
+        return value
+
+    def _validate_array(self, value):
+        if value is None:
+            return
+        if not isinstance(value, list):
+            raise ValidationError("Value must be a list.")
+
+        # Coerce each item
+        coerced = []
+        for item in value:
+            try:
+                item = self.base_type(item)  # e.g., int("4") → 4
+            except (ValueError, TypeError):
+                raise ValidationError(f"Invalid type: {item}")
+            coerced.append(item)
+
+        if self.min_items is not None and len(coerced) < self.min_items:
+            raise ValidationError(f"Minimum {self.min_items} items required.")
+        if self.max_items is not None and len(coerced) > self.max_items:
+            raise ValidationError(f"Maximum {self.max_items} items allowed.")
+
+        if self.valid_choices:
+            for item in coerced:
+                if item not in self.valid_choices:
+                    raise ValidationError(f"{item} is not a valid choice.")
+
+
+class StringArrayField(BaseArrayField):
+    def __init__(self, **kwargs):
+        super().__init__(base_type=str, **kwargs)
+
+
+class NumberArrayField(BaseArrayField):
+    def __init__(self, **kwargs):
+        super().__init__(base_type=int, **kwargs)
+
+
+class ChoicesStringArrayField(BaseArrayField):
+    def __init__(self, choices=None, min_items=None, max_items=None, **kwargs):
+        flat_choices = [
+            (c[0], c[1]) if isinstance(c, (list, tuple)) else (c, str(c))
+            for c in choices or []
+        ]
+
+        super().__init__(
+            choices=flat_choices,
+            base_type=str,
+            min_items=min_items,
+            max_items=max_items,
+            **kwargs,
+        )
+        self._original_choices = choices
+        self.min_items = min_items
+        self.max_items = max_items
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs["choices"] = self._original_choices
+        if self.min_items is not None:
+            kwargs["min_items"] = self.min_items
+        if self.max_items is not None:
+            kwargs["max_items"] = self.max_items
+        return name, path, args, kwargs
+
+
+class ChoicesNumberArrayField(BaseArrayField):
+    def __init__(self, choices=None, min_items=None, max_items=None, **kwargs):
+        flat_choices = [
+            c if isinstance(c, (list, tuple)) else (c, str(c)) for c in choices or []
+        ]
+        super().__init__(
+            base_type=int,
+            choices=flat_choices,
+            min_items=min_items,
+            max_items=max_items,
+            **kwargs,
+        )
+        self._original_choices = choices
+        self.min_items = min_items
+        self.max_items = max_items
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs["choices"] = self._original_choices
+        if self.min_items is not None:
+            kwargs["min_items"] = self.min_items
+        if self.max_items is not None:
+            kwargs["max_items"] = self.max_items
+        return name, path, args, kwargs

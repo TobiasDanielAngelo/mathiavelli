@@ -20,10 +20,11 @@ def decode_query_param(encoded_param):
 
 class CustomModelViewSet(viewsets.ModelViewSet):
     permission_classes = [
-        IsAuthenticated,
-        CustomDjangoModelPermission,
+        AllowAny,
+        # IsAuthenticated,
+        # CustomDjangoModelPermission,
     ]
-    authentication_classes = (TokenAuthentication,)
+    # authentication_classes = (TokenAuthentication,)
 
     def list(self, request, *args, **kwargs):
         params = self.request.query_params.copy()
@@ -323,3 +324,18 @@ class InventoryCategoryViewSet(CustomModelViewSet):
 class PersonalItemViewSet(CustomModelViewSet):
     queryset = PersonalItem.objects.all()
     serializer_class = PersonalItemSerializer
+
+
+class ScheduleViewSet(CustomModelViewSet):
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+
+
+class HabitViewSet(CustomModelViewSet):
+    queryset = Habit.objects.all()
+    serializer_class = HabitSerializer
+
+
+class HabitLogViewSet(CustomModelViewSet):
+    queryset = HabitLog.objects.all()
+    serializer_class = HabitLogSerializer

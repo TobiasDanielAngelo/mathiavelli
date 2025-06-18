@@ -45,6 +45,7 @@ export const PersonalItemFields: Record<
 > = {
   datetime: [] as const,
   date: ["acquiredDate"] as const,
+  time: [] as const,
   prices: ["worth"] as const,
 };
 

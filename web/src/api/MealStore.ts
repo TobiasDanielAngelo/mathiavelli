@@ -31,6 +31,7 @@ export type MealInterface = {
 export const MealFields: Record<string, (keyof MealInterface)[]> = {
   datetime: ["date"] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

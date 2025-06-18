@@ -44,6 +44,7 @@ export const TransactionFields: Record<string, (keyof TransactionInterface)[]> =
   {
     datetime: ["datetimeTransacted"] as const,
     date: [] as const,
+    time: [] as const,
     prices: ["amount"] as const,
   };
 

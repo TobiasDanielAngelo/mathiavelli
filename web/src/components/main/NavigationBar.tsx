@@ -18,11 +18,11 @@ const sections = [
   },
   {
     title: "Productivity",
-    items: ["goals", "tasks"],
+    items: ["goals", "tasks", "habits", "habit-logs"],
   },
   {
     title: "Calendar",
-    items: ["events", "tags"],
+    items: ["events", "tags", "schedules"],
   },
   {
     title: "Personal",

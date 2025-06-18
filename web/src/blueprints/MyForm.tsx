@@ -40,6 +40,18 @@ const renderField = (
   };
 
   switch (t.type) {
+    case "function":
+      return (
+        <div
+          key={key}
+          className="text-white whitespace-pre-line items-center text-center"
+        >
+          <label className="block text-xs text-left font-medium md:mt-1 text-blue-600">
+            {t.label}
+          </label>
+          {t.function?.(details)}
+        </div>
+      );
     case "password":
       return <MyInput key={key} {...commonProps} isPassword />;
     case "select":

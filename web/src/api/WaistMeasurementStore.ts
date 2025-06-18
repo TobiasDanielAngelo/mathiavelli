@@ -30,6 +30,7 @@ export const WaistMeasurementFields: Record<
 > = {
   datetime: ["date"] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

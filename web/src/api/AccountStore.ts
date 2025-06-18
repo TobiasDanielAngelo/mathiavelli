@@ -27,6 +27,7 @@ export type AccountInterface = {
 export const AccountFields: Record<string, (keyof AccountInterface)[]> = {
   datetime: ["datetimeAdded"] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

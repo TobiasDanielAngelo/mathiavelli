@@ -43,6 +43,7 @@ export type GoalInterface = {
 export const GoalFields: Record<string, (keyof GoalInterface)[]> = {
   datetime: ["dateCreated"] as const,
   date: ["dateCompleted", "dateStart", "dateEnd"] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

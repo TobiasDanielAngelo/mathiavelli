@@ -27,6 +27,7 @@ export type WeighInInterface = {
 export const WeighInFields: Record<string, (keyof WeighInInterface)[]> = {
   datetime: ["date"] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 

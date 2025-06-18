@@ -44,6 +44,7 @@ export type EventInterface = {
 export const EventFields: Record<string, (keyof EventInterface)[]> = {
   datetime: ["start", "end", "createdAt"] as const,
   date: [] as const,
+  time: [] as const,
   prices: [] as const,
 };
 
