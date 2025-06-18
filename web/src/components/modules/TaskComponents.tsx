@@ -169,7 +169,7 @@ export const TaskCard = observer((props: { item: Task }) => {
 export const TaskDashboard = observer(() => {
   const { taskStore } = useStore();
   const tasks = taskStore.items
-    .filter((s) => !s.isCompleted && !s.isCancelled)
+    .filter((s) => !s.isCompleted && !s.isCancelled && s.dueDate)
     .map((s) => ({
       id: s.id,
       name: s.title,

@@ -81,7 +81,9 @@ export class Schedule extends Model(props) {
   }
 
   get collidingDates() {
-    return generateCollidingDates(this).join("\n");
+    return generateCollidingDates(this)
+      .map((s) => ` • ${s}`)
+      .join("\n");
   }
   get $view() {
     return {

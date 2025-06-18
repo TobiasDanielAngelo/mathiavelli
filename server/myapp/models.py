@@ -204,11 +204,24 @@ class Goal(models.Model):
         return self.date_completed is not None
 
 
+class Habit(models.Model):
+    title = fields.ShortCharField()
+    description = fields.MediumCharField()
+    goal = fields.CascadeOptionalForeignKey(Goal)
+    schedule = fields.SetNullOptionalForeignKey(Schedule)
+    threshold_percent = fields.LimitedDecimalField(0, 100, 80)
+    date_start = fields.OptionalDateField()
+    date_end = fields.OptionalDateField()
+    is_archived = fields.DefaultBooleanField(False)
+    date_created = fields.AutoCreatedAtField()
+
+
 class Task(models.Model):
 
     title = fields.ShortCharField()
     description = fields.MediumCharField()
-    goal = fields.SetNullOptionalForeignKey(Goal)
+    goal = fields.CascadeOptionalForeignKey(Goal)
+    habit = fields.CascadeOptionalForeignKey(Habit)
     importance = fields.LimitedDecimalField(0, 10)
     schedule = fields.SetNullOptionalForeignKey(Schedule)
     due_date = fields.OptionalDateField()
@@ -454,18 +467,6 @@ class PersonalItem(models.Model):
     worth = fields.AmountField()
     notes = fields.LongCharField()
     is_important = fields.DefaultBooleanField(False)
-
-
-class Habit(models.Model):
-    title = fields.ShortCharField()
-    description = fields.MediumCharField()
-    goal = fields.SetNullOptionalForeignKey(Goal)
-    schedule = fields.SetNullOptionalForeignKey(Schedule)
-    threshold_percent = fields.LimitedDecimalField(0, 100, 80)
-    date_start = fields.OptionalDateField()
-    date_end = fields.OptionalDateField()
-    is_archived = fields.DefaultBooleanField(False)
-    date_created = fields.AutoCreatedAtField()
 
 
 class HabitLog(models.Model):

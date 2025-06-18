@@ -1,11 +1,11 @@
+import { format, isValid, parse } from "date-fns";
 import LZString from "lz-string";
 import moment from "moment";
-import { Options, RRule, rrulestr, Weekday } from "rrule";
+import { Options, RRule, Weekday } from "rrule";
 import { GoalInterface } from "../api/GoalStore";
 import { Schedule, ScheduleInterface } from "../api/ScheduleStore";
 import { KV } from "../blueprints/ItemDetails";
 import { Option } from "./interfaces";
-import { parse, format, isValid } from "date-fns";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -652,7 +652,7 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     byhour: schedule.byHour?.map(Number) ?? undefined,
     byminute: schedule.byMinute?.map(Number) ?? undefined,
     bysecond: schedule.bySecond?.map(Number) ?? undefined,
-    bySetPosition: schedule.bySetPosition?.map(Number) ?? undefined,
+    bysetpos: schedule.bySetPosition?.map(Number) ?? undefined,
     count: Number(schedule.count) ?? 10,
     dtstart: toUTCForRRule(start),
     until: toUTCForRRule(end),
@@ -673,10 +673,6 @@ export function generateCollidingDates(sched: Schedule): (string | Date)[] {
   const schedule = sched.$ ?? sched;
   const rule = buildRRule(schedule);
   if (!rule) return [];
-
-  const ruleStr = rule.toString();
-  console.log(rule.toString());
-  console.log(rrulestr(ruleStr).all());
 
   return rule
     .all()

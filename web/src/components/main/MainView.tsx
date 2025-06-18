@@ -44,6 +44,7 @@ export const MainView = observer(() => {
     jobStore,
     taskStore,
     inventoryCategoryStore,
+    scheduleStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ export const MainView = observer(() => {
       goalStore.fetchAll("page=all&is_completed=0&is_cancelled=0");
       jobStore.fetchAll("page=all&status__lte=3");
       taskStore.fetchAll("page=all&is_completed=0&is_cancelled=0");
+      scheduleStore.fetchAll("page=all");
     }
   };
 

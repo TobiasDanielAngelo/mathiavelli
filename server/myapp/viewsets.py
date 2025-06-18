@@ -245,8 +245,8 @@ class TaskViewSet(CustomModelViewSet):
         task = serializer.save()
 
         if task.is_completed or task.is_cancelled:
-            if hasattr(task, "event"):
-                task.event.delete()
+            if hasattr(task, "event_task"):
+                task.event_task.delete()
         else:
             self.create_or_update_event(task)
 
@@ -254,14 +254,14 @@ class TaskViewSet(CustomModelViewSet):
             self.update_goal_completion_status(task.goal)
 
     def perform_destroy(self, instance):
-        if hasattr(instance, "event"):
-            instance.event.delete()
+        if hasattr(instance, "event_task"):
+            instance.event_task.delete()
         instance.delete()
 
     def create_or_update_event(self, task):
         if not task.date_start or not task.date_end:
-            if hasattr(task, "event"):
-                task.event.delete()
+            if hasattr(task, "event_task"):
+                task.event_task.delete()
             return
 
         start_dt = timezone.make_aware(
@@ -334,6 +334,57 @@ class ScheduleViewSet(CustomModelViewSet):
 class HabitViewSet(CustomModelViewSet):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
+
+    def perform_create(self, serializer):
+        habit = serializer.save()
+        self.create_or_update_task(habit)
+
+    def create_or_update_event_from_task(self, task):
+        task_view = TaskViewSet()
+        task_view.create_or_update_event(task)
+
+    def create_or_update_task(self, habit):
+        if not habit.date_start or not habit.date_end:
+            if hasattr(habit, "task_habit"):
+                habit.task_habit.delete()
+            return
+
+        start_dt = timezone.make_aware(
+            datetime.datetime.combine(habit.date_start, datetime.time.min)
+        )
+        end_dt = timezone.make_aware(
+            datetime.datetime.combine(habit.date_end, datetime.time.max)
+        )
+
+        task, created = Task.objects.get_or_create(
+            habit=habit,
+            defaults={
+                "title": habit.title,
+                "description": habit.description,
+                "date_start": start_dt,
+                "date_end": end_dt,
+                "goal": habit.goal,
+                "schedule": habit.schedule,
+                "importance": 5,
+            },
+        )
+
+        self.create_or_update_event_from_task(task)
+
+        if not created:
+            task.title = habit.title
+            task.description = habit.description
+            task.date_start = start_dt
+            task.date_end = end_dt
+            task.goal = habit.goal
+            task.schedule = habit.schedule
+            task.importance = 5
+            task.save()
+
+    def perform_update(self, serializer):
+        habit = serializer.save()
+
+        self.create_or_update_task(habit)
 
 
 class HabitLogViewSet(CustomModelViewSet):
