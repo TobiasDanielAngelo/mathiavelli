@@ -24,6 +24,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: TagViewContext, useGenericView: useTagView } =
   createGenericViewContext<TagInterface>();
 
+const title = "Tags";
+
 export const TagIdMap = {} as const;
 
 export const TagForm = ({
@@ -104,6 +106,7 @@ export const TagCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={TagCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={tagStore.items}
@@ -143,13 +146,23 @@ export const TagRow = observer((props: { item: Tag }) => {
 
 export const TagTable = observer(() => {
   const { tagStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useTagView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useTagView();
 
   return (
     <MyGenericTable
       items={tagStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -172,6 +185,10 @@ export const TagView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof TagInterface)[],
     "shownFieldsTag"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsTag"
   );
   const fetchFcn = async () => {
     const resp = await tagStore.fetchAll(params.toString());
@@ -218,6 +235,7 @@ export const TagView = observer(() => {
 
   return (
     <MyGenericView<TagInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -227,6 +245,8 @@ export const TagView = observer(() => {
       TableComponent={TagTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

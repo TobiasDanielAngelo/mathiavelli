@@ -28,6 +28,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: BodyFatViewContext, useGenericView: useBodyFatView } =
   createGenericViewContext<BodyFatInterface>();
 
+const title = "Body Fats";
+
 export const BodyFatIdMap = {} as const;
 
 export const BodyFatForm = ({
@@ -96,6 +98,7 @@ export const BodyFatCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={BodyFatCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={bodyFatStore.items}
@@ -135,13 +138,23 @@ export const BodyFatRow = observer((props: { item: BodyFat }) => {
 
 export const BodyFatTable = observer(() => {
   const { bodyFatStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useBodyFatView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useBodyFatView();
 
   return (
     <MyGenericTable
       items={bodyFatStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -164,6 +177,10 @@ export const BodyFatView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof BodyFatInterface)[],
     "shownFieldsBodyFat"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsBodyFat"
   );
   const fetchFcn = async () => {
     const resp = await bodyFatStore.fetchAll(params.toString());
@@ -210,6 +227,7 @@ export const BodyFatView = observer(() => {
 
   return (
     <MyGenericView<BodyFatInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -219,6 +237,8 @@ export const BodyFatView = observer(() => {
       TableComponent={BodyFatTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

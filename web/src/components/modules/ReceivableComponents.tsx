@@ -41,6 +41,8 @@ export const {
   useGenericView: useReceivableView,
 } = createGenericViewContext<ReceivableInterface>();
 
+const title = "Receivables";
+
 export const ReceivableIdMap = {} as const;
 
 export const ReceivableForm = ({
@@ -166,6 +168,7 @@ export const ReceivableCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={ReceivableCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={receivableStore.items}
@@ -205,13 +208,23 @@ export const ReceivableRow = observer((props: { item: Receivable }) => {
 
 export const ReceivableTable = observer(() => {
   const { receivableStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useReceivableView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useReceivableView();
 
   return (
     <MyGenericTable
       items={receivableStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -234,6 +247,10 @@ export const ReceivableView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof ReceivableInterface)[],
     "shownFieldsReceivable"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsReceivable"
   );
   const fetchFcn = async () => {
     const resp = await receivableStore.fetchAll(params.toString());
@@ -292,6 +309,7 @@ export const ReceivableView = observer(() => {
 
   return (
     <MyGenericView<ReceivableInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -301,6 +319,8 @@ export const ReceivableView = observer(() => {
       TableComponent={ReceivableTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

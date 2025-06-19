@@ -1,11 +1,16 @@
 import { observer } from "mobx-react-lite";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   InventoryCategory,
   InventoryCategoryFields,
   InventoryCategoryInterface,
 } from "../../api/InventoryCategoryStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
@@ -16,19 +21,18 @@ import {
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { sortAndFilterByIds, toTitleCase } from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { MyMultiDropdownSelector } from "../../blueprints";
+import { toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { useMemo, useState } from "react";
-import { KV } from "../../blueprints/ItemDetails";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
-export const { Context: InventoryCategoryViewContext, useGenericView: useInventoryCategoryView } =
-  createGenericViewContext<InventoryCategoryInterface>();
+export const {
+  Context: InventoryCategoryViewContext,
+  useGenericView: useInventoryCategoryView,
+} = createGenericViewContext<InventoryCategoryInterface>();
 
-export const InventoryCategoryIdMap = {
-} as const;
+const title = "Inventory Categories";
+
+export const InventoryCategoryIdMap = {} as const;
 
 export const InventoryCategoryForm = ({
   item,
@@ -39,13 +43,10 @@ export const InventoryCategoryForm = ({
   setVisible?: (t: boolean) => void;
   fetchFcn?: () => void;
 }) => {
-  const {  inventoryCategoryStore } = useStore();
+  const { inventoryCategoryStore } = useStore();
 
   const fields = useMemo(
-    () =>
-      [
-      [{ name: "name", label: "Name", type: "text",},],
-      ] satisfies Field[][],
+    () => [[{ name: "name", label: "Name", type: "text" }]] satisfies Field[][],
     []
   );
 
@@ -67,30 +68,29 @@ export const InventoryCategoryForm = ({
   );
 };
 
-export const InventoryCategoryCard = observer((props: { item: InventoryCategory }) => {
-  const { item } = props;
-  const { fetchFcn, shownFields } = useInventoryCategoryView();
-  const { inventoryCategoryStore } = useStore();
+export const InventoryCategoryCard = observer(
+  (props: { item: InventoryCategory }) => {
+    const { item } = props;
+    const { fetchFcn, shownFields } = useInventoryCategoryView();
+    const { inventoryCategoryStore } = useStore();
 
-  return (
-    <MyGenericCard
-      item={item}
-      shownFields={shownFields}
-      header={["id"]}
-      important={["name"]}
-      prices={InventoryCategoryFields.prices}
-      FormComponent={InventoryCategoryForm}
-      deleteItem={inventoryCategoryStore.deleteItem}
-      fetchFcn={fetchFcn}
-    />
-  );
-});
+    return (
+      <MyGenericCard
+        item={item}
+        shownFields={shownFields}
+        header={["id"]}
+        important={["name"]}
+        prices={InventoryCategoryFields.prices}
+        FormComponent={InventoryCategoryForm}
+        deleteItem={inventoryCategoryStore.deleteItem}
+        fetchFcn={fetchFcn}
+      />
+    );
+  }
+);
 
 export const InventoryCategoryDashboard = observer(() => {
-  return (
-    <>
-    </>
-  );
+  return <></>;
 });
 
 export const InventoryCategoryCollection = observer(() => {
@@ -100,19 +100,13 @@ export const InventoryCategoryCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              inventoryCategoryStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <InventoryCategoryCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={InventoryCategoryCard}
+          title={title}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={inventoryCategoryStore.items}
+        />
       }
       SideB={<InventoryCategoryDashboard />}
       ratio={0.7}
@@ -124,37 +118,49 @@ export const InventoryCategoryFilter = observer(() => {
   return (
     <MyGenericFilter
       view={new InventoryCategory({}).$}
-      title="InventoryCategory Filters"
+      title="Inventory Category Filters"
       dateFields={InventoryCategoryFields.datetime}
       excludeFields={["id"]}
     />
   );
 });
 
-export const InventoryCategoryRow = observer((props: { item: InventoryCategory }) => {
-  const { item } = props;
-  const { fetchFcn } = useInventoryCategoryView();
-  const { inventoryCategoryStore } = useStore();
+export const InventoryCategoryRow = observer(
+  (props: { item: InventoryCategory }) => {
+    const { item } = props;
+    const { fetchFcn } = useInventoryCategoryView();
+    const { inventoryCategoryStore } = useStore();
 
-  return (
-    <MyGenericRow
-      item={item}
-      FormComponent={InventoryCategoryForm}
-      deleteItem={inventoryCategoryStore.deleteItem}
-      fetchFcn={fetchFcn}
-    />
-  );
-});
+    return (
+      <MyGenericRow
+        item={item}
+        FormComponent={InventoryCategoryForm}
+        deleteItem={inventoryCategoryStore.deleteItem}
+        fetchFcn={fetchFcn}
+      />
+    );
+  }
+);
 
 export const InventoryCategoryTable = observer(() => {
   const { inventoryCategoryStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useInventoryCategoryView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useInventoryCategoryView();
 
   return (
     <MyGenericTable
       items={inventoryCategoryStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -178,6 +184,10 @@ export const InventoryCategoryView = observer(() => {
     Object.keys(objWithFields) as (keyof InventoryCategoryInterface)[],
     "shownFieldsInventoryCategory"
   );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsInventoryCategory"
+  );
   const fetchFcn = async () => {
     const resp = await inventoryCategoryStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -193,7 +203,9 @@ export const InventoryCategoryView = observer(() => {
       icon: "NoteAdd",
       label: "NEW",
       name: "Add a InventoryCategory",
-      modal: <InventoryCategoryForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
+      modal: (
+        <InventoryCategoryForm fetchFcn={fetchFcn} setVisible={setVisible1} />
+      ),
     },
     {
       icon: "ViewList",
@@ -203,7 +215,9 @@ export const InventoryCategoryView = observer(() => {
         <MyMultiDropdownSelector
           label="Fields"
           value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof InventoryCategoryInterface)[])}
+          onChangeValue={(t) =>
+            setShownFields(t as (keyof InventoryCategoryInterface)[])
+          }
           options={Object.keys(objWithFields).map((s) => ({
             id: s,
             name: toTitleCase(s),
@@ -223,6 +237,7 @@ export const InventoryCategoryView = observer(() => {
 
   return (
     <MyGenericView<InventoryCategoryInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -232,6 +247,8 @@ export const InventoryCategoryView = observer(() => {
       TableComponent={InventoryCategoryTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

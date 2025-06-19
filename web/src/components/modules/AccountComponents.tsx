@@ -28,6 +28,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: AccountViewContext, useGenericView: useAccountView } =
   createGenericViewContext<AccountInterface>();
 
+const title = "Accounts";
+
 export const AccountIdMap = {
   Wallet: 1000001,
   Coins: 1000002,
@@ -102,6 +104,7 @@ export const AccountCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={AccountCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={accountStore.items}
@@ -141,13 +144,23 @@ export const AccountRow = observer((props: { item: Account }) => {
 
 export const AccountTable = observer(() => {
   const { accountStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useAccountView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useAccountView();
 
   return (
     <MyGenericTable
       items={accountStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -170,6 +183,10 @@ export const AccountView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof AccountInterface)[],
     "shownFieldsAccount"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsAccount"
   );
   const fetchFcn = async () => {
     const resp = await accountStore.fetchAll(params.toString());
@@ -216,6 +233,7 @@ export const AccountView = observer(() => {
 
   return (
     <MyGenericView<AccountInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -225,6 +243,8 @@ export const AccountView = observer(() => {
       TableComponent={AccountTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

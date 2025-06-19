@@ -18,7 +18,7 @@ const sections = [
   },
   {
     title: "Productivity",
-    items: ["goals", "tasks", "habits", "habit-logs"],
+    items: ["goals", "habits", "tasks", "habit-logs"],
   },
   {
     title: "Calendar",

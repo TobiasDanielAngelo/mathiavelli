@@ -33,6 +33,8 @@ export const {
   useGenericView: useTransactionView,
 } = createGenericViewContext<TransactionInterface>();
 
+const title = "Transactions";
+
 export const TransactionIdMap = {} as const;
 
 export const TransactionForm = ({
@@ -184,6 +186,7 @@ export const TransactionCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={TransactionCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={transactionStore.items}
@@ -223,13 +226,23 @@ export const TransactionRow = observer((props: { item: Transaction }) => {
 
 export const TransactionTable = observer(() => {
   const { transactionStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useTransactionView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useTransactionView();
 
   return (
     <MyGenericTable
       items={transactionStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -252,6 +265,10 @@ export const TransactionView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof TransactionInterface)[],
     "shownFieldsTransaction"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsTransaction"
   );
   const fetchFcn = async () => {
     const resp = await transactionStore.fetchAll(params.toString());
@@ -335,6 +352,7 @@ export const TransactionView = observer(() => {
 
   return (
     <MyGenericView<TransactionInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -344,6 +362,8 @@ export const TransactionView = observer(() => {
       TableComponent={TransactionTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

@@ -25,6 +25,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: TaskViewContext, useGenericView: useTaskView } =
   createGenericViewContext<TaskInterface>();
 
+const title = "Tasks";
+
 export const TaskIdMap = {} as const;
 
 export const TaskForm = ({
@@ -154,7 +156,8 @@ export const TaskCard = observer((props: { item: Task }) => {
         "isCancelled",
         "isCompleted",
         "goalTitle",
-        "scheduleName",
+        "habitTitle",
+        // "scheduleName",
         "dateCompleted",
         "dateDuration",
       ]}
@@ -193,6 +196,7 @@ export const TaskCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={TaskCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={taskStore.items}
@@ -232,13 +236,23 @@ export const TaskRow = observer((props: { item: Task }) => {
 
 export const TaskTable = observer(() => {
   const { taskStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useTaskView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useTaskView();
 
   return (
     <MyGenericTable
       items={taskStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -251,7 +265,7 @@ export const TaskTable = observer(() => {
 });
 
 export const TaskView = observer(() => {
-  const { taskStore, goalStore, scheduleStore } = useStore();
+  const { taskStore, goalStore, scheduleStore, habitStore } = useStore();
   const { setVisible1, isVisible, setVisible } = useVisible();
   const [pageDetails, setPageDetails] = useState<
     PaginatedDetails | undefined
@@ -262,12 +276,18 @@ export const TaskView = observer(() => {
     Object.keys(objWithFields) as (keyof TaskInterface)[],
     "shownFieldsTask"
   );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsTask"
+  );
   const fetchFcn = async () => {
     const resp = await taskStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
       return;
     }
     setPageDetails(resp.pageDetails);
+    const habits = resp.data.map((s) => s.habit).filter(Boolean);
+    habitStore.fetchAll(`id__in=${habits.join(",")}`);
   };
 
   const itemMap = useMemo(
@@ -281,10 +301,19 @@ export const TaskView = observer(() => {
         {
           key: "schedule",
           values: scheduleStore.items,
-          label: "",
+          label: "name",
+        },
+        {
+          key: "habit",
+          values: habitStore.items,
+          label: "title",
         },
       ] satisfies KV<any>[],
-    [goalStore.items.length, scheduleStore.items.length]
+    [
+      goalStore.items.length,
+      scheduleStore.items.length,
+      habitStore.items.length,
+    ]
   );
 
   const actionModalDefs = [
@@ -322,6 +351,7 @@ export const TaskView = observer(() => {
 
   return (
     <MyGenericView<TaskInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -331,6 +361,8 @@ export const TaskView = observer(() => {
       TableComponent={TaskTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

@@ -136,8 +136,13 @@ class PersonalItemAdmin(admin.ModelAdmin):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
+    readonly_fields = ("datetimes_display",)
+
     def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+        return ["datetimes_display"] + [field.name for field in self.model._meta.fields]
+
+    def datetimes_display(self, obj):
+        return "\n".join(str(dt) for dt in obj.datetimes)
 
 
 @admin.register(Habit)

@@ -28,6 +28,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: PlatformViewContext, useGenericView: usePlatformView } =
   createGenericViewContext<PlatformInterface>();
 
+const title = "Platforms";
+
 export const PlatformIdMap = {
   Google: 1000001,
   GitHub: 1000002,
@@ -107,6 +109,7 @@ export const PlatformCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={PlatformCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={platformStore.items}
@@ -146,13 +149,23 @@ export const PlatformRow = observer((props: { item: Platform }) => {
 
 export const PlatformTable = observer(() => {
   const { platformStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    usePlatformView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = usePlatformView();
 
   return (
     <MyGenericTable
       items={platformStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -175,6 +188,10 @@ export const PlatformView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof PlatformInterface)[],
     "shownFieldsPlatform"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsPlatform"
   );
   const fetchFcn = async () => {
     const resp = await platformStore.fetchAll(params.toString());
@@ -223,6 +240,7 @@ export const PlatformView = observer(() => {
 
   return (
     <MyGenericView<PlatformInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -232,6 +250,8 @@ export const PlatformView = observer(() => {
       TableComponent={PlatformTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

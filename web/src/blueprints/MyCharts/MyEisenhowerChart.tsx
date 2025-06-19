@@ -71,7 +71,6 @@ const compress = (value: number, factor = 0.9) => {
 };
 
 export function MyEisenhowerChart<T>({ items }: Props<T>) {
-  if (items.length === 0) return <div>No data</div>;
   const [selectedItem, setSelectedItem] = useState<Item<T>>();
   const { isVisible1, setVisible1 } = useVisible();
 
@@ -94,6 +93,8 @@ export function MyEisenhowerChart<T>({ items }: Props<T>) {
       item,
     };
   });
+
+  if (items.length === 0) return <div>No data</div>;
 
   return (
     <>

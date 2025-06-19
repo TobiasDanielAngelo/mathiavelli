@@ -29,6 +29,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: CategoryViewContext, useGenericView: useCategoryView } =
   createGenericViewContext<CategoryInterface>();
 
+const title = "Categories";
+
 export const CategoryIdMap = {
   "Receivable Payment": 1000001,
   "Payable Payment": 1000002,
@@ -121,6 +123,7 @@ export const CategoryCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={CategoryCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={categoryStore.items}
@@ -160,13 +163,23 @@ export const CategoryRow = observer((props: { item: Category }) => {
 
 export const CategoryTable = observer(() => {
   const { categoryStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useCategoryView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useCategoryView();
 
   return (
     <MyGenericTable
       items={categoryStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -189,6 +202,10 @@ export const CategoryView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof CategoryInterface)[],
     "shownFieldsCategory"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsCategory"
   );
   const fetchFcn = async () => {
     const resp = await categoryStore.fetchAll(params.toString());
@@ -237,6 +254,7 @@ export const CategoryView = observer(() => {
 
   return (
     <MyGenericView<CategoryInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -246,6 +264,8 @@ export const CategoryView = observer(() => {
       TableComponent={CategoryTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

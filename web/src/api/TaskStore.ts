@@ -25,6 +25,7 @@ const props = {
   title: prop<string>(""),
   description: prop<string>(""),
   goal: prop<number | null>(null),
+  habit: prop<number | null>(null),
   schedule: prop<number | null>(null),
   importance: prop<number>(0),
   dueDate: prop<string>(""),
@@ -72,6 +73,13 @@ export class Task extends Model(props) {
     );
   }
 
+  get habitTitle() {
+    return (
+      getRoot<Store>(this)?.habitStore?.allItems.get(this.habit ?? -1)?.title ||
+      "—"
+    );
+  }
+
   get dateDuration() {
     return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
   }
@@ -88,6 +96,9 @@ export class Task extends Model(props) {
       goalTitle:
         getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.title ||
         "—",
+      habitTitle:
+        getRoot<Store>(this)?.habitStore?.allItems.get(this.habit ?? -1)
+          ?.title || "—",
       scheduleName:
         getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
           ?.name || "—",

@@ -30,6 +30,8 @@ export const {
   useGenericView: useWaistMeasurementView,
 } = createGenericViewContext<WaistMeasurementInterface>();
 
+const title = "Waist Measurements";
+
 export const WaistMeasurementIdMap = {} as const;
 
 export const WaistMeasurementForm = ({
@@ -100,6 +102,7 @@ export const WaistMeasurementCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={WaistMeasurementCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={waistMeasurementStore.items}
@@ -141,13 +144,23 @@ export const WaistMeasurementRow = observer(
 
 export const WaistMeasurementTable = observer(() => {
   const { waistMeasurementStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useWaistMeasurementView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useWaistMeasurementView();
 
   return (
     <MyGenericTable
       items={waistMeasurementStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -170,6 +183,10 @@ export const WaistMeasurementView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof WaistMeasurementInterface)[],
     "shownFieldsWaistMeasurement"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsWaistMeasurement"
   );
   const fetchFcn = async () => {
     const resp = await waistMeasurementStore.fetchAll(params.toString());
@@ -220,6 +237,7 @@ export const WaistMeasurementView = observer(() => {
 
   return (
     <MyGenericView<WaistMeasurementInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -229,6 +247,8 @@ export const WaistMeasurementView = observer(() => {
       TableComponent={WaistMeasurementTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

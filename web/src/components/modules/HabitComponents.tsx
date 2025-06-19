@@ -1,7 +1,12 @@
 import { observer } from "mobx-react-lite";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Habit, HabitFields, HabitInterface } from "../../api/HabitStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
@@ -12,20 +17,14 @@ import {
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  sortAndFilterByIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { MyMultiDropdownSelector } from "../../blueprints";
+import { toOptions, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { useMemo, useState } from "react";
-import { KV } from "../../blueprints/ItemDetails";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: HabitViewContext, useGenericView: useHabitView } =
   createGenericViewContext<HabitInterface>();
+
+const title = "Habits";
 
 export const HabitIdMap = {} as const;
 
@@ -134,19 +133,13 @@ export const HabitCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              habitStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <HabitCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={HabitCard}
+          title={title}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={habitStore.items}
+        />
       }
       SideB={<HabitDashboard />}
       ratio={0.7}
@@ -182,13 +175,23 @@ export const HabitRow = observer((props: { item: Habit }) => {
 
 export const HabitTable = observer(() => {
   const { habitStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useHabitView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useHabitView();
 
   return (
     <MyGenericTable
       items={habitStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -211,6 +214,10 @@ export const HabitView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof HabitInterface)[],
     "shownFieldsHabit"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsHabit"
   );
   const fetchFcn = async () => {
     const resp = await habitStore.fetchAll(params.toString());
@@ -257,6 +264,7 @@ export const HabitView = observer(() => {
 
   return (
     <MyGenericView<HabitInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -266,6 +274,8 @@ export const HabitView = observer(() => {
       TableComponent={HabitTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

@@ -31,6 +31,8 @@ export const {
   useGenericView: useCredentialView,
 } = createGenericViewContext<CredentialInterface>();
 
+const title = "Credentials";
+
 export const CredentialIdMap = {} as const;
 
 export const CredentialForm = ({
@@ -164,6 +166,7 @@ export const CredentialCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={CredentialCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={credentialStore.items}
@@ -203,13 +206,23 @@ export const CredentialRow = observer((props: { item: Credential }) => {
 
 export const CredentialTable = observer(() => {
   const { credentialStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useCredentialView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useCredentialView();
 
   return (
     <MyGenericTable
       items={credentialStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -232,6 +245,10 @@ export const CredentialView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof CredentialInterface)[],
     "shownFieldsCredential"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsCredential"
   );
   const fetchFcn = async () => {
     const resp = await credentialStore.fetchAll(params.toString());
@@ -300,6 +317,7 @@ export const CredentialView = observer(() => {
 
   return (
     <MyGenericView<CredentialInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -309,6 +327,8 @@ export const CredentialView = observer(() => {
       TableComponent={CredentialTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

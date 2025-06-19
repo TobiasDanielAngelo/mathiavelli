@@ -28,6 +28,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: JournalViewContext, useGenericView: useJournalView } =
   createGenericViewContext<JournalInterface>();
 
+const title = "Journals";
+
 export const JournalIdMap = {} as const;
 
 export const JournalForm = ({
@@ -120,6 +122,7 @@ export const JournalCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={JournalCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={journalStore.items}
@@ -159,13 +162,23 @@ export const JournalRow = observer((props: { item: Journal }) => {
 
 export const JournalTable = observer(() => {
   const { journalStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useJournalView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useJournalView();
 
   return (
     <MyGenericTable
       items={journalStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -188,6 +201,10 @@ export const JournalView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof JournalInterface)[],
     "shownFieldsJournal"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsJournal"
   );
   const fetchFcn = async () => {
     const resp = await journalStore.fetchAll(params.toString());
@@ -234,6 +251,7 @@ export const JournalView = observer(() => {
 
   return (
     <MyGenericView<JournalInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -243,6 +261,8 @@ export const JournalView = observer(() => {
       TableComponent={JournalTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

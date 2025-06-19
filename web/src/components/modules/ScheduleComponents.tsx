@@ -1,4 +1,6 @@
 import { observer } from "mobx-react-lite";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   FREQ_CHOICES,
   Schedule,
@@ -7,7 +9,10 @@ import {
   WEEKDAY_CHOICES,
 } from "../../api/ScheduleStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
@@ -21,19 +26,16 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import {
   generateCollidingDates,
   range,
-  sortAndFilterByIds,
   toOptions,
   toTitleCase,
 } from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { useMemo, useState } from "react";
-import { KV } from "../../blueprints/ItemDetails";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: ScheduleViewContext, useGenericView: useScheduleView } =
   createGenericViewContext<ScheduleInterface>();
+
+const title = "Schedules";
 
 export const ScheduleIdMap = {} as const;
 
@@ -223,19 +225,13 @@ export const ScheduleCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              scheduleStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <ScheduleCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={ScheduleCard}
+          title={title}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={scheduleStore.items}
+        />
       }
       SideB={<ScheduleDashboard />}
       ratio={0.7}
@@ -271,13 +267,23 @@ export const ScheduleRow = observer((props: { item: Schedule }) => {
 
 export const ScheduleTable = observer(() => {
   const { scheduleStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useScheduleView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useScheduleView();
 
   return (
     <MyGenericTable
       items={scheduleStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -300,6 +306,10 @@ export const ScheduleView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof ScheduleInterface)[],
     "shownFieldsSchedule"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsSchedule"
   );
   const fetchFcn = async () => {
     const resp = await scheduleStore.fetchAll(params.toString());
@@ -348,6 +358,7 @@ export const ScheduleView = observer(() => {
 
   return (
     <MyGenericView<ScheduleInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -357,6 +368,8 @@ export const ScheduleView = observer(() => {
       TableComponent={ScheduleTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

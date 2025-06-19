@@ -10,7 +10,7 @@ export const MyTable = (props: {
     <div
       className={"relative overflow-x-auto shadow-md sm:rounded-lg mt-4 mx-5"}
     >
-      <table className="w-[300%] md:w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <table className="m-auto min-w-[50%] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead className="text-md text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             {matrix[0].map((s, ind) => (

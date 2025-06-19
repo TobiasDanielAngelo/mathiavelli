@@ -29,6 +29,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: FollowUpViewContext, useGenericView: useFollowUpView } =
   createGenericViewContext<FollowUpInterface>();
 
+const title = "Follow Ups";
+
 export const FollowUpIdMap = {} as const;
 
 export const FollowUpForm = ({
@@ -107,6 +109,7 @@ export const FollowUpCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={FollowUpCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={followUpStore.items}
@@ -146,13 +149,23 @@ export const FollowUpRow = observer((props: { item: FollowUp }) => {
 
 export const FollowUpTable = observer(() => {
   const { followUpStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useFollowUpView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useFollowUpView();
 
   return (
     <MyGenericTable
       items={followUpStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -175,6 +188,10 @@ export const FollowUpView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof FollowUpInterface)[],
     "shownFieldsFollowUp"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsFollowUp"
   );
   const fetchFcn = async () => {
     const resp = await followUpStore.fetchAll(params.toString());
@@ -238,6 +255,7 @@ export const FollowUpView = observer(() => {
 
   return (
     <MyGenericView<FollowUpInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -247,6 +265,8 @@ export const FollowUpView = observer(() => {
       TableComponent={FollowUpTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

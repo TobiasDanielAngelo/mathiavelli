@@ -33,6 +33,8 @@ export const {
   useGenericView: useBuyListItemView,
 } = createGenericViewContext<BuyListItemInterface>();
 
+const title = "Buy List Items";
+
 export const BuyListItemIdMap = {} as const;
 
 export const BuyListItemForm = ({
@@ -120,6 +122,7 @@ export const BuyListItemCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={BuyListItemCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={buyListItemStore.items}
@@ -159,13 +162,23 @@ export const BuyListItemRow = observer((props: { item: BuyListItem }) => {
 
 export const BuyListItemTable = observer(() => {
   const { buyListItemStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useBuyListItemView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useBuyListItemView();
 
   return (
     <MyGenericTable
       items={buyListItemStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -188,6 +201,10 @@ export const BuyListItemView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof BuyListItemInterface)[],
     "shownFieldsBuyListItem"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsBuyListItem"
   );
   const fetchFcn = async () => {
     const resp = await buyListItemStore.fetchAll(params.toString());
@@ -251,6 +268,7 @@ export const BuyListItemView = observer(() => {
 
   return (
     <MyGenericView<BuyListItemInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -260,6 +278,8 @@ export const BuyListItemView = observer(() => {
       TableComponent={BuyListItemTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

@@ -29,6 +29,8 @@ export const MyGenericView = observer(
     TableComponent: React.FC;
     shownFields: (keyof T)[];
     setShownFields: Dispatch<SetStateAction<(keyof T)[]>>;
+    sortFields: string[];
+    setSortFields: Dispatch<SetStateAction<string[]>>;
     availableGraphs: GraphType[];
     actionModalDefs: readonly ActionModalDef[];
     pageDetails: PaginatedDetails | undefined;
@@ -37,6 +39,7 @@ export const MyGenericView = observer(
     params: URLSearchParams;
     setParams: SetURLSearchParams;
     itemMap: KV<any>[];
+    title: string;
   }) => {
     const {
       fetchFcn,
@@ -53,6 +56,9 @@ export const MyGenericView = observer(
       params,
       setParams,
       itemMap,
+      sortFields,
+      setSortFields,
+      title,
     } = props;
 
     const graphIconMap: Record<GraphType, { icon: IconName; label: string }> =
@@ -102,6 +108,7 @@ export const MyGenericView = observer(
           )
         }
         onClickPage={(n: number) => updatePage(() => n)}
+        title={title}
       />
     );
 
@@ -172,6 +179,8 @@ export const MyGenericView = observer(
       fetchFcn,
       itemMap,
       graph,
+      sortFields,
+      setSortFields,
     };
 
     return (

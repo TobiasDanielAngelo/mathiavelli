@@ -1,11 +1,16 @@
 import { observer } from "mobx-react-lite";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   HabitLog,
   HabitLogFields,
   HabitLogInterface,
 } from "../../api/HabitLogStore";
 import { useStore } from "../../api/Store";
+import { MyMultiDropdownSelector } from "../../blueprints";
+import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
 import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
@@ -16,20 +21,14 @@ import {
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  sortAndFilterByIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import { MyMultiDropdownSelector } from "../../blueprints";
+import { toOptions, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { useSearchParams } from "react-router-dom";
-import { useMemo, useState } from "react";
-import { KV } from "../../blueprints/ItemDetails";
+import { Field, PaginatedDetails } from "../../constants/interfaces";
 
 export const { Context: HabitLogViewContext, useGenericView: useHabitLogView } =
   createGenericViewContext<HabitLogInterface>();
+
+const title = "Habit Logs";
 
 export const HabitLogIdMap = {} as const;
 
@@ -109,19 +108,13 @@ export const HabitLogCollection = observer(() => {
   return (
     <SideBySideView
       SideA={
-        <div className="flex flex-col min-h-[85vh]">
-          <PageBar />
-          <div className="flex-1">
-            {sortAndFilterByIds(
-              habitLogStore.items,
-              pageDetails?.ids ?? [],
-              (s) => s.id
-            ).map((s) => (
-              <HabitLogCard item={s} key={s.id} />
-            ))}
-          </div>
-          <PageBar />
-        </div>
+        <MyGenericCollection
+          CardComponent={HabitLogCard}
+          title={title}
+          pageDetails={pageDetails}
+          PageBar={PageBar}
+          items={habitLogStore.items}
+        />
       }
       SideB={<HabitLogDashboard />}
       ratio={0.7}
@@ -157,13 +150,23 @@ export const HabitLogRow = observer((props: { item: HabitLog }) => {
 
 export const HabitLogTable = observer(() => {
   const { habitLogStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useHabitLogView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useHabitLogView();
 
   return (
     <MyGenericTable
       items={habitLogStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -186,6 +189,10 @@ export const HabitLogView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof HabitLogInterface)[],
     "shownFieldsHabitLog"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsHabitLog"
   );
   const fetchFcn = async () => {
     const resp = await habitLogStore.fetchAll(params.toString());
@@ -234,6 +241,7 @@ export const HabitLogView = observer(() => {
 
   return (
     <MyGenericView<HabitLogInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -243,6 +251,8 @@ export const HabitLogView = observer(() => {
       TableComponent={HabitLogTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

@@ -7,6 +7,8 @@ import { GraphType } from "./MyGenericView";
 export interface GenericViewProps<T> {
   shownFields: (keyof T)[];
   setShownFields: Dispatch<SetStateAction<(keyof T)[]>>;
+  sortFields: string[];
+  setSortFields: Dispatch<SetStateAction<string[]>>;
   params: URLSearchParams;
   setParams: SetURLSearchParams;
   pageDetails: PaginatedDetails | undefined;

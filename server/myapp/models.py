@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from .helpers import get_datetimes
 from . import fields
 
 
@@ -75,6 +76,10 @@ class Schedule(models.Model):
 
     def __str__(self):
         return self.name or f"{self.freq}"
+
+    @property
+    def datetimes(self):
+        return get_datetimes(self)
 
 
 class Journal(models.Model):

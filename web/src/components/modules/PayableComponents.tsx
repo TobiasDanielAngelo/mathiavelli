@@ -39,6 +39,8 @@ import { TransactionForm } from "./TransactionComponents";
 export const { Context: PayableViewContext, useGenericView: usePayableView } =
   createGenericViewContext<PayableInterface>();
 
+const title = "Payables";
+
 export const PayableIdMap = {} as const;
 
 export const PayableForm = ({
@@ -165,6 +167,7 @@ export const PayableCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={PayableCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={payableStore.items}
@@ -204,13 +207,23 @@ export const PayableRow = observer((props: { item: Payable }) => {
 
 export const PayableTable = observer(() => {
   const { payableStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    usePayableView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = usePayableView();
 
   return (
     <MyGenericTable
       items={payableStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -233,6 +246,10 @@ export const PayableView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof PayableInterface)[],
     "shownFieldsPayable"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsPayable"
   );
   const fetchFcn = async () => {
     const resp = await payableStore.fetchAll(params.toString());
@@ -289,6 +306,7 @@ export const PayableView = observer(() => {
 
   return (
     <MyGenericView<PayableInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -298,6 +316,8 @@ export const PayableView = observer(() => {
       TableComponent={PayableTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

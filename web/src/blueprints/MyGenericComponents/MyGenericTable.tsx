@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import {
   camelToSnakeCase,
   formatValue,
@@ -9,10 +9,12 @@ import {
 import { KV } from "../ItemDetails";
 import { MyTable } from "../MyTable";
 
-type MyGenericTableProps<T extends Record<string, any>> = {
+type MyGenericTableProps<T extends object> = {
   items: T[];
   itemMap?: KV<any>[];
   shownFields: (keyof T & string)[];
+  sortFields: string[];
+  setSortFields: Dispatch<SetStateAction<string[]>>;
   priceFields?: (keyof T & string)[];
   pageIds: number[];
   setParams: (updater: (params: URLSearchParams) => URLSearchParams) => void;
@@ -26,6 +28,8 @@ export const MyGenericTable = observer(
     items,
     itemMap,
     shownFields,
+    sortFields,
+    setSortFields,
     priceFields,
     pageIds,
     setParams,
@@ -66,6 +70,7 @@ export const MyGenericTable = observer(
 
           newParams.delete("order_by");
           newOrderBy.forEach((field) => newParams.append("order_by", field));
+          setSortFields(newOrderBy);
           newParams.set("page", "1");
           return newParams;
         });
@@ -109,13 +114,23 @@ export const MyGenericTable = observer(
       itemMap,
     ]);
 
+    useEffect(() => {
+      setParams((t) => {
+        const newParams = new URLSearchParams(t);
+        newParams.delete("order_by");
+        sortFields.forEach((field) => newParams.append("order_by", field));
+        newParams.set("page", "1");
+        return newParams;
+      });
+    }, []);
+
     return (
       <div className="flex flex-1 flex-col min-h-[85vh] max-h-[85vh] w-5/6 justify-center m-auto">
         <div className="sticky top-0">
           <PageBar />
         </div>
         <div className="flex-1 overflow-scroll">
-          <MyTable matrix={matrix} />
+          <MyTable matrix={matrix} hidden={!shownFields.length} />
         </div>
       </div>
     );

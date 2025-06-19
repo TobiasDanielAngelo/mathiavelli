@@ -28,6 +28,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: GoalViewContext, useGenericView: useGoalView } =
   createGenericViewContext<GoalInterface>();
 
+const title = "Goals";
+
 export const GoalIdMap = {} as const;
 
 export const GoalForm = ({
@@ -147,6 +149,7 @@ export const GoalCollection = observer(() => {
       SideB={
         <MyGenericCollection
           CardComponent={GoalCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={goalStore.items.filter((s) => s.parentGoal == null)}
@@ -186,13 +189,23 @@ export const GoalRow = observer((props: { item: Goal }) => {
 
 export const GoalTable = observer(() => {
   const { goalStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useGoalView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useGoalView();
 
   return (
     <MyGenericTable
       items={goalStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -215,6 +228,10 @@ export const GoalView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof GoalInterface)[],
     "shownFieldsGoal"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsGoal"
   );
   const fetchFcn = async () => {
     const resp = await goalStore.fetchAll(params.toString());
@@ -271,6 +288,7 @@ export const GoalView = observer(() => {
 
   return (
     <MyGenericView<GoalInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -280,6 +298,8 @@ export const GoalView = observer(() => {
       TableComponent={GoalTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

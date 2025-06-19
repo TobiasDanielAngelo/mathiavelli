@@ -29,6 +29,8 @@ import MyTimelineChart from "../../blueprints/MyCharts/MyTimelineChart";
 export const { Context: WeighInViewContext, useGenericView: useWeighInView } =
   createGenericViewContext<WeighInInterface>();
 
+const title = "Weigh Ins";
+
 export const WeighInIdMap = {} as const;
 
 export const WeighInForm = ({
@@ -101,6 +103,7 @@ export const WeighInCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={WeighInCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={weighInStore.items}
@@ -140,13 +143,23 @@ export const WeighInRow = observer((props: { item: WeighIn }) => {
 
 export const WeighInTable = observer(() => {
   const { weighInStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useWeighInView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useWeighInView();
 
   return (
     <MyGenericTable
       items={weighInStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -169,6 +182,10 @@ export const WeighInView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof WeighInInterface)[],
     "shownFieldsWeighIn"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsWeighIn"
   );
   const fetchFcn = async () => {
     const resp = await weighInStore.fetchAll(params.toString());
@@ -215,6 +232,7 @@ export const WeighInView = observer(() => {
 
   return (
     <MyGenericView<WeighInInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -224,6 +242,8 @@ export const WeighInView = observer(() => {
       TableComponent={WeighInTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

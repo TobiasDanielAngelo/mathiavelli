@@ -26,6 +26,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
 
+const title = "Events";
+
 export const EventIdMap = {} as const;
 
 export const EventForm = ({
@@ -157,6 +159,7 @@ export const EventCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={EventCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={eventStore.items}
@@ -196,13 +199,23 @@ export const EventRow = observer((props: { item: Event }) => {
 
 export const EventTable = observer(() => {
   const { eventStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useEventView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useEventView();
 
   return (
     <MyGenericTable
       items={eventStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -225,6 +238,10 @@ export const EventView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof EventInterface)[],
     "shownFieldsEvent"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsEvent"
   );
   const fetchFcn = async () => {
     const resp = await eventStore.fetchAll(params.toString());
@@ -281,6 +298,7 @@ export const EventView = observer(() => {
 
   return (
     <MyGenericView<EventInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -290,6 +308,8 @@ export const EventView = observer(() => {
       TableComponent={EventTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}

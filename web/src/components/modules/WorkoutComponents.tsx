@@ -29,6 +29,8 @@ import { Field, PaginatedDetails } from "../../constants/interfaces";
 export const { Context: WorkoutViewContext, useGenericView: useWorkoutView } =
   createGenericViewContext<WorkoutInterface>();
 
+const title = "Workouts";
+
 export const WorkoutIdMap = {} as const;
 
 export const WorkoutForm = ({
@@ -107,6 +109,7 @@ export const WorkoutCollection = observer(() => {
       SideA={
         <MyGenericCollection
           CardComponent={WorkoutCard}
+          title={title}
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={workoutStore.items}
@@ -146,13 +149,23 @@ export const WorkoutRow = observer((props: { item: Workout }) => {
 
 export const WorkoutTable = observer(() => {
   const { workoutStore } = useStore();
-  const { shownFields, params, setParams, pageDetails, PageBar, itemMap } =
-    useWorkoutView();
+  const {
+    shownFields,
+    params,
+    setParams,
+    pageDetails,
+    PageBar,
+    itemMap,
+    sortFields,
+    setSortFields,
+  } = useWorkoutView();
 
   return (
     <MyGenericTable
       items={workoutStore.items}
       shownFields={shownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
       params={params}
       setParams={setParams}
@@ -175,6 +188,10 @@ export const WorkoutView = observer(() => {
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof WorkoutInterface)[],
     "shownFieldsWorkout"
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    "sortFieldsWorkout"
   );
   const fetchFcn = async () => {
     const resp = await workoutStore.fetchAll(params.toString());
@@ -221,6 +238,7 @@ export const WorkoutView = observer(() => {
 
   return (
     <MyGenericView<WorkoutInterface>
+      title={title}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
@@ -230,6 +248,8 @@ export const WorkoutView = observer(() => {
       TableComponent={WorkoutTable}
       shownFields={shownFields}
       setShownFields={setShownFields}
+      sortFields={sortFields}
+      setSortFields={setSortFields}
       availableGraphs={["pie", "line"]}
       pageDetails={pageDetails}
       params={params}
