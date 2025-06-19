@@ -55,7 +55,7 @@ export class Habit extends Model(props) {
 
   get goalName() {
     return (
-      getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.name ||
+      getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.title ||
       "—"
     );
   }
@@ -70,7 +70,7 @@ export class Habit extends Model(props) {
     return {
       ...this.$,
       goalName:
-        getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.name ||
+        getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.title ||
         "—",
       scheduleName:
         getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)

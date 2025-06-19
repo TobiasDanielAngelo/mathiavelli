@@ -49,7 +49,7 @@ export class HabitLog extends Model(props) {
 
   get habitName() {
     return (
-      getRoot<Store>(this)?.habitStore?.allItems.get(this.habit ?? -1)?.name ||
+      getRoot<Store>(this)?.habitStore?.allItems.get(this.habit ?? -1)?.title ||
       "—"
     );
   }
@@ -59,7 +59,7 @@ export class HabitLog extends Model(props) {
       ...this.$,
       habitName:
         getRoot<Store>(this)?.habitStore?.allItems.get(this.habit ?? -1)
-          ?.name || "—",
+          ?.title || "—",
     };
   }
 }
