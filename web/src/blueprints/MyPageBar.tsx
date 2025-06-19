@@ -98,7 +98,7 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
           ))
         )}
         <li>
-          {currentPage === totalPages ? (
+          {currentPage >= totalPages ? (
             <></>
           ) : (
             <div

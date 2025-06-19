@@ -25,12 +25,14 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import {
   generateCollidingDates,
+  generateScheduleDefinition,
   range,
   toOptions,
   toTitleCase,
 } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
 import { Field, PaginatedDetails } from "../../constants/interfaces";
+import moment from "moment";
 
 export const { Context: ScheduleViewContext, useGenericView: useScheduleView } =
   createGenericViewContext<ScheduleInterface>();
@@ -147,10 +149,21 @@ export const ScheduleForm = ({
         ],
         [
           {
+            name: "scheduleDefinitions",
+            label: "Schedule Definition",
+            type: "function",
+            function: (t) => generateScheduleDefinition(t),
+          },
+        ],
+        [
+          {
             name: "collidings",
             label: "Colliding Dates",
             type: "function",
-            function: (t) => generateCollidingDates(t).join("\n"),
+            function: (t) =>
+              generateCollidingDates(t)
+                .map((s) => moment(s).format("lll"))
+                .join("\n"),
           },
         ],
       ] satisfies Field[][],
@@ -204,6 +217,7 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
         "freqName",
         "interval",
         "weekStartName",
+        "definition",
         "collidingDates",
       ]}
       prices={ScheduleFields.prices}

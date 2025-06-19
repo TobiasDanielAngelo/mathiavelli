@@ -7,8 +7,6 @@ class MyappConfig(AppConfig):
 
     def ready(self):
         from . import signals
-
-        # from .utils import generate_missing_events_for_today
         import sys
 
         if "runserver" in sys.argv:

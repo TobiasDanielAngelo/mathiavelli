@@ -171,6 +171,7 @@ class TaskSerializer(serializers.ModelSerializer):
                     "date_end": ["End time must be after start time."],
                 }
             )
+        return super().validate(data)
 
 
 class LoginSerializer(serializers.Serializer):

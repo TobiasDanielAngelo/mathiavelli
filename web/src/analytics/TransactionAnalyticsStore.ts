@@ -8,7 +8,7 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
-import { fetchItemsRequest } from "../constants/storeHelpers";
+import { fetchItemsRequest } from "../api/_apiHelpers";
 import Swal from "sweetalert2";
 
 const slug = "analytics/transactions";

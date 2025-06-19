@@ -234,7 +234,7 @@ export const EventView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Event({}).$;
+  const objWithFields = new Event({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof EventInterface)[],
     "shownFieldsEvent"

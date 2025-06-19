@@ -20,11 +20,11 @@ def decode_query_param(encoded_param):
 
 class CustomModelViewSet(viewsets.ModelViewSet):
     permission_classes = [
-        AllowAny,
-        # IsAuthenticated,
-        # CustomDjangoModelPermission,
+        # AllowAny,
+        IsAuthenticated,
+        CustomDjangoModelPermission,
     ]
-    # authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,)
 
     def list(self, request, *args, **kwargs):
         params = self.request.query_params.copy()
@@ -47,7 +47,7 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         for key, value in params.items():
             base_key = key.split("__")[0]
             if base_key not in model_fields:
-                print(f"Skipping invalid field: {key}")
+                # print(f"Skipping field: {key}")
                 continue
             if "__search" in key:
                 field_name = key.replace("__search", "")
@@ -243,7 +243,6 @@ class TaskViewSet(CustomModelViewSet):
 
     def perform_update(self, serializer):
         task = serializer.save()
-
         if task.is_completed or task.is_cancelled:
             if hasattr(task, "event_task"):
                 task.event_task.delete()
@@ -339,10 +338,6 @@ class HabitViewSet(CustomModelViewSet):
         habit = serializer.save()
         self.create_or_update_task(habit)
 
-    def create_or_update_event_from_task(self, task):
-        task_view = TaskViewSet()
-        task_view.create_or_update_event(task)
-
     def create_or_update_task(self, habit):
         if not habit.date_start or not habit.date_end:
             if hasattr(habit, "task_habit"):
@@ -368,8 +363,6 @@ class HabitViewSet(CustomModelViewSet):
                 "importance": 5,
             },
         )
-
-        self.create_or_update_event_from_task(task)
 
         if not created:
             task.title = habit.title

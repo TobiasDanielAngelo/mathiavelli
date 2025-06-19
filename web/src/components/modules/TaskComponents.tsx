@@ -157,7 +157,7 @@ export const TaskCard = observer((props: { item: Task }) => {
         "isCompleted",
         "goalTitle",
         "habitTitle",
-        // "scheduleName",
+        "scheduleDefinition",
         "dateCompleted",
         "dateDuration",
       ]}
@@ -271,7 +271,7 @@ export const TaskView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Task({}).$;
+  const objWithFields = new Task({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof TaskInterface)[],
     "shownFieldsTask"

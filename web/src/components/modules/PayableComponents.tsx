@@ -242,7 +242,7 @@ export const PayableView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Payable({}).$;
+  const objWithFields = new Payable({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof PayableInterface)[],
     "shownFieldsPayable"

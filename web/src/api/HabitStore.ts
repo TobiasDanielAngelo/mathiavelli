@@ -13,7 +13,7 @@ import {
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
-} from "../constants/storeHelpers";
+} from "./_apiHelpers";
 import { Store } from "./Store";
 import Swal from "sweetalert2";
 
@@ -59,10 +59,10 @@ export class Habit extends Model(props) {
       "—"
     );
   }
-  get scheduleName() {
+  get scheduleDefinition() {
     return (
       getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
-        ?.name || "—"
+        ?.definition || "—"
     );
   }
 
@@ -72,9 +72,9 @@ export class Habit extends Model(props) {
       goalName:
         getRoot<Store>(this)?.goalStore?.allItems.get(this.goal ?? -1)?.title ||
         "—",
-      scheduleName:
+      scheduleDefinition:
         getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
-          ?.name || "—",
+          ?.definition || "—",
     };
   }
 }

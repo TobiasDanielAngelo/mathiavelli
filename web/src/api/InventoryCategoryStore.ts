@@ -6,7 +6,7 @@ import {
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
-} from "../constants/storeHelpers";
+} from "./_apiHelpers";
 
 const slug = "inventory-categories";
 

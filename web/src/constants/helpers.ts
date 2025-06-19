@@ -322,6 +322,7 @@ export const getFirstWords = (str: string, len = 1) => {
 };
 
 export const isDatetimeValue = (val: any) => {
+  if (val instanceof Date && !isNaN(val.getTime())) return true;
   if (typeof val !== "string") return false;
   const parsed = Date.parse(val);
   // Ensure it's a valid date and includes time components
@@ -331,6 +332,7 @@ export const isDatetimeValue = (val: any) => {
 };
 
 export const isDateValue = (val: any) => {
+  if (val instanceof Date && !isNaN(val.getTime())) return true;
   if (typeof val !== "string") return false;
   const parsed = Date.parse(val);
   return (
@@ -356,11 +358,24 @@ export const formatValue = (
   if (typeof value === "boolean") {
     return value ? "✅ Yes" : "❌ No";
   }
-  if (isDatetimeValue(value)) {
-    return moment(value).format("MMM D, YYYY h:mm A");
-  }
-  if (isDateValue(value)) {
-    return moment(value).format("MMM D, YYYY");
+  if (Array.isArray(value) && value.length > 0) {
+    if (isDatetimeValue(value[0])) {
+      return value
+        .map((s) => moment(s).format("MMM D, YYYY h:mm A"))
+        .join("\n");
+    }
+    if (isDateValue(value[0])) {
+      return value.map((s) => moment(s).format("MMM D, YYYY")).join("\n");
+    } else {
+      return value.join(", ");
+    }
+  } else {
+    if (isDatetimeValue(value)) {
+      return moment(value).format("MMM D, YYYY h:mm A");
+    }
+    if (isDateValue(value)) {
+      return moment(value).format("MMM D, YYYY");
+    }
   }
 
   return value?.toString() || "—";
@@ -669,7 +684,7 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
   }
 }
 
-export function generateCollidingDates(sched: Schedule): (string | Date)[] {
+export function generateCollidingDates(sched: Schedule): Date[] {
   const schedule = sched.$ ?? sched;
   const rule = buildRRule(schedule);
   if (!rule) return [];
@@ -677,7 +692,129 @@ export function generateCollidingDates(sched: Schedule): (string | Date)[] {
   return rule
     .all()
     .map(fromUTCForRRule)
-    .map((dt) => moment(dt).format("lll"));
+    .filter((t) => t !== null);
+  // .map((dt) => moment(dt).format("lll"));
+}
+
+export function rruleToDetailedText(rule: RRule): string {
+  const options = rule.options;
+
+  const freqMap = {
+    [RRule.DAILY]: "Daily",
+    [RRule.WEEKLY]: "Weekly",
+    [RRule.MONTHLY]: "Monthly",
+    [RRule.YEARLY]: "Yearly",
+    [RRule.HOURLY]: "Hourly",
+    [RRule.MINUTELY]: "Every minute",
+    [RRule.SECONDLY]: "Every second",
+  };
+
+  const weekdayMap: Record<string, string> = {
+    MO: "Monday",
+    TU: "Tuesday",
+    WE: "Wednesday",
+    TH: "Thursday",
+    FR: "Friday",
+    SA: "Saturday",
+    SU: "Sunday",
+  };
+
+  const monthMap = [
+    "",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const freqLabel = freqMap[options.freq] || "Repeats";
+
+  const byDay =
+    options.byweekday?.length > 0
+      ? options.byweekday
+          .map(
+            (d) =>
+              weekdayMap[d.toString() as keyof typeof weekdayMap] ||
+              d.toString()
+          )
+          .join(", ")
+      : null;
+
+  const byMonthDay = options.bymonthday?.length
+    ? "on the " +
+      options.bymonthday.map((t) => `${t}${getOrdinal(t)}`).join(", ") +
+      " day"
+    : null;
+
+  const byYearDay = options.byyearday?.length
+    ? "on day " + options.byyearday.join(", ")
+    : null;
+
+  const byWeekNo = options.byweekno?.length
+    ? "on week " + options.byweekno.join(", ")
+    : null;
+
+  const byMonth = options.bymonth?.length
+    ? "in " + options.bymonth.map((m) => monthMap[m] || `Month ${m}`).join(", ")
+    : null;
+
+  const hours = options.byhour || [];
+  const minutes = options.byminute || [0];
+
+  const times: string[] = [];
+  for (const hour of hours) {
+    for (const minute of minutes) {
+      const timeStr = moment({ hour, minute }).format("h:mm A");
+      times.push(timeStr);
+    }
+  }
+
+  const byTime = times.length > 0 ? `at ${times.join(", ")}` : null;
+
+  const interval =
+    options.interval > 1
+      ? `every ${options.interval} ${freqLabel
+          .toLowerCase()
+          .replace("ly", "")}s`
+      : freqLabel.toLowerCase();
+
+  const parts = [];
+  if (options.dtstart) {
+    parts.push(`Starting ${moment(options.dtstart).format("MMM D, YYYY")},`);
+  }
+  if (interval) parts.push(interval);
+  if (byDay) parts.push("on " + byDay);
+  if (byWeekNo) parts.push(byWeekNo);
+  if (byMonthDay) parts.push(byMonthDay);
+  if (byYearDay) parts.push(byYearDay);
+  if (byMonth) parts.push(byMonth);
+  if (byTime) parts.push(byTime);
+  if (options.count) {
+    parts.push(`for ${options.count} time${options.count > 1 ? "s" : ""}`);
+  }
+
+  if (options.until) {
+    parts.push(`until ${moment(options.until).format("MMM D, YYYY")}`);
+  }
+
+  return parts.join(" ");
+}
+
+export function generateScheduleDefinition(sched: Schedule): string {
+  const schedule = sched.$ ?? sched;
+  const rule = buildRRule(schedule);
+  if (!rule) return "";
+
+  return rruleToDetailedText(rule);
+  // .map((dt) => moment(dt).format("lll"));
 }
 
 export function range(a: number, b: number): number[] {

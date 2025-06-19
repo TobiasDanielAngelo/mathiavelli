@@ -1,8 +1,8 @@
-import { PaginatedResponse } from "./interfaces";
+import { PaginatedResponse } from "../constants/interfaces";
 
-const getToken = () => localStorage.getItem("@userToken") ?? "";
+export const getToken = () => localStorage.getItem("@userToken") ?? "";
 
-async function request<T>(
+export async function guidedRequest<T>(
   endpoint: string,
   options: {
     method: "GET" | "POST" | "PATCH" | "DELETE";
@@ -63,7 +63,7 @@ export async function fetchItemsRequest<T>(
   data: T[] | null;
   pageDetails?: Omit<PaginatedResponse<T>, "results">;
 }> {
-  const result = await request<{
+  const result = await guidedRequest<{
     results: T[];
     count: number;
     next: string | null;
@@ -81,7 +81,7 @@ export async function fetchItemsRequest<T>(
 }
 
 export async function postItemRequest<T>(endpoint: string, body: T) {
-  return await request<T>(endpoint, {
+  return await guidedRequest<T>(endpoint, {
     method: "POST",
     body: body,
   });
@@ -92,7 +92,7 @@ export async function updateItemRequest<T>(
   itemId: number,
   body: T
 ) {
-  return await request<T>(endpoint, {
+  return await guidedRequest<T>(endpoint, {
     method: "PATCH",
     body: body,
     itemId: itemId,
@@ -100,7 +100,7 @@ export async function updateItemRequest<T>(
 }
 
 export async function deleteItemRequest(endpoint: string, itemId: number) {
-  return await request(endpoint, {
+  return await guidedRequest(endpoint, {
     method: "DELETE",
     itemId: itemId,
   });

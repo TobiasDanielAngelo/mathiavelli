@@ -396,7 +396,7 @@ class BaseArrayField(models.JSONField):
         **kwargs,
     ):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", [])
+        kwargs.setdefault("default", list)
 
         self.base_type = base_type
         self.min_items = min_items

@@ -197,7 +197,7 @@ export const JournalView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Journal({}).$;
+  const objWithFields = new Journal({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof JournalInterface)[],
     "shownFieldsJournal"

@@ -184,7 +184,7 @@ export const WorkoutView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Workout({}).$;
+  const objWithFields = new Workout({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof WorkoutInterface)[],
     "shownFieldsWorkout"

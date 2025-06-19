@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
 import { Dispatch, SetStateAction, useState } from "react";
-import { TwoDates } from "../constants/classes";
 import { useWindowWidth } from "../constants/hooks";
 import { GuidedDiv } from "./MyGuidedDiv";
 import { MyIcon } from "./MyIcon";
@@ -70,10 +69,14 @@ export const MyCalendar = observer(
             const isSelected = day.isSame(date, "day");
             const isWeekend = day.day() === 0 || day.day() === 6;
 
-            const dayEvents = events.filter((e) =>
-              new TwoDates(e.start, e.end).contains(
-                day.endOf("day").subtract(1, "second").toDate()
-              )
+            const dayEvents = events.filter(
+              (e) =>
+                day.format("YYYY-MM-DD") ===
+                  moment(e.start).format("YYYY-MM-DD") ||
+                day.format("YYYY-MM-DD") === moment(e.end).format("YYYY-MM-DD")
+              // new TwoDates(e.start, e.end).contains(
+              //   day.endOf("day").subtract(1, "second").toDate()
+              // )
             );
 
             return (

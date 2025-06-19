@@ -198,7 +198,7 @@ export const CategoryView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Category({}).$;
+  const objWithFields = new Category({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof CategoryInterface)[],
     "shownFieldsCategory"

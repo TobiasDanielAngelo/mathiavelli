@@ -241,7 +241,7 @@ export const CredentialView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Credential({}).$;
+  const objWithFields = new Credential({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof CredentialInterface)[],
     "shownFieldsCredential"

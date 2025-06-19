@@ -179,7 +179,7 @@ export const AccountView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Account({}).$;
+  const objWithFields = new Account({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof AccountInterface)[],
     "shownFieldsAccount"

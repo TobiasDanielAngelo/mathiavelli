@@ -184,7 +184,7 @@ export const FollowUpView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new FollowUp({}).$;
+  const objWithFields = new FollowUp({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof FollowUpInterface)[],
     "shownFieldsFollowUp"

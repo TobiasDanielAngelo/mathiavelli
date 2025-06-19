@@ -1,3 +1,4 @@
+import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -7,16 +8,15 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
-import { computed } from "mobx";
+import moment from "moment";
+import Swal from "sweetalert2";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
-} from "../constants/storeHelpers";
-import Swal from "sweetalert2";
+} from "./_apiHelpers";
 import { Store } from "./Store";
-import { TwoDates } from "../constants/classes";
 
 const slug = "tasks";
 
@@ -81,12 +81,14 @@ export class Task extends Model(props) {
   }
 
   get dateDuration() {
-    return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
+    return `${moment(this.dateStart).format("lll")}${
+      this.dateEnd ? " – " + moment(this.dateEnd).format("lll") : ""
+    }`;
   }
-  get scheduleName() {
+  get scheduleDefinition() {
     return (
       getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
-        ?.name || "—"
+        ?.definition || "—"
     );
   }
 
@@ -99,7 +101,7 @@ export class Task extends Model(props) {
       habitTitle:
         getRoot<Store>(this)?.habitStore?.allItems.get(this.habit ?? -1)
           ?.title || "—",
-      scheduleName:
+      scheduleDefinition:
         getRoot<Store>(this)?.scheduleStore?.allItems.get(this.schedule ?? -1)
           ?.name || "—",
       dateDuration: this.dateDuration,

@@ -181,7 +181,7 @@ export const TagView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Tag({}).$;
+  const objWithFields = new Tag({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof TagInterface)[],
     "shownFieldsTag"

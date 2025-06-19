@@ -1,3 +1,4 @@
+import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -7,16 +8,15 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
-import { computed } from "mobx";
+import moment from "moment";
+import Swal from "sweetalert2";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
-} from "../constants/storeHelpers";
-import Swal from "sweetalert2";
+} from "./_apiHelpers";
 import { Store } from "./Store";
-import { TwoDates } from "../constants/classes";
 
 const slug = "events";
 
@@ -61,7 +61,9 @@ export class Event extends Model(props) {
   }
 
   get dateDuration() {
-    return new TwoDates(this.start, this.end).getRangeString;
+    return `${moment(this.start).format("lll")}${
+      this.end ? " – " + moment(this.end).format("lll") : ""
+    }`;
   }
 
   get $view() {

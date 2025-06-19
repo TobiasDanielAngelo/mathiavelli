@@ -257,7 +257,7 @@ class Event(models.Model):
     location = fields.ShortCharField()
     tags = fields.OptionalManyToManyField(Tag)
     created_at = fields.AutoCreatedAtField()
-    task = fields.OptionalOneToOneField(Task)
+    task = fields.SetNullOptionalForeignKey(Task)
 
     def clean(self):
         if self.start and self.end and self.start >= self.end:

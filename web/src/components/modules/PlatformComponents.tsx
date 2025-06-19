@@ -184,7 +184,7 @@ export const PlatformView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Platform({}).$;
+  const objWithFields = new Platform({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof PlatformInterface)[],
     "shownFieldsPlatform"

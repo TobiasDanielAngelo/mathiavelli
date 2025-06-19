@@ -197,7 +197,7 @@ export const BuyListItemView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new BuyListItem({}).$;
+  const objWithFields = new BuyListItem({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof BuyListItemInterface)[],
     "shownFieldsBuyListItem"

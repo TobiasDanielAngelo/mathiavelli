@@ -6,16 +6,24 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework import permissions, response, status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authentication import TokenAuthentication
+from knox.auth import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 import os
 
 
-class LoginAPI(KnoxLoginView):
-    serializer_class = LoginSerializer
+class CustomAPIView(APIView):
+    permission_classes = [
+        IsAuthenticated,
+        # AllowAny
+    ]
     authentication_classes = [
         TokenAuthentication,
     ]
+
+
+class LoginAPI(KnoxLoginView):
+    serializer_class = LoginSerializer
     permission_classes = [
         permissions.AllowAny,
     ]
@@ -136,3 +144,12 @@ class ReauthAPI(APIView):
                 },
             }
             return response.Response(data)
+
+
+class GenerateEventsView(CustomAPIView):
+
+    def post(self, request):
+        from .utils import generate_missing_events
+
+        count = generate_missing_events()
+        return Response({"message": f"{count} events generated."})

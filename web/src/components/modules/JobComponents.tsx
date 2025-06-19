@@ -235,7 +235,7 @@ export const JobView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Job({}).$;
+  const objWithFields = new Job({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof JobInterface)[],
     "shownFieldsJob"

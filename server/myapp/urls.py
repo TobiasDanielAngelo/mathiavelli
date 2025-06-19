@@ -46,4 +46,5 @@ urlpatterns = [
     path("signup", views.RegistrationAPI.as_view(), name="register"),
     path("reauth", views.ReauthAPI.as_view(), name="reauth"),
     path("logout", KnoxLogoutView.as_view(), name="logout"),
+    path("generate-events", views.GenerateEventsView.as_view(), name="gen_events"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

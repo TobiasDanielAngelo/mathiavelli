@@ -57,7 +57,7 @@ export const HabitForm = ({
             name: "schedule",
             label: "Schedule",
             type: "select",
-            options: toOptions(scheduleStore.items, "name"),
+            options: toOptions(scheduleStore.items, "definition"),
           },
         ],
         [
@@ -110,7 +110,7 @@ export const HabitCard = observer((props: { item: Habit }) => {
         "dateEnd",
         "dateStart",
         "goalName",
-        "scheduleName",
+        "scheduleDefinition",
         "isArchived",
         "thresholdPercent",
       ]}
@@ -150,7 +150,7 @@ export const HabitCollection = observer(() => {
 export const HabitFilter = observer(() => {
   return (
     <MyGenericFilter
-      view={new Habit({}).$}
+      view={new Habit({}).$view}
       title="Habit Filters"
       dateFields={HabitFields.datetime}
       excludeFields={["id"]}
@@ -210,7 +210,7 @@ export const HabitView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Habit({}).$;
+  const objWithFields = new Habit({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof HabitInterface)[],
     "shownFieldsHabit"

@@ -30,6 +30,7 @@ import { PersonalItemView } from "../modules/PersonalItemComponents";
 import { HabitView } from "../modules/HabitComponents";
 import { HabitLogView } from "../modules/HabitLogComponents";
 import { ScheduleView } from "../modules/ScheduleComponents";
+import { generateMissingEvents } from "../../api/_apis";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -59,6 +60,7 @@ export const MainView = observer(() => {
     if (!resp.ok) {
       navigate("/login");
     } else {
+      generateMissingEvents();
       platformStore.fetchAll("page=all");
       accountStore.fetchAll("page=all");
       categoryStore.fetchAll("page=all");

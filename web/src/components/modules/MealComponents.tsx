@@ -183,7 +183,7 @@ export const MealView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Meal({}).$;
+  const objWithFields = new Meal({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof MealInterface)[],
     "shownFieldsMeal"

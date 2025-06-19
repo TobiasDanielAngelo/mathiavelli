@@ -185,7 +185,7 @@ export const HabitLogView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new HabitLog({}).$;
+  const objWithFields = new HabitLog({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof HabitLogInterface)[],
     "shownFieldsHabitLog"

@@ -173,7 +173,7 @@ export const BodyFatView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new BodyFat({}).$;
+  const objWithFields = new BodyFat({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof BodyFatInterface)[],
     "shownFieldsBodyFat"

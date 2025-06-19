@@ -6,8 +6,11 @@ import {
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
-} from "../constants/storeHelpers";
-import { generateCollidingDates } from "../constants/helpers";
+} from "./_apiHelpers";
+import {
+  generateCollidingDates,
+  generateScheduleDefinition,
+} from "../constants/helpers";
 
 const slug = "schedules";
 
@@ -81,9 +84,11 @@ export class Schedule extends Model(props) {
   }
 
   get collidingDates() {
-    return generateCollidingDates(this)
-      .map((s) => ` • ${s}`)
-      .join("\n");
+    return generateCollidingDates(this);
+  }
+
+  get definition() {
+    return generateScheduleDefinition(this);
   }
   get $view() {
     return {
@@ -92,6 +97,7 @@ export class Schedule extends Model(props) {
       weekStartName:
         WEEKDAY_CHOICES.find((_, ind) => ind === this.weekStart) ?? "—",
       collidingDates: this.collidingDates,
+      definition: this.definition,
     };
   }
 }

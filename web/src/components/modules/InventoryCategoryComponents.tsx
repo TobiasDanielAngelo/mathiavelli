@@ -179,7 +179,7 @@ export const InventoryCategoryView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new InventoryCategory({}).$;
+  const objWithFields = new InventoryCategory({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof InventoryCategoryInterface)[],
     "shownFieldsInventoryCategory"

@@ -243,7 +243,7 @@ export const ReceivableView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Receivable({}).$;
+  const objWithFields = new Receivable({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof ReceivableInterface)[],
     "shownFieldsReceivable"

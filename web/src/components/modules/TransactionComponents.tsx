@@ -261,7 +261,7 @@ export const TransactionView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Transaction({}).$;
+  const objWithFields = new Transaction({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof TransactionInterface)[],
     "shownFieldsTransaction"

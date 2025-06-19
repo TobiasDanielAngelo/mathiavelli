@@ -179,7 +179,7 @@ export const WaistMeasurementView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new WaistMeasurement({}).$;
+  const objWithFields = new WaistMeasurement({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof WaistMeasurementInterface)[],
     "shownFieldsWaistMeasurement"

@@ -178,7 +178,7 @@ export const WeighInView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new WeighIn({}).$;
+  const objWithFields = new WeighIn({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof WeighInInterface)[],
     "shownFieldsWeighIn"

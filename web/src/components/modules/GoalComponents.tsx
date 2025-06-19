@@ -224,7 +224,7 @@ export const GoalView = observer(() => {
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
-  const objWithFields = new Goal({}).$;
+  const objWithFields = new Goal({}).$view;
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof GoalInterface)[],
     "shownFieldsGoal"
