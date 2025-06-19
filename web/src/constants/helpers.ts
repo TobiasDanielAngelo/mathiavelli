@@ -755,7 +755,7 @@ export function rruleToDetailedText(rule: RRule): string {
     : null;
 
   const byYearDay = options.byyearday?.length
-    ? "on day " + options.byyearday.join(", ")
+    ? "on day " + options.byyearday.join(", ") + " of the year"
     : null;
 
   const byWeekNo = options.byweekno?.length

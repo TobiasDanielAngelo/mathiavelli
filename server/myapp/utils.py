@@ -15,6 +15,10 @@ def generate_missing_events():
             datetimes = task.schedule.datetimes
         else:
             datetimes = []
+        deleted, _ = (
+            Event.objects.filter(task=task).exclude(start__in=datetimes).delete()
+        )
+        print(f"Deleted {deleted} incorrect events.")
         for dt in datetimes:
             if Event.objects.filter(task=task, start=dt).exists():
                 print("Event already exists.")

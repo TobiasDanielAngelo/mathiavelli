@@ -58,21 +58,27 @@ export function MyGenericForm<T>({
 
     dateFields.forEach((k) => {
       const val = copy[k];
-      if (val) {
+      if (val === "") {
+        copy[k] = null as any;
+      } else if (val) {
         copy[k] = moment(val as any, "MMM D, YYYY").format("YYYY-MM-DD") as any;
       }
     });
 
     datetimeFields.forEach((k) => {
       const val = copy[k];
-      if (val) {
+      if (val === "") {
+        copy[k] = null as any;
+      } else if (val) {
         copy[k] = moment(val as any, "MMM D YYYY h:mm A").toISOString() as any;
       }
     });
 
     timeFields.forEach((k) => {
       const val = copy[k];
-      if (val) {
+      if (val === "") {
+        copy[k] = null as any;
+      } else if (val) {
         copy[k] = moment(val as any, "h:mm A").format("HH:mm:ss") as any;
       }
     });
