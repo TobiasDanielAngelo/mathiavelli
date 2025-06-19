@@ -138,7 +138,7 @@ const NavLink = ({
       )}
 
       {page.children && page.children?.length > 0 && (
-        <div className="absolute top-full left-0 z-10 hidden group-hover:block bg-gray-800 rounded shadow-lg min-w-[150px] py-2">
+        <div className="absolute top-full left-0 z-20 hidden group-hover:block bg-gray-800 rounded shadow-lg min-w-[150px] py-2">
           {page.children.map((child, idx) => (
             <Link
               key={idx}
