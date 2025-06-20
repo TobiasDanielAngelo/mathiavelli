@@ -18,25 +18,17 @@ class HabitViewSet(CustomModelViewSet):
         self.create_or_update_task(habit)
 
     def create_or_update_task(self, habit):
-        if not habit.date_start or not habit.date_end:
-            if hasattr(habit, "task_habit"):
-                habit.task_habit.delete()
-            return
 
-        start_dt = (
-            timezone.make_aware(
+        start_dt = None
+        end_dt = None
+        if habit.date_start:
+            start_dt = timezone.make_aware(
                 datetime.datetime.combine(habit.date_start, datetime.time.min)
             )
-            if habit.date_start
-            else None
-        )
-        end_dt = (
-            timezone.make_aware(
+        if habit.date_end:
+            end_dt = timezone.make_aware(
                 datetime.datetime.combine(habit.date_end, datetime.time.max)
             )
-            if habit.date_end
-            else None
-        )
 
         task, created = Task.objects.get_or_create(
             habit=habit,
@@ -108,8 +100,7 @@ class TaskViewSet(CustomModelViewSet):
     def perform_update(self, serializer):
         task = serializer.save()
         if task.is_completed or task.is_cancelled:
-            if hasattr(task, "event_task"):
-                task.event_task.delete()
+            pass
         else:
             self.create_or_update_event(task)
 
@@ -117,22 +108,20 @@ class TaskViewSet(CustomModelViewSet):
             self.update_goal_completion_status(task.goal)
 
     def perform_destroy(self, instance):
-        if hasattr(instance, "event_task"):
-            instance.event_task.delete()
         instance.delete()
 
     def create_or_update_event(self, task):
-        if not task.date_start or not task.date_end:
-            if hasattr(task, "event_task"):
-                task.event_task.delete()
-            return
+        start_dt = None
+        end_dt = None
 
-        start_dt = timezone.make_aware(
-            datetime.datetime.combine(task.date_start, datetime.time.min)
-        )
-        end_dt = timezone.make_aware(
-            datetime.datetime.combine(task.date_end, datetime.time.max)
-        )
+        if task.date_start:
+            start_dt = timezone.make_aware(
+                datetime.datetime.combine(task.date_start, datetime.time.min)
+            )
+        if task.date_end:
+            end_dt = timezone.make_aware(
+                datetime.datetime.combine(task.date_end, datetime.time.max)
+            )
 
         event, created = Event.objects.get_or_create(
             task=task,

@@ -13,38 +13,47 @@ type CalendarEvent = {
   end: string;
 };
 
+export type CalendarView = "month" | "year" | "decade";
+
 export const MyCalendar = observer(
   (props: {
     date: Date;
     setDate: StateSetter<Date>;
+    view: CalendarView;
+    setView: StateSetter<CalendarView>;
     events: CalendarEvent[];
     renderEventContent?: (events: CalendarEvent[]) => React.ReactNode;
   }) => {
-    const { date, setDate, events, renderEventContent } = props;
-    const [view, setView] = useState("month");
+    const { date, setDate, view, setView, events, renderEventContent } = props;
     const [currentDate, setCurrentDate] = useState(moment());
     const width = useWindowWidth();
 
     const startDecade = Math.floor(currentDate.year() / 10) * 10;
 
     const handlePrev = () => {
-      setCurrentDate(
+      const newDate =
         view === "month"
           ? moment(currentDate).subtract(1, "month")
           : view === "year"
           ? moment(currentDate).subtract(1, "year")
-          : moment(currentDate).subtract(10, "year")
-      );
+          : moment(currentDate).subtract(10, "year");
+      setCurrentDate(newDate);
+      setDate(newDate.toDate());
     };
 
     const handleNext = () => {
-      setCurrentDate(
+      const newDate =
         view === "month"
-          ? moment(currentDate).add(1, "month")
+          ? moment(currentDate).add(1, "month").startOf("month")
           : view === "year"
-          ? moment(currentDate).add(1, "year")
-          : moment(currentDate).add(10, "year")
-      );
+          ? moment(currentDate).add(1, "year").startOf("year")
+          : moment(currentDate)
+              .add(10, "year")
+              .startOf("year")
+              .year(Math.floor(moment(currentDate).year() / 10) * 10 + 10);
+
+      setCurrentDate(newDate);
+      setDate(newDate.toDate());
     };
 
     const renderMonthView = () => {

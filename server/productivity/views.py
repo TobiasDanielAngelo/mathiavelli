@@ -8,7 +8,8 @@ class GenerateEventsView(CustomAPIView):
     def get(self, request):
         from .utils import generate_missing_events
 
-        new_events = generate_missing_events()
+        params = self.request.query_params.copy()
+        new_events = generate_missing_events(params)
 
         return response.Response(
             {

@@ -70,7 +70,6 @@ export const HabitForm = ({
         [{ name: "dateStart", label: "Date Start", type: "date" }],
         [{ name: "dateEnd", label: "Date End", type: "date" }],
         [{ name: "isArchived", label: "Is Archived", type: "check" }],
-        [{ name: "dateCreated", label: "Date Created", type: "datetime" }],
       ] satisfies Field[][],
     [goalStore.items.length, scheduleStore.items.length]
   );

@@ -81,7 +81,7 @@ export class Task extends Model(props) {
   }
 
   get dateDuration() {
-    return `${moment(this.dateStart).format("lll")}${
+    return `${this.dateStart ? moment(this.dateStart).format("lll") : ""}${
       this.dateEnd ? " – " + moment(this.dateEnd).format("lll") : ""
     }`;
   }

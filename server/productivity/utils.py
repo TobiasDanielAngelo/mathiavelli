@@ -10,7 +10,10 @@ from dateutil.rrule import (
     MINUTELY,
     SECONDLY,
 )
-
+from django.utils.timezone import now
+from datetime import datetime, timedelta
+from dateutil.parser import parse
+import re
 
 FREQ_MAP = {
     0: YEARLY,
@@ -21,6 +24,7 @@ FREQ_MAP = {
     5: MINUTELY,
     6: SECONDLY,
 }
+
 
 WEEKDAY_MAP = {"MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6}
 
@@ -79,15 +83,97 @@ def get_datetimes(obj):
         return []
 
 
-def generate_missing_events():
+def safe_parse_datetime(value):
+    try:
+        return parse(value) if value else None
+    except Exception:
+        return None
+
+
+def parse_range_param(value: str):
+    today = datetime.today()
+
+    if not value:
+        return None, None
+
+    if value.lower() == "year":
+        start = today.replace(month=1, day=1, hour=0, minute=0, second=0)
+        end = start.replace(year=start.year + 1)
+        return start, end
+
+    if value.lower() == "month":
+        start = today.replace(day=1, hour=0, minute=0, second=0)
+        next_month = start.replace(day=28) + timedelta(days=4)
+        end = next_month.replace(day=1)
+        return start, end
+
+    try:
+        dt = parse(value)
+        if re.fullmatch(r"\d{4}", value):  # year only
+            start = dt.replace(month=1, day=1)
+            end = start.replace(year=start.year + 1)
+        elif re.fullmatch(r"\d{4}-\d{2}", value):  # year-month
+            start = dt.replace(day=1)
+            next_month = start.replace(day=28) + timedelta(days=4)
+            end = next_month.replace(day=1)
+        elif re.fullmatch(r"\d{3}X", value):  # decade like 202X
+            decade = int(value[:3]) * 10
+            start = datetime(decade, 1, 1)
+            end = datetime(decade + 10, 1, 1)
+        else:  # exact day
+            start = dt.replace(hour=0, minute=0, second=0)
+            end = start + timedelta(days=1)
+
+        return start, end
+    except Exception:
+        return None, None
+
+
+def ensure_aware(dt):
+    from django.utils.timezone import make_aware, is_aware
+    from django.utils.timezone import get_current_timezone
+
+    if dt and not is_aware(dt):
+        return make_aware(dt, get_current_timezone())
+    return dt
+
+
+def generate_missing_events(params):
     from .models import Task, Event
 
-    today = timezone.localdate()
+    start = safe_parse_datetime(params.get("start"))
+    end = safe_parse_datetime(params.get("end"))
+    range_val = params.get("range")
+
+    if range_val:
+        start, end = parse_range_param(range_val)
+
+    start = ensure_aware(start)
+    end = ensure_aware(end)
+
+    def is_in_range(dt):
+        dt = safe_parse_datetime(dt)
+        if range:
+            today = now().date()
+            if range == "today":
+                return dt.date() == today
+            elif range == "week":
+                start_of_week = today - timedelta(days=today.weekday())
+                end_of_week = start_of_week + timedelta(days=6)
+                return start_of_week <= dt.date() <= end_of_week
+            elif range == "month":
+                return dt.year == today.year and dt.month == today.month
+            elif range == "year":
+                return dt.year == today.year
+        if start and dt < start:
+            return False
+        if end and dt > end:
+            return False
+        return True
 
     new_events = []
 
     for task in Task.objects.all():
-        print(task.pk)
         if task.schedule:
             datetimes = task.schedule.datetimes
         else:
@@ -96,8 +182,9 @@ def generate_missing_events():
             Event.objects.filter(task=task).exclude(start__in=datetimes).delete()
         )
         print(f"Deleted {deleted} incorrect events.")
-        print(f"There are {len(datetimes)} events for task {task.pk}.")
-        for dt in datetimes:
+
+        filtered_datetimes = [dt for dt in datetimes if is_in_range(dt)]
+        for dt in filtered_datetimes:
             if Event.objects.filter(task=task, start=dt).exists():
                 print("Event already exists.")
             else:

@@ -61,7 +61,7 @@ export const MainView = observer(() => {
     if (!resp.ok) {
       navigate("/login");
     } else {
-      eventStore.fetchMissingEvents();
+      eventStore.fetchMissingEvents("range=2025-07");
       platformStore.fetchAll("page=all");
       accountStore.fetchAll("page=all");
       categoryStore.fetchAll("page=all");

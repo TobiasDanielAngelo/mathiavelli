@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Event, EventFields, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
 import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
-import { MyCalendar } from "../../blueprints/MyCalendar";
+import { CalendarView, MyCalendar } from "../../blueprints/MyCalendar";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -26,6 +26,7 @@ import {
   PaginatedDetails,
   StateSetter,
 } from "../../constants/interfaces";
+import moment from "moment";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -144,13 +145,29 @@ export const EventCard = observer((props: { item: Event }) => {
 });
 
 export const EventDashboard = observer(
-  (props: { date: Date; setDate: StateSetter<Date> }) => {
+  (props: {
+    date: Date;
+    setDate: StateSetter<Date>;
+    view: CalendarView;
+    setView: StateSetter<CalendarView>;
+  }) => {
+    const { date, view } = props;
     const { eventStore } = useStore();
-    const { date, setDate } = props;
+
+    const range =
+      view === "month"
+        ? moment(date).format("YYYY-MM")
+        : view === "year"
+        ? moment(date).format("YYYY")
+        : `${Math.floor(moment(date).year() / 10)}X`;
+
+    useEffect(() => {
+      eventStore.fetchMissingEvents(`range=${range}`);
+    }, [range]);
 
     return (
       <MyLockedCard isUnlocked>
-        <MyCalendar date={date} setDate={setDate} events={eventStore.items} />
+        <MyCalendar {...props} events={eventStore.items} />
       </MyLockedCard>
     );
   }
@@ -160,25 +177,31 @@ export const EventCollection = observer(() => {
   const { eventStore } = useStore();
   const { pageDetails, PageBar } = useEventView();
   const [date, setDate] = useState(new Date());
+  const [view, setView] = useState<CalendarView>("month");
 
   const values = {
     date,
     setDate,
+    view,
+    setView,
   };
   return (
-    <SideBySideView
-      SideA={
-        <MyGenericCollection
-          CardComponent={EventCard}
-          title={title}
-          pageDetails={pageDetails}
-          PageBar={PageBar}
-          items={eventStore.items}
-        />
-      }
-      SideB={<EventDashboard {...values} />}
-      ratio={0.7}
-    />
+    <>
+      {moment(date).format("lll, Z")}
+      <SideBySideView
+        SideA={
+          <MyGenericCollection
+            CardComponent={EventCard}
+            title={title}
+            pageDetails={pageDetails}
+            PageBar={PageBar}
+            items={eventStore.items}
+          />
+        }
+        SideB={<EventDashboard {...values} />}
+        ratio={0.7}
+      />
+    </>
   );
 });
 
@@ -255,7 +278,7 @@ export const EventView = observer(() => {
     "sortFieldsEvent"
   );
   const fetchFcn = async () => {
-    const resp1 = await eventStore.fetchMissingEvents();
+    const resp1 = await eventStore.fetchMissingEvents("range=month");
     if (!resp1.ok || !resp1.data) {
       return;
     }

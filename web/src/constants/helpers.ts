@@ -374,7 +374,7 @@ export const formatValue = (
   if (Array.isArray(value) && value.length > 0) {
     if (isDatetimeValue(value[0])) {
       return value
-        .map((s) => moment(s).format("MMM D, YYYY h:mm A"))
+        .map((s) => moment(s).format("MMM D, YYYY h:mm A, Z"))
         .join("\n");
     }
     if (isDateValue(value[0])) {
@@ -384,7 +384,7 @@ export const formatValue = (
     }
   } else {
     if (isDatetimeValue(value)) {
-      return moment(value).format("MMM D, YYYY h:mm A");
+      return moment(value).format("MMM D, YYYY h:mm A, Z");
     }
     if (isDateValue(value)) {
       return moment(value).format("MMM D, YYYY");
@@ -581,7 +581,11 @@ function normalizeDate(dateStr: string | null | Date | undefined): string {
     const parsed = parse(dateStr, fmt, new Date());
     if (isValid(parsed)) return format(parsed, "yyyy-MM-dd");
   }
-  return dateStr;
+  try {
+    return dateStr;
+  } catch (_) {
+    return "";
+  }
 }
 
 function normalizeTime(timeStr: string | null | Date | undefined): string {
@@ -593,7 +597,11 @@ function normalizeTime(timeStr: string | null | Date | undefined): string {
     const parsed = parse(timeStr, fmt, new Date());
     if (isValid(parsed)) return format(parsed, "HH:mm:ss");
   }
-  return format(timeStr, "HH:mm:ss");
+  try {
+    return format(timeStr, "HH:mm:ss");
+  } catch (_) {
+    return "";
+  }
 }
 
 export function isValidRRuleOptions(options: Partial<Options>): boolean {
@@ -701,6 +709,8 @@ export function generateCollidingDates(sched: Schedule): Date[] {
   const schedule = sched.$ ?? sched;
   const rule = buildRRule(schedule);
   if (!rule) return [];
+
+  console.log(rule.toString());
 
   return rule
     .all()

@@ -1,3 +1,4 @@
+import { computed } from "mobx";
 import {
   Model,
   _async,
@@ -7,16 +8,15 @@ import {
   modelFlow,
   prop,
 } from "mobx-keystone";
-import { computed } from "mobx";
+import moment from "moment";
+import Swal from "sweetalert2";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "./_apiHelpers";
-import Swal from "sweetalert2";
 import { Store } from "./Store";
-import { TwoDates } from "../constants/classes";
 
 const slug = "productivity/goals";
 
@@ -54,7 +54,9 @@ export class Goal extends Model(props) {
   }
 
   get dateDuration() {
-    return new TwoDates(this.dateStart, this.dateEnd).getRangeString;
+    return `${this.dateStart ? moment(this.dateStart).format("lll") : ""}${
+      this.dateEnd ? " – " + moment(this.dateEnd).format("lll") : ""
+    }`;
   }
   get parentGoalTitle() {
     return (

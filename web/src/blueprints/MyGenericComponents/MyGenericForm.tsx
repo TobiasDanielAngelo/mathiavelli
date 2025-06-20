@@ -2,7 +2,7 @@ import moment from "moment";
 import { useState } from "react";
 import { MyForm } from "../MyForm";
 import { Field } from "../../constants/interfaces";
-import { toTitleCase } from "../../constants/helpers";
+import { cleanObject, toTitleCase } from "../../constants/helpers";
 
 interface MyGenericFormProps<T> {
   item?: T & { id?: number };
@@ -83,7 +83,7 @@ export function MyGenericForm<T>({
       }
     });
 
-    return copy;
+    return cleanObject(copy as Record<string, any>) as T;
   };
 
   const [details, setDetails] = useState<T>(() =>
