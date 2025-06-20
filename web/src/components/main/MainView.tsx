@@ -4,6 +4,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../../api/Store";
 import { DashboardView } from "../dashboards/DashboardView";
 import { HealthView } from "../dashboards/HealthView";
+import { ModularView } from "../dashboards/ModularView";
 import { AccountView } from "../modules/AccountComponents";
 import { BodyFatView } from "../modules/BodyFatComponents";
 import { BuyListItemView } from "../modules/BuyListItemComponents";
@@ -84,7 +85,7 @@ export const MainView = observer(() => {
     <div className="flex flex-col min-h-screen">
       <NavBar open={open} setOpen={setOpen} />
       <Routes>
-        <Route path="" element={<DashboardView />} />
+        <Route path="" element={<ModularView />} />
         <Route path="dashboard" element={<DashboardView />} />
         <Route path="journals" element={<JournalView />} />
         <Route path="transactions" element={<TransactionView />} />

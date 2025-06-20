@@ -9,6 +9,19 @@ import { Option } from "./interfaces";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
+export function kebabToCamel(str: string) {
+  return str.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+}
+
+export function titleToCamel(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/(?:^\w|[\s-]\w)/g, (match, offset) =>
+      offset === 0 ? match.toLowerCase() : match.trim().toUpperCase()
+    )
+    .replace(/\s+/g, "");
+}
+
 export const getOrdinal = (n: number) => {
   let ord = "th";
 

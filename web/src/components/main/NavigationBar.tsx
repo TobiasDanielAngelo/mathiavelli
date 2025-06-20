@@ -4,7 +4,13 @@ import { useLocation } from "react-router-dom";
 import { MyNavBar } from "../../blueprints/MyNavigation";
 import { toTitleCase } from "../../constants/helpers";
 
-const sections = [
+export type ViewPath = {
+  title: string;
+  items: string[];
+  mainLink: string;
+};
+
+export const allViewPaths = [
   {
     title: "Finance",
     items: [
@@ -49,7 +55,7 @@ const sections = [
       "workouts",
     ],
   },
-];
+] as ViewPath[];
 
 export const NavBar = observer(
   (props: { open: boolean; setOpen?: Dispatch<SetStateAction<boolean>> }) => {
@@ -66,7 +72,7 @@ export const NavBar = observer(
           : "Mathiavelli Self-HQ";
     }, [current]);
 
-    const nav = sections.map(({ title, items, mainLink }) => {
+    const nav = allViewPaths.map(({ title, items, mainLink }) => {
       const allPaths = [...items, ...(mainLink ? [mainLink] : [])];
       const isSelected = allPaths.includes(current);
 
