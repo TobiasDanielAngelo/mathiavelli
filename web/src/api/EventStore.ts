@@ -18,7 +18,7 @@ import {
 } from "./_apiHelpers";
 import { Store } from "./Store";
 
-const slug = "events";
+const slug = "productivity/events";
 
 const props = {
   id: prop<number>(-1),
@@ -102,6 +102,39 @@ export class EventStore extends Model({
 
     try {
       result = yield* _await(fetchItemsRequest<Event>(slug, params));
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+      });
+      error;
+      return { details: "Network Error", ok: false, data: null };
+    }
+
+    if (!result.ok || !result.data) {
+      return result;
+    }
+
+    result.data.forEach((s) => {
+      if (!this.items.map((s) => s.id).includes(s.id)) {
+        this.items.push(new Event(s));
+      } else {
+        this.items.find((t) => t.id === s.id)?.update(s);
+      }
+    });
+
+    return result;
+  });
+
+  // Special
+  @modelFlow
+  fetchMissingEvents = _async(function* (this: EventStore, params?: string) {
+    let result;
+
+    try {
+      result = yield* _await(
+        fetchItemsRequest<Event>("productivity/generate-events", params)
+      );
     } catch (error) {
       Swal.fire({
         icon: "error",

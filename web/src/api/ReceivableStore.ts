@@ -17,7 +17,7 @@ import {
 import Swal from "sweetalert2";
 import { Store } from "./Store";
 
-const slug = "receivables";
+const slug = "finance/receivables";
 
 const props = {
   id: prop<number>(-1),

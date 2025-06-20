@@ -2,35 +2,34 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../../api/Store";
+import { DashboardView } from "../dashboards/DashboardView";
+import { HealthView } from "../dashboards/HealthView";
 import { AccountView } from "../modules/AccountComponents";
+import { BodyFatView } from "../modules/BodyFatComponents";
 import { BuyListItemView } from "../modules/BuyListItemComponents";
 import { CategoryView } from "../modules/CategoryComponents";
 import { CredentialView } from "../modules/CredentialComponents";
-import { DashboardView } from "../dashboards/DashboardView";
 import { EventView } from "../modules/EventComponents";
 import { FollowUpView } from "../modules/FollowUpComponents";
 import { GoalView } from "../modules/GoalComponents";
-import { HealthView } from "../dashboards/HealthView";
+import { HabitView } from "../modules/HabitComponents";
+import { HabitLogView } from "../modules/HabitLogComponents";
+import { InventoryCategoryView } from "../modules/InventoryCategoryComponents";
 import { JobView } from "../modules/JobComponents";
 import { JournalView } from "../modules/JournalComponents";
-import { NavBar } from "./NavigationBar";
+import { MealView } from "../modules/MealComponents";
 import { PayableView } from "../modules/PayableComponents";
+import { PersonalItemView } from "../modules/PersonalItemComponents";
 import { PlatformView } from "../modules/PlatformComponents";
 import { ReceivableView } from "../modules/ReceivableComponents";
+import { ScheduleView } from "../modules/ScheduleComponents";
 import { TagView } from "../modules/TagComponents";
 import { TaskView } from "../modules/TaskComponents";
 import { TransactionView } from "../modules/TransactionComponents";
-import { WorkoutView } from "../modules/WorkoutComponents";
-import { WeighInView } from "../modules/WeighInComponents";
-import { MealView } from "../modules/MealComponents";
 import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
-import { BodyFatView } from "../modules/BodyFatComponents";
-import { InventoryCategoryView } from "../modules/InventoryCategoryComponents";
-import { PersonalItemView } from "../modules/PersonalItemComponents";
-import { HabitView } from "../modules/HabitComponents";
-import { HabitLogView } from "../modules/HabitLogComponents";
-import { ScheduleView } from "../modules/ScheduleComponents";
-import { generateMissingEvents } from "../../api/_apis";
+import { WeighInView } from "../modules/WeighInComponents";
+import { WorkoutView } from "../modules/WorkoutComponents";
+import { NavBar } from "./NavigationBar";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -46,6 +45,7 @@ export const MainView = observer(() => {
     taskStore,
     inventoryCategoryStore,
     scheduleStore,
+    eventStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -60,7 +60,7 @@ export const MainView = observer(() => {
     if (!resp.ok) {
       navigate("/login");
     } else {
-      generateMissingEvents();
+      eventStore.fetchMissingEvents();
       platformStore.fetchAll("page=all");
       accountStore.fetchAll("page=all");
       categoryStore.fetchAll("page=all");

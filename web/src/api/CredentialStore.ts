@@ -17,7 +17,7 @@ import {
 import Swal from "sweetalert2";
 import { Store } from "./Store";
 
-const slug = "credentials";
+const slug = "personal/credentials";
 
 const props = {
   id: prop<number>(-1),

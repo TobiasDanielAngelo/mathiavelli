@@ -244,11 +244,15 @@ export const EventView = observer(() => {
     "sortFieldsEvent"
   );
   const fetchFcn = async () => {
-    const resp = await eventStore.fetchAll(params.toString());
-    if (!resp.ok || !resp.data) {
+    const resp1 = await eventStore.fetchMissingEvents();
+    if (!resp1.ok || !resp1.data) {
       return;
     }
-    setPageDetails(resp.pageDetails);
+    const resp2 = await eventStore.fetchAll(params.toString());
+    if (!resp2.ok || !resp2.data) {
+      return;
+    }
+    setPageDetails(resp2.pageDetails);
   };
 
   const itemMap = useMemo(

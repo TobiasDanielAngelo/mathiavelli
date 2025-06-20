@@ -12,7 +12,7 @@ import {
   generateScheduleDefinition,
 } from "../constants/helpers";
 
-const slug = "schedules";
+const slug = "productivity/schedules";
 
 const props = {
   id: prop<number>(-1),

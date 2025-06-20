@@ -18,7 +18,7 @@ import Swal from "sweetalert2";
 import { Store } from "./Store";
 import { TwoDates } from "../constants/classes";
 
-const slug = "goals";
+const slug = "productivity/goals";
 
 const props = {
   id: prop<number>(-1),

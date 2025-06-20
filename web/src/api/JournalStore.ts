@@ -8,7 +8,7 @@ import {
 } from "./_apiHelpers";
 import Swal from "sweetalert2";
 
-const slug = "journals";
+const slug = "personal/journals";
 
 const props = {
   id: prop<number>(-1),

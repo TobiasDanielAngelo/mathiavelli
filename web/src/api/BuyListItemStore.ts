@@ -8,7 +8,7 @@ import {
 } from "./_apiHelpers";
 import Swal from "sweetalert2";
 
-const slug = "buy-list-items";
+const slug = "finance/buy-list-items";
 
 const props = {
   id: prop<number>(-1),

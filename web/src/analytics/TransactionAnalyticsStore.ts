@@ -11,7 +11,7 @@ import {
 import { fetchItemsRequest } from "../api/_apiHelpers";
 import Swal from "sweetalert2";
 
-const slug = "analytics/transactions";
+const slug = "finance/analytics/transactions";
 
 const props = {
   id: prop<string>(""),

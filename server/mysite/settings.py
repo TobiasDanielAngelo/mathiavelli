@@ -44,7 +44,12 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "knox",
-    "myapp",
+    "productivity",
+    "finance",
+    "health",
+    "career",
+    "personal",
+    "core",
 ]
 
 MIDDLEWARE = [
@@ -152,7 +157,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ),
-    "DEFAULT_PAGINATION_CLASS": "myapp.paginations.CustomPagination",
+    "DEFAULT_PAGINATION_CLASS": "core.paginations.CustomPagination",
     "PAGE_SIZE": 10,
     "COERCE_DECIMAL_TO_STRING": False,
 }

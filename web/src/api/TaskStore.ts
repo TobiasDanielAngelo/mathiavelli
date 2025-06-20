@@ -18,7 +18,7 @@ import {
 } from "./_apiHelpers";
 import { Store } from "./Store";
 
-const slug = "tasks";
+const slug = "productivity/tasks";
 
 const props = {
   id: prop<number>(-1),

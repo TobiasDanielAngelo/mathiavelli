@@ -8,7 +8,7 @@ import {
   updateItemRequest,
 } from "./_apiHelpers";
 
-const slug = "inventory-categories";
+const slug = "finance/inventory-categories";
 
 const props = {
   id: prop<number>(-1),
