@@ -5,7 +5,7 @@ import { PaginatedDetails } from "../../constants/interfaces";
 export const MyGenericCollection = observer(
   <T extends { id: number } & object>(props: {
     PageBar: React.FC;
-    pageDetails: PaginatedDetails | undefined;
+    pageDetails?: PaginatedDetails | undefined; // set page details to undefined if you don't want any filters
     items: T[];
     CardComponent: React.ComponentType<{
       item: T;
@@ -21,11 +21,13 @@ export const MyGenericCollection = observer(
         </div>
         <PageBar />
         <div className="flex-1">
-          {sortAndFilterByIds(items, pageDetails?.ids ?? [], (s) => s.id).map(
-            (s) => (
-              <CardComponent item={s} key={s.id} />
-            )
-          )}
+          {sortAndFilterByIds(
+            items,
+            pageDetails?.ids ?? items.map((s) => s.id),
+            (s) => s.id
+          ).map((s) => (
+            <CardComponent item={s} key={s.id} />
+          ))}
         </div>
       </div>
     );

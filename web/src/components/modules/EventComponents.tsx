@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Event, EventFields, EventInterface } from "../../api/EventStore";
@@ -26,7 +27,6 @@ import {
   PaginatedDetails,
   StateSetter,
 } from "../../constants/interfaces";
-import moment from "moment";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -150,16 +150,10 @@ export const EventDashboard = observer(
     setDate: StateSetter<Date>;
     view: CalendarView;
     setView: StateSetter<CalendarView>;
+    range: string;
   }) => {
-    const { date, view } = props;
+    const { range } = props;
     const { eventStore } = useStore();
-
-    const range =
-      view === "month"
-        ? moment(date).format("YYYY-MM")
-        : view === "year"
-        ? moment(date).format("YYYY")
-        : `${Math.floor(moment(date).year() / 10)}X`;
 
     useEffect(() => {
       eventStore.fetchMissingEvents(`range=${range}`);
@@ -175,27 +169,42 @@ export const EventDashboard = observer(
 
 export const EventCollection = observer(() => {
   const { eventStore } = useStore();
-  const { pageDetails, PageBar } = useEventView();
+  const { PageBar } = useEventView();
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>("month");
+
+  const range =
+    view === "month"
+      ? moment(date).format("YYYY-MM")
+      : view === "year"
+      ? moment(date).format("YYYY")
+      : `${Math.floor(moment(date).year() / 10)}X`;
+
+  const filteredItems = eventStore.items.filter((s) => {
+    const m = moment(s.start);
+    if (view === "month") return m.format("YYYY-MM") === range;
+    if (view === "year") return m.format("YYYY") === range;
+    if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;
+    return false;
+  });
 
   const values = {
     date,
     setDate,
     view,
     setView,
+    range,
   };
   return (
     <>
-      {moment(date).format("lll, Z")}
       <SideBySideView
         SideA={
           <MyGenericCollection
             CardComponent={EventCard}
             title={title}
-            pageDetails={pageDetails}
+            pageDetails={undefined}
             PageBar={PageBar}
-            items={eventStore.items}
+            items={filteredItems}
           />
         }
         SideB={<EventDashboard {...values} />}
@@ -278,15 +287,11 @@ export const EventView = observer(() => {
     "sortFieldsEvent"
   );
   const fetchFcn = async () => {
-    const resp1 = await eventStore.fetchMissingEvents("range=month");
-    if (!resp1.ok || !resp1.data) {
+    const resp = await eventStore.fetchAll(params.toString());
+    if (!resp.ok || !resp.data) {
       return;
     }
-    const resp2 = await eventStore.fetchAll(params.toString());
-    if (!resp2.ok || !resp2.data) {
-      return;
-    }
-    setPageDetails(resp2.pageDetails);
+    setPageDetails(resp.pageDetails);
   };
 
   const itemMap = useMemo(
