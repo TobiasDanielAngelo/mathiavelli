@@ -37,7 +37,7 @@ export const SideBySideView = observer(
             className="lg:overflow-scroll m-2 min-h-[40vh] border border-gray-500 rounded-lg items-center justify-center"
             style={{
               width: width >= 1024 ? widthB : "100%",
-              display: SideB ? "block" : "none",
+              // display: SideB ? "block" : "none",
             }}
           >
             {SideB}

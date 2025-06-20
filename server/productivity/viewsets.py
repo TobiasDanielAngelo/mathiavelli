@@ -18,10 +18,10 @@ class HabitViewSet(CustomModelViewSet):
         self.create_or_update_task(habit)
 
     def create_or_update_task(self, habit):
-        # if not habit.date_start or not habit.date_end:
-        #     if hasattr(habit, "task_habit"):
-        #         habit.task_habit.delete()
-        #     return
+        if not habit.date_start or not habit.date_end:
+            if hasattr(habit, "task_habit"):
+                habit.task_habit.delete()
+            return
 
         start_dt = (
             timezone.make_aware(
@@ -101,9 +101,9 @@ class TaskViewSet(CustomModelViewSet):
 
         goal.save()
 
-    # def perform_create(self, serializer):
-    #     task = serializer.save()
-    #     self.create_or_update_event(task)
+    def perform_create(self, serializer):
+        task = serializer.save()
+        self.create_or_update_event(task)
 
     def perform_update(self, serializer):
         task = serializer.save()

@@ -1,13 +1,14 @@
 import { Dialog } from "@mui/material";
 import { useClickAway } from "@uidotdev/usehooks";
-import { Dispatch, PropsWithChildren, SetStateAction } from "react";
+import { PropsWithChildren } from "react";
 import { useKeyPress } from "../constants/hooks";
+import { StateSetter } from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
 
 export const MyModal = (
   props: PropsWithChildren<{
     isVisible: boolean;
-    setVisible: Dispatch<SetStateAction<boolean>>;
+    setVisible: StateSetter<boolean>;
     fullWidth?: boolean;
     title?: string;
     subTitle?: string;

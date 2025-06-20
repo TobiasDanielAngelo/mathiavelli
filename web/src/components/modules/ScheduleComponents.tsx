@@ -62,7 +62,7 @@ export const ScheduleForm = ({
         [
           {
             name: "freq",
-            label: "Freq",
+            label: "Frequency",
             type: "select",
             options: toOptions(FREQ_CHOICES),
           },

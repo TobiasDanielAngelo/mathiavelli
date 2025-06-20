@@ -1,14 +1,14 @@
 import { observer } from "mobx-react-lite";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SetURLSearchParams } from "react-router-dom";
 import { VisibleMap } from "../../constants/hooks";
-import { PaginatedDetails } from "../../constants/interfaces";
+import { PaginatedDetails, StateSetter } from "../../constants/interfaces";
+import { KV } from "../ItemDetails";
 import { IconName, MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
 import { MyPageBar } from "../MyPageBar";
 import { MySpeedDial } from "../MySpeedDial";
 import { GenericViewProps } from "./MyGenericProps";
-import { KV } from "../ItemDetails";
 
 export const graphTypes = ["pie", "line", "bar", "area"] as const;
 
@@ -28,9 +28,9 @@ export const MyGenericView = observer(
     CollectionComponent: React.FC;
     TableComponent: React.FC;
     shownFields: (keyof T)[];
-    setShownFields: Dispatch<SetStateAction<(keyof T)[]>>;
+    setShownFields: StateSetter<(keyof T)[]>;
     sortFields: string[];
-    setSortFields: Dispatch<SetStateAction<string[]>>;
+    setSortFields: StateSetter<string[]>;
     availableGraphs: GraphType[];
     actionModalDefs: readonly ActionModalDef[];
     pageDetails: PaginatedDetails | undefined;

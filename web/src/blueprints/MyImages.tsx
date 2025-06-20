@@ -25,7 +25,7 @@ import schedules from "/images/schedules.png";
 import tags from "/images/tags.png";
 import tasks from "/images/tasks.png";
 import transactions from "/images/transactions.png";
-import waistMeasurements from "/images/waist-measurements.png";
+import waistMeasure from "/images/waist-measure.png";
 import weighIns from "/images/weigh-ins.png";
 import wishlist from "/images/wishlist.png";
 import workouts from "/images/workouts.png";
@@ -58,7 +58,7 @@ const IMAGES: Record<string, string> = {
   tags,
   tasks,
   transactions,
-  waistMeasurements,
+  waistMeasure,
   weighIns,
   wishlist,
   workouts,

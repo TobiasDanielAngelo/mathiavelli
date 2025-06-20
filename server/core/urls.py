@@ -5,7 +5,7 @@ from rest_framework.viewsets import ViewSetMixin
 import inflect
 import re
 from . import views
-from .helpers import camel_to_kebab
+from .utils import camel_to_kebab
 from django.conf import settings
 from django.conf.urls.static import static
 from . import viewsets as vs_module

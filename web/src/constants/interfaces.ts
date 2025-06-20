@@ -42,3 +42,5 @@ export type PaginatedResponse<T> = {
 export type PaginatedDetails = Omit<PaginatedResponse<unknown>, "results">;
 
 export type Graph = "line" | "pie";
+
+export type StateSetter<T> = React.Dispatch<React.SetStateAction<T>>;

@@ -1,7 +1,8 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useWindowWidth } from "../constants/hooks";
+import { StateSetter } from "../constants/interfaces";
 import { GuidedDiv } from "./MyGuidedDiv";
 import { MyIcon } from "./MyIcon";
 
@@ -15,7 +16,7 @@ type CalendarEvent = {
 export const MyCalendar = observer(
   (props: {
     date: Date;
-    setDate: Dispatch<SetStateAction<Date>>;
+    setDate: StateSetter<Date>;
     events: CalendarEvent[];
     renderEventContent?: (events: CalendarEvent[]) => React.ReactNode;
   }) => {

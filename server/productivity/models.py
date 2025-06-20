@@ -1,6 +1,6 @@
 from django.db import models
 from core import fields
-from core.helpers import get_datetimes
+from .utils import get_datetimes
 from django.core.exceptions import ValidationError
 
 
@@ -46,10 +46,7 @@ class Schedule(models.Model):
 
     name = fields.ShortCharField()
     freq = fields.ChoiceIntegerField(FREQ_CHOICES)
-
     interval = fields.LimitedDecimalField(1)
-
-    # Date-based recurrence
     by_week_day = fields.ChoicesStringArrayField(
         ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
     )
@@ -57,8 +54,6 @@ class Schedule(models.Model):
     by_month = fields.ChoicesNumberArrayField(range(1, 13))
     by_year_day = fields.ChoicesNumberArrayField(range(1, 367))
     by_week_no = fields.ChoicesNumberArrayField(range(1, 54))
-
-    # Time-based recurrence
     by_hour = fields.ChoicesNumberArrayField(range(0, 24))
     by_minute = fields.ChoicesNumberArrayField(range(0, 60))
     by_second = fields.ChoicesNumberArrayField(range(0, 60))
@@ -67,11 +62,10 @@ class Schedule(models.Model):
     count = fields.LimitedDecimalField(1)
     start_date = fields.OptionalDateField()
     end_date = fields.OptionalDateField()
-    week_start = fields.ChoiceIntegerField(WEEKDAY_CHOICES)
-
-    # Metadata
     start_time = fields.OptionalLimitedTimeField()
     end_time = fields.OptionalLimitedTimeField()
+
+    week_start = fields.ChoiceIntegerField(WEEKDAY_CHOICES)
 
     def __str__(self):
         return self.name or f"{self.freq}"

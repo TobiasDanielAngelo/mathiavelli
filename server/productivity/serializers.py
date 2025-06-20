@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-from core.helpers import get_datetimes
+from .utils import get_datetimes
 from django.utils import timezone
 
 

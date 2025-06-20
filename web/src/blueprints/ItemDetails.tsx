@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { Dispatch, SetStateAction } from "react";
 import { formatValue, toTitleCase } from "../constants/helpers";
+import { StateSetter } from "../constants/interfaces";
 
 export interface KV<U extends Record<string, any>> {
   key: string;
@@ -16,7 +16,7 @@ export interface ItemDetailsProps<T> {
   body?: (keyof T)[];
   prices?: (keyof T)[];
   showMore?: boolean;
-  setShowMore?: Dispatch<SetStateAction<boolean>>;
+  setShowMore?: StateSetter<boolean>;
 }
 
 const sectionStyles: Record<string, string> = {

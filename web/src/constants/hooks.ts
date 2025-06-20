@@ -1,5 +1,6 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { handleKeyDown } from "./helpers";
+import { StateSetter } from "./interfaces";
 
 export const useKeyPress = (keys: string[], callbackFcn: () => void) => {
   useEffect(() => {
@@ -67,7 +68,7 @@ export type UseVisibleMapReturn = {
   toggleVisible: (key: number) => void;
   setVisible: (key: number, value: boolean) => void;
 } & {
-  [K in Index as `setVisible${K}`]: Dispatch<SetStateAction<boolean>>;
+  [K in Index as `setVisible${K}`]: StateSetter<boolean>;
 } & {
   [K in Index as `isVisible${K}`]: boolean;
 };
@@ -106,7 +107,7 @@ export function useVisible(): UseVisibleMapReturn {
 
   const individualSetters = Object.fromEntries(
     indices.map((i) => {
-      const setter: Dispatch<SetStateAction<boolean>> = (value) => {
+      const setter: StateSetter<boolean> = (value) => {
         setVisibleState((prev) => ({
           ...prev,
           [i]: typeof value === "function" ? (value as any)(prev[i]) : value,

@@ -1,4 +1,5 @@
-import { Dispatch, PropsWithChildren, SetStateAction, useState } from "react";
+import { PropsWithChildren, useState } from "react";
+import { StateSetter } from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
 import { MySearch } from "./MySearch";
 
@@ -6,7 +7,7 @@ export const MyFilters = (
   props: PropsWithChildren<{
     active?: number;
     query?: string;
-    setQuery?: Dispatch<SetStateAction<string>>;
+    setQuery?: StateSetter<string>;
   }>
 ) => {
   const { children, active, query, setQuery } = props;

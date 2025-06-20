@@ -1,11 +1,6 @@
-import {
-  Dispatch,
-  PropsWithChildren,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { usePDF } from "react-to-pdf";
+import { StateSetter } from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
 import { MyModal } from "./MyModal";
 
@@ -13,7 +8,7 @@ export const MyPrintModal = (
   props: PropsWithChildren<{
     pageName?: string;
     isVisible: boolean;
-    setVisible: Dispatch<SetStateAction<boolean>>;
+    setVisible: StateSetter<boolean>;
   }>
 ) => {
   const { pageName, children, isVisible, setVisible } = props;

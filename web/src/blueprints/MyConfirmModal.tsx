@@ -1,10 +1,10 @@
-import { Dispatch, SetStateAction } from "react";
+import { StateSetter } from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
 import { MyModal } from "./MyModal";
 
 export const MyConfirmModal = (props: {
   isVisible: boolean;
-  setVisible: Dispatch<SetStateAction<boolean>>;
+  setVisible: StateSetter<boolean>;
   onClickCheck: () => void;
   objectName?: string;
   actionName?: string;

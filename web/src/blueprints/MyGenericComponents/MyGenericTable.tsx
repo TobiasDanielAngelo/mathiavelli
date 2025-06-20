@@ -1,11 +1,12 @@
 import { observer } from "mobx-react-lite";
-import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   camelToSnakeCase,
   formatValue,
   getStoreSignature,
   toTitleCase,
 } from "../../constants/helpers";
+import { StateSetter } from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
 import { MyTable } from "../MyTable";
 
@@ -14,7 +15,7 @@ type MyGenericTableProps<T extends object> = {
   itemMap?: KV<any>[];
   shownFields: (keyof T & string)[];
   sortFields: string[];
-  setSortFields: Dispatch<SetStateAction<string[]>>;
+  setSortFields: StateSetter<string[]>;
   priceFields?: (keyof T & string)[];
   pageIds: number[];
   setParams: (updater: (params: URLSearchParams) => URLSearchParams) => void;

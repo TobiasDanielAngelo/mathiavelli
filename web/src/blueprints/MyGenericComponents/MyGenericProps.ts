@@ -1,14 +1,14 @@
-import { createContext, Dispatch, SetStateAction, useContext } from "react";
+import { createContext, useContext } from "react";
 import { SetURLSearchParams } from "react-router-dom";
-import { PaginatedDetails } from "../../constants/interfaces";
+import { PaginatedDetails, StateSetter } from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
 import { GraphType } from "./MyGenericView";
 
 export interface GenericViewProps<T> {
   shownFields: (keyof T)[];
-  setShownFields: Dispatch<SetStateAction<(keyof T)[]>>;
+  setShownFields: StateSetter<(keyof T)[]>;
   sortFields: string[];
-  setSortFields: Dispatch<SetStateAction<string[]>>;
+  setSortFields: StateSetter<string[]>;
   params: URLSearchParams;
   setParams: SetURLSearchParams;
   pageDetails: PaginatedDetails | undefined;

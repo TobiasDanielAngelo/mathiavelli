@@ -6,12 +6,12 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { observer } from "mobx-react-lite";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../api/Store";
 import anon from "../assets/anon.jpg";
 import { useKeyPress } from "../constants/hooks";
-import { Page } from "../constants/interfaces";
+import { Page, StateSetter } from "../constants/interfaces";
 import { MyDropdownMenu } from "./MyDropdownMenu";
 import { MyIcon } from "./MyIcon";
 
@@ -20,10 +20,10 @@ const drawerWidth = 240;
 export const ResponsiveDrawer = observer(
   (props: {
     open?: boolean;
-    setOpen?: Dispatch<SetStateAction<boolean>>;
+    setOpen?: StateSetter<boolean>;
     paths?: Page[];
     location?: string;
-    setLocation?: Dispatch<SetStateAction<string>>;
+    setLocation?: StateSetter<string>;
   }) => {
     const { open, setOpen, paths, setLocation } = props;
     const navigate = useNavigate();
@@ -161,9 +161,9 @@ export const MyNavBar = observer(
   (props: {
     title?: string;
     drawerOpen?: boolean;
-    setDrawerOpen?: Dispatch<SetStateAction<boolean>>;
+    setDrawerOpen?: StateSetter<boolean>;
     location?: string;
-    setLocation?: Dispatch<SetStateAction<string>>;
+    setLocation?: StateSetter<string>;
     profileUrl?: string;
     paths?: Page[];
   }) => {

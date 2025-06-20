@@ -104,7 +104,7 @@ export const MainView = observer(() => {
         <Route path="jobs" element={<JobView />} />
         <Route path="follow-ups" element={<FollowUpView />} />
         <Route path="body-fats" element={<BodyFatView />} />
-        <Route path="waist-measurements" element={<WaistMeasurementView />} />
+        <Route path="waist-measure" element={<WaistMeasurementView />} />
         <Route path="meals" element={<MealView />} />
         <Route path="weigh-ins" element={<WeighInView />} />
         <Route path="workouts" element={<WorkoutView />} />

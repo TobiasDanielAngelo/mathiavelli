@@ -1,8 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { MyNavBar } from "../../blueprints/MyNavigation";
 import { toTitleCase } from "../../constants/helpers";
+import { StateSetter } from "../../constants/interfaces";
 
 export type ViewPath = {
   title: string;
@@ -47,18 +48,12 @@ export const allViewPaths = [
   },
   {
     title: "Health",
-    items: [
-      "meals",
-      "weigh-ins",
-      "body-fats",
-      "waist-measurements",
-      "workouts",
-    ],
+    items: ["meals", "weigh-ins", "body-fats", "waist-measure", "workouts"],
   },
 ] as ViewPath[];
 
 export const NavBar = observer(
-  (props: { open: boolean; setOpen?: Dispatch<SetStateAction<boolean>> }) => {
+  (props: { open: boolean; setOpen?: StateSetter<boolean> }) => {
     const { open, setOpen } = props;
 
     const location = useLocation();

@@ -1,13 +1,13 @@
-import SearchIcon from "@mui/icons-material/Search";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import { SetStateAction } from "react";
+import SearchIcon from "@mui/icons-material/Search";
+import { StateSetter } from "../constants/interfaces";
 import { MyInput } from "./MyInput";
 
 export const MySearch = (props: {
   query?: string;
-  setQuery: React.Dispatch<SetStateAction<string>>;
+  setQuery: StateSetter<string>;
   open?: boolean;
-  setOpen?: React.Dispatch<SetStateAction<boolean>>;
+  setOpen?: StateSetter<boolean>;
 }) => {
   const { query, setQuery, open, setOpen } = props;
 

@@ -21,7 +21,11 @@ import { MyLockedCard } from "../../blueprints/MyLockedCard";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions, toTitleCase } from "../../constants/helpers";
 import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import {
+  Field,
+  PaginatedDetails,
+  StateSetter,
+} from "../../constants/interfaces";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -139,21 +143,28 @@ export const EventCard = observer((props: { item: Event }) => {
   );
 });
 
-export const EventDashboard = observer(() => {
-  const [date, setDate] = useState(new Date());
-  const { eventStore } = useStore();
+export const EventDashboard = observer(
+  (props: { date: Date; setDate: StateSetter<Date> }) => {
+    const { eventStore } = useStore();
+    const { date, setDate } = props;
 
-  return (
-    <MyLockedCard isUnlocked>
-      <MyCalendar date={date} setDate={setDate} events={eventStore.items} />
-    </MyLockedCard>
-  );
-});
+    return (
+      <MyLockedCard isUnlocked>
+        <MyCalendar date={date} setDate={setDate} events={eventStore.items} />
+      </MyLockedCard>
+    );
+  }
+);
 
 export const EventCollection = observer(() => {
   const { eventStore } = useStore();
   const { pageDetails, PageBar } = useEventView();
+  const [date, setDate] = useState(new Date());
 
+  const values = {
+    date,
+    setDate,
+  };
   return (
     <SideBySideView
       SideA={
@@ -165,7 +176,7 @@ export const EventCollection = observer(() => {
           items={eventStore.items}
         />
       }
-      SideB={<EventDashboard />}
+      SideB={<EventDashboard {...values} />}
       ratio={0.7}
     />
   );
