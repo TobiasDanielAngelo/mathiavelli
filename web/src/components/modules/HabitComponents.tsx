@@ -69,7 +69,6 @@ export const HabitForm = ({
         ],
         [{ name: "dateStart", label: "Date Start", type: "datetime" }],
         [{ name: "dateEnd", label: "Date End", type: "datetime" }],
-        [{ name: "dateCompleted", label: "Date Completed", type: "datetime" }],
         [{ name: "isArchived", label: "Is Archived", type: "check" }],
       ] satisfies Field[][],
     [goalStore.items.length, scheduleStore.items.length]
@@ -107,6 +106,7 @@ export const HabitCard = observer((props: { item: Habit }) => {
       body={[
         "description",
         "dateCreated",
+        "dateCompleted",
         "dateEnd",
         "dateStart",
         "goalName",

@@ -76,16 +76,11 @@ export const EventForm = ({
           },
           {
             name: "dateCompleted",
-            label: "Date/Time End",
+            label: "Date/Time Completed",
             type: "datetime",
           },
         ],
         [
-          {
-            name: "allDay",
-            label: "All Day?",
-            type: "check",
-          },
           {
             name: "isArchived",
             label: "Is Archived?",

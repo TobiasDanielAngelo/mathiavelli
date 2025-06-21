@@ -104,11 +104,6 @@ export const TaskForm = ({
             label: "Due Date",
             type: "date",
           },
-          {
-            name: "dateCompleted",
-            label: "Date Completed",
-            type: "datetime",
-          },
         ],
       ] satisfies Field[][],
     [goalStore.items.length, scheduleStore.items.length, item?.id]

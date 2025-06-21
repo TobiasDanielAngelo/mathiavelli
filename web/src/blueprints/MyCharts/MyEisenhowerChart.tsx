@@ -94,7 +94,7 @@ export function MyEisenhowerChart<T>({ items }: Props<T>) {
     };
   });
 
-  if (items.length === 0) return <div>No data</div>;
+  if (items.length === 0) return <div></div>;
 
   return (
     <>

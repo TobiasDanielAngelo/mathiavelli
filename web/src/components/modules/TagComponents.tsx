@@ -26,7 +26,9 @@ export const { Context: TagViewContext, useGenericView: useTagView } =
 
 const title = "Tags";
 
-export const TagIdMap = {} as const;
+export const TagIdMap = {
+  Habit: 1000001,
+} as const;
 
 export const TagForm = ({
   item,

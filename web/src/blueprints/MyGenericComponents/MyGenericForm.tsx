@@ -83,7 +83,8 @@ export function MyGenericForm<T>({
       }
     });
 
-    return cleanObject(copy as Record<string, any>) as T;
+    return copy;
+    // cleanObject(copy as Record<string, any>) as T;
   };
 
   const [details, setDetails] = useState<T>(() =>

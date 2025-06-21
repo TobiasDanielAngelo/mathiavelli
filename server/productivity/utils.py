@@ -138,8 +138,11 @@ def ensure_aware(dt):
     return dt
 
 
-def generate_missing_events(params):
+def generate_missing_events(params=None):
     from .models import Task, Event
+
+    if params is None:
+        params = {"range": "month"}
 
     start = safe_parse_datetime(params.get("start"))
     end = safe_parse_datetime(params.get("end"))
@@ -193,7 +196,6 @@ def generate_missing_events(params):
                     description=task.description or "",
                     date_start=dt,
                     date_end=None,
-                    all_day=False,
                     location="",
                     task=task,
                 )

@@ -28,7 +28,6 @@ const props = {
   dateEnd: prop<string>(""),
   dateCompleted: prop<string>(""),
   isArchived: prop<boolean>(false),
-  allDay: prop<boolean>(false),
   location: prop<string>(""),
   tags: prop<number[] | null>(null),
   dateCreated: prop<string>(""),

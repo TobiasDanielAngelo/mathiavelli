@@ -106,11 +106,10 @@ class Habit(Productivity):
 
 
 class Task(Productivity):
-
     goal = fields.CascadeOptionalForeignKey(Goal)
-    habit = fields.CascadeOptionalForeignKey(Habit)
-    importance = fields.LimitedDecimalField(0, 10)
+    habit = fields.OptionalOneToOneField(Habit)
     schedule = fields.SetNullOptionalForeignKey(Schedule)
+    importance = fields.LimitedDecimalField(0, 10)
     due_date = fields.OptionalDateField()
 
     def __str__(self):
@@ -133,8 +132,6 @@ class Tag(models.Model):
 
 
 class Event(Productivity):
-
-    all_day = fields.DefaultBooleanField(False)
     location = fields.ShortCharField()
     tags = fields.OptionalManyToManyField(Tag)
     task = fields.CascadeOptionalForeignKey(Task)
