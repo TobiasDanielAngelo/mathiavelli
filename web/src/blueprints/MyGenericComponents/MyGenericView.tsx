@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { SetURLSearchParams } from "react-router-dom";
-import { VisibleMap } from "../../constants/hooks";
+import { useKeyPress, VisibleMap } from "../../constants/hooks";
 import { PaginatedDetails, StateSetter } from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
 import { IconName, MyIcon } from "../MyIcon";
@@ -31,6 +31,8 @@ export const MyGenericView = observer(
     setShownFields: StateSetter<(keyof T)[]>;
     sortFields: string[];
     setSortFields: StateSetter<string[]>;
+    graph: GraphType;
+    setGraph: StateSetter<GraphType>;
     availableGraphs: GraphType[];
     actionModalDefs: readonly ActionModalDef[];
     pageDetails: PaginatedDetails | undefined;
@@ -58,6 +60,8 @@ export const MyGenericView = observer(
       itemMap,
       sortFields,
       setSortFields,
+      graph,
+      setGraph,
       title,
     } = props;
 
@@ -72,8 +76,6 @@ export const MyGenericView = observer(
         acc[type] = iconMap[type];
         return acc;
       }, {} as Record<GraphType, { icon: IconName; label: string }>);
-
-    const [graph, setGraph] = useState<GraphType>("pie");
 
     const [view, setView] = useState<"card" | "table">("card");
 
@@ -163,6 +165,10 @@ export const MyGenericView = observer(
           onClick: () => setVisible(i + 1, true),
         })),
       [setVisible, actionModalDefs]
+    );
+
+    actions.forEach((s, ind) =>
+      useKeyPress(["Alt", `Digit${ind + 1}`], s.onClick)
     );
 
     useEffect(() => {

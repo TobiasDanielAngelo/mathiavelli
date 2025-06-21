@@ -20,6 +20,7 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
+  GraphType,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
@@ -150,6 +151,8 @@ export const TransactionDashboard = observer(
       fetchTransactionAnalytics();
     }, [graph]);
 
+    console.log(transactionAnalyticsStore.items.map((s) => s.total));
+
     return (
       <>
         {graph === "pie" ? (
@@ -168,7 +171,7 @@ export const TransactionDashboard = observer(
             yKey="total"
             formatter={(value: number, name: string) => [toMoney(value), name]}
             itemMap={itemMap}
-            excludedFromTotal={["Operations"]}
+            excludedFromTotal={["Operations", "Initial"]}
             selectionLabel="Accounts"
           />
         )}
@@ -255,13 +258,19 @@ export const TransactionTable = observer(() => {
 });
 
 export const TransactionView = observer(() => {
-  const { transactionStore, accountStore, categoryStore } = useStore();
+  const {
+    transactionStore,
+    accountStore,
+    categoryStore,
+    transactionAnalyticsStore,
+  } = useStore();
   const { setVisible1, setVisible4, isVisible, setVisible } = useVisible();
   const [pageDetails, setPageDetails] = useState<
     PaginatedDetails | undefined
   >();
   const [params, setParams] = useSearchParams();
   const objWithFields = new Transaction({}).$view;
+  const [graph, setGraph] = useState<GraphType>("pie");
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof TransactionInterface)[],
     "shownFieldsTransaction"
@@ -276,6 +285,7 @@ export const TransactionView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
+    transactionAnalyticsStore.fetchAll(`graph=${graph}`);
   };
 
   const itemMap = useMemo(
@@ -369,6 +379,8 @@ export const TransactionView = observer(() => {
       params={params}
       setParams={setParams}
       itemMap={itemMap}
+      graph={graph}
+      setGraph={setGraph}
     />
   );
 });

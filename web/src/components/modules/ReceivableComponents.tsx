@@ -21,6 +21,7 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
+  GraphType,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { MyModal } from "../../blueprints/MyModal";
@@ -244,6 +245,7 @@ export const ReceivableView = observer(() => {
   >();
   const [params, setParams] = useSearchParams();
   const objWithFields = new Receivable({}).$view;
+  const [graph, setGraph] = useState<GraphType>("pie");
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof ReceivableInterface)[],
     "shownFieldsReceivable"
@@ -326,6 +328,8 @@ export const ReceivableView = observer(() => {
       params={params}
       setParams={setParams}
       itemMap={itemMap}
+      graph={graph}
+      setGraph={setGraph}
     />
   );
 });

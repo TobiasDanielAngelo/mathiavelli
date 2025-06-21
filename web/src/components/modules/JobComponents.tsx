@@ -22,6 +22,7 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
+  GraphType,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
@@ -236,6 +237,7 @@ export const JobView = observer(() => {
   >();
   const [params, setParams] = useSearchParams();
   const objWithFields = new Job({}).$view;
+  const [graph, setGraph] = useState<GraphType>("pie");
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof JobInterface)[],
     "shownFieldsJob"
@@ -331,6 +333,8 @@ export const JobView = observer(() => {
       params={params}
       setParams={setParams}
       itemMap={itemMap}
+      graph={graph}
+      setGraph={setGraph}
     />
   );
 });

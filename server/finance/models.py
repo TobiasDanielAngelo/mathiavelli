@@ -5,8 +5,13 @@ from django.utils import timezone
 
 
 class Account(models.Model):
+    # CURRENCY_CHOICES = [
+    #     (0, "PHP"),
+    #     (1, "USD"),
+    # ]
     name = fields.ShortCharField()
     datetime_added = fields.DefaultNowField()
+    # currency = fields.ChoiceIntegerField(CURRENCY_CHOICES)
 
     def __str__(self):
         return f"{self.pk} - {self.name}"

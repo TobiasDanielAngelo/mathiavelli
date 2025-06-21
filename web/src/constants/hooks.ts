@@ -5,9 +5,16 @@ import { StateSetter } from "./interfaces";
 export const useKeyPress = (keys: string[], callbackFcn: () => void) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (keys.includes(e.key)) {
-        callbackFcn();
-      }
+      const held = new Set<string>();
+
+      if (e.ctrlKey) held.add("Control");
+      if (e.metaKey) held.add("Meta");
+      if (e.shiftKey) held.add("Shift");
+      if (e.altKey) held.add("Alt");
+
+      held.add(e.code); // e.g., KeyC, Digit1, etc.
+      const allPressed = keys.every((k) => held.has(k));
+      if (allPressed) callbackFcn();
     };
 
     document.addEventListener("keydown", handleKeyDown);

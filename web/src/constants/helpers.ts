@@ -678,7 +678,6 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     freq: Number(schedule.freq) ?? RRule.DAILY,
     interval: Number(schedule.interval) || 1,
     byweekday: schedule.byWeekDay
-      ?.map(Number)
       ?.map((d) => WEEKDAY_MAP[d])
       .filter(Boolean) as Weekday[],
     bymonth: schedule.byMonth?.map(Number) ?? undefined,

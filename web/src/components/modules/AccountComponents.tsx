@@ -18,6 +18,7 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
+  GraphType,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
@@ -180,6 +181,7 @@ export const AccountView = observer(() => {
   >();
   const [params, setParams] = useSearchParams();
   const objWithFields = new Account({}).$view;
+  const [graph, setGraph] = useState<GraphType>("pie");
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof AccountInterface)[],
     "shownFieldsAccount"
@@ -250,6 +252,8 @@ export const AccountView = observer(() => {
       params={params}
       setParams={setParams}
       itemMap={itemMap}
+      graph={graph}
+      setGraph={setGraph}
     />
   );
 });

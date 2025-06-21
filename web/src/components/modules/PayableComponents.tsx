@@ -21,6 +21,7 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
+  GraphType,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { MyModal } from "../../blueprints/MyModal";
@@ -243,6 +244,7 @@ export const PayableView = observer(() => {
   >();
   const [params, setParams] = useSearchParams();
   const objWithFields = new Payable({}).$view;
+  const [graph, setGraph] = useState<GraphType>("pie");
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof PayableInterface)[],
     "shownFieldsPayable"
@@ -323,6 +325,8 @@ export const PayableView = observer(() => {
       params={params}
       setParams={setParams}
       itemMap={itemMap}
+      graph={graph}
+      setGraph={setGraph}
     />
   );
 });

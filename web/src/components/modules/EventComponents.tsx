@@ -16,6 +16,7 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
+  GraphType,
   MyGenericView,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { MyLockedCard } from "../../blueprints/MyLockedCard";
@@ -276,6 +277,7 @@ export const EventView = observer(() => {
   >();
   const [params, setParams] = useSearchParams();
   const objWithFields = new Event({}).$view;
+  const [graph, setGraph] = useState<GraphType>("pie");
   const [shownFields, setShownFields] = useLocalStorageState(
     Object.keys(objWithFields) as (keyof EventInterface)[],
     "shownFieldsEvent"
@@ -356,6 +358,8 @@ export const EventView = observer(() => {
       params={params}
       setParams={setParams}
       itemMap={itemMap}
+      graph={graph}
+      setGraph={setGraph}
     />
   );
 });

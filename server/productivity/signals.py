@@ -1,6 +1,7 @@
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from .models import Task, Event, Schedule, Habit, Goal, HabitLog
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now, get_current_timezone
 from dateutil.parser import parse
 from django.db.models.signals import post_save
@@ -118,19 +119,26 @@ def sync_habit_from_task(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Schedule)
 def schedule_updated(sender, instance, **kwargs):
-    # Find all related tasks
-    for task in Task.objects.filter(schedule=instance):
+    if not instance.pk:
+        return  # new instance, nothing to compare yet
+
+    try:
         old = Schedule.objects.get(pk=instance.pk)
-        if old.datetimes != instance.datetimes:
+    except Schedule.DoesNotExist:
+        return  # should not happen, but just in case
+
+    if old.datetimes != instance.datetimes:
+        for task in Task.objects.filter(schedule=instance):
             Event.objects.filter(task=task).delete()
 
 
 @receiver([post_save, post_delete], sender=Event)
 def maybe_complete_task(sender, instance, **kwargs):
-
-    if not hasattr(instance, "task"):
+    try:
+        task = instance.task
+    except ObjectDoesNotExist:
         return
-    task = instance.task
+
     if not task or not task.schedule:
         return
 

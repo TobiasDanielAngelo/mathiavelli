@@ -10,7 +10,7 @@ class ScheduleAdmin(admin.ModelAdmin):
         return ["datetimes_display"] + [field.name for field in self.model._meta.fields]
 
     def datetimes_display(self, obj):
-        return "\n".join(str(dt) for dt in obj.datetimes)
+        return f"{len(obj.datetimes)} occurences"
 
 
 @admin.register(Goal)
