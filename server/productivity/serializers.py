@@ -10,13 +10,13 @@ class EventSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def validate(self, data):
-        start = data.get("start")
-        end = data.get("end")
+        start = data.get("date_start")
+        end = data.get("date_end")
         if start and end and start >= end:
             raise ValidationError(
                 {
-                    "start": ["Start time must be before end time."],
-                    "end": ["End time must be after start time."],
+                    "date_start": ["Start time must be before end time."],
+                    "date_end": ["End time must be after start time."],
                 }
             )
         return data
@@ -29,9 +29,6 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class GoalSerializer(serializers.ModelSerializer):
-    is_completed = serializers.SerializerMethodField()
-    # Optional: allow client to toggle completion via boolean
-    set_completed = serializers.BooleanField(write_only=True, required=False)
 
     class Meta:
         model = Goal
@@ -48,9 +45,6 @@ class GoalSerializer(serializers.ModelSerializer):
                 }
             )
         return data
-
-    def get_is_completed(self, obj):
-        return obj.date_completed is not None
 
     def update(self, instance, validated_data):
         if "set_completed" in validated_data:

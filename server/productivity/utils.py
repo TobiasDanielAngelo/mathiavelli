@@ -179,20 +179,20 @@ def generate_missing_events(params):
         else:
             datetimes = []
         deleted, _ = (
-            Event.objects.filter(task=task).exclude(start__in=datetimes).delete()
+            Event.objects.filter(task=task).exclude(date_start__in=datetimes).delete()
         )
         print(f"Deleted {deleted} incorrect events.")
 
         filtered_datetimes = [dt for dt in datetimes if is_in_range(dt)]
         for dt in filtered_datetimes:
-            if Event.objects.filter(task=task, start=dt).exists():
+            if Event.objects.filter(task=task, date_start=dt).exists():
                 print("Event already exists.")
             else:
                 event = Event.objects.create(
                     title=task.title,
                     description=task.description or "",
-                    start=dt,
-                    end=None,
+                    date_start=dt,
+                    date_end=None,
                     all_day=False,
                     location="",
                     task=task,

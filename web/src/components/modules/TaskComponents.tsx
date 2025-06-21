@@ -74,13 +74,8 @@ export const TaskForm = ({
         ],
         [
           {
-            name: "isCompleted",
-            label: "Complete?",
-            type: "check",
-          },
-          {
-            name: "isCancelled",
-            label: "Cancel?",
+            name: "isArchived",
+            label: "Archived?",
             type: "check",
           },
           {
@@ -95,12 +90,12 @@ export const TaskForm = ({
           {
             name: "dateStart",
             label: "Date Start",
-            type: "date",
+            type: "datetime",
           },
           {
             name: "dateEnd",
             label: "Date End",
-            type: "date",
+            type: "datetime",
           },
         ],
         [
@@ -112,7 +107,7 @@ export const TaskForm = ({
           {
             name: "dateCompleted",
             label: "Date Completed",
-            type: "date",
+            type: "datetime",
           },
         ],
       ] satisfies Field[][],
@@ -153,8 +148,7 @@ export const TaskCard = observer((props: { item: Task }) => {
         "importance",
         "dateStart",
         "dateEnd",
-        "isCancelled",
-        "isCompleted",
+        "isArchived",
         "goalTitle",
         "habitTitle",
         "scheduleDefinition",
@@ -172,7 +166,7 @@ export const TaskCard = observer((props: { item: Task }) => {
 export const TaskDashboard = observer(() => {
   const { taskStore } = useStore();
   const tasks = taskStore.items
-    .filter((s) => !s.isCompleted && !s.isCancelled && s.dueDate)
+    .filter((s) => !s.dateCompleted && !s.isArchived && s.dueDate)
     .map((s) => ({
       id: s.id,
       name: s.title,

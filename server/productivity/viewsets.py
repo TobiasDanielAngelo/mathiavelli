@@ -84,9 +84,9 @@ class TaskViewSet(CustomModelViewSet):
     serializer_class = TaskSerializer
 
     def update_goal_completion_status(self, goal):
-        tasks = goal.task_goal.filter(is_cancelled=False)
+        tasks = goal.task_goal.filter(is_archived=False)
 
-        if tasks.exists() and all(task.is_completed for task in tasks):
+        if tasks.exists():
             goal.date_completed = timezone.now().date()
         else:
             goal.date_completed = None
@@ -99,7 +99,7 @@ class TaskViewSet(CustomModelViewSet):
 
     def perform_update(self, serializer):
         task = serializer.save()
-        if task.is_completed or task.is_cancelled:
+        if task.is_archived:
             pass
         else:
             self.create_or_update_event(task)
@@ -128,8 +128,8 @@ class TaskViewSet(CustomModelViewSet):
             defaults={
                 "title": task.title,
                 "description": task.description,
-                "start": start_dt,
-                "end": end_dt,
+                "date_start": start_dt,
+                "date_end": end_dt,
                 "all_day": True,
             },
         )
@@ -137,8 +137,8 @@ class TaskViewSet(CustomModelViewSet):
         if not created:
             event.title = task.title
             event.description = task.description
-            event.start = start_dt
-            event.end = end_dt
+            event.date_start = start_dt
+            event.date_end = end_dt
             event.all_day = True
             event.save()
 

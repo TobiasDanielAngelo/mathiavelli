@@ -28,6 +28,7 @@ const props = {
   thresholdPercent: prop<number>(0),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
+  dateCompleted: prop<string>(""),
   isArchived: prop<boolean>(false),
   dateCreated: prop<string>(""),
 };
@@ -41,8 +42,8 @@ export type HabitInterface = {
 };
 
 export const HabitFields: Record<string, (keyof HabitInterface)[]> = {
-  datetime: ["dateCreated"] as const,
-  date: ["dateStart", "dateEnd"] as const,
+  datetime: ["dateCreated", "dateStart", "dateEnd", "dateCompleted"] as const,
+  date: [] as const,
   time: [] as const,
   prices: [] as const,
 };

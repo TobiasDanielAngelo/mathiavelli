@@ -2,6 +2,7 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from finance.models import *
 from personal.models import *
+from productivity.models import *
 
 
 @receiver(post_migrate)
@@ -26,6 +27,7 @@ def create_default_accounts(sender, **kwargs):
         (Platform, 1000008, {"name": "Netflix"}),
         (Platform, 1000009, {"name": "Steam"}),
         (Platform, 1000010, {"name": "Spotify"}),
+        (Tag, 1000001, {"name": "Habit"}),
     ]
 
     for model, id, fields in defaults:

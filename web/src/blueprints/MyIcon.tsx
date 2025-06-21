@@ -27,6 +27,7 @@ import BarChart from "@mui/icons-material/BarChart";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import Sort from "@mui/icons-material/Sort";
+import Today from "@mui/icons-material/Today";
 import Settings from "@mui/icons-material/Settings";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
@@ -55,6 +56,7 @@ const iconMap = {
   Timeline,
   TableChart,
   Padding,
+  Today,
   BarChart,
   ExpandMore,
   ExpandLess,

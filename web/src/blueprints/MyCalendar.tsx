@@ -9,8 +9,8 @@ import { MyIcon } from "./MyIcon";
 type CalendarEvent = {
   id: string | number;
   title: string;
-  start: string;
-  end: string;
+  dateStart: string;
+  dateEnd: string;
 };
 
 export type CalendarView = "month" | "year" | "decade";
@@ -82,8 +82,9 @@ export const MyCalendar = observer(
             const dayEvents = events.filter(
               (e) =>
                 day.format("YYYY-MM-DD") ===
-                  moment(e.start).format("YYYY-MM-DD") ||
-                day.format("YYYY-MM-DD") === moment(e.end).format("YYYY-MM-DD")
+                  moment(e.dateStart).format("YYYY-MM-DD") ||
+                day.format("YYYY-MM-DD") ===
+                  moment(e.dateEnd).format("YYYY-MM-DD")
               // new TwoDates(e.start, e.end).contains(
               //   day.endOf("day").subtract(1, "second").toDate()
               // )

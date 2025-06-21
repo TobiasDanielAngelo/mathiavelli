@@ -65,12 +65,17 @@ export const EventForm = ({
         ],
         [
           {
-            name: "start",
+            name: "dateStart",
             label: "Date/Time Start",
             type: "datetime",
           },
           {
-            name: "end",
+            name: "dateEnd",
+            label: "Date/Time End",
+            type: "datetime",
+          },
+          {
+            name: "dateCompleted",
             label: "Date/Time End",
             type: "datetime",
           },
@@ -82,16 +87,14 @@ export const EventForm = ({
             type: "check",
           },
           {
+            name: "isArchived",
+            label: "Is Archived?",
+            type: "check",
+          },
+          {
             name: "location",
             label: "Location",
             type: "text",
-          },
-        ],
-        [
-          {
-            name: "createdAt",
-            label: "Created At",
-            type: "datetime",
           },
         ],
         [
@@ -181,7 +184,7 @@ export const EventCollection = observer(() => {
       : `${Math.floor(moment(date).year() / 10)}X`;
 
   const filteredItems = eventStore.items.filter((s) => {
-    const m = moment(s.start);
+    const m = moment(s.dateStart);
     if (view === "month") return m.format("YYYY-MM") === range;
     if (view === "year") return m.format("YYYY") === range;
     if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;

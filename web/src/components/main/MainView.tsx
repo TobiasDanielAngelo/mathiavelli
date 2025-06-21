@@ -65,9 +65,9 @@ export const MainView = observer(() => {
       categoryStore.fetchAll("page=all");
       tagStore.fetchAll("page=all");
       inventoryCategoryStore.fetchAll("page=all");
-      goalStore.fetchAll("page=all&is_completed=0&is_cancelled=0");
+      goalStore.fetchAll("page=all&is_archived=0");
       jobStore.fetchAll("page=all&status__lte=3");
-      taskStore.fetchAll("page=all&is_completed=0&is_cancelled=0");
+      taskStore.fetchAll("page=all&is_archived=0");
       scheduleStore.fetchAll("page=all");
     }
   };

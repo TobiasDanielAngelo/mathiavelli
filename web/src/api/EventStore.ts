@@ -24,12 +24,14 @@ const props = {
   id: prop<number>(-1),
   title: prop<string>(""),
   description: prop<string>(""),
-  start: prop<string>(""),
-  end: prop<string>(""),
+  dateStart: prop<string>(""),
+  dateEnd: prop<string>(""),
+  dateCompleted: prop<string>(""),
+  isArchived: prop<boolean>(false),
   allDay: prop<boolean>(false),
   location: prop<string>(""),
   tags: prop<number[] | null>(null),
-  createdAt: prop<string>(""),
+  dateCreated: prop<string>(""),
   task: prop<number | null>(null),
 };
 
@@ -42,7 +44,7 @@ export type EventInterface = {
 };
 
 export const EventFields: Record<string, (keyof EventInterface)[]> = {
-  datetime: ["start", "end", "createdAt"] as const,
+  datetime: ["dateStart", "dateEnd", "dateCreated", "dateCompleted"] as const,
   date: [] as const,
   time: [] as const,
   prices: [] as const,
@@ -61,8 +63,8 @@ export class Event extends Model(props) {
   }
 
   get dateDuration() {
-    return `${moment(this.start).format("lll")}${
-      this.end ? " – " + moment(this.end).format("lll") : ""
+    return `${moment(this.dateStart).format("lll")}${
+      this.dateEnd ? " – " + moment(this.dateEnd).format("lll") : ""
     }`;
   }
 

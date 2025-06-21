@@ -29,12 +29,11 @@ const props = {
   schedule: prop<number | null>(null),
   importance: prop<number>(0),
   dueDate: prop<string>(""),
-  isCompleted: prop<boolean>(false),
   dateCompleted: prop<string>(""),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
   dateCreated: prop<string>(""),
-  isCancelled: prop<boolean>(false),
+  isArchived: prop<boolean>(false),
 };
 
 export const FREQUENCY_CHOICES = [
@@ -54,8 +53,8 @@ export type TaskInterface = {
 };
 
 export const TaskFields: Record<string, (keyof TaskInterface)[]> = {
-  datetime: ["dateCreated"] as const,
-  date: ["dueDate", "dateCompleted", "dateStart", "dateEnd"] as const,
+  datetime: ["dateCreated", "dateCompleted", "dateStart", "dateEnd"] as const,
+  date: ["dueDate"] as const,
   time: [] as const,
   prices: [] as const,
 };

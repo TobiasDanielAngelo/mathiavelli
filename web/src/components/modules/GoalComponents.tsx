@@ -81,19 +81,24 @@ export const GoalForm = ({
           {
             name: "dateStart",
             label: "Date Start",
-            type: "date",
+            type: "datetime",
           },
           {
             name: "dateEnd",
             label: "Date End",
-            type: "date",
+            type: "datetime",
           },
         ],
         [
           {
             name: "dateCompleted",
             label: "Date Completed",
-            type: "date",
+            type: "datetime",
+          },
+          {
+            name: "isArchived",
+            label: "Is Archived?",
+            type: "check",
           },
         ],
       ] satisfies Field[][],
@@ -128,7 +133,7 @@ export const GoalCard = observer((props: { item: Goal }) => {
       item={item}
       shownFields={shownFields}
       important={["title"]}
-      body={["description", "dateDuration", "isCancelled"]}
+      body={["description", "dateDuration", "isArchived"]}
       prices={GoalFields.prices}
       FormComponent={GoalForm}
       deleteItem={followUpStore.deleteItem}

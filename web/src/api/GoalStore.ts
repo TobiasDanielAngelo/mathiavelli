@@ -29,7 +29,7 @@ const props = {
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
   dateCreated: prop<string>(""),
-  isCancelled: prop<boolean>(false),
+  isArchived: prop<boolean>(false),
 };
 
 export type GoalInterface = {
@@ -41,8 +41,8 @@ export type GoalInterface = {
 };
 
 export const GoalFields: Record<string, (keyof GoalInterface)[]> = {
-  datetime: ["dateCreated"] as const,
-  date: ["dateCompleted", "dateStart", "dateEnd"] as const,
+  datetime: ["dateCreated", "dateStart", "dateEnd", "dateCompleted"] as const,
+  date: [] as const,
   time: [] as const,
   prices: [] as const,
 };

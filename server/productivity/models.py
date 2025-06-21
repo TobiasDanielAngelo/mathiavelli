@@ -4,6 +4,19 @@ from .utils import get_datetimes
 from django.core.exceptions import ValidationError
 
 
+class Productivity(models.Model):
+    title = fields.ShortCharField()
+    description = fields.MediumCharField()
+    date_start = fields.OptionalDateTimeField()
+    date_end = fields.OptionalDateTimeField()
+    date_created = fields.AutoCreatedAtField()
+    date_completed = fields.OptionalDateTimeField()
+    is_archived = fields.DefaultBooleanField(False)
+
+    class Meta:
+        abstract = True
+
+
 class Schedule(models.Model):
     """
     Recurrence Range vs. Event Duration:
@@ -75,15 +88,8 @@ class Schedule(models.Model):
         return get_datetimes(self)
 
 
-class Goal(models.Model):
-    title = fields.ShortCharField()
-    description = fields.MediumCharField()
+class Goal(Productivity):
     parent_goal = fields.CascadeOptionalForeignKey("self")
-    date_completed = fields.OptionalDateField()
-    date_start = fields.OptionalDateField()
-    date_end = fields.OptionalDateField()
-    date_created = fields.AutoCreatedAtField()
-    is_cancelled = fields.DefaultBooleanField(False)
 
     def __str__(self):
         return self.title
@@ -92,38 +98,20 @@ class Goal(models.Model):
         if self.date_start and self.date_end and self.date_start > self.date_end:
             raise ValidationError("Start time must be before end time.")
 
-    @property
-    def is_completed(self):
-        return self.date_completed is not None
 
-
-class Habit(models.Model):
-    title = fields.ShortCharField()
-    description = fields.MediumCharField()
+class Habit(Productivity):
     goal = fields.CascadeOptionalForeignKey(Goal)
     schedule = fields.SetNullOptionalForeignKey(Schedule)
     threshold_percent = fields.LimitedDecimalField(0, 100, 80)
-    date_start = fields.OptionalDateField()
-    date_end = fields.OptionalDateField()
-    is_archived = fields.DefaultBooleanField(False)
-    date_created = fields.AutoCreatedAtField()
 
 
-class Task(models.Model):
+class Task(Productivity):
 
-    title = fields.ShortCharField()
-    description = fields.MediumCharField()
     goal = fields.CascadeOptionalForeignKey(Goal)
     habit = fields.CascadeOptionalForeignKey(Habit)
     importance = fields.LimitedDecimalField(0, 10)
     schedule = fields.SetNullOptionalForeignKey(Schedule)
     due_date = fields.OptionalDateField()
-    is_completed = fields.DefaultBooleanField(False)
-    date_completed = fields.OptionalDateField()
-    date_start = fields.OptionalDateField()
-    date_end = fields.OptionalDateField()
-    date_created = fields.AutoCreatedAtField()
-    is_cancelled = fields.DefaultBooleanField(False)
 
     def __str__(self):
         return self.title
@@ -144,23 +132,19 @@ class Tag(models.Model):
         return self.name
 
 
-class Event(models.Model):
-    title = fields.ShortCharField()
-    description = fields.MediumCharField()
-    start = fields.OptionalDateTimeField()
-    end = fields.OptionalDateTimeField()
+class Event(Productivity):
+
     all_day = fields.DefaultBooleanField(False)
     location = fields.ShortCharField()
     tags = fields.OptionalManyToManyField(Tag)
-    created_at = fields.AutoCreatedAtField()
     task = fields.CascadeOptionalForeignKey(Task)
 
     def clean(self):
-        if self.start and self.end and self.start >= self.end:
+        if self.date_start and self.date_end and self.date_start >= self.date_end:
             raise ValidationError("Start time must be before end time.")
 
     def __str__(self):
-        return f"{self.title} ({self.start} - {self.end})"
+        return f"{self.title} ({self.date_start} - {self.date_end})"
 
 
 class HabitLog(models.Model):
