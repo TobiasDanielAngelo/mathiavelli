@@ -314,6 +314,12 @@ class OptionalOneToOneField(OneToOneField):
         super().__init__(to, *args, **kwargs)
 
 
+class OneToOneField(OneToOneField):
+    def __init__(self, to, *args, **kwargs):
+        kwargs.setdefault("on_delete", models.CASCADE)
+        super().__init__(to, *args, **kwargs)
+
+
 class OptionalEmailField(models.EmailField):
     """
     EmailField with null=True, blank=True by default.

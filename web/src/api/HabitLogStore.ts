@@ -22,8 +22,7 @@ const slug = "productivity/habit-logs";
 const props = {
   id: prop<number>(-1),
   habit: prop<number | null>(null),
-  date: prop<string>(""),
-  completedAt: prop<string>(""),
+  dateCreated: prop<string>(""),
 };
 
 export type HabitLogInterface = {
@@ -35,7 +34,7 @@ export type HabitLogInterface = {
 };
 
 export const HabitLogFields: Record<string, (keyof HabitLogInterface)[]> = {
-  datetime: ["date", "completedAt"] as const,
+  datetime: ["dateCreated"] as const,
   date: [] as const,
   time: [] as const,
   prices: [] as const,

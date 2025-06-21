@@ -1,8 +1,12 @@
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
-from .models import Task, Event, Schedule, Habit, Goal
+from .models import Task, Event, Schedule, Habit, Goal, HabitLog
 from django.utils.timezone import now, get_current_timezone
 from dateutil.parser import parse
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.timezone import make_aware
+from datetime import datetime
 
 # Prevent recursion
 _is_syncing = set()
@@ -164,3 +168,28 @@ def create_events_for_task(sender, instance, created, **kwargs):
         from .utils import generate_missing_events
 
         generate_missing_events()
+
+
+@receiver(post_save, sender=Event)
+def sync_habitlog_from_event(sender, instance, **kwargs):
+    task = instance.task
+    if not task or not task.habit:
+        return
+
+    habit = task.habit
+    log_date = instance.date_start
+
+    if instance.date_completed:
+        # Ensure timezone-aware datetime
+        if isinstance(log_date, datetime) and log_date.tzinfo is None:
+            log_date = make_aware(log_date)
+
+        HabitLog.objects.get_or_create(
+            habit=habit,
+            date_created=log_date,
+        )
+    else:
+        HabitLog.objects.filter(
+            habit=habit,
+            date_created=log_date,
+        ).delete()
