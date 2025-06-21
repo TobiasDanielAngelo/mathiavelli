@@ -145,5 +145,5 @@ class Event(Productivity):
 
 
 class HabitLog(models.Model):
-    habit = fields.OneToOneField(Habit)
+    habit = fields.CascadeRequiredForeignKey(Habit)
     date_created = fields.DefaultNowField()
