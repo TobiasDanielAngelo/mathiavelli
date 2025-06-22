@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   BuyListItem,
   BuyListItemFields,
@@ -10,7 +9,6 @@ import {
 } from "../../api/BuyListItemStore";
 import { STATUS_CHOICES } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -21,13 +19,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const {
   Context: BuyListItemViewContext,
@@ -83,13 +81,10 @@ export const BuyListItemForm = ({
       fetchFcn={fetchFcn}
       objectName="buy list item"
       fields={fields}
-      storeFns={{
-        add: buyListItemStore.addItem,
-        update: buyListItemStore.updateItem,
-        delete: buyListItemStore.deleteItem,
-      }}
-      datetimeFields={BuyListItemFields.datetime}
-      dateFields={BuyListItemFields.date}
+      store={buyListItemStore}
+      datetimeFields={BuyListItemFields.datetimeFields}
+      dateFields={BuyListItemFields.dateFields}
+      timeFields={BuyListItemFields.timeFields}
     />
   );
 };
@@ -103,10 +98,9 @@ export const BuyListItemCard = observer((props: { item: BuyListItem }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["plannedDate"]}
+      header={["id", "plannedDate"]}
       important={["name"]}
-      body={["estimatedPrice", "priorityName", "statusName"]}
-      prices={BuyListItemFields.prices}
+      prices={BuyListItemFields.pricesFields}
       FormComponent={BuyListItemForm}
       deleteItem={buyListItemStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -140,8 +134,13 @@ export const BuyListItemFilter = observer(() => {
     <MyGenericFilter
       view={new BuyListItem({}).$view}
       title="Buy List Item Filters"
-      dateFields={[...BuyListItemFields.date, ...BuyListItemFields.datetime]}
+      dateFields={[
+        ...BuyListItemFields.dateFields,
+        ...BuyListItemFields.datetimeFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -163,51 +162,28 @@ export const BuyListItemRow = observer((props: { item: BuyListItem }) => {
 
 export const BuyListItemTable = observer(() => {
   const { buyListItemStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useBuyListItemView();
+  const values = useBuyListItemView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={buyListItemStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <BuyListItemRow item={item} />}
-      priceFields={BuyListItemFields.prices}
-      itemMap={itemMap}
+      priceFields={BuyListItemFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const BuyListItemView = observer(() => {
   const { buyListItemStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new BuyListItem({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof BuyListItemInterface)[],
-    "shownFieldsBuyListItem"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<BuyListItemInterface, BuyListItem>(
+    "BuyListItem",
+    new BuyListItem({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsBuyListItem"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await buyListItemStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -233,62 +209,22 @@ export const BuyListItemView = observer(() => {
     []
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Wish List",
-      modal: <BuyListItemForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof BuyListItemInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <BuyListItemFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<BuyListItemInterface>
       title={title}
+      Context={BuyListItemViewContext}
+      CollectionComponent={BuyListItemCollection}
+      FormComponent={BuyListItemForm}
+      FilterComponent={BuyListItemFilter}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
       setVisible={setVisible}
-      Context={BuyListItemViewContext}
-      CollectionComponent={BuyListItemCollection}
       TableComponent={BuyListItemTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

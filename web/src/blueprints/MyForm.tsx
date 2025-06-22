@@ -127,6 +127,25 @@ const renderField = (
   }
 };
 
+type FormProps = {
+  fields: (Field | undefined)[][];
+  title: string;
+  objectName?: string;
+  details: any;
+  setDetails: (t: any) => void;
+  onClickSubmit: () => void;
+  hasDelete?: boolean;
+  onDelete?: () => Promise<void>;
+  msg?: Object;
+  isLoading?: boolean;
+};
+
+export type MyFormProps<T extends Object & { id: number | null }> = {
+  item?: T;
+  setVisible?: (t: boolean) => void;
+  fetchFcn?: () => void;
+};
+
 export const MyForm = observer(
   ({
     fields,
@@ -139,18 +158,7 @@ export const MyForm = observer(
     onDelete,
     msg,
     isLoading,
-  }: {
-    fields: (Field | undefined)[][];
-    title: string;
-    objectName?: string;
-    details: any;
-    setDetails: (t: any) => void;
-    onClickSubmit: () => void;
-    hasDelete?: boolean;
-    onDelete?: () => Promise<void>;
-    msg?: Object;
-    isLoading?: boolean;
-  }) => {
+  }: FormProps) => {
     useKeyPress(["Enter"], onClickSubmit);
     const { isVisible1, setVisible1 } = useVisible();
     const width = useWindowWidth();

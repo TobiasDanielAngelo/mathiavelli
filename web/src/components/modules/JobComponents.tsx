@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Job,
   JOB_TYPE_CHOICES,
@@ -11,7 +10,6 @@ import {
   WORK_SETUP_CHOICES,
 } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -22,13 +20,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: JobViewContext, useGenericView: useJobView } =
   createGenericViewContext<JobInterface>();
@@ -104,13 +102,10 @@ export const JobForm = ({
       fetchFcn={fetchFcn}
       objectName="job"
       fields={fields}
-      storeFns={{
-        add: jobStore.addItem,
-        update: jobStore.updateItem,
-        delete: jobStore.deleteItem,
-      }}
-      datetimeFields={JobFields.datetime}
-      dateFields={JobFields.date}
+      store={jobStore}
+      datetimeFields={JobFields.datetimeFields}
+      dateFields={JobFields.dateFields}
+      timeFields={JobFields.timeFields}
     />
   );
 };
@@ -124,23 +119,9 @@ export const JobCard = observer((props: { item: Job }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["createdAt"]}
+      header={["id", "createdAt"]}
       important={["title"]}
-      body={[
-        "company",
-        "salary",
-        "workSetupName",
-        "jobTypeName",
-        "link",
-        "location",
-        "notes",
-        "sourceName",
-        "statusName",
-        "appliedDate",
-        "deadline",
-        "updatedAt",
-      ]}
-      prices={JobFields.prices}
+      prices={JobFields.pricesFields}
       FormComponent={JobForm}
       deleteItem={jobStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -178,8 +159,10 @@ export const JobFilter = observer(() => {
     <MyGenericFilter
       view={new Job({}).$view}
       title="Job Filters"
-      dateFields={[...JobFields.date, ...JobFields.datetime]}
+      dateFields={[...JobFields.dateFields, ...JobFields.datetimeFields]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -201,51 +184,25 @@ export const JobRow = observer((props: { item: Job }) => {
 
 export const JobTable = observer(() => {
   const { jobStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useJobView();
+  const values = useJobView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={jobStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <JobRow item={item} />}
-      priceFields={JobFields.prices}
-      itemMap={itemMap}
+      priceFields={JobFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const JobView = observer(() => {
   const { jobStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Job({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof JobInterface)[],
-    "shownFieldsJob"
-  );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsJob"
-  );
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<JobInterface, Job>("Job", new Job({}));
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await jobStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -281,60 +238,22 @@ export const JobView = observer(() => {
     []
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Job",
-      modal: <JobForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof JobInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <JobFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<JobInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={JobViewContext}
       CollectionComponent={JobCollection}
+      FormComponent={JobForm}
+      FilterComponent={JobFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={JobTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

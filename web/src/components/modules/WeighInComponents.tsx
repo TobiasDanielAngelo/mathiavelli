@@ -1,14 +1,13 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import {
   WeighIn,
   WeighInFields,
   WeighInInterface,
 } from "../../api/WeighInStore";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
+import MyTimelineChart from "../../blueprints/MyCharts/MyTimelineChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -18,14 +17,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import MyTimelineChart from "../../blueprints/MyCharts/MyTimelineChart";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: WeighInViewContext, useGenericView: useWeighInView } =
   createGenericViewContext<WeighInInterface>();
@@ -61,13 +58,10 @@ export const WeighInForm = ({
       fetchFcn={fetchFcn}
       objectName="weighIn"
       fields={fields}
-      storeFns={{
-        add: weighInStore.addItem,
-        update: weighInStore.updateItem,
-        delete: weighInStore.deleteItem,
-      }}
-      datetimeFields={WeighInFields.datetime}
-      dateFields={WeighInFields.date}
+      store={weighInStore}
+      datetimeFields={WeighInFields.datetimeFields}
+      dateFields={WeighInFields.dateFields}
+      timeFields={WeighInFields.timeFields}
     />
   );
 };
@@ -83,7 +77,7 @@ export const WeighInCard = observer((props: { item: WeighIn }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["weightKg"]}
-      prices={WeighInFields.prices}
+      prices={WeighInFields.pricesFields}
       FormComponent={WeighInForm}
       deleteItem={weighInStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -121,8 +115,13 @@ export const WeighInFilter = observer(() => {
     <MyGenericFilter
       view={new WeighIn({}).$view}
       title="WeighIn Filters"
-      dateFields={WeighInFields.datetime}
+      dateFields={[
+        ...WeighInFields.datetimeFields,
+        ...WeighInFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -144,51 +143,28 @@ export const WeighInRow = observer((props: { item: WeighIn }) => {
 
 export const WeighInTable = observer(() => {
   const { weighInStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useWeighInView();
+  const values = useWeighInView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={weighInStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <WeighInRow item={item} />}
-      priceFields={WeighInFields.prices}
-      itemMap={itemMap}
+      priceFields={WeighInFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const WeighInView = observer(() => {
   const { weighInStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new WeighIn({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof WeighInInterface)[],
-    "shownFieldsWeighIn"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<WeighInInterface, WeighIn>(
+    "WeighIn",
+    new WeighIn({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsWeighIn"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await weighInStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -199,60 +175,22 @@ export const WeighInView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a WeighIn",
-      modal: <WeighInForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof WeighInInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <WeighInFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<WeighInInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={WeighInViewContext}
       CollectionComponent={WeighInCollection}
+      FormComponent={WeighInForm}
+      FilterComponent={WeighInFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={WeighInTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

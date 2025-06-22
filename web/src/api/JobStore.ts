@@ -67,10 +67,10 @@ export type JobInterface = {
 };
 
 export const JobFields: Record<string, (keyof JobInterface)[]> = {
-  datetime: ["createdAt", "updatedAt"] as const,
-  date: ["deadline", "appliedDate"] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: ["createdAt", "updatedAt"] as const,
+  dateFields: ["deadline", "appliedDate"] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Job")

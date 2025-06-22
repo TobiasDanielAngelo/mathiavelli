@@ -35,6 +35,25 @@ export const getOrdinal = (n: number) => {
   return ord;
 };
 
+export function toMoneyShortened(val: number) {
+  const value = Math.abs(val);
+  const negative = value < 0;
+  if (value < 1000)
+    return `\u20b1${
+      negative ? "(" + value.toFixed(2) + ")" : value.toFixed(2)
+    }`; // If the value is less than 1000, no need for formatting
+
+  const suffixes = ["", "K", "M", "B", "T"]; // Suffixes for thousands, millions, billions, etc.
+  const magnitude = Math.floor(Math.log10(value) / 3); // Determine the magnitude (thousands, millions, etc.)
+
+  const shortValue = value / Math.pow(1000, magnitude); // Scale the number by the appropriate power of 1000
+  const formattedValue = `${(Math.round(shortValue * 10) / 10).toFixed(1)}${
+    suffixes[magnitude]
+  }`; // Round to one decimal place and add suffix
+
+  return `\u20b1${negative ? "(" + formattedValue + ")" : formattedValue}`;
+}
+
 /**
  * Replaces multiple substrings in a string with a given replacement.
  * Returns '-' if the final string is empty or only whitespace.
@@ -704,18 +723,83 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
   }
 }
 
+export function toRoman(num: number): string {
+  const map: [number, string][] = [
+    [1000, "M"],
+    [900, "CM"],
+    [500, "D"],
+    [400, "CD"],
+    [100, "C"],
+    [90, "XC"],
+    [50, "L"],
+    [40, "XL"],
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
+  ];
+
+  let result = "";
+  for (const [val, roman] of map) {
+    while (num >= val) {
+      result += roman;
+      num -= val;
+    }
+  }
+  return result;
+}
+
+export function toSuperscript(n: number): string {
+  const map: { [k: string]: string } = {
+    "0": "⁰",
+    "1": "¹",
+    "2": "²",
+    "3": "³",
+    "4": "⁴",
+    "5": "⁵",
+    "6": "⁶",
+    "7": "⁷",
+    "8": "⁸",
+    "9": "⁹",
+  };
+  return String(n)
+    .split("")
+    .map((c) => map[c] || "")
+    .join("");
+}
+
+export function toRomanWithExponents(num: number): string {
+  const chunks: string[] = [];
+
+  const powers = [
+    [1_000_000_000, 4],
+    [1_000_000, 3],
+    [1000, 2],
+  ];
+
+  for (const [divisor, exp] of powers) {
+    const part = Math.floor(num / divisor);
+    if (part > 0) {
+      chunks.push(`${toRoman(part)}M${toSuperscript(exp)}`);
+      num %= divisor;
+    }
+  }
+
+  if (num > 0) chunks.push(toRoman(num));
+
+  return chunks.join(" ");
+}
+
 export function generateCollidingDates(sched: Schedule): Date[] {
   const schedule = sched.$ ?? sched;
   const rule = buildRRule(schedule);
   if (!rule) return [];
 
-  console.log(rule.toString());
-
   return rule
     .all()
     .map(fromUTCForRRule)
     .filter((t) => t !== null);
-  // .map((dt) => moment(dt).format("lll"));
 }
 
 export function rruleToDetailedText(rule: RRule): string {

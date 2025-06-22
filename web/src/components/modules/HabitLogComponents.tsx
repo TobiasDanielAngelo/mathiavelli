@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   HabitLog,
   HabitLogFields,
   HabitLogInterface,
 } from "../../api/HabitLogStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,13 +16,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: HabitLogViewContext, useGenericView: useHabitLogView } =
   createGenericViewContext<HabitLogInterface>();
@@ -67,13 +65,10 @@ export const HabitLogForm = ({
       fetchFcn={fetchFcn}
       objectName="habitLog"
       fields={fields}
-      storeFns={{
-        add: habitLogStore.addItem,
-        update: habitLogStore.updateItem,
-        delete: habitLogStore.deleteItem,
-      }}
-      datetimeFields={HabitLogFields.datetime}
-      dateFields={HabitLogFields.date}
+      store={habitLogStore}
+      datetimeFields={HabitLogFields.datetimeFields}
+      dateFields={HabitLogFields.dateFields}
+      timeFields={HabitLogFields.timeFields}
     />
   );
 };
@@ -87,9 +82,9 @@ export const HabitLogCard = observer((props: { item: HabitLog }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["dateCreated"]}
+      header={["id", "dateCreated"]}
       important={["habitName"]}
-      prices={HabitLogFields.prices}
+      prices={HabitLogFields.pricesFields}
       FormComponent={HabitLogForm}
       deleteItem={habitLogStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -127,8 +122,13 @@ export const HabitLogFilter = observer(() => {
     <MyGenericFilter
       view={new HabitLog({}).$}
       title="HabitLog Filters"
-      dateFields={HabitLogFields.datetime}
+      dateFields={[
+        ...HabitLogFields.datetimeFields,
+        ...HabitLogFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -150,51 +150,28 @@ export const HabitLogRow = observer((props: { item: HabitLog }) => {
 
 export const HabitLogTable = observer(() => {
   const { habitLogStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useHabitLogView();
+  const values = useHabitLogView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={habitLogStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <HabitLogRow item={item} />}
-      priceFields={HabitLogFields.prices}
-      itemMap={itemMap}
+      priceFields={HabitLogFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const HabitLogView = observer(() => {
   const { habitLogStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new HabitLog({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof HabitLogInterface)[],
-    "shownFieldsHabitLog"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<HabitLogInterface, HabitLog>(
+    "HabitLog",
+    new HabitLog({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsHabitLog"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await habitLogStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -205,62 +182,22 @@ export const HabitLogView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a HabitLog",
-      modal: <HabitLogForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof HabitLogInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <HabitLogFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<HabitLogInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={HabitLogViewContext}
       CollectionComponent={HabitLogCollection}
+      FormComponent={HabitLogForm}
+      FilterComponent={HabitLogFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={HabitLogTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

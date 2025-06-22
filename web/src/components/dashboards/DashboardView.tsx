@@ -1,8 +1,8 @@
-import EventIcon from "@mui/icons-material/Event";
 import { observer } from "mobx-react-lite";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
+import { SideBySideView } from "../../blueprints/SideBySideView";
 import { TransactionDashboard } from "../modules/TransactionComponents";
 
 export const DashboardCard = (
@@ -69,14 +69,10 @@ export const DashboardView = observer(() => {
 
   return (
     <div className="m-2">
-      <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-5 mb-3">
-        <TransactionDashboard graph="pie" itemMap={itemMap} />
-        {[...Array(1)].map((_, i) => (
-          <DashboardCard key={i} title="Summary" stats={i} change={i}>
-            <EventIcon fontSize="large" />
-          </DashboardCard>
-        ))}
-      </div>
+      <SideBySideView
+        SideA={<TransactionDashboard graph="pie" itemMap={itemMap} />}
+        SideB={<TransactionDashboard graph="line" itemMap={itemMap} />}
+      />
     </div>
   );
 });

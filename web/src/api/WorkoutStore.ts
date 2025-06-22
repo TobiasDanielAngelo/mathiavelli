@@ -37,10 +37,10 @@ export type WorkoutInterface = {
 };
 
 export const WorkoutFields: Record<string, (keyof WorkoutInterface)[]> = {
-  datetime: ["date"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: ["date"] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Workout")

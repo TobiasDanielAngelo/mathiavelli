@@ -28,10 +28,10 @@ export const WaistMeasurementFields: Record<
   string,
   (keyof WaistMeasurementInterface)[]
 > = {
-  datetime: ["date"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: ["date"] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/WaistMeasurement")

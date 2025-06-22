@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import {
   Workout,
@@ -8,7 +7,6 @@ import {
   WorkoutFields,
   WorkoutInterface,
 } from "../../api/WorkoutStore";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -19,13 +17,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: WorkoutViewContext, useGenericView: useWorkoutView } =
   createGenericViewContext<WorkoutInterface>();
@@ -71,13 +69,10 @@ export const WorkoutForm = ({
       fetchFcn={fetchFcn}
       objectName="workout"
       fields={fields}
-      storeFns={{
-        add: workoutStore.addItem,
-        update: workoutStore.updateItem,
-        delete: workoutStore.deleteItem,
-      }}
-      datetimeFields={WorkoutFields.datetime}
-      dateFields={WorkoutFields.date}
+      store={workoutStore}
+      datetimeFields={WorkoutFields.datetimeFields}
+      dateFields={WorkoutFields.dateFields}
+      timeFields={WorkoutFields.timeFields}
     />
   );
 };
@@ -93,7 +88,7 @@ export const WorkoutCard = observer((props: { item: Workout }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={WorkoutFields.prices}
+      prices={WorkoutFields.pricesFields}
       FormComponent={WorkoutForm}
       deleteItem={workoutStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -127,8 +122,13 @@ export const WorkoutFilter = observer(() => {
     <MyGenericFilter
       view={new Workout({}).$view}
       title="Workout Filters"
-      dateFields={WorkoutFields.datetime}
+      dateFields={[
+        ...WorkoutFields.datetimeFields,
+        ...WorkoutFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -150,51 +150,28 @@ export const WorkoutRow = observer((props: { item: Workout }) => {
 
 export const WorkoutTable = observer(() => {
   const { workoutStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useWorkoutView();
+  const values = useWorkoutView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={workoutStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <WorkoutRow item={item} />}
-      priceFields={WorkoutFields.prices}
-      itemMap={itemMap}
+      priceFields={WorkoutFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const WorkoutView = observer(() => {
   const { workoutStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Workout({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof WorkoutInterface)[],
-    "shownFieldsWorkout"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<WorkoutInterface, Workout>(
+    "Workout",
+    new Workout({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsWorkout"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await workoutStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -205,60 +182,22 @@ export const WorkoutView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Workout",
-      modal: <WorkoutForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof WorkoutInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <WorkoutFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<WorkoutInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={WorkoutViewContext}
       CollectionComponent={WorkoutCollection}
+      FormComponent={WorkoutForm}
+      FilterComponent={WorkoutFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={WorkoutTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

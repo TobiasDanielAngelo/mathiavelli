@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import {
   WaistMeasurement,
   WaistMeasurementFields,
   WaistMeasurementInterface,
 } from "../../api/WaistMeasurementStore";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,13 +16,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const {
   Context: WaistMeasurementViewContext,
@@ -62,13 +59,10 @@ export const WaistMeasurementForm = ({
       fetchFcn={fetchFcn}
       objectName="waistMeasurement"
       fields={fields}
-      storeFns={{
-        add: waistMeasurementStore.addItem,
-        update: waistMeasurementStore.updateItem,
-        delete: waistMeasurementStore.deleteItem,
-      }}
-      datetimeFields={WaistMeasurementFields.datetime}
-      dateFields={WaistMeasurementFields.date}
+      store={waistMeasurementStore}
+      datetimeFields={WaistMeasurementFields.datetimeFields}
+      dateFields={WaistMeasurementFields.dateFields}
+      timeFields={WaistMeasurementFields.timeFields}
     />
   );
 };
@@ -85,7 +79,7 @@ export const WaistMeasurementCard = observer(
         shownFields={shownFields}
         header={["id"]}
         important={["waistCm"]}
-        prices={WaistMeasurementFields.prices}
+        prices={WaistMeasurementFields.pricesFields}
         FormComponent={WaistMeasurementForm}
         deleteItem={waistMeasurementStore.deleteItem}
         fetchFcn={fetchFcn}
@@ -120,8 +114,13 @@ export const WaistMeasurementFilter = observer(() => {
     <MyGenericFilter
       view={new WaistMeasurement({}).$view}
       title="WaistMeasurement Filters"
-      dateFields={WaistMeasurementFields.datetime}
+      dateFields={[
+        ...WaistMeasurementFields.datetimeFields,
+        ...WaistMeasurementFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -145,51 +144,28 @@ export const WaistMeasurementRow = observer(
 
 export const WaistMeasurementTable = observer(() => {
   const { waistMeasurementStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useWaistMeasurementView();
+  const values = useWaistMeasurementView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={waistMeasurementStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <WaistMeasurementRow item={item} />}
-      priceFields={WaistMeasurementFields.prices}
-      itemMap={itemMap}
+      priceFields={WaistMeasurementFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const WaistMeasurementView = observer(() => {
   const { waistMeasurementStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new WaistMeasurement({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof WaistMeasurementInterface)[],
-    "shownFieldsWaistMeasurement"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<WaistMeasurementInterface, WaistMeasurement>(
+    "WaistMeasurement",
+    new WaistMeasurement({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsWaistMeasurement"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await waistMeasurementStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -200,64 +176,22 @@ export const WaistMeasurementView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a WaistMeasurement",
-      modal: (
-        <WaistMeasurementForm fetchFcn={fetchFcn} setVisible={setVisible1} />
-      ),
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof WaistMeasurementInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <WaistMeasurementFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<WaistMeasurementInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={WaistMeasurementViewContext}
       CollectionComponent={WaistMeasurementCollection}
+      FormComponent={WaistMeasurementForm}
+      FilterComponent={WaistMeasurementFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={WaistMeasurementTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

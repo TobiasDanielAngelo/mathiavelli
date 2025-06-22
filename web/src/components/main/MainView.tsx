@@ -45,6 +45,7 @@ export const MainView = observer(() => {
     jobStore,
     taskStore,
     inventoryCategoryStore,
+    transactionAnalyticsStore,
     scheduleStore,
   } = useStore();
 
@@ -60,6 +61,7 @@ export const MainView = observer(() => {
     if (!resp.ok) {
       navigate("/login");
     } else {
+      transactionAnalyticsStore.fetchAll();
       platformStore.fetchAll("page=all");
       accountStore.fetchAll("page=all");
       categoryStore.fetchAll("page=all");

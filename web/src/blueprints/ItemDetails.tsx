@@ -1,5 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { formatValue, toTitleCase } from "../constants/helpers";
+import {
+  formatValue,
+  toRomanWithExponents,
+  toTitleCase,
+} from "../constants/helpers";
 import { StateSetter } from "../constants/interfaces";
 
 export interface KV<U extends Record<string, any>> {
@@ -13,7 +17,6 @@ export interface ItemDetailsProps<T> {
   shownFields?: (keyof T)[];
   header?: (keyof T)[];
   important?: (keyof T)[];
-  body?: (keyof T)[];
   prices?: (keyof T)[];
   showMore?: boolean;
   setShowMore?: StateSetter<boolean>;
@@ -31,34 +34,34 @@ export const ItemDetails = observer(
     shownFields = [],
     header = [],
     important = [],
-    body = [],
     prices = [],
     showMore,
   }: ItemDetailsProps<T>) => {
+    const itemView = item.$view ?? item;
+    const allItemKeys = Object.keys(itemView).filter(
+      (s) => !s.includes("$")
+    ) as (keyof T)[];
+
     const sections = [
       { title: "Header", keys: header },
       { title: "Important", keys: important },
       {
         title: "Body",
-        keys: body,
-        // Array.from(new Set([...(body || []), ...(shownFields || [])])).filter((s) => !header.includes(s) && !important.includes(s)),
+        keys: allItemKeys.filter(
+          (key) => !header.includes(key) && !important.includes(key)
+        ),
       },
     ];
 
-    const allSectionKeys = sections.flatMap((s) => s.keys);
-    const allItemKeys = Object.keys(item).filter(
-      (s) => !s.includes("$")
-    ) as (keyof T)[];
-    const leftoverKeys = allItemKeys.filter(
-      (key) => !allSectionKeys.includes(key)
-    );
-    const shownKeys = shownFields.filter((key) => allSectionKeys.includes(key));
-    // const hiddenKeys = allSectionKeys.filter((key) => !shownKeys.includes(key));
+    const hiddenKeys = allItemKeys.filter((s) => !shownFields.includes(s));
 
     const renderRow = (key: keyof T, title: string) => {
       const value = item[key];
       const keyTitle = key === "id" ? "ID" : toTitleCase(key as string);
-      const body = formatValue(value, String(key), prices as string[]);
+      const body =
+        key === "id"
+          ? toRomanWithExponents(value)
+          : formatValue(value, String(key), prices as string[]);
 
       return body === "—" ? (
         <div key={String(key)}></div>
@@ -77,11 +80,11 @@ export const ItemDetails = observer(
         {sections.map(({ title, keys }) => (
           <div key={title} className={sectionStyles[title] || ""}>
             {keys
-              .filter((key) => shownKeys.includes(key) || showMore)
+              .filter((key) => shownFields.includes(key) || showMore)
               .map((key) => renderRow(key, title))}
             {title === "Body" &&
               showMore &&
-              leftoverKeys.map((key) => renderRow(key, title))}
+              hiddenKeys.map((key) => renderRow(key, title))}
           </div>
         ))}
       </>

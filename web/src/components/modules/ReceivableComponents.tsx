@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Receivable,
   ReceivableFields,
   ReceivableInterface,
 } from "../../api/ReceivableStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import {
   IAction,
@@ -21,18 +19,14 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { MyModal } from "../../blueprints/MyModal";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  generateShortId,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { generateShortId, toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 import { AccountIdMap } from "./AccountComponents";
 import { CategoryIdMap } from "./CategoryComponents";
 import { TransactionForm } from "./TransactionComponents";
@@ -98,13 +92,10 @@ export const ReceivableForm = ({
       fetchFcn={fetchFcn}
       objectName="receivable"
       fields={fields}
-      storeFns={{
-        add: receivableStore.addItem,
-        update: receivableStore.updateItem,
-        delete: receivableStore.deleteItem,
-      }}
-      datetimeFields={ReceivableFields.datetime}
-      dateFields={ReceivableFields.date}
+      store={receivableStore}
+      datetimeFields={ReceivableFields.datetimeFields}
+      dateFields={ReceivableFields.dateFields}
+      timeFields={ReceivableFields.timeFields}
     />
   );
 };
@@ -138,15 +129,7 @@ export const ReceivableCard = observer((props: { item: Receivable }) => {
         shownFields={shownFields}
         header={["id", "datetimeDue"]}
         important={["lentAmount"]}
-        body={[
-          "borrowerName",
-          "description",
-          "datetimeOpened",
-          "datetimeClosed",
-          "paymentDescription",
-          "paymentTotal",
-        ]}
-        prices={ReceivableFields.prices}
+        prices={ReceivableFields.pricesFields}
         FormComponent={ReceivableForm}
         deleteItem={receivableStore.deleteItem}
         fetchFcn={fetchFcn}
@@ -186,8 +169,13 @@ export const ReceivableFilter = observer(() => {
     <MyGenericFilter
       view={new Receivable({}).$view}
       title="Receivable Filters"
-      dateFields={[...ReceivableFields.date, ...ReceivableFields.datetime]}
+      dateFields={[
+        ...ReceivableFields.dateFields,
+        ...ReceivableFields.datetimeFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -209,51 +197,28 @@ export const ReceivableRow = observer((props: { item: Receivable }) => {
 
 export const ReceivableTable = observer(() => {
   const { receivableStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useReceivableView();
+  const values = useReceivableView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={receivableStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <ReceivableRow item={item} />}
-      priceFields={ReceivableFields.prices}
-      itemMap={itemMap}
+      priceFields={ReceivableFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const ReceivableView = observer(() => {
   const { receivableStore, transactionStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Receivable({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof ReceivableInterface)[],
-    "shownFieldsReceivable"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<ReceivableInterface, Receivable>(
+    "Receivable",
+    new Receivable({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsReceivable"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await receivableStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -274,62 +239,22 @@ export const ReceivableView = observer(() => {
     [transactionStore.items.length]
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Receivable",
-      modal: <ReceivableForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof ReceivableInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <ReceivableFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<ReceivableInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={ReceivableViewContext}
       CollectionComponent={ReceivableCollection}
+      FormComponent={ReceivableForm}
+      FilterComponent={ReceivableFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={ReceivableTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

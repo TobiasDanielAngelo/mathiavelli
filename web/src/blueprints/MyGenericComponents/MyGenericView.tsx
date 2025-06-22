@@ -1,11 +1,17 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
-import { SetURLSearchParams } from "react-router-dom";
-import { useKeyPress, VisibleMap } from "../../constants/hooks";
+import { SetURLSearchParams, useSearchParams } from "react-router-dom";
+import { toTitleCase } from "../../constants/helpers";
+import {
+  useKeyPress,
+  useLocalStorageState,
+  VisibleMap,
+} from "../../constants/hooks";
 import { PaginatedDetails, StateSetter } from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
 import { IconName, MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
+import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
 import { MyPageBar } from "../MyPageBar";
 import { MySpeedDial } from "../MySpeedDial";
 import { GenericViewProps } from "./MyGenericProps";
@@ -21,20 +27,66 @@ export type ActionModalDef = {
   modal: React.ReactNode;
 };
 
+export const useViewValues = <
+  U extends Object & { id?: number | null },
+  T extends { $view: Record<string, any> }
+>(
+  name: string,
+  obj: T,
+  graphs: GraphType[] = ["pie", "line"]
+) => {
+  const [pageDetails, setPageDetails] = useState<
+    PaginatedDetails | undefined
+  >();
+  const [params, setParams] = useSearchParams();
+  const availableGraphs = graphs as GraphType[];
+  const objWithFields = obj.$view;
+  const [graph, setGraph] = useState<GraphType>("pie");
+  const [shownFields, setShownFields] = useLocalStorageState(
+    Object.keys(objWithFields) as (keyof U)[],
+    `shownFields${name}`
+  );
+  const [sortFields, setSortFields] = useLocalStorageState(
+    [] as string[],
+    `sortFields${name}`
+  );
+
+  return {
+    pageDetails,
+    setPageDetails,
+    params,
+    setParams,
+    availableGraphs,
+    graph,
+    setGraph,
+    shownFields,
+    setShownFields,
+    sortFields,
+    setSortFields,
+    objWithFields,
+  };
+};
+
 export const MyGenericView = observer(
   <T extends Record<string, any>>(props: {
     fetchFcn: () => void;
     Context: React.Context<GenericViewProps<T> | null>;
     CollectionComponent: React.FC;
     TableComponent: React.FC;
+    FormComponent: React.ComponentType<{
+      setVisible: (v: boolean) => void;
+      fetchFcn: () => void;
+    }>;
+    FilterComponent: React.FC;
     shownFields: (keyof T)[];
     setShownFields: StateSetter<(keyof T)[]>;
+    objWithFields: Record<string, any>;
     sortFields: string[];
     setSortFields: StateSetter<string[]>;
     graph: GraphType;
     setGraph: StateSetter<GraphType>;
     availableGraphs: GraphType[];
-    actionModalDefs: readonly ActionModalDef[];
+    actionModalDefs?: readonly ActionModalDef[];
     pageDetails: PaginatedDetails | undefined;
     isVisible: VisibleMap;
     setVisible: (index: number, visible: boolean) => void;
@@ -48,6 +100,9 @@ export const MyGenericView = observer(
       Context,
       CollectionComponent,
       TableComponent,
+      FormComponent,
+      FilterComponent,
+      objWithFields,
       actionModalDefs,
       isVisible,
       setVisible,
@@ -64,6 +119,50 @@ export const MyGenericView = observer(
       setGraph,
       title,
     } = props;
+
+    const setVisibleForIndex = (index: number) => {
+      return (value: boolean) => {
+        setVisible(index, value); // Use setVisible with the given index
+      };
+    };
+
+    const defaultActionModalDefs = [
+      {
+        icon: "NoteAdd",
+        label: "NEW",
+        name: "Add a Account",
+        modal: (
+          <FormComponent
+            fetchFcn={fetchFcn}
+            setVisible={setVisibleForIndex(1)}
+          />
+        ),
+      },
+      {
+        icon: "ViewList",
+        label: "FIELDS",
+        name: "Show Fields",
+        modal: (
+          <MyMultiDropdownSelector
+            label="Fields"
+            value={shownFields as string[]}
+            onChangeValue={(t) => setShownFields(t as (keyof T)[])}
+            options={Object.keys(objWithFields).map((s) => ({
+              id: s,
+              name: toTitleCase(s),
+            }))}
+            relative
+            open
+          />
+        ),
+      },
+      {
+        icon: "FilterListAlt",
+        label: "FILTERS",
+        name: "Filters",
+        modal: <FilterComponent />,
+      },
+    ] satisfies ActionModalDef[];
 
     const graphIconMap: Record<GraphType, { icon: IconName; label: string }> =
       availableGraphs.reduce((acc, type) => {
@@ -114,7 +213,7 @@ export const MyGenericView = observer(
       />
     );
 
-    const Modals = actionModalDefs
+    const Modals = [...defaultActionModalDefs, ...(actionModalDefs ?? [])]
       .map((s) => s.modal)
       .map((child, i) => (
         <MyModal
@@ -159,12 +258,14 @@ export const MyGenericView = observer(
 
     const actions = useMemo(
       () =>
-        actionModalDefs.map((def, i) => ({
-          icon: <MyIcon icon={def.icon} fontSize="large" label={def.label} />,
-          name: def.name,
-          onClick: () => setVisible(i + 1, true),
-        })),
-      [setVisible, actionModalDefs]
+        [...defaultActionModalDefs, ...(actionModalDefs ?? [])].map(
+          (def, i) => ({
+            icon: <MyIcon icon={def.icon} fontSize="large" label={def.label} />,
+            name: def.name,
+            onClick: () => setVisible(i + 1, true),
+          })
+        ),
+      [setVisible, actionModalDefs, defaultActionModalDefs]
     );
 
     actions.forEach((s, ind) =>

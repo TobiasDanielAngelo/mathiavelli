@@ -16,7 +16,7 @@ export const MyGenericCollection = observer(
 
     return (
       <div className="flex flex-col min-h-[85vh]">
-        <div className="sticky font-bold top-0 z-10 text-lg border border-gray-600  p-2 text-center bg-[#242424]">
+        <div className="sticky font-bold top-0 z-10 text-lg border border-gray-600 p-2 text-center bg-[#242424]">
           {title.toUpperCase()}
         </div>
         <PageBar />

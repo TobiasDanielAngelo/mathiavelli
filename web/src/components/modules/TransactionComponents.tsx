@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import {
   Transaction,
   TransactionFields,
   TransactionInterface,
 } from "../../api/TransactionStore";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
@@ -20,13 +18,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toMoney, toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toMoneyShortened, toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 import { AccountForm } from "./AccountComponents";
 
 export const {
@@ -104,13 +102,10 @@ export const TransactionForm = ({
       fetchFcn={fetchFcn}
       objectName="transaction"
       fields={fields}
-      storeFns={{
-        add: transactionStore.addItem,
-        update: transactionStore.updateItem,
-        delete: transactionStore.deleteItem,
-      }}
-      datetimeFields={TransactionFields.datetime}
-      dateFields={TransactionFields.date}
+      store={transactionStore}
+      datetimeFields={TransactionFields.datetimeFields}
+      dateFields={TransactionFields.dateFields}
+      timeFields={TransactionFields.timeFields}
     />
   );
 };
@@ -126,8 +121,7 @@ export const TransactionCard = observer((props: { item: Transaction }) => {
       shownFields={shownFields}
       header={["id", "datetimeTransacted"]}
       important={["amount"]}
-      body={["categoryTitle", "transmitterName", "receiverName", "description"]}
-      prices={TransactionFields.prices}
+      prices={TransactionFields.pricesFields}
       FormComponent={TransactionForm}
       deleteItem={transactionStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -140,36 +134,33 @@ export const TransactionDashboard = observer(
     const { transactionAnalyticsStore } = useStore();
     const { itemMap, graph } = props;
 
-    const fetchTransactionAnalytics = async () => {
-      const resp = await transactionAnalyticsStore.fetchAll(`graph=${graph}`);
-      if (!resp.ok || !resp.data) {
-        return;
-      }
-    };
-
-    useEffect(() => {
-      fetchTransactionAnalytics();
-    }, [graph]);
-
-    console.log(transactionAnalyticsStore.items.map((s) => s.total));
-
     return (
       <>
         {graph === "pie" ? (
           <MyPieChart
-            data={transactionAnalyticsStore.items}
+            data={transactionAnalyticsStore.items.filter(
+              (s) => s.graph === "pie"
+            )}
             nameKey="category"
             dataKey="total"
             itemMap={itemMap}
-            formatter={(value: number, name: string) => [toMoney(value), name]}
+            formatter={(value: number, name: string) => [
+              toMoneyShortened(value),
+              name,
+            ]}
           />
         ) : (
           <MyLineChart
-            data={transactionAnalyticsStore.items}
+            data={transactionAnalyticsStore.items.filter(
+              (s) => s.graph === "line"
+            )}
             traceKey="account"
             xKey="period"
             yKey="total"
-            formatter={(value: number, name: string) => [toMoney(value), name]}
+            formatter={(value: number, name: string) => [
+              toMoneyShortened(value),
+              name,
+            ]}
             itemMap={itemMap}
             excludedFromTotal={["Operations", "Initial"]}
             selectionLabel="Accounts"
@@ -206,8 +197,13 @@ export const TransactionFilter = observer(() => {
     <MyGenericFilter
       view={new Transaction({}).$view}
       title="Transaction Filters"
-      dateFields={TransactionFields.datetime}
+      dateFields={[
+        ...TransactionFields.datetimeFields,
+        ...TransactionFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -229,30 +225,16 @@ export const TransactionRow = observer((props: { item: Transaction }) => {
 
 export const TransactionTable = observer(() => {
   const { transactionStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useTransactionView();
+  const values = useTransactionView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={transactionStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <TransactionRow item={item} />}
-      priceFields={TransactionFields.prices}
-      itemMap={itemMap}
+      priceFields={TransactionFields.pricesFields}
+      {...values}
     />
   );
 });
@@ -264,28 +246,19 @@ export const TransactionView = observer(() => {
     categoryStore,
     transactionAnalyticsStore,
   } = useStore();
-  const { setVisible1, setVisible4, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Transaction({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof TransactionInterface)[],
-    "shownFieldsTransaction"
+  const { setVisible4, isVisible, setVisible } = useVisible();
+  const values = useViewValues<TransactionInterface, Transaction>(
+    "Transaction",
+    new Transaction({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsTransaction"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await transactionStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
       return;
     }
     setPageDetails(resp.pageDetails);
-    transactionAnalyticsStore.fetchAll(`graph=${graph}`);
+    transactionAnalyticsStore.fetchAll();
   };
 
   const itemMap = useMemo(
@@ -322,38 +295,6 @@ export const TransactionView = observer(() => {
   const actionModalDefs = [
     {
       icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Transaction",
-      modal: <TransactionForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof TransactionInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <TransactionFilter />,
-    },
-    {
-      icon: "NoteAdd",
       label: "ACCT",
       name: "Add an Account",
       modal: <AccountForm setVisible={setVisible4} />,
@@ -363,24 +304,17 @@ export const TransactionView = observer(() => {
   return (
     <MyGenericView<TransactionInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={TransactionViewContext}
       CollectionComponent={TransactionCollection}
+      FormComponent={TransactionForm}
+      FilterComponent={TransactionFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={TransactionTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

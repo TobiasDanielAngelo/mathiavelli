@@ -1,9 +1,7 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { Goal, GoalFields, GoalInterface } from "../../api/GoalStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -14,17 +12,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  getDescendantIds,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { getDescendantIds, toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: GoalViewContext, useGenericView: useGoalView } =
   createGenericViewContext<GoalInterface>();
@@ -108,13 +102,10 @@ export const GoalForm = ({
       fetchFcn={fetchFcn}
       objectName="goal"
       fields={fields}
-      storeFns={{
-        add: goalStore.addItem,
-        update: goalStore.updateItem,
-        delete: goalStore.deleteItem,
-      }}
-      datetimeFields={GoalFields.datetime}
-      dateFields={GoalFields.date}
+      store={goalStore}
+      datetimeFields={GoalFields.datetimeFields}
+      dateFields={GoalFields.dateFields}
+      timeFields={GoalFields.timeFields}
     />
   );
 };
@@ -122,17 +113,16 @@ export const GoalForm = ({
 export const GoalCard = observer((props: { item: Goal }) => {
   const { item } = props;
   const { fetchFcn, shownFields } = useGoalView();
-  const { followUpStore, goalStore } = useStore();
+  const { goalStore } = useStore();
 
   return (
     <MyGenericRecursiveCard
       item={item}
       shownFields={shownFields}
       important={["title"]}
-      body={["description", "dateDuration", "isArchived", "dateCompleted"]}
-      prices={GoalFields.prices}
+      prices={GoalFields.pricesFields}
       FormComponent={GoalForm}
-      deleteItem={followUpStore.deleteItem}
+      deleteItem={goalStore.deleteItem}
       fetchFcn={fetchFcn}
       items={goalStore.items}
       parentKey={"parentGoal"}
@@ -167,8 +157,10 @@ export const GoalFilter = observer(() => {
     <MyGenericFilter
       view={new Goal({}).$view}
       title="Goal Filters"
-      dateFields={[...GoalFields.date, ...GoalFields.datetime]}
+      dateFields={[...GoalFields.dateFields, ...GoalFields.datetimeFields]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -190,51 +182,25 @@ export const GoalRow = observer((props: { item: Goal }) => {
 
 export const GoalTable = observer(() => {
   const { goalStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useGoalView();
+  const values = useGoalView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={goalStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <GoalRow item={item} />}
-      priceFields={GoalFields.prices}
-      itemMap={itemMap}
+      priceFields={GoalFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const GoalView = observer(() => {
   const { goalStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Goal({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof GoalInterface)[],
-    "shownFieldsGoal"
-  );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsGoal"
-  );
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<GoalInterface, Goal>("Goal", new Goal({}));
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await goalStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -255,60 +221,22 @@ export const GoalView = observer(() => {
     [goalStore.items.length]
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Goal",
-      modal: <GoalForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof GoalInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <GoalFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<GoalInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={GoalViewContext}
       CollectionComponent={GoalCollection}
+      FormComponent={GoalForm}
+      FilterComponent={GoalFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={GoalTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

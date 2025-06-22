@@ -1,19 +1,19 @@
 import moment from "moment";
 import { useState } from "react";
-import { MyForm } from "../MyForm";
+import { toTitleCase } from "../../constants/helpers";
 import { Field } from "../../constants/interfaces";
-import { cleanObject, toTitleCase } from "../../constants/helpers";
+import { MyForm } from "../MyForm";
 
-interface MyGenericFormProps<T> {
+export interface MyGenericFormProps<T> {
   item?: T & { id?: number };
   setVisible?: (t: boolean) => void;
   fetchFcn?: () => void;
   fields: Field[][];
   objectName: string;
-  storeFns: {
-    add: (item: T) => Promise<any>;
-    update: (id: number, item: T) => Promise<any>;
-    delete: (id: number) => Promise<any>;
+  store: {
+    addItem: (item: T) => Promise<any>;
+    updateItem: (id: number, item: T) => Promise<any>;
+    deleteItem: (id: number) => Promise<any>;
   };
   dateFields?: (keyof T)[];
   datetimeFields?: (keyof T)[];
@@ -26,7 +26,7 @@ export function MyGenericForm<T>({
   fetchFcn,
   fields,
   objectName,
-  storeFns,
+  store,
   dateFields = [],
   datetimeFields = [],
   timeFields = [],
@@ -95,7 +95,7 @@ export function MyGenericForm<T>({
 
   const onClickCreate = async () => {
     setLoading(true);
-    const resp = await storeFns.add(transformTo(details));
+    const resp = await store.addItem(transformTo(details));
     setLoading(false);
     if (!resp.ok) return setMsg(resp.details);
     fetchFcn?.();
@@ -105,7 +105,7 @@ export function MyGenericForm<T>({
   const onClickEdit = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await storeFns.update(item.id, transformTo(details));
+    const resp = await store.updateItem(item.id, transformTo(details));
     setLoading(false);
     if (!resp.ok) return setMsg(resp.details);
     fetchFcn?.();
@@ -115,7 +115,7 @@ export function MyGenericForm<T>({
   const onClickDelete = async () => {
     if (!item?.id) return;
     setLoading(true);
-    const resp = await storeFns.delete(item.id);
+    const resp = await store.deleteItem(item.id);
     setLoading(false);
     if (!resp.ok) return setMsg(resp.details);
     fetchFcn?.();

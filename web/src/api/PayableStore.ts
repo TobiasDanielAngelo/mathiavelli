@@ -41,10 +41,10 @@ export type PayableInterface = {
 };
 
 export const PayableFields: Record<string, (keyof PayableInterface)[]> = {
-  datetime: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: ["borrowedAmount", "paymentTotal"] as const,
+  datetimeFields: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: ["borrowedAmount", "paymentTotal"] as const,
 };
 
 @model("myApp/Payable")

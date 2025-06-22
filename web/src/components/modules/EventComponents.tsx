@@ -1,10 +1,8 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Event, EventFields, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { CalendarView, MyCalendar } from "../../blueprints/MyCalendar";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
@@ -16,18 +14,14 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { MyLockedCard } from "../../blueprints/MyLockedCard";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import {
-  Field,
-  PaginatedDetails,
-  StateSetter,
-} from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field, StateSetter } from "../../constants/interfaces";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -112,13 +106,10 @@ export const EventForm = ({
       fetchFcn={fetchFcn}
       objectName="event"
       fields={fields}
-      storeFns={{
-        add: eventStore.addItem,
-        update: eventStore.updateItem,
-        delete: eventStore.deleteItem,
-      }}
-      datetimeFields={EventFields.datetime}
-      dateFields={EventFields.date}
+      store={eventStore}
+      datetimeFields={EventFields.datetimeFields}
+      dateFields={EventFields.dateFields}
+      timeFields={EventFields.timeFields}
     />
   );
 };
@@ -134,8 +125,7 @@ export const EventCard = observer((props: { item: Event }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["title"]}
-      body={["description", "tagsName", "dateDuration"]}
-      prices={EventFields.prices}
+      prices={EventFields.pricesFields}
       FormComponent={EventForm}
       deleteItem={eventStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -218,8 +208,10 @@ export const EventFilter = observer(() => {
     <MyGenericFilter
       view={new Event({}).$view}
       title="Event Filters"
-      dateFields={[...EventFields.date, ...EventFields.datetime]}
+      dateFields={[...EventFields.dateFields, ...EventFields.datetimeFields]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -241,51 +233,25 @@ export const EventRow = observer((props: { item: Event }) => {
 
 export const EventTable = observer(() => {
   const { eventStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useEventView();
+  const values = useEventView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={eventStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <EventRow item={item} />}
-      priceFields={EventFields.prices}
-      itemMap={itemMap}
+      priceFields={EventFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const EventView = observer(() => {
   const { eventStore, tagStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Event({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof EventInterface)[],
-    "shownFieldsEvent"
-  );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsEvent"
-  );
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<EventInterface, Event>("Event", new Event({}));
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await eventStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -306,60 +272,22 @@ export const EventView = observer(() => {
     [tagStore.items.length]
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Event",
-      modal: <EventForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof EventInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <EventFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<EventInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={EventViewContext}
       CollectionComponent={EventCollection}
+      FormComponent={EventForm}
+      FilterComponent={EventFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={EventTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

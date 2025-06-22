@@ -68,7 +68,7 @@ export function useLocalStorageState<T>(defaultValue: T, key: string) {
 }
 
 export type VisibleMap = Record<number, boolean>;
-type Index = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type Index = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export type UseVisibleMapReturn = {
   isVisible: VisibleMap;

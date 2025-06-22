@@ -60,10 +60,10 @@ export type CredentialInterface = {
 };
 
 export const CredentialFields: Record<string, (keyof CredentialInterface)[]> = {
-  datetime: ["addedAt"] as const,
-  date: ["dateCreated"] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: ["addedAt"] as const,
+  dateFields: ["dateCreated"] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Credential")

@@ -25,10 +25,10 @@ export type TagInterface = {
 };
 
 export const TagFields: Record<string, (keyof TagInterface)[]> = {
-  datetime: [] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Tag")

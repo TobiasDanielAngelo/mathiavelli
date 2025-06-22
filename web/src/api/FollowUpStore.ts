@@ -47,10 +47,10 @@ export type FollowUpInterface = {
 };
 
 export const FollowUpFields: Record<string, (keyof FollowUpInterface)[]> = {
-  datetime: [] as const,
-  date: ["date"] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [] as const,
+  dateFields: ["date"] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/FollowUp")

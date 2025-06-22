@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Journal,
   JournalFields,
   JournalInterface,
 } from "../../api/JournalStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,13 +16,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: JournalViewContext, useGenericView: useJournalView } =
   createGenericViewContext<JournalInterface>();
@@ -79,13 +76,10 @@ export const JournalForm = ({
       fetchFcn={fetchFcn}
       objectName="journal"
       fields={fields}
-      storeFns={{
-        add: journalStore.addItem,
-        update: journalStore.updateItem,
-        delete: journalStore.deleteItem,
-      }}
-      datetimeFields={JournalFields.datetime}
-      dateFields={JournalFields.date}
+      store={journalStore}
+      datetimeFields={JournalFields.datetimeFields}
+      dateFields={JournalFields.dateFields}
+      timeFields={JournalFields.timeFields}
     />
   );
 };
@@ -99,10 +93,9 @@ export const JournalCard = observer((props: { item: Journal }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["datetimeCreated"]}
+      header={["id", "datetimeCreated"]}
       important={["title"]}
-      body={["description"]}
-      prices={JournalFields.prices}
+      prices={JournalFields.pricesFields}
       FormComponent={JournalForm}
       deleteItem={journalStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -140,8 +133,13 @@ export const JournalFilter = observer(() => {
     <MyGenericFilter
       view={new Journal({}).$view}
       title="Journal Filters"
-      dateFields={[...JournalFields.date, ...JournalFields.datetime]}
+      dateFields={[
+        ...JournalFields.dateFields,
+        ...JournalFields.datetimeFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -163,51 +161,28 @@ export const JournalRow = observer((props: { item: Journal }) => {
 
 export const JournalTable = observer(() => {
   const { journalStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useJournalView();
+  const values = useJournalView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={journalStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <JournalRow item={item} />}
-      priceFields={JournalFields.prices}
-      itemMap={itemMap}
+      priceFields={JournalFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const JournalView = observer(() => {
   const { journalStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Journal({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof JournalInterface)[],
-    "shownFieldsJournal"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<JournalInterface, Journal>(
+    "Journal",
+    new Journal({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsJournal"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await journalStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -218,60 +193,22 @@ export const JournalView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Journal",
-      modal: <JournalForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof JournalInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <JournalFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<JournalInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={JournalViewContext}
       CollectionComponent={JournalCollection}
+      FormComponent={JournalForm}
+      FilterComponent={JournalFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={JournalTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

@@ -42,10 +42,15 @@ export type HabitInterface = {
 };
 
 export const HabitFields: Record<string, (keyof HabitInterface)[]> = {
-  datetime: ["dateCreated", "dateStart", "dateEnd", "dateCompleted"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [
+    "dateCreated",
+    "dateStart",
+    "dateEnd",
+    "dateCompleted",
+  ] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Habit")

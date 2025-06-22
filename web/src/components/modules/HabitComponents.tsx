@@ -1,9 +1,7 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { Habit, HabitFields, HabitInterface } from "../../api/HabitStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -14,13 +12,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: HabitViewContext, useGenericView: useHabitView } =
   createGenericViewContext<HabitInterface>();
@@ -82,13 +80,10 @@ export const HabitForm = ({
       fetchFcn={fetchFcn}
       objectName="habit"
       fields={fields}
-      storeFns={{
-        add: habitStore.addItem,
-        update: habitStore.updateItem,
-        delete: habitStore.deleteItem,
-      }}
-      datetimeFields={HabitFields.datetime}
-      dateFields={HabitFields.date}
+      store={habitStore}
+      datetimeFields={HabitFields.datetimeFields}
+      dateFields={HabitFields.dateFields}
+      timeFields={HabitFields.timeFields}
     />
   );
 };
@@ -104,18 +99,7 @@ export const HabitCard = observer((props: { item: Habit }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["title"]}
-      body={[
-        "description",
-        "dateCreated",
-        "dateCompleted",
-        "dateEnd",
-        "dateStart",
-        "goalName",
-        "scheduleDefinition",
-        "isArchived",
-        "thresholdPercent",
-      ]}
-      prices={HabitFields.prices}
+      prices={HabitFields.pricesFields}
       FormComponent={HabitForm}
       deleteItem={habitStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -153,8 +137,10 @@ export const HabitFilter = observer(() => {
     <MyGenericFilter
       view={new Habit({}).$view}
       title="Habit Filters"
-      dateFields={HabitFields.datetime}
+      dateFields={[...HabitFields.datetimeFields, ...HabitFields.dateFields]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -176,51 +162,25 @@ export const HabitRow = observer((props: { item: Habit }) => {
 
 export const HabitTable = observer(() => {
   const { habitStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useHabitView();
+  const values = useHabitView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={habitStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <HabitRow item={item} />}
-      priceFields={HabitFields.prices}
-      itemMap={itemMap}
+      priceFields={HabitFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const HabitView = observer(() => {
   const { habitStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Habit({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof HabitInterface)[],
-    "shownFieldsHabit"
-  );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsHabit"
-  );
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<HabitInterface, Habit>("Habit", new Habit({}));
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await habitStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -231,60 +191,22 @@ export const HabitView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Habit",
-      modal: <HabitForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof HabitInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <HabitFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<HabitInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={HabitViewContext}
       CollectionComponent={HabitCollection}
+      FormComponent={HabitForm}
+      FilterComponent={HabitFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={HabitTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

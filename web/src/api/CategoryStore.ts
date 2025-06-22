@@ -34,10 +34,10 @@ export type CategoryInterface = {
 };
 
 export const CategoryFields: Record<string, (keyof CategoryInterface)[]> = {
-  datetime: [] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Category")

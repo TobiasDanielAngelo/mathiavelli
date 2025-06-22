@@ -25,10 +25,10 @@ export type AccountInterface = {
 };
 
 export const AccountFields: Record<string, (keyof AccountInterface)[]> = {
-  datetime: ["datetimeAdded"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: ["datetimeAdded"] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Account")

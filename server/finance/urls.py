@@ -34,6 +34,7 @@ for attr_name in dir(an_module):
             route = f"analytics/{inflector.plural(kebab)}"
             router.register(route, viewset, basename=route)
 
+
 urlpatterns = [
     path("", include(router.urls)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

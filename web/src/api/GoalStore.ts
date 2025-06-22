@@ -41,10 +41,15 @@ export type GoalInterface = {
 };
 
 export const GoalFields: Record<string, (keyof GoalInterface)[]> = {
-  datetime: ["dateCreated", "dateStart", "dateEnd", "dateCompleted"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [
+    "dateCreated",
+    "dateStart",
+    "dateEnd",
+    "dateCompleted",
+  ] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Goal")

@@ -1,9 +1,7 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import { Task, TaskFields, TaskInterface } from "../../api/TaskStore";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
@@ -15,13 +13,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: TaskViewContext, useGenericView: useTaskView } =
   createGenericViewContext<TaskInterface>();
@@ -117,13 +115,10 @@ export const TaskForm = ({
       fetchFcn={fetchFcn}
       objectName="task"
       fields={fields}
-      storeFns={{
-        add: taskStore.addItem,
-        update: taskStore.updateItem,
-        delete: taskStore.deleteItem,
-      }}
-      datetimeFields={TaskFields.datetime}
-      dateFields={TaskFields.date}
+      store={taskStore}
+      datetimeFields={TaskFields.datetimeFields}
+      dateFields={TaskFields.dateFields}
+      timeFields={TaskFields.timeFields}
     />
   );
 };
@@ -137,21 +132,9 @@ export const TaskCard = observer((props: { item: Task }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["dueDate"]}
+      header={["id", "dueDate"]}
       important={["title"]}
-      body={[
-        "description",
-        "importance",
-        "dateStart",
-        "dateEnd",
-        "isArchived",
-        "goalTitle",
-        "habitTitle",
-        "scheduleDefinition",
-        "dateCompleted",
-        "dateDuration",
-      ]}
-      prices={TaskFields.prices}
+      prices={TaskFields.pricesFields}
       FormComponent={TaskForm}
       deleteItem={taskStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -203,8 +186,10 @@ export const TaskFilter = observer(() => {
     <MyGenericFilter
       view={new Task({}).$view}
       title="Task Filters"
-      dateFields={TaskFields.datetime}
+      dateFields={[...TaskFields.datetimeFields, ...TaskFields.dateFields]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -226,51 +211,25 @@ export const TaskRow = observer((props: { item: Task }) => {
 
 export const TaskTable = observer(() => {
   const { taskStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useTaskView();
+  const values = useTaskView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={taskStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <TaskRow item={item} />}
-      priceFields={TaskFields.prices}
-      itemMap={itemMap}
+      priceFields={TaskFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const TaskView = observer(() => {
   const { taskStore, goalStore, scheduleStore, habitStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Task({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof TaskInterface)[],
-    "shownFieldsTask"
-  );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsTask"
-  );
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<TaskInterface, Task>("Task", new Task({}));
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await taskStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -307,60 +266,22 @@ export const TaskView = observer(() => {
     ]
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Task",
-      modal: <TaskForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof TaskInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <TaskFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<TaskInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={TaskViewContext}
       CollectionComponent={TaskCollection}
+      FormComponent={TaskForm}
+      FilterComponent={TaskFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={TaskTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

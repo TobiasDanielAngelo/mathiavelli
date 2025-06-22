@@ -53,10 +53,15 @@ export type TaskInterface = {
 };
 
 export const TaskFields: Record<string, (keyof TaskInterface)[]> = {
-  datetime: ["dateCreated", "dateCompleted", "dateStart", "dateEnd"] as const,
-  date: ["dueDate"] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [
+    "dateCreated",
+    "dateCompleted",
+    "dateStart",
+    "dateEnd",
+  ] as const,
+  dateFields: ["dueDate"] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Task")

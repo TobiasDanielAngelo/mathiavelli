@@ -10,7 +10,10 @@ class ScheduleAdmin(admin.ModelAdmin):
         return ["datetimes_display"] + [field.name for field in self.model._meta.fields]
 
     def datetimes_display(self, obj):
-        return f"{len(obj.datetimes)} occurences"
+        return "\n".join(
+            [str(dt) for dt in obj.datetimes[:3]]
+            + (["..."] if len(obj.datetimes) > 3 else [])
+        )
 
 
 @admin.register(Goal)

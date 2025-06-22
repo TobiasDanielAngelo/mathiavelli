@@ -10,11 +10,13 @@ import {
 } from "mobx-keystone";
 import { fetchItemsRequest } from "../api/_apiHelpers";
 import Swal from "sweetalert2";
+import { GraphType } from "../blueprints/MyGenericComponents/MyGenericView";
 
 const slug = "finance/analytics/transactions";
 
 const props = {
   id: prop<string>(""),
+  graph: prop<GraphType>("pie"),
   category: prop<number | null>(null),
   account: prop<number | null>(null),
   period: prop<string | null>(null),

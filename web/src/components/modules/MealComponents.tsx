@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Meal,
   MEAL_CATEGORY_CHOICES,
@@ -8,7 +7,6 @@ import {
   MealInterface,
 } from "../../api/MealStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -19,13 +17,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: MealViewContext, useGenericView: useMealView } =
   createGenericViewContext<MealInterface>();
@@ -70,13 +68,10 @@ export const MealForm = ({
       fetchFcn={fetchFcn}
       objectName="meal"
       fields={fields}
-      storeFns={{
-        add: mealStore.addItem,
-        update: mealStore.updateItem,
-        delete: mealStore.deleteItem,
-      }}
-      datetimeFields={MealFields.datetime}
-      dateFields={MealFields.date}
+      store={mealStore}
+      datetimeFields={MealFields.datetimeFields}
+      dateFields={MealFields.dateFields}
+      timeFields={MealFields.timeFields}
     />
   );
 };
@@ -92,7 +87,7 @@ export const MealCard = observer((props: { item: Meal }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name", "categoryName"]}
-      prices={MealFields.prices}
+      prices={MealFields.pricesFields}
       FormComponent={MealForm}
       deleteItem={mealStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -126,8 +121,10 @@ export const MealFilter = observer(() => {
     <MyGenericFilter
       view={new Meal({}).$view}
       title="Meal Filters"
-      dateFields={MealFields.datetime}
+      dateFields={[...MealFields.datetimeFields, ...MealFields.dateFields]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -149,51 +146,25 @@ export const MealRow = observer((props: { item: Meal }) => {
 
 export const MealTable = observer(() => {
   const { mealStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useMealView();
+  const values = useMealView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={mealStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <MealRow item={item} />}
-      priceFields={MealFields.prices}
-      itemMap={itemMap}
+      priceFields={MealFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const MealView = observer(() => {
   const { mealStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Meal({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof MealInterface)[],
-    "shownFieldsMeal"
-  );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsMeal"
-  );
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<MealInterface, Meal>("Meal", new Meal({}));
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await mealStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -204,60 +175,22 @@ export const MealView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Meal",
-      modal: <MealForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof MealInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <MealFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<MealInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={MealViewContext}
       CollectionComponent={MealCollection}
+      FormComponent={MealForm}
+      FilterComponent={MealFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={MealTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

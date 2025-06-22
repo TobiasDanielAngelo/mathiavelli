@@ -25,10 +25,10 @@ export type WeighInInterface = {
 };
 
 export const WeighInFields: Record<string, (keyof WeighInInterface)[]> = {
-  datetime: ["date"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: ["date"] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/WeighIn")

@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   BodyFat,
   BodyFatFields,
   BodyFatInterface,
 } from "../../api/BodyFatStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,13 +16,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: BodyFatViewContext, useGenericView: useBodyFatView } =
   createGenericViewContext<BodyFatInterface>();
@@ -60,13 +57,10 @@ export const BodyFatForm = ({
       fetchFcn={fetchFcn}
       objectName="bodyFat"
       fields={fields}
-      storeFns={{
-        add: bodyFatStore.addItem,
-        update: bodyFatStore.updateItem,
-        delete: bodyFatStore.deleteItem,
-      }}
-      datetimeFields={BodyFatFields.datetime}
-      dateFields={BodyFatFields.date}
+      store={bodyFatStore}
+      datetimeFields={BodyFatFields.datetimeFields}
+      dateFields={BodyFatFields.dateFields}
+      timeFields={BodyFatFields.timeFields}
     />
   );
 };
@@ -82,7 +76,7 @@ export const BodyFatCard = observer((props: { item: BodyFat }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["bodyFatPercent"]}
-      prices={BodyFatFields.prices}
+      prices={BodyFatFields.pricesFields}
       FormComponent={BodyFatForm}
       deleteItem={bodyFatStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -116,8 +110,13 @@ export const BodyFatFilter = observer(() => {
     <MyGenericFilter
       view={new BodyFat({}).$view}
       title="BodyFat Filters"
-      dateFields={BodyFatFields.datetime}
+      dateFields={[
+        ...BodyFatFields.datetimeFields,
+        ...BodyFatFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -139,51 +138,28 @@ export const BodyFatRow = observer((props: { item: BodyFat }) => {
 
 export const BodyFatTable = observer(() => {
   const { bodyFatStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useBodyFatView();
+  const values = useBodyFatView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={bodyFatStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <BodyFatRow item={item} />}
-      priceFields={BodyFatFields.prices}
-      itemMap={itemMap}
+      priceFields={BodyFatFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const BodyFatView = observer(() => {
   const { bodyFatStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new BodyFat({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof BodyFatInterface)[],
-    "shownFieldsBodyFat"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<BodyFatInterface, BodyFat>(
+    "BodyFat",
+    new BodyFat({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsBodyFat"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await bodyFatStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -194,60 +170,22 @@ export const BodyFatView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a BodyFat",
-      modal: <BodyFatForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof BodyFatInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <BodyFatFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<BodyFatInterface>
       title={title}
+      Context={BodyFatViewContext}
+      CollectionComponent={BodyFatCollection}
+      FormComponent={BodyFatForm}
+      FilterComponent={BodyFatFilter}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
       setVisible={setVisible}
-      Context={BodyFatViewContext}
-      CollectionComponent={BodyFatCollection}
       TableComponent={BodyFatTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

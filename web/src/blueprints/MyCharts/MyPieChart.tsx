@@ -1,8 +1,73 @@
 import { observer } from "mobx-react-lite";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  Cell,
+  Pie,
+  PieChart,
+  PieLabelRenderProps,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { MyCircleChartProps, useCircleChart } from ".";
-import { getFirstWords } from "../../constants/helpers";
 import { MyCustomTooltip } from "./MyCustomToolTip";
+
+// Custom label component
+const CustomLabel = ({
+  percent,
+  name,
+  value,
+  fill,
+  x,
+  y,
+  cx,
+  cy,
+  data,
+  formatter,
+}: PieLabelRenderProps) => {
+  if (percent && percent > 0.01 && cx && cy) {
+    // Splitting the label into multiple lines
+    const formattedValue = formatter(value, name)[0];
+    const label = `${String(name)}\n${(percent * 100).toFixed(
+      1
+    )}%\n${formattedValue}`;
+
+    // Calculate the angle to adjust the dy based on the label's position
+
+    const allX = data.map((_: any, i: number) => {
+      const angle = (360 / data.length) * i;
+      const radian = (angle * Math.PI) / 180;
+      const offsetX = (cx as number) + Math.cos(radian) * 150; // Calculate the x position
+      return offsetX;
+    });
+
+    const allY = data.map((_: any, i: number) => {
+      const angle = (360 / data.length) * i;
+      const radian = (angle * Math.PI) / 180;
+      const offsetY = (cy as number) + Math.sin(radian) * 150; // Calculate the y position
+      return offsetY;
+    });
+    const isAbove = y < Math.min(...allY); // Check if the label is higher than all other labels
+    const isLeft = x < Math.min(...allX); // Label is to the left if its x is smaller than all others
+
+    // Adjust dy dynamically: move label up or down based on its position
+    const dyAdjustment = isAbove ? -40 : 5; // Negative for upper half, positive for lower half
+    const dxAdjustment = isLeft ? -60 : 15;
+    return (
+      <text
+        x={x}
+        y={y}
+        dx={dxAdjustment}
+        dy={dyAdjustment}
+        fontSize={15}
+        style={{ whiteSpace: "pre-line" }}
+        fill={fill}
+      >
+        {label}
+      </text>
+    );
+  }
+
+  return null; // Return nothing if the condition isn't met
+};
 
 /**
  * PieChart Component
@@ -35,6 +100,7 @@ export const MyPieChart = observer(
     formatter,
   }: MyCircleChartProps<T>) => {
     const { resolvedData } = useCircleChart(data, nameKey, dataKey, itemMap);
+
     return (
       <div className="w-full h-full">
         <ResponsiveContainer width={width} height={height}>
@@ -49,13 +115,13 @@ export const MyPieChart = observer(
               outerRadius={"60%"}
               innerRadius={"30%"}
               fill="#8884d8"
-              label={({ percent, name }) =>
-                percent > 0.01
-                  ? `${getFirstWords(String(name))}\n${(percent * 100).toFixed(
-                      1
-                    )}%`
-                  : ""
-              }
+              label={(props) => (
+                <CustomLabel
+                  {...props}
+                  data={resolvedData}
+                  formatter={formatter}
+                />
+              )}
               labelLine={() => <></>}
             >
               {resolvedData.map((_, index) => (

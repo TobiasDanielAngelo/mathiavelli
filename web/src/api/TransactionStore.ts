@@ -42,10 +42,10 @@ export type TransactionInterface = {
 
 export const TransactionFields: Record<string, (keyof TransactionInterface)[]> =
   {
-    datetime: ["datetimeTransacted"] as const,
-    date: [] as const,
-    time: [] as const,
-    prices: ["amount"] as const,
+    datetimeFields: ["datetimeTransacted"] as const,
+    dateFields: [] as const,
+    timeFields: [] as const,
+    pricesFields: ["amount"] as const,
   };
 
 @model("myApp/Transaction")

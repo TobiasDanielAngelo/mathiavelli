@@ -34,10 +34,10 @@ export type BuyListItemInterface = {
 
 export const BuyListItemFields: Record<string, (keyof BuyListItemInterface)[]> =
   {
-    datetime: ["addedAt"] as const,
-    date: ["plannedDate"] as const,
-    time: [] as const,
-    prices: ["estimatedPrice"] as const,
+    datetimeFields: ["addedAt"] as const,
+    dateFields: ["plannedDate"] as const,
+    timeFields: [] as const,
+    pricesFields: ["estimatedPrice"] as const,
   };
 
 @model("myApp/BuyListItem")

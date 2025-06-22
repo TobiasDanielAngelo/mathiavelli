@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   AUTHENTICATOR_CHOICES,
   Credential,
@@ -8,7 +7,6 @@ import {
   CredentialInterface,
 } from "../../api/CredentialStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -19,13 +17,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const {
   Context: CredentialViewContext,
@@ -112,13 +110,10 @@ export const CredentialForm = ({
       fetchFcn={fetchFcn}
       objectName="credential"
       fields={fields}
-      storeFns={{
-        add: credentialStore.addItem,
-        update: credentialStore.updateItem,
-        delete: credentialStore.deleteItem,
-      }}
-      datetimeFields={CredentialFields.datetime}
-      dateFields={CredentialFields.date}
+      store={credentialStore}
+      datetimeFields={CredentialFields.datetimeFields}
+      dateFields={CredentialFields.dateFields}
+      timeFields={CredentialFields.timeFields}
     />
   );
 };
@@ -132,25 +127,9 @@ export const CredentialCard = observer((props: { item: Credential }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["email", "username"]}
+      header={["id", "email", "username"]}
       important={["platformName"]}
-      body={[
-        "accountNumber",
-        "addedAt",
-        "associatedEmail",
-        "authenticatorEmail",
-        "authenticatorAppName",
-        "backupCodes",
-        "billingAccounts",
-        "customAuthenticator",
-        "loginMethod",
-        "notes",
-        "password",
-        "pin",
-        "recoveryEmail",
-        "recoveryPhone",
-      ]}
-      prices={CredentialFields.prices}
+      prices={CredentialFields.pricesFields}
       FormComponent={CredentialForm}
       deleteItem={credentialStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -184,8 +163,13 @@ export const CredentialFilter = observer(() => {
     <MyGenericFilter
       view={new Credential({}).$view}
       title="Credential Filters"
-      dateFields={[...CredentialFields.date, ...CredentialFields.datetime]}
+      dateFields={[
+        ...CredentialFields.dateFields,
+        ...CredentialFields.datetimeFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -207,51 +191,28 @@ export const CredentialRow = observer((props: { item: Credential }) => {
 
 export const CredentialTable = observer(() => {
   const { credentialStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useCredentialView();
+  const values = useCredentialView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={credentialStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <CredentialRow item={item} />}
-      priceFields={CredentialFields.prices}
-      itemMap={itemMap}
+      priceFields={CredentialFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const CredentialView = observer(() => {
   const { credentialStore, platformStore, accountStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Credential({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof CredentialInterface)[],
-    "shownFieldsCredential"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<CredentialInterface, Credential>(
+    "Credential",
+    new Credential({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsCredential"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await credentialStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -282,62 +243,22 @@ export const CredentialView = observer(() => {
     [platformStore.items.length, accountStore.items.length]
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Wish List",
-      modal: <CredentialForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof CredentialInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <CredentialFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<CredentialInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={CredentialViewContext}
       CollectionComponent={CredentialCollection}
+      FormComponent={CredentialForm}
+      FilterComponent={CredentialFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={CredentialTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

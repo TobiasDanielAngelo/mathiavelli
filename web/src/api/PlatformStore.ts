@@ -24,10 +24,10 @@ export type PlatformInterface = {
 };
 
 export const PlatformFields: Record<string, (keyof PlatformInterface)[]> = {
-  datetime: [] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Platform")

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import moment from "moment";
+import { useMemo } from "react";
 import {
   FREQ_CHOICES,
   Schedule,
@@ -9,7 +9,6 @@ import {
   WEEKDAY_CHOICES,
 } from "../../api/ScheduleStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -20,8 +19,8 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import {
@@ -29,11 +28,9 @@ import {
   generateScheduleDefinition,
   range,
   toOptions,
-  toTitleCase,
 } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
-import moment from "moment";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: ScheduleViewContext, useGenericView: useScheduleView } =
   createGenericViewContext<ScheduleInterface>();
@@ -178,13 +175,9 @@ export const ScheduleForm = ({
       fetchFcn={fetchFcn}
       objectName="schedule"
       fields={fields}
-      storeFns={{
-        add: scheduleStore.addItem,
-        update: scheduleStore.updateItem,
-        delete: scheduleStore.deleteItem,
-      }}
-      datetimeFields={ScheduleFields.datetime}
-      dateFields={ScheduleFields.date}
+      store={scheduleStore}
+      datetimeFields={ScheduleFields.datetimeFields}
+      dateFields={ScheduleFields.dateFields}
       timeFields={ScheduleFields.time}
     />
   );
@@ -201,27 +194,7 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      body={[
-        "byHour",
-        "byMinute",
-        "byMonth",
-        "byMonthDay",
-        "bySecond",
-        "bySetPosition",
-        "byWeekDay",
-        "byWeekNo",
-        "count",
-        "startDate",
-        "endDate",
-        "startTime",
-        "endTime",
-        "freqName",
-        "interval",
-        "weekStartName",
-        "definition",
-        "collidingDates",
-      ]}
-      prices={ScheduleFields.prices}
+      prices={ScheduleFields.pricesFields}
       FormComponent={ScheduleForm}
       deleteItem={scheduleStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -259,8 +232,13 @@ export const ScheduleFilter = observer(() => {
     <MyGenericFilter
       view={new Schedule({}).$view}
       title="Schedule Filters"
-      dateFields={ScheduleFields.datetime}
+      dateFields={[
+        ...ScheduleFields.datetimeFields,
+        ...ScheduleFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -282,51 +260,28 @@ export const ScheduleRow = observer((props: { item: Schedule }) => {
 
 export const ScheduleTable = observer(() => {
   const { scheduleStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useScheduleView();
+  const values = useScheduleView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={scheduleStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <ScheduleRow item={item} />}
-      priceFields={ScheduleFields.prices}
-      itemMap={itemMap}
+      priceFields={ScheduleFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const ScheduleView = observer(() => {
   const { scheduleStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Schedule({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof ScheduleInterface)[],
-    "shownFieldsSchedule"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<ScheduleInterface, Schedule>(
+    "Schedule",
+    new Schedule({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsSchedule"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await scheduleStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -337,62 +292,22 @@ export const ScheduleView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Schedule",
-      modal: <ScheduleForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof ScheduleInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <ScheduleFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<ScheduleInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={ScheduleViewContext}
       CollectionComponent={ScheduleCollection}
+      FormComponent={ScheduleForm}
+      FilterComponent={ScheduleFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={ScheduleTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

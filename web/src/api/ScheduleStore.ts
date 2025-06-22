@@ -64,10 +64,10 @@ export type ScheduleInterface = {
 };
 
 export const ScheduleFields: Record<string, (keyof ScheduleInterface)[]> = {
-  datetime: [] as const,
-  date: ["startDate", "endDate"] as const,
-  time: ["startTime", "endTime"] as const,
-  prices: [] as const,
+  datetimeFields: [] as const,
+  dateFields: ["startDate", "endDate"] as const,
+  timeFields: ["startTime", "endTime"] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Schedule")

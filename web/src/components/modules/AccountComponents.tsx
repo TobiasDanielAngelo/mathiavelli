@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Account,
   AccountFields,
   AccountInterface,
 } from "../../api/AccountStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,13 +16,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: AccountViewContext, useGenericView: useAccountView } =
   createGenericViewContext<AccountInterface>();
@@ -66,13 +63,10 @@ export const AccountForm = ({
       fetchFcn={fetchFcn}
       objectName="account"
       fields={fields}
-      storeFns={{
-        add: accountStore.addItem,
-        update: accountStore.updateItem,
-        delete: accountStore.deleteItem,
-      }}
-      datetimeFields={AccountFields.datetime}
-      dateFields={AccountFields.date}
+      store={accountStore}
+      datetimeFields={AccountFields.datetimeFields}
+      dateFields={AccountFields.dateFields}
+      timeFields={AccountFields.timeFields}
     />
   );
 };
@@ -88,7 +82,7 @@ export const AccountCard = observer((props: { item: Account }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={AccountFields.prices}
+      prices={AccountFields.pricesFields}
       FormComponent={AccountForm}
       deleteItem={accountStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -122,8 +116,13 @@ export const AccountFilter = observer(() => {
     <MyGenericFilter
       view={new Account({}).$view}
       title="Account Filters"
-      dateFields={AccountFields.datetime}
+      dateFields={[
+        ...AccountFields.datetimeFields,
+        ...AccountFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -145,51 +144,29 @@ export const AccountRow = observer((props: { item: Account }) => {
 
 export const AccountTable = observer(() => {
   const { accountStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useAccountView();
+  const values = useAccountView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={accountStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <AccountRow item={item} />}
-      priceFields={AccountFields.prices}
-      itemMap={itemMap}
+      priceFields={AccountFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const AccountView = observer(() => {
   const { accountStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Account({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof AccountInterface)[],
-    "shownFieldsAccount"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<AccountInterface, Account>(
+    "Account",
+    new Account({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsAccount"
-  );
+  const { params, setPageDetails } = values;
+
   const fetchFcn = async () => {
     const resp = await accountStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -200,60 +177,22 @@ export const AccountView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Account",
-      modal: <AccountForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof AccountInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <AccountFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<AccountInterface>
       title={title}
+      FormComponent={AccountForm}
+      FilterComponent={AccountFilter}
+      Context={AccountViewContext}
+      CollectionComponent={AccountCollection}
+      TableComponent={AccountTable}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}
       setVisible={setVisible}
-      Context={AccountViewContext}
-      CollectionComponent={AccountCollection}
-      TableComponent={AccountTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

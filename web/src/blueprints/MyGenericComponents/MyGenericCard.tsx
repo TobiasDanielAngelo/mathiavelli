@@ -30,7 +30,6 @@ export const MyGenericCard = observer(
     shownFields,
     header,
     important,
-    body,
     prices,
     FormComponent,
     deleteItem,
@@ -88,7 +87,6 @@ export const MyGenericCard = observer(
               shownFields={shownFields}
               header={header}
               important={important}
-              body={body}
               prices={prices}
               showMore={showMore}
               setShowMore={setShowMore}

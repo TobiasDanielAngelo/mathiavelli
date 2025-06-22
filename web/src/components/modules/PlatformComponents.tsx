@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Platform,
   PlatformFields,
   PlatformInterface,
 } from "../../api/PlatformStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,13 +16,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: PlatformViewContext, useGenericView: usePlatformView } =
   createGenericViewContext<PlatformInterface>();
@@ -67,13 +64,10 @@ export const PlatformForm = ({
       fetchFcn={fetchFcn}
       objectName="platform"
       fields={fields}
-      storeFns={{
-        add: platformStore.addItem,
-        update: platformStore.updateItem,
-        delete: platformStore.deleteItem,
-      }}
-      datetimeFields={PlatformFields.datetime}
-      dateFields={PlatformFields.date}
+      store={platformStore}
+      datetimeFields={PlatformFields.datetimeFields}
+      dateFields={PlatformFields.dateFields}
+      timeFields={PlatformFields.timeFields}
     />
   );
 };
@@ -89,7 +83,7 @@ export const PlatformCard = observer((props: { item: Platform }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={PlatformFields.prices}
+      prices={PlatformFields.pricesFields}
       FormComponent={PlatformForm}
       deleteItem={platformStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -127,8 +121,13 @@ export const PlatformFilter = observer(() => {
     <MyGenericFilter
       view={new Platform({}).$view}
       title="Platform Filters"
-      dateFields={[...PlatformFields.date, ...PlatformFields.datetime]}
+      dateFields={[
+        ...PlatformFields.dateFields,
+        ...PlatformFields.datetimeFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -150,51 +149,28 @@ export const PlatformRow = observer((props: { item: Platform }) => {
 
 export const PlatformTable = observer(() => {
   const { platformStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = usePlatformView();
+  const values = usePlatformView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={platformStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <PlatformRow item={item} />}
-      priceFields={PlatformFields.prices}
-      itemMap={itemMap}
+      priceFields={PlatformFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const PlatformView = observer(() => {
   const { platformStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Platform({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof PlatformInterface)[],
-    "shownFieldsPlatform"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<PlatformInterface, Platform>(
+    "Platform",
+    new Platform({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsPlatform"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await platformStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -205,62 +181,22 @@ export const PlatformView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Platform",
-      modal: <PlatformForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof PlatformInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <PlatformFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<PlatformInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={PlatformViewContext}
       CollectionComponent={PlatformCollection}
+      FormComponent={PlatformForm}
+      FilterComponent={PlatformFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={PlatformTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

@@ -25,7 +25,6 @@ export const MyGenericRecursiveCard = observer(
     item,
     header,
     important,
-    body,
     prices,
     shownFields,
     FormComponent,
@@ -101,7 +100,6 @@ export const MyGenericRecursiveCard = observer(
                   shownFields={shownFields}
                   header={header}
                   important={important}
-                  body={body}
                   prices={prices}
                 />
               </div>
@@ -116,7 +114,6 @@ export const MyGenericRecursiveCard = observer(
                 item={s}
                 header={header}
                 important={important}
-                body={body}
                 prices={prices}
                 shownFields={shownFields}
                 FormComponent={FormComponent}

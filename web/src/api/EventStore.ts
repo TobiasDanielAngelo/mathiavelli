@@ -43,10 +43,15 @@ export type EventInterface = {
 };
 
 export const EventFields: Record<string, (keyof EventInterface)[]> = {
-  datetime: ["dateStart", "dateEnd", "dateCreated", "dateCompleted"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: [
+    "dateStart",
+    "dateEnd",
+    "dateCreated",
+    "dateCompleted",
+  ] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Event")

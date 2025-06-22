@@ -1,9 +1,7 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import { Tag, TagFields, TagInterface } from "../../api/TagStore";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -14,13 +12,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: TagViewContext, useGenericView: useTagView } =
   createGenericViewContext<TagInterface>();
@@ -70,13 +67,10 @@ export const TagForm = ({
       fetchFcn={fetchFcn}
       objectName="tag"
       fields={fields}
-      storeFns={{
-        add: tagStore.addItem,
-        update: tagStore.updateItem,
-        delete: tagStore.deleteItem,
-      }}
-      datetimeFields={TagFields.datetime}
-      dateFields={TagFields.date}
+      store={tagStore}
+      datetimeFields={TagFields.datetimeFields}
+      dateFields={TagFields.dateFields}
+      timeFields={TagFields.timeFields}
     />
   );
 };
@@ -92,7 +86,7 @@ export const TagCard = observer((props: { item: Tag }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={TagFields.prices}
+      prices={TagFields.pricesFields}
       FormComponent={TagForm}
       deleteItem={tagStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -126,8 +120,10 @@ export const TagFilter = observer(() => {
     <MyGenericFilter
       view={new Tag({}).$view}
       title="Tag Filters"
-      dateFields={TagFields.datetime}
+      dateFields={[...TagFields.datetimeFields, ...TagFields.dateFields]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -149,51 +145,25 @@ export const TagRow = observer((props: { item: Tag }) => {
 
 export const TagTable = observer(() => {
   const { tagStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useTagView();
+  const values = useTagView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={tagStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <TagRow item={item} />}
-      priceFields={TagFields.prices}
-      itemMap={itemMap}
+      priceFields={TagFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const TagView = observer(() => {
   const { tagStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Tag({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof TagInterface)[],
-    "shownFieldsTag"
-  );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsTag"
-  );
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<TagInterface, Tag>("Tag", new Tag({}));
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await tagStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -204,60 +174,22 @@ export const TagView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Tag",
-      modal: <TagForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof TagInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <TagFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<TagInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={TagViewContext}
       CollectionComponent={TagCollection}
+      FormComponent={TagForm}
+      FilterComponent={TagFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={TagTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

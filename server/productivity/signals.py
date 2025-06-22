@@ -180,7 +180,10 @@ def create_events_for_task(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Event)
 def sync_habitlog_from_event(sender, instance, **kwargs):
-    task = instance.task
+    try:
+        task = instance.task
+    except ObjectDoesNotExist:
+        return
     if not task or not task.habit:
         return
 

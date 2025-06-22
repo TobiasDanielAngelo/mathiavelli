@@ -6,6 +6,8 @@ export const MyTable = (props: {
 
   return hidden ? (
     <></>
+  ) : matrix.length < 2 ? (
+    <div className="text-center">No entries.</div>
   ) : (
     <div
       className={"relative overflow-x-auto shadow-md sm:rounded-lg mt-4 mx-5"}

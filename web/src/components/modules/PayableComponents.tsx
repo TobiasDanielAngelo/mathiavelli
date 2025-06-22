@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Payable,
   PayableFields,
   PayableInterface,
 } from "../../api/PayableStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import {
   IAction,
@@ -21,18 +19,14 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { MyModal } from "../../blueprints/MyModal";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import {
-  generateShortId,
-  toOptions,
-  toTitleCase,
-} from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { generateShortId, toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 import { AccountIdMap } from "./AccountComponents";
 import { CategoryIdMap } from "./CategoryComponents";
 import { TransactionForm } from "./TransactionComponents";
@@ -96,13 +90,10 @@ export const PayableForm = ({
       fetchFcn={fetchFcn}
       objectName="payable"
       fields={fields}
-      storeFns={{
-        add: payableStore.addItem,
-        update: payableStore.updateItem,
-        delete: payableStore.deleteItem,
-      }}
-      datetimeFields={PayableFields.datetime}
-      dateFields={PayableFields.date}
+      store={payableStore}
+      datetimeFields={PayableFields.datetimeFields}
+      dateFields={PayableFields.dateFields}
+      timeFields={PayableFields.timeFields}
     />
   );
 };
@@ -137,15 +128,7 @@ export const PayableCard = observer((props: { item: Payable }) => {
         shownFields={shownFields}
         header={["id", "datetimeDue"]}
         important={["borrowedAmount"]}
-        body={[
-          "lenderName",
-          "description",
-          "datetimeOpened",
-          "datetimeClosed",
-          "paymentDescription",
-          "paymentTotal",
-        ]}
-        prices={PayableFields.prices}
+        prices={PayableFields.pricesFields}
         FormComponent={PayableForm}
         deleteItem={payableStore.deleteItem}
         fetchFcn={fetchFcn}
@@ -185,8 +168,13 @@ export const PayableFilter = observer(() => {
     <MyGenericFilter
       view={new Payable({}).$view}
       title="Payable Filters"
-      dateFields={[...PayableFields.date, ...PayableFields.datetime]}
+      dateFields={[
+        ...PayableFields.dateFields,
+        ...PayableFields.datetimeFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -208,51 +196,28 @@ export const PayableRow = observer((props: { item: Payable }) => {
 
 export const PayableTable = observer(() => {
   const { payableStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = usePayableView();
+  const values = usePayableView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={payableStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <PayableRow item={item} />}
-      priceFields={PayableFields.prices}
-      itemMap={itemMap}
+      priceFields={PayableFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const PayableView = observer(() => {
   const { payableStore, transactionStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Payable({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof PayableInterface)[],
-    "shownFieldsPayable"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<PayableInterface, Payable>(
+    "Payable",
+    new Payable({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsPayable"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await payableStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -273,60 +238,22 @@ export const PayableView = observer(() => {
     [transactionStore.items.length]
   );
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Payable",
-      modal: <PayableForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) => setShownFields(t as (keyof PayableInterface)[])}
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <PayableFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<PayableInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={PayableViewContext}
       CollectionComponent={PayableCollection}
+      FormComponent={PayableForm}
+      FilterComponent={PayableFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={PayableTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

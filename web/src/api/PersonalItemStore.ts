@@ -43,10 +43,10 @@ export const PersonalItemFields: Record<
   string,
   (keyof PersonalItemInterface)[]
 > = {
-  datetime: [] as const,
-  date: ["acquiredDate"] as const,
-  time: [] as const,
-  prices: ["worth"] as const,
+  datetimeFields: [] as const,
+  dateFields: ["acquiredDate"] as const,
+  timeFields: [] as const,
+  pricesFields: ["worth"] as const,
 };
 
 @model("myApp/PersonalItem")

@@ -26,10 +26,10 @@ export type JournalInterface = {
 };
 
 export const JournalFields: Record<string, (keyof JournalInterface)[]> = {
-  datetime: ["datetimeCreated"] as const,
-  date: [] as const,
-  time: [] as const,
-  prices: [] as const,
+  datetimeFields: ["datetimeCreated"] as const,
+  dateFields: [] as const,
+  timeFields: [] as const,
+  pricesFields: [] as const,
 };
 
 @model("myApp/Journal")

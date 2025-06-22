@@ -1,13 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   InventoryCategory,
   InventoryCategoryFields,
   InventoryCategoryInterface,
 } from "../../api/InventoryCategoryStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,13 +16,12 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const {
   Context: InventoryCategoryViewContext,
@@ -58,13 +55,10 @@ export const InventoryCategoryForm = ({
       fetchFcn={fetchFcn}
       objectName="inventoryCategory"
       fields={fields}
-      storeFns={{
-        add: inventoryCategoryStore.addItem,
-        update: inventoryCategoryStore.updateItem,
-        delete: inventoryCategoryStore.deleteItem,
-      }}
-      datetimeFields={InventoryCategoryFields.datetime}
-      dateFields={InventoryCategoryFields.date}
+      store={inventoryCategoryStore}
+      datetimeFields={InventoryCategoryFields.datetimeFields}
+      dateFields={InventoryCategoryFields.dateFields}
+      timeFields={InventoryCategoryFields.timeFields}
     />
   );
 };
@@ -81,7 +75,7 @@ export const InventoryCategoryCard = observer(
         shownFields={shownFields}
         header={["id"]}
         important={["name"]}
-        prices={InventoryCategoryFields.prices}
+        prices={InventoryCategoryFields.pricesFields}
         FormComponent={InventoryCategoryForm}
         deleteItem={inventoryCategoryStore.deleteItem}
         fetchFcn={fetchFcn}
@@ -120,8 +114,13 @@ export const InventoryCategoryFilter = observer(() => {
     <MyGenericFilter
       view={new InventoryCategory({}).$}
       title="Inventory Category Filters"
-      dateFields={InventoryCategoryFields.datetime}
+      dateFields={[
+        ...InventoryCategoryFields.datetimeFields,
+        ...InventoryCategoryFields.dateFields,
+      ]}
       excludeFields={["id"]}
+      relatedFields={[]}
+      optionFields={[]}
     />
   );
 });
@@ -145,51 +144,28 @@ export const InventoryCategoryRow = observer(
 
 export const InventoryCategoryTable = observer(() => {
   const { inventoryCategoryStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useInventoryCategoryView();
+  const values = useInventoryCategoryView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={inventoryCategoryStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <InventoryCategoryRow item={item} />}
-      priceFields={InventoryCategoryFields.prices}
-      itemMap={itemMap}
+      priceFields={InventoryCategoryFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const InventoryCategoryView = observer(() => {
   const { inventoryCategoryStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new InventoryCategory({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof InventoryCategoryInterface)[],
-    "shownFieldsInventoryCategory"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<InventoryCategoryInterface, InventoryCategory>(
+    "InventoryCategory",
+    new InventoryCategory({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsInventoryCategory"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await inventoryCategoryStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -200,64 +176,22 @@ export const InventoryCategoryView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a InventoryCategory",
-      modal: (
-        <InventoryCategoryForm fetchFcn={fetchFcn} setVisible={setVisible1} />
-      ),
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof InventoryCategoryInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <InventoryCategoryFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<InventoryCategoryInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={InventoryCategoryViewContext}
       CollectionComponent={InventoryCategoryCollection}
+      FormComponent={InventoryCategoryForm}
+      FilterComponent={InventoryCategoryFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={InventoryCategoryTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });

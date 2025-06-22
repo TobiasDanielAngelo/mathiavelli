@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Category,
   CATEGORY_CHOICES,
@@ -8,7 +7,6 @@ import {
   CategoryInterface,
 } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
-import { MyMultiDropdownSelector } from "../../blueprints";
 import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -19,13 +17,13 @@ import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow"
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
   ActionModalDef,
-  GraphType,
   MyGenericView,
+  useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions, toTitleCase } from "../../constants/helpers";
-import { useLocalStorageState, useVisible } from "../../constants/hooks";
-import { Field, PaginatedDetails } from "../../constants/interfaces";
+import { toOptions } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
+import { Field } from "../../constants/interfaces";
 
 export const { Context: CategoryViewContext, useGenericView: useCategoryView } =
   createGenericViewContext<CategoryInterface>();
@@ -84,13 +82,10 @@ export const CategoryForm = ({
       fetchFcn={fetchFcn}
       objectName="category"
       fields={fields}
-      storeFns={{
-        add: categoryStore.addItem,
-        update: categoryStore.updateItem,
-        delete: categoryStore.deleteItem,
-      }}
-      datetimeFields={CategoryFields.datetime}
-      dateFields={CategoryFields.date}
+      store={categoryStore}
+      datetimeFields={CategoryFields.datetimeFields}
+      dateFields={CategoryFields.dateFields}
+      timeFields={CategoryFields.timeFields}
     />
   );
 };
@@ -106,8 +101,7 @@ export const CategoryCard = observer((props: { item: Category }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["title"]}
-      body={["natureName", "logo"]}
-      prices={CategoryFields.prices}
+      prices={CategoryFields.pricesFields}
       FormComponent={CategoryForm}
       deleteItem={categoryStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -141,8 +135,12 @@ export const CategoryFilter = observer(() => {
     <MyGenericFilter
       view={new Category({}).$view}
       title="Category Filters"
-      dateFields={[...CategoryFields.date, ...CategoryFields.datetime]}
-      excludeFields={["id"]}
+      dateFields={[
+        ...CategoryFields.dateFields,
+        ...CategoryFields.datetimeFields,
+      ]}
+      excludeFields={["id", "natureName", "nature"]}
+      optionFields={["nature"]}
     />
   );
 });
@@ -164,51 +162,28 @@ export const CategoryRow = observer((props: { item: Category }) => {
 
 export const CategoryTable = observer(() => {
   const { categoryStore } = useStore();
-  const {
-    shownFields,
-    params,
-    setParams,
-    pageDetails,
-    PageBar,
-    itemMap,
-    sortFields,
-    setSortFields,
-  } = useCategoryView();
+  const values = useCategoryView();
+  const { pageDetails } = values;
 
   return (
     <MyGenericTable
       items={categoryStore.items}
-      shownFields={shownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
       pageIds={pageDetails?.ids ?? []}
-      params={params}
-      setParams={setParams}
-      PageBar={PageBar}
       renderActions={(item) => <CategoryRow item={item} />}
-      priceFields={CategoryFields.prices}
-      itemMap={itemMap}
+      priceFields={CategoryFields.pricesFields}
+      {...values}
     />
   );
 });
 
 export const CategoryView = observer(() => {
   const { categoryStore } = useStore();
-  const { setVisible1, isVisible, setVisible } = useVisible();
-  const [pageDetails, setPageDetails] = useState<
-    PaginatedDetails | undefined
-  >();
-  const [params, setParams] = useSearchParams();
-  const objWithFields = new Category({}).$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
-    Object.keys(objWithFields) as (keyof CategoryInterface)[],
-    "shownFieldsCategory"
+  const { isVisible, setVisible } = useVisible();
+  const values = useViewValues<CategoryInterface, Category>(
+    "Category",
+    new Category({})
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
-    [] as string[],
-    "sortFieldsCategory"
-  );
+  const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await categoryStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -219,62 +194,22 @@ export const CategoryView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [
-    {
-      icon: "NoteAdd",
-      label: "NEW",
-      name: "Add a Wish List",
-      modal: <CategoryForm fetchFcn={fetchFcn} setVisible={setVisible1} />,
-    },
-    {
-      icon: "ViewList",
-      label: "FIELDS",
-      name: "Show Fields",
-      modal: (
-        <MyMultiDropdownSelector
-          label="Fields"
-          value={shownFields}
-          onChangeValue={(t) =>
-            setShownFields(t as (keyof CategoryInterface)[])
-          }
-          options={Object.keys(objWithFields).map((s) => ({
-            id: s,
-            name: toTitleCase(s),
-          }))}
-          relative
-          open
-        />
-      ),
-    },
-    {
-      icon: "FilterListAlt",
-      label: "FILTERS",
-      name: "Filters",
-      modal: <CategoryFilter />,
-    },
-  ] satisfies ActionModalDef[];
+  const actionModalDefs = [] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<CategoryInterface>
       title={title}
-      fetchFcn={fetchFcn}
-      actionModalDefs={actionModalDefs}
-      isVisible={isVisible}
-      setVisible={setVisible}
       Context={CategoryViewContext}
       CollectionComponent={CategoryCollection}
+      FormComponent={CategoryForm}
+      FilterComponent={CategoryFilter}
+      actionModalDefs={actionModalDefs}
       TableComponent={CategoryTable}
-      shownFields={shownFields}
-      setShownFields={setShownFields}
-      sortFields={sortFields}
-      setSortFields={setSortFields}
-      availableGraphs={["pie", "line"]}
-      pageDetails={pageDetails}
-      params={params}
-      setParams={setParams}
+      fetchFcn={fetchFcn}
+      isVisible={isVisible}
+      setVisible={setVisible}
       itemMap={itemMap}
-      graph={graph}
-      setGraph={setGraph}
+      {...values}
     />
   );
 });
