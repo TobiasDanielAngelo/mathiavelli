@@ -5,6 +5,7 @@ import { useWindowWidth } from "../constants/hooks";
 import { StateSetter } from "../constants/interfaces";
 import { GuidedDiv } from "./MyGuidedDiv";
 import { MyIcon } from "./MyIcon";
+import { sortByKey } from "../constants/helpers";
 
 type CalendarEvent = {
   id: string | number;
@@ -79,7 +80,7 @@ export const MyCalendar = observer(
             const isSelected = day.isSame(date, "day");
             const isWeekend = day.day() === 0 || day.day() === 6;
 
-            const dayEvents = events.filter(
+            const dayEvents = sortByKey(events, "dateStart").filter(
               (e) =>
                 day.format("YYYY-MM-DD") ===
                   moment(e.dateStart).format("YYYY-MM-DD") ||
@@ -117,7 +118,13 @@ export const MyCalendar = observer(
                   {renderEventContent && width > 1024
                     ? renderEventContent(dayEvents)
                     : dayEvents.length > 0 &&
-                      width > 1024 && <MyIcon icon="Event" />}
+                      width > 1024 && (
+                        <MyIcon
+                          icon="Event"
+                          fontSize="small"
+                          label={String(dayEvents.length)}
+                        />
+                      )}
                 </div>
               </GuidedDiv>
             );

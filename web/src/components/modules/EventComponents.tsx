@@ -164,7 +164,10 @@ export const EventDashboard = observer(
 
     return (
       <MyLockedCard isUnlocked>
-        <MyCalendar {...props} events={eventStore.items} />
+        <MyCalendar
+          {...props}
+          events={eventStore.items.filter((s) => !s.isArchived)}
+        />
       </MyLockedCard>
     );
   }
@@ -183,13 +186,15 @@ export const EventCollection = observer(() => {
       ? moment(date).format("YYYY")
       : `${Math.floor(moment(date).year() / 10)}X`;
 
-  const filteredItems = eventStore.items.filter((s) => {
-    const m = moment(s.dateStart);
-    if (view === "month") return m.format("YYYY-MM") === range;
-    if (view === "year") return m.format("YYYY") === range;
-    if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;
-    return false;
-  });
+  const filteredItems = eventStore.items
+    .filter((s) => {
+      const m = moment(s.dateStart);
+      if (view === "month") return m.format("YYYY-MM") === range;
+      if (view === "year") return m.format("YYYY") === range;
+      if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;
+      return false;
+    })
+    .filter((s) => !s.isArchived);
 
   const values = {
     date,

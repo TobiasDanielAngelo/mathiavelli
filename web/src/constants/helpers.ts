@@ -392,12 +392,30 @@ export const formatValue = (
   }
   if (Array.isArray(value) && value.length > 0) {
     if (isDatetimeValue(value[0])) {
-      return value
-        .map((s) => moment(s).format("MMM D, YYYY h:mm A, Z"))
-        .join("\n");
+      return (
+        value
+          .filter((_, ind) => ind < 3)
+          .map((s) => moment(s).format("MMM D, YYYY h:mm A, Z"))
+          .join("\n") +
+        `\nand ${
+          value.length >= 3 ? String(value.length - 4) + " more..." : ""
+        }` +
+        `\nup to ${moment(value[value.length - 1]).format(
+          "MMM D, YYYY h:mm A, Z"
+        )}`
+      );
     }
     if (isDateValue(value[0])) {
-      return value.map((s) => moment(s).format("MMM D, YYYY")).join("\n");
+      return (
+        value
+          .filter((_, ind) => ind < 3)
+          .map((s) => moment(s).format("MMM D, YYYY"))
+          .join("\n") +
+        `\nand ${
+          value.length >= 3 ? String(value.length - 4) + " more..." : ""
+        }` +
+        `\nup to ${moment(value[value.length - 1]).format("MMM D, YYYY")}`
+      );
     } else {
       return value.join(", ");
     }
@@ -680,7 +698,7 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
   const start = !schedule.startDate
     ? null
     : !schedule.startTime
-    ? `${normalizeDate(schedule.startDate)}`
+    ? `${normalizeDate(schedule.startDate)}T00:00`
     : `${normalizeDate(schedule.startDate)}T${normalizeTime(
         schedule.startTime || "00:00"
       )}`;
@@ -688,13 +706,13 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
   const end = !schedule.endDate
     ? null
     : !schedule.endTime
-    ? `${normalizeDate(schedule.endDate)}`
+    ? `${normalizeDate(schedule.endDate)}T23:59`
     : `${normalizeDate(schedule.endDate)}T${normalizeTime(
-        schedule.endTime || "00:00"
+        schedule.endTime || "23:59"
       )}`;
 
   const ruleOptions = {
-    freq: Number(schedule.freq) ?? RRule.DAILY,
+    freq: Number(schedule.freq) || RRule.DAILY,
     interval: Number(schedule.interval) || 1,
     byweekday: schedule.byWeekDay
       ?.map((d) => WEEKDAY_MAP[d])
@@ -707,7 +725,7 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     byminute: schedule.byMinute?.map(Number) ?? undefined,
     bysecond: schedule.bySecond?.map(Number) ?? undefined,
     bysetpos: schedule.bySetPosition?.map(Number) ?? undefined,
-    count: Number(schedule.count) ?? 10,
+    count: Number(schedule.count) || 10,
     dtstart: toUTCForRRule(start),
     until: toUTCForRRule(end),
   };

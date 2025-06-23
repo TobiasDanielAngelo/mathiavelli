@@ -13,6 +13,7 @@ class ScheduleAdmin(admin.ModelAdmin):
         return "\n".join(
             [str(dt) for dt in obj.datetimes[:3]]
             + (["..."] if len(obj.datetimes) > 3 else [])
+            + (["\n up to " + obj.datetimes[-1]] if len(obj.datetimes) > 3 else [""])
         )
 
 

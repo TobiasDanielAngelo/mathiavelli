@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   FREQ_CHOICES,
   Schedule,
@@ -10,6 +10,7 @@ import {
 } from "../../api/ScheduleStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
+import { CalendarView, MyCalendar } from "../../blueprints/MyCalendar";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -22,15 +23,17 @@ import {
   MyGenericView,
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
+import { MyLockedCard } from "../../blueprints/MyLockedCard";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import {
+  formatValue,
   generateCollidingDates,
   generateScheduleDefinition,
   range,
   toOptions,
 } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { Field, StateSetter } from "../../constants/interfaces";
 
 export const { Context: ScheduleViewContext, useGenericView: useScheduleView } =
   createGenericViewContext<ScheduleInterface>();
@@ -158,10 +161,7 @@ export const ScheduleForm = ({
             name: "collidings",
             label: "Colliding Dates",
             type: "function",
-            function: (t) =>
-              generateCollidingDates(t)
-                .map((s) => moment(s).format("lll"))
-                .join("\n"),
+            function: (t) => formatValue(generateCollidingDates(t), ""),
           },
         ],
       ] satisfies Field[][],
@@ -178,7 +178,7 @@ export const ScheduleForm = ({
       store={scheduleStore}
       datetimeFields={ScheduleFields.datetimeFields}
       dateFields={ScheduleFields.dateFields}
-      timeFields={ScheduleFields.time}
+      timeFields={ScheduleFields.timeFields}
     />
   );
 };
@@ -202,13 +202,66 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
   );
 });
 
-export const ScheduleDashboard = observer(() => {
-  return <></>;
-});
+export const ScheduleDashboard = observer(
+  (props: {
+    date: Date;
+    setDate: StateSetter<Date>;
+    view: CalendarView;
+    setView: StateSetter<CalendarView>;
+    range: string;
+  }) => {
+    const { range, view } = props;
+    const { scheduleStore } = useStore();
+
+    const items = scheduleStore.items
+      .map((s) => s.$view)
+      .flatMap((s) =>
+        s.collidingDates.map((date) => ({
+          ...s,
+          collidingDate: date,
+        }))
+      )
+      .filter((s) => {
+        const m = moment(s.collidingDate);
+        if (view === "month") return m.format("YYYY-MM") === range;
+        if (view === "year") return m.format("YYYY") === range;
+        if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;
+        return false;
+      })
+      .map((s, ind) => ({
+        id: ind,
+        title: `${s.name} - ${moment(s.collidingDate).format("h:mm A")}`,
+        dateStart: s.collidingDate.toISOString(),
+        dateEnd: s.collidingDate.toISOString(),
+      }));
+
+    return (
+      <MyLockedCard isUnlocked>
+        <MyCalendar {...props} events={items} />
+      </MyLockedCard>
+    );
+  }
+);
 
 export const ScheduleCollection = observer(() => {
   const { scheduleStore } = useStore();
   const { pageDetails, PageBar } = useScheduleView();
+  const [date, setDate] = useState(new Date());
+  const [view, setView] = useState<CalendarView>("month");
+  const range =
+    view === "month"
+      ? moment(date).format("YYYY-MM")
+      : view === "year"
+      ? moment(date).format("YYYY")
+      : `${Math.floor(moment(date).year() / 10)}X`;
+
+  const values = {
+    date,
+    setDate,
+    view,
+    setView,
+    range,
+  };
 
   return (
     <SideBySideView
@@ -221,7 +274,7 @@ export const ScheduleCollection = observer(() => {
           items={scheduleStore.items}
         />
       }
-      SideB={<ScheduleDashboard />}
+      SideB={<ScheduleDashboard {...values} />}
       ratio={0.7}
     />
   );

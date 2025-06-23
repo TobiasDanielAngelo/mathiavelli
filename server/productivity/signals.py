@@ -127,9 +127,16 @@ def schedule_updated(sender, instance, **kwargs):
     except Schedule.DoesNotExist:
         return  # should not happen, but just in case
 
-    if old.datetimes != instance.datetimes:
+    old_dates = set(old.datetimes)
+    new_dates = set(instance.datetimes)
+
+    to_archive = old_dates - new_dates  # removed dates
+
+    if to_archive:
         for task in Task.objects.filter(schedule=instance):
-            Event.objects.filter(task=task).delete()
+            Event.objects.filter(task=task, date_start__in=to_archive).update(
+                is_archived=True
+            )
 
 
 @receiver([post_save, post_delete], sender=Event)
@@ -142,7 +149,7 @@ def maybe_complete_task(sender, instance, **kwargs):
     if not task or not task.schedule:
         return
 
-    actual_events = task.event_task.all()
+    actual_events = task.event_task.all().filter(is_archived=False)
     tz = get_current_timezone()
 
     # Parse and normalize expected datetimes (string → datetime with timezone)
