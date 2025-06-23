@@ -125,18 +125,28 @@ class ChoiceIntegerField(models.IntegerField):
     def __init__(self, choices_list, *args, **kwargs):
         self._choices_list = choices_list  # store for deconstruction
         kwargs.setdefault("choices", choices_list)
-        kwargs.setdefault("default", 0)
+
+        if len(args) >= 1:
+            default = args[0]
+            args = args[1:]  # remove default from args
+            kwargs.setdefault("default", default)
+        else:
+            kwargs.setdefault("default", 0)
+
         super().__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        # Ensure first argument is the choices list
-        args = [self._choices_list] + args
-        # Remove choices/default if they're auto-set
+
+        # Put choices_list and default back into args
+        args = [self._choices_list, kwargs.get("default", 0)] + args
+
+        # Clean up if kwargs were auto-set
         if kwargs.get("choices") == self._choices_list:
             del kwargs["choices"]
         if kwargs.get("default") == 0:
             del kwargs["default"]
+
         return name, path, args, kwargs
 
 

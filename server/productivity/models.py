@@ -58,8 +58,8 @@ class Schedule(CustomModel):
     ]
 
     name = fields.ShortCharField()
-    freq = fields.ChoiceIntegerField(FREQ_CHOICES)
-    interval = fields.LimitedDecimalField(1)
+    freq = fields.ChoiceIntegerField(FREQ_CHOICES, 3)
+    interval = fields.LimitedDecimalField(1, None, 1)
     by_week_day = fields.ChoicesStringArrayField(
         ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
     )
@@ -72,7 +72,7 @@ class Schedule(CustomModel):
     by_second = fields.ChoicesNumberArrayField(range(0, 60))
     by_set_position = fields.ChoicesNumberArrayField(range(-31, 32))
 
-    count = fields.LimitedDecimalField(1)
+    count = fields.LimitedDecimalField(1, None, 1)
     start_date = fields.OptionalDateField()
     end_date = fields.OptionalDateField()
     start_time = fields.OptionalLimitedTimeField()
