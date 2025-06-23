@@ -17,6 +17,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import FilterListAlt from "@mui/icons-material/FilterListAlt";
 import NoteAdd from "@mui/icons-material/NoteAdd";
 import PieChart from "@mui/icons-material/PieChart";
+import Search from "@mui/icons-material/Search";
 import ViewList from "@mui/icons-material/ViewList";
 import TableChart from "@mui/icons-material/TableChart";
 import Timeline from "@mui/icons-material/Timeline";
@@ -68,6 +69,7 @@ const iconMap = {
   Sort,
   CheckBox,
   CheckBoxOutlineBlank,
+  Search,
 } as const;
 
 // 2. Derive type from keys
