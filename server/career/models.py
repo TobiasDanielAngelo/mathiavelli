@@ -1,8 +1,9 @@
-from django.db import models
+from core.models import CustomModel
 from core import fields
+from core.models import CustomModel
 
 
-class Job(models.Model):
+class Job(CustomModel):
     STATUS_CHOICES = [
         (0, "Wishlist"),
         (1, "Applied"),
@@ -40,8 +41,8 @@ class Job(models.Model):
         (5, "Temporary"),
     ]
 
-    title = fields.ShortCharField()
-    company = fields.ShortCharField()
+    title = fields.ShortCharField(display=True)
+    company = fields.ShortCharField(display=True)
     location = fields.MediumCharField()
     link = fields.OptionalURLField()
     salary = fields.MediumCharField()
@@ -57,11 +58,8 @@ class Job(models.Model):
     work_setup = fields.ChoiceIntegerField(WORK_SETUP_CHOICES)
     job_type = fields.ChoiceIntegerField(JOB_TYPE_CHOICES)
 
-    def __str__(self):
-        return f"{self.title} @ {self.company}"
 
-
-class FollowUp(models.Model):
+class FollowUp(CustomModel):
     FOLLOWUP_STATUS_CHOICES = [
         (0, "No Response"),
         (1, "Initial Follow-up"),
@@ -73,7 +71,7 @@ class FollowUp(models.Model):
     ]
     job = fields.CascadeRequiredForeignKey(Job)
     date = fields.OptionalDateField()
-    message = fields.LongCharField()
+    message = fields.LongCharField(display=True)
     status = fields.ChoiceIntegerField(FOLLOWUP_STATUS_CHOICES)
     reply = fields.LongCharField()
 

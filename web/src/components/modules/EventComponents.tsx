@@ -22,6 +22,7 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field, StateSetter } from "../../constants/interfaces";
+import { IconName } from "../../blueprints/MyIcon";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -119,6 +120,18 @@ export const EventCard = observer((props: { item: Event }) => {
   const { fetchFcn, shownFields } = useEventView();
   const { eventStore } = useStore();
 
+  const moreActions = [
+    {
+      onClick: () =>
+        eventStore.updateItem(item.id, {
+          dateCompleted: item.dateCompleted ? null : new Date().toISOString(),
+        }),
+      icon: (item.dateCompleted
+        ? "CheckBox"
+        : "CheckBoxOutlineBlank") as IconName,
+    },
+  ];
+
   return (
     <MyGenericCard
       item={item}
@@ -129,6 +142,7 @@ export const EventCard = observer((props: { item: Event }) => {
       FormComponent={EventForm}
       deleteItem={eventStore.deleteItem}
       fetchFcn={fetchFcn}
+      moreActions={moreActions}
     />
   );
 });

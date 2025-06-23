@@ -1,23 +1,24 @@
-from django.db import models
+from core.models import CustomModel
 from core import fields
+from core.models import CustomModel
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 
-class Account(models.Model):
+class Account(CustomModel):
     # CURRENCY_CHOICES = [
     #     (0, "PHP"),
     #     (1, "USD"),
     # ]
-    name = fields.ShortCharField()
+    name = fields.ShortCharField(display=True)
     datetime_added = fields.DefaultNowField()
     # currency = fields.ChoiceIntegerField(CURRENCY_CHOICES)
 
-    def __str__(self):
-        return f"{self.pk} - {self.name}"
+    # def __str__(self):
+    #     return f"{self.pk} - {self.name}"
 
 
-class Category(models.Model):
+class Category(CustomModel):
     CATEGORY_CHOICES = [
         (0, "Expense"),
         (1, "Income"),
@@ -29,24 +30,18 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "categories"
 
-    title = fields.ShortCharField()
+    title = fields.ShortCharField(display=True)
     nature = fields.ChoiceIntegerField(CATEGORY_CHOICES)
     logo = fields.ShortCharField()
 
-    def __str__(self):
-        return f"{self.title}"
 
-
-class Transaction(models.Model):
+class Transaction(CustomModel):
     category = fields.SetNullOptionalForeignKey(Category)
-    description = fields.MediumCharField()
+    description = fields.MediumCharField(display=True)
     transmitter = fields.SetNullOptionalForeignKey(Account)
     receiver = fields.SetNullOptionalForeignKey(Account)
     amount = fields.AmountField()
     datetime_transacted = fields.DefaultNowField()
-
-    def __str__(self):
-        return f"{self.description}"
 
     def clean(self):
         super().clean()
@@ -54,18 +49,15 @@ class Transaction(models.Model):
             raise ValidationError("Transmitter and receiver must be different.")
 
 
-class Receivable(models.Model):
+class Receivable(CustomModel):
     payment = fields.OptionalManyToManyField(Transaction)
-    borrower_name = fields.ShortCharField()
+    borrower_name = fields.ShortCharField(display=True)
     lent_amount = fields.AmountField()
-    description = fields.MediumCharField()
+    description = fields.MediumCharField(display=True)
     datetime_opened = fields.DefaultNowField()
     datetime_due = fields.OptionalDateTimeField()
     datetime_closed = fields.OptionalDateTimeField()
     is_active = fields.DefaultBooleanField(True)
-
-    def __str__(self):
-        return f"{self.borrower_name} - {self.description}"
 
     def payment_total(self):
         return sum(p.amount for p in self.payment.all())
@@ -77,18 +69,15 @@ class Receivable(models.Model):
             self.save()
 
 
-class Payable(models.Model):
+class Payable(CustomModel):
     payment = fields.OptionalManyToManyField(Transaction)
-    lender_name = fields.ShortCharField()
+    lender_name = fields.ShortCharField(display=True)
     datetime_opened = fields.DefaultNowField()
     datetime_due = fields.OptionalDateTimeField()
-    description = fields.MediumCharField()
+    description = fields.MediumCharField(display=True)
     datetime_closed = fields.OptionalDateTimeField()
     borrowed_amount = fields.AmountField()
     is_active = fields.DefaultBooleanField(True)
-
-    def __str__(self):
-        return f"{self.lender_name} - {self.description}"
 
     def payment_total(self):
         return sum(p.amount for p in self.payment.all())
@@ -100,7 +89,7 @@ class Payable(models.Model):
             self.save()
 
 
-class BuyListItem(models.Model):
+class BuyListItem(CustomModel):
     PRIORITY_CHOICES = [
         (0, "Low"),
         (1, "Medium"),
@@ -113,7 +102,7 @@ class BuyListItem(models.Model):
         (2, "Canceled"),
     ]
 
-    name = fields.ShortCharField()
+    name = fields.ShortCharField(display=True)
     description = fields.MediumCharField()
     estimated_price = fields.AmountField()
     added_at = fields.AutoCreatedAtField()
@@ -121,19 +110,16 @@ class BuyListItem(models.Model):
     priority = fields.ChoiceIntegerField(PRIORITY_CHOICES)
     status = fields.ChoiceIntegerField(WISHLIST_STATUS_CHOICES)
 
-    def __str__(self):
-        return f"{self.description} (Priority: {self.get_priority_display()}, Status: {self.get_status_display()}) - ${self.estimated_price}"
 
-
-class InventoryCategory(models.Model):
+class InventoryCategory(CustomModel):
     name = fields.ShortCharField()
 
     class Meta:
         verbose_name_plural = "inventory categories"
 
 
-class PersonalItem(models.Model):
-    name = fields.ShortCharField()
+class PersonalItem(CustomModel):
+    name = fields.ShortCharField(display=True)
     category = fields.SetNullOptionalForeignKey(InventoryCategory)
     location = fields.ShortCharField()
     quantity = fields.LimitedDecimalField(1)

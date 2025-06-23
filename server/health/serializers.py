@@ -1,32 +1,32 @@
-from rest_framework import serializers
 from .models import *
+from core.serializers import CustomSerializer
 
 
-class WeighInSerializer(serializers.ModelSerializer):
+class WeighInSerializer(CustomSerializer):
     class Meta:
         model = WeighIn
         fields = "__all__"
 
 
-class BodyFatSerializer(serializers.ModelSerializer):
+class BodyFatSerializer(CustomSerializer):
     class Meta:
         model = BodyFat
         fields = "__all__"
 
 
-class WaistMeasurementSerializer(serializers.ModelSerializer):
+class WaistMeasurementSerializer(CustomSerializer):
     class Meta:
         model = WaistMeasurement
         fields = "__all__"
 
 
-class MealSerializer(serializers.ModelSerializer):
+class MealSerializer(CustomSerializer):
     class Meta:
         model = Meal
         fields = "__all__"
 
 
-class WorkoutSerializer(serializers.ModelSerializer):
+class WorkoutSerializer(CustomSerializer):
     class Meta:
         model = Workout
         fields = "__all__"

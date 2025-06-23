@@ -1,28 +1,28 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate, hashers, password_validation
-from django.contrib.auth.models import User
+from core.serializers import CustomSerializer
+from django.db import models
 from .models import *
 
 
-class AccountSerializer(serializers.ModelSerializer):
+class AccountSerializer(CustomSerializer):
     class Meta:
         model = Account
         fields = "__all__"
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(CustomSerializer):
     class Meta:
         model = Category
         fields = "__all__"
 
 
-class BuyListItemSerializer(serializers.ModelSerializer):
+class BuyListItemSerializer(CustomSerializer):
     class Meta:
         model = BuyListItem
         fields = "__all__"
 
 
-class TransactionSerializer(serializers.ModelSerializer):
+class TransactionSerializer(CustomSerializer):
     receivableId = serializers.IntegerField(
         required=False, allow_null=True, write_only=True
     )
@@ -46,7 +46,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         return data
 
 
-class ReceivableSerializer(serializers.ModelSerializer):
+class ReceivableSerializer(CustomSerializer):
     payment_total = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -57,7 +57,7 @@ class ReceivableSerializer(serializers.ModelSerializer):
         return obj.payment.aggregate(total=models.Sum("amount"))["total"] or 0
 
 
-class PayableSerializer(serializers.ModelSerializer):
+class PayableSerializer(CustomSerializer):
     payment_total = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -68,13 +68,13 @@ class PayableSerializer(serializers.ModelSerializer):
         return obj.payment.aggregate(total=models.Sum("amount"))["total"] or 0
 
 
-class InventoryCategorySerializer(serializers.ModelSerializer):
+class InventoryCategorySerializer(CustomSerializer):
     class Meta:
         model = InventoryCategory
         fields = "__all__"
 
 
-class PersonalItemSerializer(serializers.ModelSerializer):
+class PersonalItemSerializer(CustomSerializer):
     class Meta:
         model = PersonalItem
         fields = "__all__"

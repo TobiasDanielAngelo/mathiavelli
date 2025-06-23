@@ -1,22 +1,22 @@
-from django.db import models
+from core.models import CustomModel
 from finance.models import Account
 from core import fields
 
 
-class Journal(models.Model):
+class Journal(CustomModel):
     title = fields.ShortCharField()
     description = fields.LongCharField()
     datetime_created = fields.DefaultNowField()
 
 
-class Platform(models.Model):
+class Platform(CustomModel):
     name = fields.ShortCharField()
 
     def __str__(self):
         return self.name
 
 
-class Credential(models.Model):
+class Credential(CustomModel):
     AUTHENTICATOR_CHOICES = [
         (0, "None"),
         (1, "Google Authenticator"),

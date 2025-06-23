@@ -1,14 +1,14 @@
-from rest_framework import serializers
+from core.serializers import CustomSerializer
 from .models import *
 
 
-class JobSerializer(serializers.ModelSerializer):
+class JobSerializer(CustomSerializer):
     class Meta:
         model = Job
         fields = "__all__"
 
 
-class FollowUperializer(serializers.ModelSerializer):
+class FollowUperializer(CustomSerializer):
     class Meta:
         model = FollowUp
         fields = "__all__"

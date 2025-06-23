@@ -22,7 +22,8 @@ class DecimalField(models.DecimalField):
 
 
 class LongCharField(models.CharField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, display=False, *args, **kwargs):
+        self.display = display
         kwargs.setdefault("max_length", 1023)
         kwargs.setdefault("default", "")
         kwargs.setdefault("blank", True)
@@ -30,7 +31,8 @@ class LongCharField(models.CharField):
 
 
 class MediumCharField(models.CharField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, display=False, *args, **kwargs):
+        self.display = display
         kwargs.setdefault("max_length", 255)
         kwargs.setdefault("default", "")
         kwargs.setdefault("blank", True)
@@ -38,7 +40,8 @@ class MediumCharField(models.CharField):
 
 
 class ShortCharField(models.CharField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, display=False, *args, **kwargs):
+        self.display = display
         kwargs.setdefault("max_length", 50)
         kwargs.setdefault("default", "")
         kwargs.setdefault("blank", True)
@@ -48,6 +51,8 @@ class ShortCharField(models.CharField):
 class ColorField(models.CharField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("max_length", 7)
+        kwargs.setdefault("default", "")
+        kwargs.setdefault("blank", True)
         kwargs.setdefault("help_text", "Hex color code, e.g. #FF5733")
         super().__init__(*args, **kwargs)
 

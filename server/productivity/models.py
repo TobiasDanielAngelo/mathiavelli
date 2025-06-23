@@ -1,11 +1,11 @@
-from django.db import models
+from core.models import CustomModel
 from core import fields
 from .utils import get_datetimes
 from django.core.exceptions import ValidationError
 
 
-class Productivity(models.Model):
-    title = fields.ShortCharField()
+class Productivity(CustomModel):
+    title = fields.ShortCharField(display=True)
     description = fields.MediumCharField()
     date_start = fields.OptionalDateTimeField()
     date_end = fields.OptionalDateTimeField()
@@ -17,7 +17,7 @@ class Productivity(models.Model):
         abstract = True
 
 
-class Schedule(models.Model):
+class Schedule(CustomModel):
     """
     Recurrence Range vs. Event Duration:
 
@@ -123,7 +123,7 @@ class Task(Productivity):
         unique_together = ("due_date", "importance")
 
 
-class Tag(models.Model):
+class Tag(CustomModel):
     name = fields.ShortCharField()
     color = fields.ColorField()
 
@@ -144,6 +144,6 @@ class Event(Productivity):
         return f"{self.title} ({self.date_start} - {self.date_end})"
 
 
-class HabitLog(models.Model):
+class HabitLog(CustomModel):
     habit = fields.CascadeRequiredForeignKey(Habit)
     date_created = fields.DefaultNowField()

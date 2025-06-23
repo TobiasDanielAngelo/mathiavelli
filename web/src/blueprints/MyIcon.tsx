@@ -28,6 +28,8 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import Sort from "@mui/icons-material/Sort";
 import Today from "@mui/icons-material/Today";
+import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBox from "@mui/icons-material/CheckBox";
 import Settings from "@mui/icons-material/Settings";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
@@ -64,6 +66,8 @@ const iconMap = {
   KeyboardArrowRight,
   Settings,
   Sort,
+  CheckBox,
+  CheckBoxOutlineBlank,
 } as const;
 
 // 2. Derive type from keys

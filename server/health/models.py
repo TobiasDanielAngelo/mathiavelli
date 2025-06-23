@@ -1,23 +1,23 @@
-from django.db import models
+from core.models import CustomModel
 from core import fields
 
 
-class WeighIn(models.Model):
+class WeighIn(CustomModel):
     weight_kg = fields.DecimalField()
     date = fields.AutoCreatedAtField()
 
 
-class BodyFat(models.Model):
+class BodyFat(CustomModel):
     body_fat_percent = fields.DecimalField()
     date = fields.AutoCreatedAtField()
 
 
-class WaistMeasurement(models.Model):
+class WaistMeasurement(CustomModel):
     waist_cm = fields.DecimalField()
     date = fields.AutoCreatedAtField()
 
 
-class Meal(models.Model):
+class Meal(CustomModel):
     MEAL_CATEGORY_CHOICES = [
         (0, "Breakfast"),
         (1, "Lunch"),
@@ -31,7 +31,7 @@ class Meal(models.Model):
     date = fields.DefaultNowField()
 
 
-class Workout(models.Model):
+class Workout(CustomModel):
     WORKOUT_CATEGORY_CHOICES = [
         (0, "Cardio"),
         (1, "Upper Body"),

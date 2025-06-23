@@ -2,9 +2,10 @@ from rest_framework import serializers
 from .models import *
 from .utils import get_datetimes
 from django.utils import timezone
+from core.serializers import CustomSerializer
 
 
-class EventSerializer(serializers.ModelSerializer):
+class EventSerializer(CustomSerializer):
     class Meta:
         model = Event
         fields = "__all__"
@@ -22,13 +23,13 @@ class EventSerializer(serializers.ModelSerializer):
         return data
 
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(CustomSerializer):
     class Meta:
         model = Tag
         fields = "__all__"
 
 
-class GoalSerializer(serializers.ModelSerializer):
+class GoalSerializer(CustomSerializer):
 
     class Meta:
         model = Goal
@@ -54,7 +55,7 @@ class GoalSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(CustomSerializer):
     class Meta:
         model = Task
         fields = "__all__"
@@ -72,7 +73,7 @@ class TaskSerializer(serializers.ModelSerializer):
         return super().validate(data)
 
 
-class ScheduleSerializer(serializers.ModelSerializer):
+class ScheduleSerializer(CustomSerializer):
     datetimes = serializers.SerializerMethodField()
 
     class Meta:
@@ -83,13 +84,13 @@ class ScheduleSerializer(serializers.ModelSerializer):
         return get_datetimes(obj)
 
 
-class HabitSerializer(serializers.ModelSerializer):
+class HabitSerializer(CustomSerializer):
     class Meta:
         model = Habit
         fields = "__all__"
 
 
-class HabitLogSerializer(serializers.ModelSerializer):
+class HabitLogSerializer(CustomSerializer):
     class Meta:
         model = HabitLog
         fields = "__all__"
