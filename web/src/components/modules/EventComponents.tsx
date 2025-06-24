@@ -5,11 +5,17 @@ import { Event, EventFields, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
 import { CalendarView, MyCalendar } from "../../blueprints/MyCalendar";
-import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
+import {
+  IAction,
+  MyGenericCard,
+} from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
-import { createGenericViewContext } from "../../blueprints/MyGenericComponents/MyGenericProps";
+import {
+  createGenericContext,
+  createGenericViewContext,
+} from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
@@ -17,12 +23,12 @@ import {
   MyGenericView,
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
+import { IconName } from "../../blueprints/MyIcon";
 import { MyLockedCard } from "../../blueprints/MyLockedCard";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field, StateSetter } from "../../constants/interfaces";
-import { IconName } from "../../blueprints/MyIcon";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -129,8 +135,9 @@ export const EventCard = observer((props: { item: Event }) => {
       icon: (item.dateCompleted
         ? "CheckBox"
         : "CheckBoxOutlineBlank") as IconName,
+      color: item.dateCompleted ? "success" : "inherit",
     },
-  ];
+  ] satisfies IAction[];
 
   return (
     <MyGenericCard
@@ -155,13 +162,12 @@ export const EventDashboard = observer(
     setView: StateSetter<CalendarView>;
     range: string;
   }) => {
-    const { range } = props;
     const { eventStore } = useStore();
+    const { range } = props;
 
     useEffect(() => {
       eventStore.fetchMissingEvents(`range=${range}`);
     }, [range]);
-
     return (
       <MyLockedCard isUnlocked>
         <MyCalendar
@@ -175,34 +181,9 @@ export const EventDashboard = observer(
 
 export const EventCollection = observer(() => {
   const { eventStore } = useStore();
-  const { PageBar } = useEventView();
-  const [date, setDate] = useState(new Date());
-  const [view, setView] = useState<CalendarView>("month");
+  const { PageBar, pageDetails } = useEventView();
+  const values = useMoreEventView();
 
-  const range =
-    view === "month"
-      ? moment(date).format("YYYY-MM")
-      : view === "year"
-      ? moment(date).format("YYYY")
-      : `${Math.floor(moment(date).year() / 10)}X`;
-
-  const filteredItems = eventStore.items
-    .filter((s) => {
-      const m = moment(s.dateStart);
-      if (view === "month") return m.format("YYYY-MM") === range;
-      if (view === "year") return m.format("YYYY") === range;
-      if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;
-      return false;
-    })
-    .filter((s) => !s.isArchived);
-
-  const values = {
-    date,
-    setDate,
-    view,
-    setView,
-    range,
-  };
   return (
     <>
       <SideBySideView
@@ -210,9 +191,9 @@ export const EventCollection = observer(() => {
           <MyGenericCollection
             CardComponent={EventCard}
             title={title}
-            pageDetails={undefined}
+            pageDetails={pageDetails}
             PageBar={PageBar}
-            items={filteredItems}
+            items={eventStore.items.filter((s) => !s.isArchived)}
           />
         }
         SideB={<EventDashboard {...values} />}
@@ -266,11 +247,34 @@ export const EventTable = observer(() => {
   );
 });
 
+export interface Props {
+  date: Date;
+  setDate: StateSetter<Date>;
+  view: CalendarView;
+  setView: StateSetter<CalendarView>;
+  range: string;
+}
+
+export const { Context: MoreEventContext, useGeneric: useMoreEventView } =
+  createGenericContext<Props>();
+
 export const EventView = observer(() => {
   const { eventStore, tagStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<EventInterface, Event>("Event", new Event({}));
-  const { params, setPageDetails } = values;
+  const [date, setDate] = useState(new Date());
+  const [view, setView] = useState<CalendarView>("month");
+  const range =
+    view === "month"
+      ? moment(date).format("YYYY-MM")
+      : view === "year"
+      ? moment(date).format("YYYY")
+      : `${Math.floor(moment(date).year() / 10)}X`;
+
+  const start = moment(date).startOf(view as any); // "month" → 1st of month, etc.
+  const end = moment(date).endOf(view as any); // "month" → last day of month
+
+  const { setParams, params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await eventStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
@@ -278,6 +282,24 @@ export const EventView = observer(() => {
     }
     setPageDetails(resp.pageDetails);
   };
+  const fetchRange = async () => {
+    const newParams = new URLSearchParams({
+      page: "all",
+      date_start__gte: start.format("YYYY-MM-DD"),
+      date_start__lte: end.format("YYYY-MM-DD"),
+    });
+    setParams(newParams);
+    console.log(newParams);
+    const resp = await eventStore.fetchAll(newParams.toString());
+    if (!resp.ok || !resp.data) {
+      return;
+    }
+    setPageDetails(resp.pageDetails);
+  };
+
+  useEffect(() => {
+    fetchRange();
+  }, [range]);
 
   const itemMap = useMemo(
     () =>
@@ -293,20 +315,30 @@ export const EventView = observer(() => {
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
+  const value = {
+    date,
+    setDate,
+    view,
+    setView,
+    range,
+  };
+
   return (
-    <MyGenericView<EventInterface>
-      title={title}
-      Context={EventViewContext}
-      CollectionComponent={EventCollection}
-      FormComponent={EventForm}
-      FilterComponent={EventFilter}
-      actionModalDefs={actionModalDefs}
-      TableComponent={EventTable}
-      fetchFcn={fetchFcn}
-      isVisible={isVisible}
-      setVisible={setVisible}
-      itemMap={itemMap}
-      {...values}
-    />
+    <MoreEventContext.Provider value={value}>
+      <MyGenericView<EventInterface>
+        title={title}
+        Context={EventViewContext}
+        CollectionComponent={EventCollection}
+        FormComponent={EventForm}
+        FilterComponent={EventFilter}
+        actionModalDefs={actionModalDefs}
+        TableComponent={EventTable}
+        fetchFcn={fetchFcn}
+        isVisible={isVisible}
+        setVisible={setVisible}
+        itemMap={itemMap}
+        {...values}
+      />
+    </MoreEventContext.Provider>
   );
 });

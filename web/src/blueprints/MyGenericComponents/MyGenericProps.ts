@@ -12,6 +12,7 @@ export interface GenericViewProps<T> {
   params: URLSearchParams;
   setParams: SetURLSearchParams;
   pageDetails: PaginatedDetails | undefined;
+  setPageDetails: StateSetter<PaginatedDetails | undefined>;
   PageBar: React.FC;
   fetchFcn: () => void;
   itemMap: KV<any>[];
@@ -29,4 +30,16 @@ export function createGenericViewContext<T>() {
   };
 
   return { Context, useGenericView };
+}
+
+export function createGenericContext<T>() {
+  const Context = createContext<T | null>(null);
+
+  const useGeneric = () => {
+    const ctx = useContext(Context);
+    if (!ctx) throw new Error("useGeneric must be used within its provider");
+    return ctx;
+  };
+
+  return { Context, useGeneric };
 }

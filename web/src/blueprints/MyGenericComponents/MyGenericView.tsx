@@ -88,6 +88,7 @@ export const MyGenericView = observer(
     availableGraphs: GraphType[];
     actionModalDefs?: readonly ActionModalDef[];
     pageDetails: PaginatedDetails | undefined;
+    setPageDetails: StateSetter<PaginatedDetails | undefined>;
     isVisible: VisibleMap;
     setVisible: (index: number, visible: boolean) => void;
     params: URLSearchParams;
@@ -110,6 +111,7 @@ export const MyGenericView = observer(
       setShownFields,
       availableGraphs,
       pageDetails,
+      setPageDetails,
       params,
       setParams,
       itemMap,
@@ -282,6 +284,7 @@ export const MyGenericView = observer(
       params,
       setParams,
       pageDetails,
+      setPageDetails,
       PageBar,
       fetchFcn,
       itemMap,

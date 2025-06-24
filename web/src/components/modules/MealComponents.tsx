@@ -86,7 +86,7 @@ export const MealCard = observer((props: { item: Meal }) => {
       item={item}
       shownFields={shownFields}
       header={["id"]}
-      important={["name", "categoryName"]}
+      important={["name"]}
       prices={MealFields.pricesFields}
       FormComponent={MealForm}
       deleteItem={mealStore.deleteItem}

@@ -8,15 +8,15 @@ import finance from "/images/finance.png";
 import followUps from "/images/follow-ups.png";
 import goals from "/images/goals.png";
 import back from "/images/back.png";
-import habitLogs from "/images/habit-logs.png";
+import logs from "/images/logs.png";
 import habits from "/images/habits.png";
 import health from "/images/health.png";
-import inventoryCategories from "/images/inventory-categories.png";
+import inventoryTypes from "/images/inventory-types.png";
 import jobs from "/images/jobs.png";
 import journals from "/images/journals.png";
 import meals from "/images/meals.png";
 import payables from "/images/payables.png";
-import personalItems from "/images/personal-items.png";
+import inventory from "/images/inventory.png";
 import personal from "/images/personal.png";
 import platforms from "/images/platforms.png";
 import productivity from "/images/productivity.png";
@@ -29,6 +29,8 @@ import waistMeasure from "/images/waist-measure.png";
 import weighIns from "/images/weigh-ins.png";
 import wishlist from "/images/wishlist.png";
 import workouts from "/images/workouts.png";
+import { useState } from "react";
+import { MyIcon } from "./MyIcon";
 
 const IMAGES: Record<string, string> = {
   accounts,
@@ -41,15 +43,15 @@ const IMAGES: Record<string, string> = {
   followUps,
   back,
   goals,
-  habitLogs,
+  logs,
   habits,
   health,
-  inventoryCategories,
+  inventoryTypes,
   jobs,
   journals,
   meals,
   payables,
-  personalItems,
+  inventory,
   personal,
   platforms,
   productivity,
@@ -68,11 +70,21 @@ type MyImageProps = {
   image?: keyof typeof IMAGES;
 };
 
-export const MyImage = ({ image = "accounts" }: MyImageProps) => (
-  <img
-    src={IMAGES[image]}
-    alt={image}
-    onError={(e) => (e.currentTarget.src = IMAGES["accounts"])}
-    className="w-full h-full object-contain"
-  />
-);
+export const MyImage = ({ image = "accounts" }: MyImageProps) => {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <>
+      <img
+        src={IMAGES[image]}
+        onLoad={() => setLoading(false)}
+        onError={() => {
+          setLoading(false);
+          console.error("Image failed to load.");
+        }}
+        className="w-full h-full object-contain"
+      />
+      {loading ? <MyIcon icon="RestartAlt" style={{ fontSize: 48 }} /> : <></>}
+    </>
+  );
+};

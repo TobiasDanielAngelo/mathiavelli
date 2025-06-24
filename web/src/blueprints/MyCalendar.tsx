@@ -1,17 +1,43 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
 import { useState } from "react";
-import { useWindowWidth } from "../constants/hooks";
+import { sortByKey } from "../constants/helpers";
+import { useVisible, useWindowWidth } from "../constants/hooks";
 import { StateSetter } from "../constants/interfaces";
 import { GuidedDiv } from "./MyGuidedDiv";
 import { MyIcon } from "./MyIcon";
-import { sortByKey } from "../constants/helpers";
+import { MyModal } from "./MyModal";
 
 type CalendarEvent = {
   id: string | number;
   title: string;
   dateStart: string;
   dateEnd: string;
+};
+
+const EventItem = (props: { label: string; modalContent: React.ReactNode }) => {
+  const { label, modalContent } = props;
+  const { isVisible1, setVisible1 } = useVisible();
+  const width = useWindowWidth();
+
+  return (
+    <>
+      <MyModal
+        isVisible={isVisible1}
+        setVisible={setVisible1}
+        title="Events"
+        disableClose
+      >
+        {modalContent}
+      </MyModal>
+      <MyIcon
+        icon="Event"
+        fontSize="small"
+        label={width > 1024 ? label : ""}
+        onDoubleClick={() => setVisible1(true)}
+      />
+    </>
+  );
 };
 
 export type CalendarView = "month" | "year" | "decade";
@@ -27,7 +53,6 @@ export const MyCalendar = observer(
   }) => {
     const { date, setDate, view, setView, events, renderEventContent } = props;
     const [currentDate, setCurrentDate] = useState(moment());
-    const width = useWindowWidth();
 
     const startDecade = Math.floor(currentDate.year() / 10) * 10;
 
@@ -106,7 +131,7 @@ export const MyCalendar = observer(
                     ""
                   )
                 }
-                className={`text-right text-sm md:text-md items-right justify-between flex flex-row-reverse p-1 md:p-2 rounded cursor-pointer
+                className={`md:flex-row-reverse text-right text-sm md:text-md items-right justify-between flex flex-col-reverse p-1 md:p-2 rounded cursor-pointer
                 ${day.month() === currentDate.month() ? "" : "text-gray-500"}
                 ${isWeekend ? "text-red-500" : ""}
                 ${isToday ? "text-blue-500 font-bold" : ""}
@@ -115,14 +140,22 @@ export const MyCalendar = observer(
                 {day.date()}
 
                 <div>
-                  {renderEventContent && width > 1024
+                  {renderEventContent
                     ? renderEventContent(dayEvents)
-                    : dayEvents.length > 0 &&
-                      width > 1024 && (
-                        <MyIcon
-                          icon="Event"
-                          fontSize="small"
+                    : dayEvents.length > 0 && (
+                        <EventItem
                           label={String(dayEvents.length)}
+                          modalContent={
+                            dayEvents.length > 0 ? (
+                              <div className="text-center text-gray-300">
+                                {dayEvents.map((s) => (
+                                  <div key={s.id}>{s.title}</div>
+                                ))}
+                              </div>
+                            ) : (
+                              <></>
+                            )
+                          }
                         />
                       )}
                 </div>

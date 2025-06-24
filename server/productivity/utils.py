@@ -37,7 +37,6 @@ def get_datetimes(obj):
     start_dt = timezone.make_aware(
         datetime.combine(obj.start_date, obj.start_time or time(0, 0))
     )
-    print(start_dt)
     if obj.end_date:
         end_dt = timezone.make_aware(
             datetime.combine(obj.end_date, obj.end_time or time(23, 59))
@@ -187,7 +186,12 @@ def generate_missing_events(params=None):
             .exclude(date_start__in=datetimes)
             .update(is_archived=True)
         )
-        print(f"Archived {updated} incorrect events.")
+        print(
+            f"Archived {updated} incorrect events for task {task.pk}.",
+            Event.objects.filter(task=task)
+            .exclude(date_start__in=datetimes)
+            .values("id"),
+        )
 
         filtered_datetimes = [dt for dt in datetimes if is_in_range(dt)]
         for dt in filtered_datetimes:

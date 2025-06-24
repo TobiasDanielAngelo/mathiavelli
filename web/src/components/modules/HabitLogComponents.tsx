@@ -165,7 +165,7 @@ export const HabitLogTable = observer(() => {
 });
 
 export const HabitLogView = observer(() => {
-  const { habitLogStore } = useStore();
+  const { habitLogStore, habitStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<HabitLogInterface, HabitLog>(
     "HabitLog",
@@ -178,6 +178,10 @@ export const HabitLogView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
+    const habits = resp.data.map((s) => s.habit);
+    if (habits.length) {
+      habitStore.fetchAll(`id__in=${habits.join(",")}`);
+    }
   };
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);

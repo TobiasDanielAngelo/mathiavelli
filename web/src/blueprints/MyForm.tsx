@@ -134,6 +134,7 @@ type FormProps = {
   details: any;
   setDetails: (t: any) => void;
   onClickSubmit: () => void;
+  onClickSubmitAdd: () => void;
   hasDelete?: boolean;
   onDelete?: () => Promise<void>;
   msg?: Object;
@@ -154,6 +155,7 @@ export const MyForm = observer(
     details,
     setDetails,
     onClickSubmit,
+    onClickSubmitAdd,
     hasDelete,
     onDelete,
     msg,
@@ -209,8 +211,18 @@ export const MyForm = observer(
           <div>{getMsg(msg, "detail")}</div>
         </label>
         <div className="flex flex-row-reverse justify-between items-center">
-          <MyButton onClick={onClickSubmit} isLoading={isLoading} />
-          {hasDelete && (
+          <MyButton
+            onClick={onClickSubmit}
+            isLoading={isLoading}
+            label="Save"
+          />
+          {!hasDelete ? (
+            <MyButton
+              onClick={onClickSubmitAdd}
+              isLoading={isLoading}
+              label="Save and Add"
+            />
+          ) : (
             <MyIcon icon="Delete" fontSize="large" onClick={onClickDelete} />
           )}
         </div>

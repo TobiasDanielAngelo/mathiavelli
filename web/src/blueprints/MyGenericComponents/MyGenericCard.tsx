@@ -11,6 +11,16 @@ import { MyModal } from "../MyModal";
 export interface IAction {
   onClick: () => void;
   icon: IconName;
+  color?:
+    | "inherit"
+    | "action"
+    | "disabled"
+    | "primary"
+    | "secondary"
+    | "error"
+    | "info"
+    | "success"
+    | "warning";
 }
 
 interface MyGenericCardProps<T> extends ItemDetailsProps<T> {
@@ -112,6 +122,7 @@ export const MyGenericCard = observer(
                   onClick={s.onClick}
                   fontSize="small"
                   key={ind}
+                  color={s.color}
                 />
               ))}
               <MyIcon

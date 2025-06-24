@@ -102,6 +102,15 @@ export function MyGenericForm<T>({
     setVisible?.(false);
   };
 
+  const onClickCreateAdd = async () => {
+    setLoading(true);
+    const resp = await store.addItem(transformTo(details));
+    setLoading(false);
+    if (!resp.ok) return setMsg(resp.details);
+    fetchFcn?.();
+    setDetails(transformFrom({} as T));
+  };
+
   const onClickEdit = async () => {
     if (!item?.id) return;
     setLoading(true);
@@ -130,6 +139,7 @@ export function MyGenericForm<T>({
         details={details}
         setDetails={setDetails}
         onClickSubmit={item?.id ? onClickEdit : onClickCreate}
+        onClickSubmitAdd={onClickCreateAdd}
         hasDelete={!!item?.id}
         onDelete={onClickDelete}
         msg={msg}

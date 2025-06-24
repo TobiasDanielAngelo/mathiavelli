@@ -31,6 +31,7 @@ import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { WeighInView } from "../modules/WeighInComponents";
 import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
+import { FinanceView } from "../modules/FinanceComponents";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -108,13 +109,11 @@ export const MainView = observer(() => {
         <Route path="meals" element={<MealView />} />
         <Route path="weigh-ins" element={<WeighInView />} />
         <Route path="workouts" element={<WorkoutView />} />
-        <Route
-          path="inventory-categories"
-          element={<InventoryCategoryView />}
-        />
-        <Route path="personal-items" element={<PersonalItemView />} />
+        <Route path="inventory-types" element={<InventoryCategoryView />} />
+        <Route path="inventory" element={<PersonalItemView />} />
+        <Route path="finance" element={<FinanceView />} />
         <Route path="habits" element={<HabitView />} />
-        <Route path="habit-logs" element={<HabitLogView />} />
+        <Route path="logs" element={<HabitLogView />} />
         <Route path="schedules" element={<ScheduleView />} />
       </Routes>
     </div>
