@@ -274,22 +274,22 @@ export const EventView = observer(() => {
   const start = moment(date).startOf(view as any); // "month" → 1st of month, etc.
   const end = moment(date).endOf(view as any); // "month" → last day of month
 
-  const { setParams, params, setPageDetails } = values;
+  const { setParams, setPageDetails } = values;
+  // const fetchFcn = async () => {
+  //   const resp = await eventStore.fetchAll(params.toString());
+  //   if (!resp.ok || !resp.data) {
+  //     return;
+  //   }
+  //   setPageDetails(resp.pageDetails);
+  // };
   const fetchFcn = async () => {
-    const resp = await eventStore.fetchAll(params.toString());
-    if (!resp.ok || !resp.data) {
-      return;
-    }
-    setPageDetails(resp.pageDetails);
-  };
-  const fetchRange = async () => {
     const newParams = new URLSearchParams({
       page: "all",
-      date_start__gte: start.format("YYYY-MM-DD"),
-      date_start__lte: end.format("YYYY-MM-DD"),
+      date_start__gte: start.toISOString(),
+      date_start__lte: end.toISOString(),
+      order_by: "-date_start",
     });
     setParams(newParams);
-    console.log(newParams);
     const resp = await eventStore.fetchAll(newParams.toString());
     if (!resp.ok || !resp.data) {
       return;
@@ -298,7 +298,7 @@ export const EventView = observer(() => {
   };
 
   useEffect(() => {
-    fetchRange();
+    fetchFcn();
   }, [range]);
 
   const itemMap = useMemo(

@@ -90,7 +90,9 @@ export const MyGenericTable = observer(
 
     const matrix = useMemo(() => {
       const header = [
-        ...shownFields.map((k) => <HeaderWithSort k={k} key={k} />),
+        ...shownFields
+          .filter((s) => Object.keys(items[0].$).includes(s))
+          .map((k) => <HeaderWithSort k={k} key={k} />),
         "Actions",
       ];
       const rows = items
@@ -99,10 +101,12 @@ export const MyGenericTable = observer(
           return (pageIds.indexOf(a.id) ?? 0) - (pageIds.indexOf(b.id) ?? 0);
         })
         .map((item) => [
-          ...shownFields.map((key) => {
-            const kv = itemMap?.find((s) => s.key === key);
-            return formatValue(item[key], key, priceFields, kv);
-          }),
+          ...shownFields
+            .filter((s) => Object.keys(items[0].$).includes(s))
+            .map((key) => {
+              const kv = itemMap?.find((s) => s.key === key);
+              return formatValue(item[key], key, priceFields, kv);
+            }),
           renderActions(item),
         ]);
 

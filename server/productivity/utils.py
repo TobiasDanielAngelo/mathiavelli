@@ -187,16 +187,18 @@ def generate_missing_events(params=None):
             .update(is_archived=True)
         )
         print(
-            f"Archived {updated} incorrect events for task {task.pk}.",
-            Event.objects.filter(task=task)
-            .exclude(date_start__in=datetimes)
-            .values("id"),
+            f"Archived {updated} incorrect events for task {task.pk} - {list(
+                Event.objects.filter(task=task)
+                .exclude(date_start__in=datetimes)
+                .values_list("id", flat=True)
+            )}."
         )
 
         filtered_datetimes = [dt for dt in datetimes if is_in_range(dt)]
         for dt in filtered_datetimes:
             if Event.objects.filter(task=task, date_start=dt).exists():
-                print("Event already exists.")
+                pass
+                # print("Event already exists.")
             else:
                 event = Event.objects.create(
                     title=task.title,

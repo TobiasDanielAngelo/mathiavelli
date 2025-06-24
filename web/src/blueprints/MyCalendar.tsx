@@ -111,9 +111,6 @@ export const MyCalendar = observer(
                   moment(e.dateStart).format("YYYY-MM-DD") ||
                 day.format("YYYY-MM-DD") ===
                   moment(e.dateEnd).format("YYYY-MM-DD")
-              // new TwoDates(e.start, e.end).contains(
-              //   day.endOf("day").subtract(1, "second").toDate()
-              // )
             );
 
             return (
@@ -122,9 +119,11 @@ export const MyCalendar = observer(
                 onClick={() => setDate(day.toDate())}
                 title={
                   dayEvents.length > 0 ? (
-                    <div className="text-center">
-                      {dayEvents.map((s) => (
-                        <div key={s.id}>{s.title}</div>
+                    <div className="text-right">
+                      {sortByKey(dayEvents, "dateStart").map((s) => (
+                        <div key={s.id}>
+                          {s.title} - {moment(s.dateStart).format("h:mm A")}
+                        </div>
                       ))}
                     </div>
                   ) : (
@@ -147,9 +146,12 @@ export const MyCalendar = observer(
                           label={String(dayEvents.length)}
                           modalContent={
                             dayEvents.length > 0 ? (
-                              <div className="text-center text-gray-300">
-                                {dayEvents.map((s) => (
-                                  <div key={s.id}>{s.title}</div>
+                              <div className="text-right text-gray-300">
+                                {sortByKey(dayEvents, "dateStart").map((s) => (
+                                  <div key={s.id}>
+                                    {s.title} -{" "}
+                                    {moment(s.dateStart).format("h:mm A")}
+                                  </div>
                                 ))}
                               </div>
                             ) : (

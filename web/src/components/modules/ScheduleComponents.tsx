@@ -230,7 +230,7 @@ export const ScheduleDashboard = observer(
       })
       .map((s, ind) => ({
         id: ind,
-        title: `${s.name} - ${moment(s.collidingDate).format("h:mm A")}`,
+        title: s.name,
         dateStart: s.collidingDate.toISOString(),
         dateEnd: s.collidingDate.toISOString(),
       }));
