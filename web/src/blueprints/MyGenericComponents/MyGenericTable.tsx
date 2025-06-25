@@ -91,7 +91,7 @@ export const MyGenericTable = observer(
     const matrix = useMemo(() => {
       const header = [
         ...shownFields
-          .filter((s) => Object.keys(items[0].$).includes(s))
+          .filter((s) => Object.keys(items[0].$view).includes(s))
           .map((k) => <HeaderWithSort k={k} key={k} />),
         "Actions",
       ];
@@ -102,7 +102,7 @@ export const MyGenericTable = observer(
         })
         .map((item) => [
           ...shownFields
-            .filter((s) => Object.keys(items[0].$).includes(s))
+            .filter((s) => Object.keys(items[0].$view).includes(s))
             .map((key) => {
               const kv = itemMap?.find((s) => s.key === key);
               return formatValue(item[key], key, priceFields, kv);

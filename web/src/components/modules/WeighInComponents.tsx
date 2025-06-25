@@ -75,8 +75,7 @@ export const WeighInCard = observer((props: { item: WeighIn }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["id"]}
-      important={["weightKg"]}
+      header={["id", "date"]}
       prices={WeighInFields.pricesFields}
       FormComponent={WeighInForm}
       deleteItem={weighInStore.deleteItem}

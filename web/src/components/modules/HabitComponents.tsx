@@ -19,6 +19,7 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field } from "../../constants/interfaces";
+import { ScheduleForm } from "./ScheduleComponents";
 
 export const { Context: HabitViewContext, useGenericView: useHabitView } =
   createGenericViewContext<HabitInterface>();
@@ -56,7 +57,7 @@ export const HabitForm = ({
             name: "schedule",
             label: "Schedule",
             type: "select",
-            options: toOptions(scheduleStore.items, "definition"),
+            options: toOptions(scheduleStore.items, "name"),
           },
         ],
         [
@@ -178,7 +179,7 @@ export const HabitTable = observer(() => {
 
 export const HabitView = observer(() => {
   const { habitStore } = useStore();
-  const { isVisible, setVisible } = useVisible();
+  const { isVisible, setVisible, setVisible4 } = useVisible();
   const values = useViewValues<HabitInterface, Habit>("Habit", new Habit({}));
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
@@ -191,7 +192,14 @@ export const HabitView = observer(() => {
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
-  const actionModalDefs = [] satisfies ActionModalDef[];
+  const actionModalDefs = [
+    {
+      icon: "NoteAdd",
+      label: "SCHED",
+      name: "Add a Schedule",
+      modal: <ScheduleForm setVisible={setVisible4} />,
+    },
+  ] satisfies ActionModalDef[];
 
   return (
     <MyGenericView<HabitInterface>

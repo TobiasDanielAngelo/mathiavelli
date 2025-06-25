@@ -4,15 +4,16 @@ import { useState } from "react";
 import { sortByKey } from "../constants/helpers";
 import { useVisible, useWindowWidth } from "../constants/hooks";
 import { StateSetter } from "../constants/interfaces";
-import { GuidedDiv } from "./MyGuidedDiv";
 import { MyIcon } from "./MyIcon";
 import { MyModal } from "./MyModal";
+import { MyTable } from "./MyTable";
 
 type CalendarEvent = {
   id: string | number;
   title: string;
   dateStart: string;
   dateEnd: string;
+  dateCompleted?: string;
 };
 
 const EventItem = (props: { label: string; modalContent: React.ReactNode }) => {
@@ -114,22 +115,31 @@ export const MyCalendar = observer(
             );
 
             return (
-              <GuidedDiv
+              <div
                 key={i}
                 onClick={() => setDate(day.toDate())}
-                title={
-                  dayEvents.length > 0 ? (
-                    <div className="text-right">
-                      {sortByKey(dayEvents, "dateStart").map((s) => (
-                        <div key={s.id}>
-                          {s.title} - {moment(s.dateStart).format("h:mm A")}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    ""
-                  )
-                }
+                // title={
+                //   dayEvents.length > 0 ? (
+                //     <MyTable
+                //       matrix={[
+                //         ["Event", "Time", "Completed?"],
+                //         ...sortByKey(dayEvents, "dateStart").map((s) => [
+                //           s.title,
+                //           moment(s.dateStart).format("h:mm A"),
+                //           <MyIcon
+                //             icon={
+                //               s.dateCompleted
+                //                 ? "CheckBox"
+                //                 : "CheckBoxOutlineBlank"
+                //             }
+                //           />,
+                //         ]),
+                //       ]}
+                //     />
+                //   ) : (
+                //     ""
+                //   )
+                // }
                 className={`md:flex-row-reverse text-right text-sm md:text-md items-right justify-between flex flex-col-reverse p-1 md:p-2 rounded cursor-pointer
                 ${day.month() === currentDate.month() ? "" : "text-gray-500"}
                 ${isWeekend ? "text-red-500" : ""}
@@ -146,14 +156,24 @@ export const MyCalendar = observer(
                           label={String(dayEvents.length)}
                           modalContent={
                             dayEvents.length > 0 ? (
-                              <div className="text-right text-gray-300">
-                                {sortByKey(dayEvents, "dateStart").map((s) => (
-                                  <div key={s.id}>
-                                    {s.title} -{" "}
-                                    {moment(s.dateStart).format("h:mm A")}
-                                  </div>
-                                ))}
-                              </div>
+                              <MyTable
+                                matrix={[
+                                  ["Event", "Time", "Completed?"],
+                                  ...sortByKey(dayEvents, "dateStart").map(
+                                    (s) => [
+                                      s.title,
+                                      moment(s.dateStart).format("h:mm A"),
+                                      <MyIcon
+                                        icon={
+                                          s.dateCompleted
+                                            ? "CheckBox"
+                                            : "CheckBoxOutlineBlank"
+                                        }
+                                      />,
+                                    ]
+                                  ),
+                                ]}
+                              />
                             ) : (
                               <></>
                             )
@@ -161,7 +181,7 @@ export const MyCalendar = observer(
                         />
                       )}
                 </div>
-              </GuidedDiv>
+              </div>
             );
           })}
         </div>

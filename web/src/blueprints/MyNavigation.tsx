@@ -22,10 +22,8 @@ export const ResponsiveDrawer = observer(
     open?: boolean;
     setOpen?: StateSetter<boolean>;
     paths?: Page[];
-    location?: string;
-    setLocation?: StateSetter<string>;
   }) => {
-    const { open, setOpen, paths, setLocation } = props;
+    const { open, setOpen, paths } = props;
     const navigate = useNavigate();
     const { userStore } = useStore();
 
@@ -48,7 +46,6 @@ export const ResponsiveDrawer = observer(
               <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => {
-                    setLocation?.("/");
                     navigate("/");
                     setOpen?.(false);
                   }}
@@ -63,7 +60,6 @@ export const ResponsiveDrawer = observer(
                 <ListItem key={ind} disablePadding>
                   <ListItemButton
                     onClick={() => {
-                      setLocation && s.link && setLocation(s.link);
                       navigate(s?.link ?? "/");
                       setOpen?.(false);
                     }}
@@ -81,7 +77,6 @@ export const ResponsiveDrawer = observer(
                 <ListItem key={ind} disablePadding>
                   <ListItemButton
                     onClick={() => {
-                      setLocation?.("/");
                       userStore.logoutUser();
                       navigate("/login");
                       setOpen?.(false);
@@ -102,21 +97,12 @@ export const ResponsiveDrawer = observer(
   }
 );
 
-const NavLink = ({
-  page,
-  setLocation,
-}: {
-  page: Page;
-  setLocation?: (path: string) => void;
-}) => {
+const NavLink = ({ page }: { page: Page }) => {
   return (
     <div className="relative group px-2 py-1">
       {page.link ? (
         <Link
           to={page.link}
-          onClick={() => {
-            setLocation?.(page.link!);
-          }}
           className={
             page.selected
               ? "md:text-gray-300 font-bold"
@@ -143,9 +129,6 @@ const NavLink = ({
             <Link
               key={idx}
               to={child.link ?? ""}
-              onClick={() => {
-                setLocation?.(child.link!);
-              }}
               className="block px-4 py-2 text-sm text-white hover:bg-gray-100"
             >
               {child.title}
@@ -162,20 +145,10 @@ export const MyNavBar = observer(
     title?: string;
     drawerOpen?: boolean;
     setDrawerOpen?: StateSetter<boolean>;
-    location?: string;
-    setLocation?: StateSetter<string>;
     profileUrl?: string;
     paths?: Page[];
   }) => {
-    const {
-      title,
-      drawerOpen,
-      setDrawerOpen,
-      setLocation,
-      profileUrl,
-      paths,
-      location,
-    } = props;
+    const { title, drawerOpen, setDrawerOpen, profileUrl, paths } = props;
 
     const navigate = useNavigate();
 
@@ -190,7 +163,6 @@ export const MyNavBar = observer(
         ? p.children.filter((c) => !c.children?.length)
         : [];
 
-      // Include mainLink if present
       if (p.link) {
         leaves.push({
           title: p.title,
@@ -206,8 +178,6 @@ export const MyNavBar = observer(
           open={drawerOpen}
           setOpen={setDrawerOpen}
           paths={leafPages}
-          location={location}
-          setLocation={setLocation}
         />
         <div className="flex flex-wrap items-center justify-between mx-auto p-4">
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -216,7 +186,6 @@ export const MyNavBar = observer(
                 icon="InsertChart"
                 fontSize="large"
                 className="text-gray-700 dark:text-gray-100 hover:text-green-700 hover:scale-125 [&:not(hover)]:transition-all hover:transition-all ease-in-out hover:animate-pulse"
-                onClick={() => setLocation?.("/")}
               />
             </Link>
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
@@ -228,7 +197,7 @@ export const MyNavBar = observer(
             <ul className="font-medium flex flex-col items-center justify-center md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               {paths?.map((s, ind) => (
                 <div key={ind} className="hidden lg:block">
-                  <NavLink page={s} setLocation={setLocation} />
+                  <NavLink page={s} />
                 </div>
               ))}
               <div className="items-center content-center place-items-center place-content-center justify-center justify-items-center">
@@ -248,7 +217,6 @@ export const MyNavBar = observer(
                       title: s.title,
                       selected: false,
                       onClick: () => {
-                        setLocation && s.link && setLocation(s.link);
                         navigate(s?.link ?? "/");
                         setOpen2(false);
                       },

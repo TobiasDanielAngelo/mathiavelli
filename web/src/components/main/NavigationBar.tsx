@@ -59,6 +59,10 @@ export const NavBar = observer(
           : "Mathiavelli Self-HQ";
     }, [current]);
 
+    useEffect(() => {
+      setLoc(location.pathname.split("/")[1]);
+    }, [location]);
+
     const nav = allViewPaths.map(({ title, items, mainLink }) => {
       const allPaths = [...items, ...(mainLink ? [mainLink] : [])];
       const isSelected = allPaths.includes(current);
@@ -85,8 +89,6 @@ export const NavBar = observer(
         title="Mathiavelli Self-HQ"
         drawerOpen={open}
         setDrawerOpen={setOpen}
-        location={loc}
-        setLocation={setLoc}
         profileUrl={"#"}
         paths={nav}
       />

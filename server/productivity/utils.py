@@ -49,8 +49,7 @@ def get_datetimes(obj):
     }
 
     # Optional rule fields
-    if obj.count:
-        rule_kwargs["count"] = int(obj.count)
+    rule_kwargs["count"] = int(obj.count) if obj.count else 300
     if end_dt:
         end_dt = datetime.combine(obj.end_date, obj.end_time or time(23, 59))
         rule_kwargs["until"] = end_dt
@@ -77,7 +76,7 @@ def get_datetimes(obj):
 
     # Generate occurrences (limit for safety)
     try:
-        dates = list(rrule(**rule_kwargs))[:100]  # Limit to first 100 occurrences
+        dates = list(rrule(**rule_kwargs))[:300]  # Limit to first 300 occurrences
         return [dt.isoformat() for dt in dates]
     except Exception as e:
         return []
@@ -186,6 +185,11 @@ def generate_missing_events(params=None):
             .exclude(date_start__in=datetimes)
             .update(is_archived=True)
         )
+        deleted, _ = (
+            Event.objects.filter(task=task)
+            .filter(date_completed=None, is_archived=True)
+            .delete()
+        )
         print(
             f"Archived {updated} incorrect events for task {task.pk} - {list(
                 Event.objects.filter(task=task)
@@ -193,22 +197,36 @@ def generate_missing_events(params=None):
                 .values_list("id", flat=True)
             )}."
         )
+        print(f"Deleted {deleted} archived events that were not completed.")
 
-        filtered_datetimes = [dt for dt in datetimes if is_in_range(dt)]
-        for dt in filtered_datetimes:
-            if Event.objects.filter(task=task, date_start=dt).exists():
-                pass
-                # print("Event already exists.")
-            else:
-                event = Event.objects.create(
-                    title=task.title,
-                    description=task.description or "",
-                    date_start=dt,
-                    date_end=None,
-                    location="",
-                    task=task,
-                )
-                new_events.append(event)
-                print(f"Creating event for Task # {task.pk} at {dt}")
+        filtered_datetimes = [
+            safe_parse_datetime(dt) for dt in datetimes if is_in_range(dt)
+        ]
+        existing = set(
+            Event.objects.filter(
+                task=task, date_start__in=filtered_datetimes
+            ).values_list("date_start", flat=True)
+        )
 
+        to_create = [
+            Event(
+                title=task.title,
+                description=task.description or "",
+                date_start=dt,
+                date_end=None,
+                location="",
+                task=task,
+            )
+            for dt in filtered_datetimes
+            if dt not in existing
+        ]
+
+        Event.objects.bulk_create(to_create)
+        new_events.extend(to_create)
+
+        if to_create:
+            print(
+                f"Creating {len(to_create)} events for Task #{task.pk} "
+                f"from {to_create[0].date_start} to {to_create[-1].date_start}"
+            )
     return new_events

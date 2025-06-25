@@ -29,6 +29,7 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field, StateSetter } from "../../constants/interfaces";
+import { TwoDates } from "../../constants/classes";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -183,6 +184,7 @@ export const EventCollection = observer(() => {
   const { eventStore } = useStore();
   const { PageBar, pageDetails } = useEventView();
   const values = useMoreEventView();
+  const { date } = values;
 
   return (
     <>
@@ -193,7 +195,10 @@ export const EventCollection = observer(() => {
             title={title}
             pageDetails={pageDetails}
             PageBar={PageBar}
-            items={eventStore.items.filter((s) => !s.isArchived)}
+            items={eventStore.items.filter(
+              (s) =>
+                !s.isArchived && new TwoDates(s.dateStart, date).isEqualDate
+            )}
           />
         }
         SideB={<EventDashboard {...values} />}
@@ -259,7 +264,7 @@ export const { Context: MoreEventContext, useGeneric: useMoreEventView } =
   createGenericContext<Props>();
 
 export const EventView = observer(() => {
-  const { eventStore, tagStore } = useStore();
+  const { eventStore, tagStore, taskStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<EventInterface, Event>("Event", new Event({}));
   const [date, setDate] = useState(new Date());
@@ -269,25 +274,20 @@ export const EventView = observer(() => {
       ? moment(date).format("YYYY-MM")
       : view === "year"
       ? moment(date).format("YYYY")
-      : `${Math.floor(moment(date).year() / 10)}X`;
+      : "month";
+  // : `${Math.floor(moment(date).year() / 10)}X`;
 
-  const start = moment(date).startOf(view as any); // "month" → 1st of month, etc.
-  const end = moment(date).endOf(view as any); // "month" → last day of month
+  const start = moment(date).startOf(view as moment.unitOfTime.StartOf);
+  const end = moment(date).endOf(view as moment.unitOfTime.StartOf);
 
   const { setParams, setPageDetails } = values;
-  // const fetchFcn = async () => {
-  //   const resp = await eventStore.fetchAll(params.toString());
-  //   if (!resp.ok || !resp.data) {
-  //     return;
-  //   }
-  //   setPageDetails(resp.pageDetails);
-  // };
+
   const fetchFcn = async () => {
     const newParams = new URLSearchParams({
       page: "all",
       date_start__gte: start.toISOString(),
       date_start__lte: end.toISOString(),
-      order_by: "-date_start",
+      order_by: "date_start",
     });
     setParams(newParams);
     const resp = await eventStore.fetchAll(newParams.toString());
@@ -309,8 +309,13 @@ export const EventView = observer(() => {
           values: tagStore.items,
           label: "name",
         },
+        {
+          key: "task",
+          values: taskStore.items,
+          label: "title",
+        },
       ] satisfies KV<any>[],
-    [tagStore.items.length]
+    [tagStore.items.length, taskStore.items.length]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

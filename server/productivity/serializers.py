@@ -74,7 +74,7 @@ class TaskSerializer(CustomSerializer):
 
 
 class ScheduleSerializer(CustomSerializer):
-    datetimes = serializers.SerializerMethodField()
+    # datetimes = serializers.SerializerMethodField()
 
     class Meta:
         model = Schedule

@@ -132,7 +132,7 @@ export const MyGenericView = observer(
       {
         icon: "NoteAdd",
         label: "NEW",
-        name: "Add a Account",
+        name: `Add ${title}`,
         modal: (
           <FormComponent
             fetchFcn={fetchFcn}

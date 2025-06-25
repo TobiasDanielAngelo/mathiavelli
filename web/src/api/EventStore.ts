@@ -66,6 +66,10 @@ export class Event extends Model(props) {
     );
   }
 
+  get taskTitle() {
+    return getRoot<Store>(this)?.taskStore?.allItems.get(this.id)?.title ?? "";
+  }
+
   get dateDuration() {
     return `${moment(this.dateStart).format("lll")}${
       this.dateEnd ? " – " + moment(this.dateEnd).format("lll") : ""
@@ -78,6 +82,8 @@ export class Event extends Model(props) {
       tagsName: this.tags?.map(
         (s) => getRoot<Store>(this)?.tagStore?.allItems.get(s)?.name ?? ""
       ),
+      taskTitle:
+        getRoot<Store>(this)?.taskStore?.allItems.get(this.id)?.title ?? "",
       dateDuration: this.dateDuration,
     };
   }

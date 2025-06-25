@@ -29,7 +29,7 @@ export const {
   useGenericView: usePersonalItemView,
 } = createGenericViewContext<PersonalItemInterface>();
 
-const title = "Personal Items";
+const title = "Inventory";
 
 export const PersonalItemIdMap = {} as const;
 

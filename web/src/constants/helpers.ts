@@ -725,7 +725,7 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     byminute: schedule.byMinute?.map(Number) ?? undefined,
     bysecond: schedule.bySecond?.map(Number) ?? undefined,
     bysetpos: schedule.bySetPosition?.map(Number) ?? undefined,
-    count: Number(schedule.count) || 10,
+    count: Number(schedule.count) || 1000,
     dtstart: toUTCForRRule(start),
     until: toUTCForRRule(end),
   };
@@ -768,7 +768,7 @@ export function toRoman(num: number): string {
   return result;
 }
 
-export function toSuperscript(n: number): string {
+export function toSuperscript(n: number | string): string {
   const map: { [k: string]: string } = {
     "0": "⁰",
     "1": "¹",
@@ -780,6 +780,13 @@ export function toSuperscript(n: number): string {
     "7": "⁷",
     "8": "⁸",
     "9": "⁹",
+    I: "ᴵ",
+    V: "ⱽ",
+    X: "ˣ",
+    L: "ᴸ",
+    C: "ᶜ",
+    D: "ᴰ",
+    M: "ᴹ",
   };
   return String(n)
     .split("")
@@ -799,7 +806,7 @@ export function toRomanWithExponents(num: number): string {
   for (const [divisor, exp] of powers) {
     const part = Math.floor(num / divisor);
     if (part > 0) {
-      chunks.push(`${toRoman(part)}M${toSuperscript(exp)}`);
+      chunks.push(`${toRoman(part)}M${toSuperscript(toRoman(exp))}`);
       num %= divisor;
     }
   }
