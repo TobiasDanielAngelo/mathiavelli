@@ -342,6 +342,14 @@ class OptionalOneToOneField(OneToOneField):
         super().__init__(to, *args, **kwargs)
 
 
+class OptionalSetNullOneToOneField(OneToOneField):
+    def __init__(self, to, *args, **kwargs):
+        kwargs.setdefault("null", True)
+        kwargs.setdefault("blank", True)
+        kwargs.setdefault("on_delete", models.SET_NULL)
+        super().__init__(to, *args, **kwargs)
+
+
 class OneToOneField(OneToOneField):
     def __init__(self, to, *args, **kwargs):
         kwargs.setdefault("on_delete", models.CASCADE)

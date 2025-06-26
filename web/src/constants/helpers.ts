@@ -789,14 +789,14 @@ export function rruleToDetailedText(rule: RRule): string {
     [RRule.SECONDLY]: "Every second",
   };
 
-  const weekdayMap: Record<string, string> = {
-    MO: "Monday",
-    TU: "Tuesday",
-    WE: "Wednesday",
-    TH: "Thursday",
-    FR: "Friday",
-    SA: "Saturday",
-    SU: "Sunday",
+  const weekdayMap: Record<number, string> = {
+    0: "Mondays",
+    1: "Tuesdays",
+    2: "Wednesdays",
+    3: "Thursdays",
+    4: "Fridays",
+    5: "Saturdays",
+    6: "Sundays",
   };
 
   const monthMap = [
@@ -820,11 +820,7 @@ export function rruleToDetailedText(rule: RRule): string {
   const byDay =
     options.byweekday?.length > 0
       ? options.byweekday
-          .map(
-            (d) =>
-              weekdayMap[d.toString() as keyof typeof weekdayMap] ||
-              d.toString()
-          )
+          .map((d) => weekdayMap[d as keyof typeof weekdayMap] || d.toString())
           .join(", ")
       : null;
 
@@ -880,7 +876,7 @@ export function rruleToDetailedText(rule: RRule): string {
   if (options.count) {
     parts.push(`for ${options.count} time${options.count > 1 ? "s" : ""}`);
   } else {
-    parts.push(`for indefinite times`);
+    parts.push(`indefinitely`);
   }
 
   if (options.until) {

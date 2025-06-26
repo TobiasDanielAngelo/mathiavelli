@@ -96,14 +96,14 @@ class Goal(Productivity):
 
 class Habit(Productivity):
     goal = fields.CascadeOptionalForeignKey(Goal)
-    schedule = fields.SetNullOptionalForeignKey(Schedule)
+    schedule = fields.CascadeOptionalForeignKey(Schedule)
     threshold_percent = fields.LimitedDecimalField(0, 100, 80)
 
 
 class Task(Productivity):
     goal = fields.CascadeOptionalForeignKey(Goal)
-    habit = fields.OptionalOneToOneField(Habit)
-    schedule = fields.SetNullOptionalForeignKey(Schedule)
+    habit = fields.OptionalSetNullOneToOneField(Habit)
+    schedule = fields.CascadeOptionalForeignKey(Schedule)
     importance = fields.LimitedDecimalField(0, 10)
     due_date = fields.OptionalDateField()
 

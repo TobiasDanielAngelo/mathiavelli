@@ -143,8 +143,11 @@ def ensure_aware(dt):
 def generate_missing_events(params=None):
     from .models import Task, Event
 
-    start = safe_parse_datetime(params.get("start"))
-    end = safe_parse_datetime(params.get("end"))
+    try:
+        start = safe_parse_datetime(params.get("start", None))
+        end = safe_parse_datetime(params.get("end", None))
+    except:
+        return []
 
     start = ensure_aware(start)
     end = ensure_aware(end)
