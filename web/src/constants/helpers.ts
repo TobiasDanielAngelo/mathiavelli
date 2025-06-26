@@ -6,7 +6,6 @@ import { GoalInterface } from "../api/GoalStore";
 import { Schedule, ScheduleInterface } from "../api/ScheduleStore";
 import { KV } from "../blueprints/ItemDetails";
 import { Option } from "./interfaces";
-import { TwoDates } from "./classes";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -654,11 +653,13 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
 
   // FREQ is required
   if (typeof options.freq !== "number" || !allowedFreq.includes(options.freq)) {
+    console.warn("Freq issue");
     return false;
   }
 
   // DTSTART must be a valid Date
   if (!(options.dtstart instanceof Date) || isNaN(options.dtstart.getTime())) {
+    console.warn("DTstart issue");
     return false;
   }
 
@@ -667,6 +668,7 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
     options.interval &&
     (!Number.isInteger(options.interval) || options.interval <= 0)
   ) {
+    console.warn("Interval issue");
     return false;
   }
 
@@ -675,6 +677,7 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
     options.count &&
     (!Number.isInteger(options.count) || options.count <= 0)
   ) {
+    console.warn("Count issue");
     return false;
   }
 
@@ -683,6 +686,7 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
     options.until &&
     (!(options.until instanceof Date) || isNaN(options.until.getTime()))
   ) {
+    console.warn("Until issue");
     return false;
   }
 
@@ -698,23 +702,17 @@ export const fromUTCForRRule = (date: Date | string): Date =>
     .add(new Date().getTimezoneOffset(), "minutes")
     .toDate();
 
-export function buildRRule(
-  schedule: ScheduleInterface,
-  window?: { startDate: Date | string; endDate: Date | string }
-): RRule | null {
-  const startDate = window
-    ? schedule.startDate
-      ? new TwoDates(window.startDate, schedule.startDate).later
-      : null
-    : schedule.startDate;
+export function buildRRule(schedule: ScheduleInterface): RRule | null {
+  const startDate = schedule.startDate;
   const startTime =
-    window || !schedule.startTime ? "12:00 AM" : schedule.startTime;
-  const endDate = window
-    ? schedule.endDate
-      ? new TwoDates(window.endDate, schedule.endDate).earlier
-      : null
-    : schedule.endDate;
-  const endTime = window || !schedule.endTime ? "11:59 PM" : schedule.endTime;
+    schedule.startTime && schedule.startTime?.length
+      ? schedule.startTime
+      : "12:00 AM";
+  const endDate = schedule.endDate;
+  const endTime =
+    schedule.endTime && schedule.endTime?.length
+      ? schedule.endTime
+      : "11:59 PM";
 
   const start = !startDate
     ? null
@@ -723,8 +721,6 @@ export function buildRRule(
   const end = !endDate
     ? null
     : `${normalizeDate(endDate)}T${normalizeTime(endTime)}`;
-
-  console.log("ZZ", start, end);
 
   const ruleOptions = {
     freq: Number(schedule.freq) || RRule.DAILY,
@@ -740,7 +736,7 @@ export function buildRRule(
     byminute: schedule.byMinute?.map(Number) ?? undefined,
     bysecond: schedule.bySecond?.map(Number) ?? undefined,
     bysetpos: schedule.bySetPosition?.map(Number) ?? undefined,
-    count: Number(schedule.count) || 3,
+    count: Number(schedule.count) === 0 ? undefined : Number(schedule.count),
     dtstart: toUTCForRRule(start),
     until: toUTCForRRule(end),
   };
@@ -760,15 +756,24 @@ export function buildRRule(
 
 export function generateCollidingDates(
   sched: ScheduleInterface,
-  window?: { startDate: Date | string; endDate: Date | string }
+  window?: { startDate: Date; endDate: Date }
 ): Date[] {
   const schedule = sched;
-  const timeFrame = window;
-
-  const rule = buildRRule(schedule, timeFrame);
+  const rule = buildRRule(schedule);
   if (!rule) return [];
 
-  return rule.all().map(fromUTCForRRule);
+  if (window) {
+    console.log(
+      sched.name,
+      window,
+      rule.between(window.startDate, window.endDate)
+    );
+  }
+  return window
+    ? rule.between(window.startDate, window.endDate).map(fromUTCForRRule)
+    : sched.count
+    ? rule.all().map(fromUTCForRRule)
+    : new RRule({ ...rule.options, count: 5 }).all().map(fromUTCForRRule);
 }
 
 export function rruleToDetailedText(rule: RRule): string {

@@ -224,8 +224,8 @@ export const ScheduleDashboard = observer(
       .map((s) => s.$view)
       .flatMap((s) =>
         generateCollidingDates(s, {
-          startDate: moment(date).startOf("month").format("YYYY-MM-DD"),
-          endDate: moment(date).endOf("month").format("YYYY-MM-DD"),
+          startDate: moment(date).startOf("month").toDate(),
+          endDate: moment(date).endOf("month").toDate(),
         }).map((date) => ({
           ...s,
           collidingDate: date,

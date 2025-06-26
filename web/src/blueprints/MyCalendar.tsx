@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getStoreSignature, sortByKey } from "../constants/helpers";
 import { useVisible, useWindowWidth } from "../constants/hooks";
 import { StateSetter } from "../constants/interfaces";
@@ -65,15 +65,20 @@ export const MyCalendar = observer(
 
     const startDecade = Math.floor(currentDate.year() / 10) * 10;
 
+    useEffect(() => {
+      setDate(currentDate.toDate());
+    }, [currentDate]);
+
     const handlePrev = () => {
       const newDate =
         view === "month"
           ? moment(currentDate).subtract(1, "month")
           : view === "year"
           ? moment(currentDate).subtract(1, "year")
-          : moment(currentDate).subtract(10, "year");
+          : view === "decade"
+          ? moment(currentDate).subtract(10, "year").startOf("year")
+          : moment(currentDate);
       setCurrentDate(newDate);
-      setDate(newDate.toDate());
     };
 
     const handleNext = () => {
@@ -82,13 +87,14 @@ export const MyCalendar = observer(
           ? moment(currentDate).add(1, "month").startOf("month")
           : view === "year"
           ? moment(currentDate).add(1, "year").startOf("year")
-          : moment(currentDate)
+          : view === "decade"
+          ? moment(currentDate)
               .add(10, "year")
               .startOf("year")
-              .year(Math.floor(moment(currentDate).year() / 10) * 10 + 10);
+              .year(Math.floor(moment(currentDate).year() / 10) * 10 + 10)
+          : moment(currentDate);
 
       setCurrentDate(newDate);
-      setDate(newDate.toDate());
     };
 
     const renderMonthView = useCallback(() => {

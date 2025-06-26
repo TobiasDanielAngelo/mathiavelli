@@ -8,6 +8,7 @@ import {
   updateItemRequest,
 } from "./_apiHelpers";
 import {
+  formatValue,
   generateCollidingDates,
   generateScheduleDefinition,
 } from "../constants/helpers";
@@ -28,7 +29,7 @@ const props = {
   byMinute: prop<number[]>(() => []),
   bySecond: prop<number[]>(() => []),
   bySetPosition: prop<number[]>(() => []),
-  count: prop<number>(0),
+  count: prop<number | null>(null),
   startDate: prop<string>(""),
   endDate: prop<string>(""),
   weekStart: prop<number>(0),
@@ -84,9 +85,13 @@ export class Schedule extends Model(props) {
   }
 
   get collidingDates() {
-    return this.count
-      ? generateCollidingDates(this)
-      : generateCollidingDates(this);
+    return formatValue(
+      generateCollidingDates(this),
+      "",
+      [],
+      undefined,
+      this.count === 0 || this.count === null ? true : false
+    );
   }
 
   get definition() {
