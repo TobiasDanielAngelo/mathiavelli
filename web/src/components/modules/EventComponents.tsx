@@ -26,7 +26,7 @@ import {
 import { IconName } from "../../blueprints/MyIcon";
 import { MyLockedCard } from "../../blueprints/MyLockedCard";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { toOptions } from "../../constants/helpers";
+import { sortAndFilterByIds, toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field, StateSetter } from "../../constants/interfaces";
 import { TwoDates } from "../../constants/classes";
@@ -164,16 +164,18 @@ export const EventDashboard = observer(
     range: string;
   }) => {
     const { eventStore } = useStore();
-    const { range } = props;
+    const { pageDetails } = useEventView();
 
-    useEffect(() => {
-      eventStore.fetchMissingEvents(`range=${range}`);
-    }, [range]);
     return (
       <MyLockedCard isUnlocked>
         <MyCalendar
           {...props}
-          events={eventStore.items.filter((s) => !s.isArchived)}
+          noIcon
+          events={sortAndFilterByIds(
+            eventStore.items,
+            pageDetails?.ids ?? eventStore.items.map((s) => s.id),
+            (s) => s.id
+          ).filter((s) => !s.isArchived)}
         />
       </MyLockedCard>
     );
@@ -277,8 +279,8 @@ export const EventView = observer(() => {
       : "month";
   // : `${Math.floor(moment(date).year() / 10)}X`;
 
-  const start = moment(date).startOf(view as moment.unitOfTime.StartOf);
-  const end = moment(date).endOf(view as moment.unitOfTime.StartOf);
+  const start = moment(date).startOf("day");
+  const end = moment(date).endOf("day");
 
   const { setParams, setPageDetails } = values;
 
@@ -299,6 +301,10 @@ export const EventView = observer(() => {
 
   useEffect(() => {
     fetchFcn();
+  }, [date]);
+
+  useEffect(() => {
+    eventStore.fetchMissingEvents(`range=${range}`);
   }, [range]);
 
   const itemMap = useMemo(

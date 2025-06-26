@@ -206,6 +206,14 @@ export class TwoDates {
     return this.start.toTimeString() === this.end.toTimeString();
   }
 
+  get earlier() {
+    return this.start > this.end ? this.end : this.start;
+  }
+
+  get later() {
+    return this.start < this.end ? this.end : this.start;
+  }
+
   isOverlapWith(td: TwoDates) {
     return this.start <= td.end && td.start <= this.end;
   }

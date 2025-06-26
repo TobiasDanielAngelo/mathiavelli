@@ -30,9 +30,9 @@ SYNC_FIELDS = [
 
 
 def update_goal_completion(goal: Goal):
-    tasks = goal.task_goal.all()
-    habits = goal.habit_goal.all()
-    subgoals = goal.goal_parent_goal.all()
+    tasks = goal.task_goal.all().filter(is_archived=False)
+    habits = goal.habit_goal.all().filter(is_archived=False)
+    subgoals = goal.goal_parent_goal.all().filter(is_archived=False)
 
     all_tasks_done = all(t.date_completed for t in tasks)
     all_habits_done = all(h.date_completed for h in habits)
@@ -117,28 +117,6 @@ def sync_habit_from_task(sender, instance, **kwargs):
         habit.save()
 
 
-@receiver(pre_save, sender=Schedule)
-def schedule_updated(sender, instance, **kwargs):
-    if not instance.pk:
-        return  # new instance, nothing to compare yet
-
-    try:
-        old = Schedule.objects.get(pk=instance.pk)
-    except Schedule.DoesNotExist:
-        return  # should not happen, but just in case
-
-    old_dates = set(old.datetimes)
-    new_dates = set(instance.datetimes)
-
-    to_archive = old_dates - new_dates  # removed dates
-
-    if to_archive:
-        for task in Task.objects.filter(schedule=instance):
-            Event.objects.filter(task=task, date_start__in=to_archive).update(
-                is_archived=True
-            )
-
-
 @receiver([post_save, post_delete], sender=Event)
 def maybe_complete_task(sender, instance, **kwargs):
     try:
@@ -147,6 +125,11 @@ def maybe_complete_task(sender, instance, **kwargs):
         return
 
     if not task or not task.schedule:
+        return
+
+    if not task.schedule.count:
+        task.date_completed = None
+        task.save()
         return
 
     actual_events = task.event_task.all().filter(is_archived=False)

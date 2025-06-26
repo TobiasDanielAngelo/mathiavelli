@@ -1,6 +1,4 @@
-from rest_framework import serializers
 from .models import *
-from .utils import get_datetimes
 from django.utils import timezone
 from core.serializers import CustomSerializer
 
@@ -74,14 +72,10 @@ class TaskSerializer(CustomSerializer):
 
 
 class ScheduleSerializer(CustomSerializer):
-    # datetimes = serializers.SerializerMethodField()
 
     class Meta:
         model = Schedule
         fields = "__all__"
-
-    def get_datetimes(self, obj):
-        return get_datetimes(obj)
 
 
 class HabitSerializer(CustomSerializer):

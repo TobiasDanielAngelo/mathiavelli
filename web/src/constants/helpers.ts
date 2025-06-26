@@ -6,6 +6,7 @@ import { GoalInterface } from "../api/GoalStore";
 import { Schedule, ScheduleInterface } from "../api/ScheduleStore";
 import { KV } from "../blueprints/ItemDetails";
 import { Option } from "./interfaces";
+import { TwoDates } from "./classes";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -376,8 +377,33 @@ export const formatValue = (
   value: any,
   key: string,
   prices?: string[],
-  kv?: KV<any>
+  kv?: KV<any>,
+  arrayIsInfinite?: boolean
 ) => {
+  const formatList = (
+    value: Date[],
+    formatStr: string,
+    suffixLabel: string
+  ): string => {
+    const list = value
+      .slice(0, 3)
+      .map((s) => moment(s).format(formatStr))
+      .join("\n");
+
+    const remaining = value.length - 4;
+    const suffix = arrayIsInfinite
+      ? `${suffixLabel}ad infinitum...`
+      : value.length >= 4
+      ? `${suffixLabel}and ${remaining} more...`
+      : "";
+
+    const finalDate = !arrayIsInfinite
+      ? `\nup to ${moment(value[value.length - 1]).format(formatStr)}`
+      : "";
+
+    return list + suffix + finalDate;
+  };
+
   if (kv) {
     const lookup = (val: any) =>
       kv.label === ""
@@ -392,30 +418,10 @@ export const formatValue = (
   }
   if (Array.isArray(value) && value.length > 0) {
     if (isDatetimeValue(value[0])) {
-      return (
-        value
-          .filter((_, ind) => ind < 3)
-          .map((s) => moment(s).format("MMM D, YYYY h:mm A, Z"))
-          .join("\n") +
-        `\nand ${
-          value.length >= 3 ? String(value.length - 4) + " more..." : ""
-        }` +
-        `\nup to ${moment(value[value.length - 1]).format(
-          "MMM D, YYYY h:mm A, Z"
-        )}`
-      );
+      return formatList(value, "MMM D, YYYY h:mm A, Z", "\n");
     }
     if (isDateValue(value[0])) {
-      return (
-        value
-          .filter((_, ind) => ind < 3)
-          .map((s) => moment(s).format("MMM D, YYYY"))
-          .join("\n") +
-        `\nand ${
-          value.length >= 3 ? String(value.length - 4) + " more..." : ""
-        }` +
-        `\nup to ${moment(value[value.length - 1]).format("MMM D, YYYY")}`
-      );
+      return formatList(value, "MMM D, YYYY", "and ");
     } else {
       return value.join(", ");
     }
@@ -687,29 +693,38 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
  * Converts a UTC date from RRULE back to local time.
  * Adjusts by adding the local timezone offset.
  */
-export const fromUTCForRRule = (date: Date | string): Date | null =>
-  !date
-    ? null
-    : moment(new Date(date))
-        .add(new Date().getTimezoneOffset(), "minutes")
-        .toDate();
+export const fromUTCForRRule = (date: Date | string): Date =>
+  moment(new Date(date))
+    .add(new Date().getTimezoneOffset(), "minutes")
+    .toDate();
 
-export function buildRRule(schedule: ScheduleInterface): RRule | null {
-  const start = !schedule.startDate
-    ? null
-    : !schedule.startTime
-    ? `${normalizeDate(schedule.startDate)}T00:00`
-    : `${normalizeDate(schedule.startDate)}T${normalizeTime(
-        schedule.startTime || "00:00"
-      )}`;
+export function buildRRule(
+  schedule: ScheduleInterface,
+  window?: { startDate: Date | string; endDate: Date | string }
+): RRule | null {
+  const startDate = window
+    ? schedule.startDate
+      ? new TwoDates(window.startDate, schedule.startDate).later
+      : null
+    : schedule.startDate;
+  const startTime =
+    window || !schedule.startTime ? "12:00 AM" : schedule.startTime;
+  const endDate = window
+    ? schedule.endDate
+      ? new TwoDates(window.endDate, schedule.endDate).earlier
+      : null
+    : schedule.endDate;
+  const endTime = window || !schedule.endTime ? "11:59 PM" : schedule.endTime;
 
-  const end = !schedule.endDate
+  const start = !startDate
     ? null
-    : !schedule.endTime
-    ? `${normalizeDate(schedule.endDate)}T23:59`
-    : `${normalizeDate(schedule.endDate)}T${normalizeTime(
-        schedule.endTime || "23:59"
-      )}`;
+    : `${normalizeDate(startDate)}T${normalizeTime(startTime)}`;
+
+  const end = !endDate
+    ? null
+    : `${normalizeDate(endDate)}T${normalizeTime(endTime)}`;
+
+  console.log("ZZ", start, end);
 
   const ruleOptions = {
     freq: Number(schedule.freq) || RRule.DAILY,
@@ -725,12 +740,14 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     byminute: schedule.byMinute?.map(Number) ?? undefined,
     bysecond: schedule.bySecond?.map(Number) ?? undefined,
     bysetpos: schedule.bySetPosition?.map(Number) ?? undefined,
-    count: Number(schedule.count) || 1000,
+    count: Number(schedule.count) || 3,
     dtstart: toUTCForRRule(start),
     until: toUTCForRRule(end),
   };
 
-  if (!isValidRRuleOptions(ruleOptions)) return null;
+  if (!isValidRRuleOptions(ruleOptions)) {
+    return null;
+  }
 
   try {
     const rule = new RRule(cleanObject(ruleOptions) as Options);
@@ -741,90 +758,17 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
   }
 }
 
-export function toRoman(num: number): string {
-  const map: [number, string][] = [
-    [1000, "M"],
-    [900, "CM"],
-    [500, "D"],
-    [400, "CD"],
-    [100, "C"],
-    [90, "XC"],
-    [50, "L"],
-    [40, "XL"],
-    [10, "X"],
-    [9, "IX"],
-    [5, "V"],
-    [4, "IV"],
-    [1, "I"],
-  ];
+export function generateCollidingDates(
+  sched: ScheduleInterface,
+  window?: { startDate: Date | string; endDate: Date | string }
+): Date[] {
+  const schedule = sched;
+  const timeFrame = window;
 
-  let result = "";
-  for (const [val, roman] of map) {
-    while (num >= val) {
-      result += roman;
-      num -= val;
-    }
-  }
-  return result;
-}
-
-export function toSuperscript(n: number | string): string {
-  const map: { [k: string]: string } = {
-    "0": "⁰",
-    "1": "¹",
-    "2": "²",
-    "3": "³",
-    "4": "⁴",
-    "5": "⁵",
-    "6": "⁶",
-    "7": "⁷",
-    "8": "⁸",
-    "9": "⁹",
-    I: "ᴵ",
-    V: "ⱽ",
-    X: "ˣ",
-    L: "ᴸ",
-    C: "ᶜ",
-    D: "ᴰ",
-    M: "ᴹ",
-  };
-  return String(n)
-    .split("")
-    .map((c) => map[c] || "")
-    .join("");
-}
-
-export function toRomanWithExponents(num: number): string {
-  const chunks: string[] = [];
-
-  const powers = [
-    [1_000_000_000, 4],
-    [1_000_000, 3],
-    [1000, 2],
-  ];
-
-  for (const [divisor, exp] of powers) {
-    const part = Math.floor(num / divisor);
-    if (part > 0) {
-      chunks.push(`${toRoman(part)}M${toSuperscript(toRoman(exp))}`);
-      num %= divisor;
-    }
-  }
-
-  if (num > 0) chunks.push(toRoman(num));
-
-  return chunks.join(" ");
-}
-
-export function generateCollidingDates(sched: Schedule): Date[] {
-  const schedule = sched.$ ?? sched;
-  const rule = buildRRule(schedule);
+  const rule = buildRRule(schedule, timeFrame);
   if (!rule) return [];
 
-  return rule
-    .all()
-    .map(fromUTCForRRule)
-    .filter((t) => t !== null);
+  return rule.all().map(fromUTCForRRule);
 }
 
 export function rruleToDetailedText(rule: RRule): string {
@@ -930,6 +874,8 @@ export function rruleToDetailedText(rule: RRule): string {
   if (byTime) parts.push(byTime);
   if (options.count) {
     parts.push(`for ${options.count} time${options.count > 1 ? "s" : ""}`);
+  } else {
+    parts.push(`for indefinite times`);
   }
 
   if (options.until) {
@@ -950,4 +896,79 @@ export function generateScheduleDefinition(sched: Schedule): string {
 
 export function range(a: number, b: number): number[] {
   return Array.from({ length: b - a }, (_, i) => i + a);
+}
+
+export function toRoman(num: number): string {
+  const map: [number, string][] = [
+    [1000, "M"],
+    [900, "CM"],
+    [500, "D"],
+    [400, "CD"],
+    [100, "C"],
+    [90, "XC"],
+    [50, "L"],
+    [40, "XL"],
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
+  ];
+
+  let result = "";
+  for (const [val, roman] of map) {
+    while (num >= val) {
+      result += roman;
+      num -= val;
+    }
+  }
+  return result;
+}
+
+export function toSuperscript(n: number | string): string {
+  const map: { [k: string]: string } = {
+    "0": "⁰",
+    "1": "¹",
+    "2": "²",
+    "3": "³",
+    "4": "⁴",
+    "5": "⁵",
+    "6": "⁶",
+    "7": "⁷",
+    "8": "⁸",
+    "9": "⁹",
+    I: "ᴵ",
+    V: "ⱽ",
+    X: "ˣ",
+    L: "ᴸ",
+    C: "ᶜ",
+    D: "ᴰ",
+    M: "ᴹ",
+  };
+  return String(n)
+    .split("")
+    .map((c) => map[c] || "")
+    .join("");
+}
+
+export function toRomanWithExponents(num: number): string {
+  const chunks: string[] = [];
+
+  const powers = [
+    [1_000_000_000, 4],
+    [1_000_000, 3],
+    [1000, 2],
+  ];
+
+  for (const [divisor, exp] of powers) {
+    const part = Math.floor(num / divisor);
+    if (part > 0) {
+      chunks.push(`${toRoman(part)}M${toSuperscript(toRoman(exp))}`);
+      num %= divisor;
+    }
+  }
+
+  if (num > 0) chunks.push(toRoman(num));
+
+  return chunks.join(" ");
 }

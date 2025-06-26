@@ -84,7 +84,9 @@ export class Schedule extends Model(props) {
   }
 
   get collidingDates() {
-    return generateCollidingDates(this);
+    return this.count
+      ? generateCollidingDates(this)
+      : generateCollidingDates(this);
   }
 
   get definition() {

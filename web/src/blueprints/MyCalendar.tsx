@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { useState } from "react";
-import { sortByKey } from "../constants/helpers";
+import { useCallback, useState } from "react";
+import { getStoreSignature, sortByKey } from "../constants/helpers";
 import { useVisible, useWindowWidth } from "../constants/hooks";
 import { StateSetter } from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
@@ -16,8 +16,13 @@ type CalendarEvent = {
   dateCompleted?: string;
 };
 
-const EventItem = (props: { label: string; modalContent: React.ReactNode }) => {
-  const { label, modalContent } = props;
+const EventItem = (props: {
+  label: string;
+  modalContent: React.ReactNode;
+  noIcon?: boolean;
+  date: number;
+}) => {
+  const { label, modalContent, noIcon, date } = props;
   const { isVisible1, setVisible1 } = useVisible();
   const width = useWindowWidth();
 
@@ -31,12 +36,15 @@ const EventItem = (props: { label: string; modalContent: React.ReactNode }) => {
       >
         {modalContent}
       </MyModal>
-      <MyIcon
-        icon="Event"
-        fontSize="small"
-        label={width > 1024 ? label : ""}
-        onDoubleClick={() => setVisible1(true)}
-      />
+      <span onDoubleClick={() => setVisible1(true)}>{date}</span>
+      {!noIcon && (
+        <MyIcon
+          icon="Event"
+          fontSize="small"
+          label={width > 1024 ? label : ""}
+          onDoubleClick={() => setVisible1(true)}
+        />
+      )}
     </>
   );
 };
@@ -50,9 +58,9 @@ export const MyCalendar = observer(
     view: CalendarView;
     setView: StateSetter<CalendarView>;
     events: CalendarEvent[];
-    renderEventContent?: (events: CalendarEvent[]) => React.ReactNode;
+    noIcon?: boolean;
   }) => {
-    const { date, setDate, view, setView, events, renderEventContent } = props;
+    const { date, setDate, view, setView, events, noIcon } = props;
     const [currentDate, setCurrentDate] = useState(moment());
 
     const startDecade = Math.floor(currentDate.year() / 10) * 10;
@@ -83,12 +91,11 @@ export const MyCalendar = observer(
       setDate(newDate.toDate());
     };
 
-    const renderMonthView = () => {
+    const renderMonthView = useCallback(() => {
       const start = moment(currentDate).startOf("month").startOf("week");
       const days = Array.from({ length: 42 }, (_, i) =>
         moment(start).add(i, "day")
       );
-
       return (
         <div className="grid grid-cols-7 gap-4">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d, i) => (
@@ -118,75 +125,41 @@ export const MyCalendar = observer(
               <div
                 key={i}
                 onClick={() => setDate(day.toDate())}
-                // title={
-                //   dayEvents.length > 0 ? (
-                //     <MyTable
-                //       matrix={[
-                //         ["Event", "Time", "Completed?"],
-                //         ...sortByKey(dayEvents, "dateStart").map((s) => [
-                //           s.title,
-                //           moment(s.dateStart).format("h:mm A"),
-                //           <MyIcon
-                //             icon={
-                //               s.dateCompleted
-                //                 ? "CheckBox"
-                //                 : "CheckBoxOutlineBlank"
-                //             }
-                //           />,
-                //         ]),
-                //       ]}
-                //     />
-                //   ) : (
-                //     ""
-                //   )
-                // }
                 className={`md:flex-row-reverse text-right text-sm md:text-md items-right justify-between flex flex-col-reverse p-1 md:p-2 rounded cursor-pointer
                 ${day.month() === currentDate.month() ? "" : "text-gray-500"}
                 ${isWeekend ? "text-red-500" : ""}
                 ${isToday ? "text-blue-500 font-bold" : ""}
                 ${isSelected ? "bg-teal-300 text-black" : ""}`}
               >
-                {day.date()}
-
-                <div>
-                  {renderEventContent
-                    ? renderEventContent(dayEvents)
-                    : dayEvents.length > 0 && (
-                        <EventItem
-                          label={String(dayEvents.length)}
-                          modalContent={
-                            dayEvents.length > 0 ? (
-                              <MyTable
-                                matrix={[
-                                  ["Event", "Time", "Completed?"],
-                                  ...sortByKey(dayEvents, "dateStart").map(
-                                    (s) => [
-                                      s.title,
-                                      moment(s.dateStart).format("h:mm A"),
-                                      <MyIcon
-                                        icon={
-                                          s.dateCompleted
-                                            ? "CheckBox"
-                                            : "CheckBoxOutlineBlank"
-                                        }
-                                      />,
-                                    ]
-                                  ),
-                                ]}
-                              />
-                            ) : (
-                              <></>
-                            )
-                          }
-                        />
-                      )}
-                </div>
+                <EventItem
+                  noIcon={noIcon || !dayEvents.length}
+                  date={day.date()}
+                  label={String(dayEvents.length)}
+                  modalContent={
+                    <MyTable
+                      matrix={[
+                        ["Event", "Time", "Completed?"],
+                        ...sortByKey(dayEvents, "dateStart").map((s) => [
+                          s.title,
+                          moment(s.dateStart).format("h:mm A"),
+                          <MyIcon
+                            icon={
+                              s.dateCompleted
+                                ? "CheckBox"
+                                : "CheckBoxOutlineBlank"
+                            }
+                          />,
+                        ]),
+                      ]}
+                    />
+                  }
+                />
               </div>
             );
           })}
         </div>
       );
-    };
+    }, [getStoreSignature(events), currentDate, date, events.length]);
 
     const renderYearView = () => (
       <div className="grid grid-cols-3 gap-2">

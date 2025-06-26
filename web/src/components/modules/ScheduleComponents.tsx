@@ -161,7 +161,14 @@ export const ScheduleForm = ({
             name: "collidings",
             label: "Colliding Dates",
             type: "function",
-            function: (t) => formatValue(generateCollidingDates(t), ""),
+            function: (t) =>
+              formatValue(
+                generateCollidingDates(t),
+                "",
+                [],
+                undefined,
+                isNaN(parseInt(t.count))
+              ),
           },
         ],
       ] satisfies Field[][],
@@ -210,13 +217,16 @@ export const ScheduleDashboard = observer(
     setView: StateSetter<CalendarView>;
     range: string;
   }) => {
-    const { range, view } = props;
+    const { range, view, date } = props;
     const { scheduleStore } = useStore();
 
     const items = scheduleStore.items
       .map((s) => s.$view)
       .flatMap((s) =>
-        s.collidingDates.map((date) => ({
+        generateCollidingDates(s, {
+          startDate: moment(date).startOf("month").format("YYYY-MM-DD"),
+          endDate: moment(date).endOf("month").format("YYYY-MM-DD"),
+        }).map((date) => ({
           ...s,
           collidingDate: date,
         }))
