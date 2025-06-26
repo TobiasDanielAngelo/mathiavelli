@@ -140,33 +140,14 @@ def ensure_aware(dt):
 def generate_missing_events(params=None):
     from .models import Task, Event
 
-    if params is None:
-        params = {"range": "today"}
-
     start = safe_parse_datetime(params.get("start"))
     end = safe_parse_datetime(params.get("end"))
-    # range_val = params.get("range")
-
-    # if range_val:
-    #     start, end = parse_range_param(range_val)
 
     start = ensure_aware(start)
     end = ensure_aware(end)
 
     def is_in_range(dt):
         dt = safe_parse_datetime(dt)
-        if range:
-            today = now().date()
-            if range == "today":
-                return dt.date() == today
-            elif range == "week":
-                start_of_week = today - timedelta(days=today.weekday())
-                end_of_week = start_of_week + timedelta(days=6)
-                return start_of_week <= dt.date() <= end_of_week
-            elif range == "month":
-                return dt.year == today.year and dt.month == today.month
-            elif range == "year":
-                return dt.year == today.year
         if start and dt < start:
             return False
         if end and dt > end:
