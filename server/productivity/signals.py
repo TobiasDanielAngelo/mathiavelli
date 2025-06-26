@@ -8,6 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.timezone import make_aware
 from datetime import datetime
+from .utils import get_datetimes
 
 # Prevent recursion
 _is_syncing = set()
@@ -136,7 +137,9 @@ def maybe_complete_task(sender, instance, **kwargs):
     tz = get_current_timezone()
 
     # Parse and normalize expected datetimes (string → datetime with timezone)
-    expected_datetimes = set(parse(dt).astimezone(tz) for dt in task.schedule.datetimes)
+    expected_datetimes = set(
+        parse(dt).astimezone(tz) for dt in get_datetimes(task.schedule)
+    )
 
     # Normalize actual event datetimes
     actual_datetimes = set(

@@ -4,17 +4,19 @@ from .models import *
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    readonly_fields = ("datetimes_display",)
+    # readonly_fields = ("datetimes_display",)
 
     def get_list_display(self, request):
-        return ["datetimes_display"] + [field.name for field in self.model._meta.fields]
+        return [field.name for field in self.model._meta.fields]
 
-    def datetimes_display(self, obj):
-        return "\n".join(
-            [str(dt) for dt in obj.datetimes[:3]]
-            + (["..."] if len(obj.datetimes) > 3 else [])
-            + (["\n up to " + obj.datetimes[-1]] if len(obj.datetimes) > 3 else [""])
-        )
+    # + ["datetimes_display"]
+
+    # def datetimes_display(self, obj):
+    #     return "\n".join(
+    #         [str(dt) for dt in obj.datetimes[:3]]
+    #         + (["..."] if len(obj.datetimes) > 3 else [])
+    #         + (["\n up to " + obj.datetimes[-1]] if len(obj.datetimes) > 3 else [""])
+    #     )
 
 
 @admin.register(Goal)

@@ -29,7 +29,7 @@ FREQ_MAP = {
 WEEKDAY_MAP = {"MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6}
 
 
-def get_datetimes(obj):
+def get_datetimes(obj, start: datetime = None, end: datetime = None):
     if not obj.start_date:
         return []
     end_dt = None
@@ -49,7 +49,8 @@ def get_datetimes(obj):
     }
 
     # Optional rule fields
-    rule_kwargs["count"] = int(obj.count) if obj.count else 300
+    if obj.count:
+        rule_kwargs["count"] = int(obj.count)
     if end_dt:
         end_dt = datetime.combine(obj.end_date, obj.end_time or time(23, 59))
         rule_kwargs["until"] = end_dt
@@ -76,7 +77,9 @@ def get_datetimes(obj):
 
     # Generate occurrences (limit for safety)
     try:
-        dates = list(rrule(**rule_kwargs))[:300]  # Limit to first 300 occurrences
+        dates = list(rrule(**rule_kwargs).between(start, end))[
+            :300
+        ]  # Limit to first 300 occurrences
         return [dt.isoformat() for dt in dates]
     except Exception as e:
         return []
@@ -158,11 +161,11 @@ def generate_missing_events(params=None):
 
     for task in Task.objects.all():
         if task.schedule:
-            datetimes = task.schedule.datetimes
+            datetimes = get_datetimes(task.schedule, start, end)
         else:
             datetimes = []
         updated = (
-            Event.objects.filter(task=task)
+            Event.objects.filter(task=task, date_start__gte=start, date_start__lte=end)
             .exclude(date_start__in=datetimes)
             .update(is_archived=True)
         )
