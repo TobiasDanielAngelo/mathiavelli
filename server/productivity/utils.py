@@ -141,14 +141,14 @@ def generate_missing_events(params=None):
     from .models import Task, Event
 
     if params is None:
-        params = {"range": "month"}
+        params = {"range": "today"}
 
     start = safe_parse_datetime(params.get("start"))
     end = safe_parse_datetime(params.get("end"))
-    range_val = params.get("range")
+    # range_val = params.get("range")
 
-    if range_val:
-        start, end = parse_range_param(range_val)
+    # if range_val:
+    #     start, end = parse_range_param(range_val)
 
     start = ensure_aware(start)
     end = ensure_aware(end)

@@ -300,12 +300,12 @@ export const EventView = observer(() => {
   };
 
   useEffect(() => {
-    fetchFcn();
+    eventStore
+      .fetchMissingEvents(
+        `start=${start.toISOString()}&end=${end.toISOString()}`
+      )
+      .then(fetchFcn);
   }, [date]);
-
-  useEffect(() => {
-    eventStore.fetchMissingEvents(`range=${range}`);
-  }, [range]);
 
   const itemMap = useMemo(
     () =>
