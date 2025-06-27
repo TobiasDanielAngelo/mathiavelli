@@ -179,9 +179,8 @@ def generate_missing_events(params=None):
         )
         print(
             f"Archived {updated} incorrect events for task {task.pk} - {list(
-                Event.objects.filter(task=task)
-                .exclude(date_start__in=datetimes)
-                .values_list("id", flat=True)
+                Event.objects.filter(task=task, date_start__gte=start, date_start__lte=end)
+            .exclude(date_start__in=datetimes)
             )}."
         )
         print(f"Deleted {deleted} archived events that were not completed.")

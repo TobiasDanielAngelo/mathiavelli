@@ -32,9 +32,16 @@ export const MyRadialBarChart = observer(
     data,
     dataKey,
     nameKey,
+    traceKey,
     itemMap,
   }: MyCircleChartProps<T>) => {
-    const { resolvedData } = useCircleChart(data, nameKey, dataKey, itemMap);
+    const { resolvedData } = useCircleChart(
+      data,
+      nameKey,
+      dataKey,
+      traceKey,
+      itemMap
+    );
     return (
       <ResponsiveContainer width="100%" height="100%">
         <RadialBarChart

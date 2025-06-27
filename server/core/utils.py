@@ -123,7 +123,6 @@ def generate_period_list(qs, datetime_key, *fields, separator="-"):
                 seen.add(label)
                 periods.append(label)
             current += relativedelta(days=1)
-    print(periods)
     return periods
 
 
