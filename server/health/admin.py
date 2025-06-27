@@ -1,32 +1,21 @@
-from django.contrib import admin
-from .models import *
+from core.admin import CustomAdmin
 
 
-@admin.register(WeighIn)
-class WeighInAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class WeighInAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(BodyFat)
-class BodyFatAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class BodyFatAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(WaistMeasurement)
-class WaistMeasurementAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class WaistMeasurementAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Meal)
-class MealAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class MealAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Workout)
-class WorkoutAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class WorkoutAdmin(CustomAdmin):
+    pass

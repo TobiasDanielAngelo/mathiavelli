@@ -44,12 +44,12 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "knox",
-    "productivity",
+    "core",
     "finance",
     "health",
     "career",
     "personal",
-    "core",
+    "productivity",
 ]
 
 MIDDLEWARE = [

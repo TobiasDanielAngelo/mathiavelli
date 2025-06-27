@@ -1,55 +1,29 @@
-from django.contrib import admin
-from .models import *
+from core.admin import CustomAdmin
 
 
-@admin.register(Schedule)
-class ScheduleAdmin(admin.ModelAdmin):
-    # readonly_fields = ("datetimes_display",)
-
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
-
-    # + ["datetimes_display"]
-
-    # def datetimes_display(self, obj):
-    #     return "\n".join(
-    #         [str(dt) for dt in obj.datetimes[:3]]
-    #         + (["..."] if len(obj.datetimes) > 3 else [])
-    #         + (["\n up to " + obj.datetimes[-1]] if len(obj.datetimes) > 3 else [""])
-    #     )
+class ScheduleAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Goal)
-class GoalAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class GoalAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Habit)
-class HabitAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class HabitAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Task)
-class TaskAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class TaskAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class TagAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class EventAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(HabitLog)
-class HabitLogAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class HabitLogAdmin(CustomAdmin):
+    pass

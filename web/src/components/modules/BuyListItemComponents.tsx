@@ -98,7 +98,7 @@ export const BuyListItemCard = observer((props: { item: BuyListItem }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["id", "plannedDate"]}
+      header={["id", "addedAt"]}
       important={["name"]}
       prices={BuyListItemFields.pricesFields}
       FormComponent={BuyListItemForm}

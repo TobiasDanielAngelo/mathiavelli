@@ -4,7 +4,7 @@ from django.db.models import Sum, F
 from rest_framework.permissions import IsAuthenticated
 from .models import Transaction
 from collections import defaultdict
-from core.utils import annotate_period
+from core.utils import annotate_period, generate_period_list
 
 
 class TransactionAnalyticsViewSet(viewsets.ViewSet):
@@ -16,13 +16,14 @@ class TransactionAnalyticsViewSet(viewsets.ViewSet):
 
     def list(self, request):
         queryset = Transaction.objects.all()
-        queryset = annotate_period(queryset, "datetime_transacted", *("year", "week"))
-
-        # params = self.request.query_params.copy()
-        # graph = params.get("graph", None)
+        queryset = annotate_period(
+            queryset, "datetime_transacted", *("year", "month", "day")
+        )
+        period_list = generate_period_list(
+            queryset, "datetime_transacted", *("year", "month", "day")
+        )
 
         result = []
-        # Prepare the line graph data
         line_result = []
         queryset_line = queryset.values("receiver", "transmitter", "period", "amount")
         accounts = defaultdict(
@@ -35,19 +36,25 @@ class TransactionAnalyticsViewSet(viewsets.ViewSet):
             accounts[row["receiver"]][period]["incoming"] += amount
             accounts[row["transmitter"]][period]["outgoing"] += amount
 
-        line_result = [
-            {
-                "graph": "line",  # Annotating as line graph data
-                "account": acc,
-                "period": period,
-                "incoming": vals["incoming"],
-                "outgoing": vals["outgoing"],
-                "total": vals["incoming"] - vals["outgoing"],
-                "id": f"{acc}_{period}",
-            }
-            for acc, periods in accounts.items()
-            for period, vals in periods.items()
-        ]
+        for period in period_list:
+            print(period)
+            for acc, periods in accounts.items():
+                print(periods)
+                vals = periods.get(period, {})
+                incoming = vals.get("incoming", 0)
+                outgoing = vals.get("outgoing", 0)
+
+                line_result.append(
+                    {
+                        "graph": "line",
+                        "account": acc,
+                        "period": period,
+                        "incoming": incoming,
+                        "outgoing": outgoing,
+                        "total": incoming - outgoing,
+                        "id": f"{acc}_{period}",
+                    }
+                )
 
         line_result = sorted(line_result, key=lambda x: x["period"])
 

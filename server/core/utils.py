@@ -6,9 +6,12 @@ from django.db.models.functions import (
     ExtractWeekDay,
     ExtractQuarter,
 )
-from django.db.models import CharField, F, Value, Func
+from django.db.models import CharField, F, Value, Func, Count, Min, Max, Sum
 from django.db.models.functions import Concat, Cast, Right
+from dateutil.relativedelta import relativedelta
 import re
+from datetime import datetime
+from django.utils import timezone
 
 
 def obj_list_to_obj_val(**list):
@@ -29,10 +32,99 @@ date_annotations = [
 ]
 
 
-def annotate_period(qs, datetime_key, *fields):
+def annotate_period(qs, datetime_key, *fields, separator="-"):
     for name, func in date_annotations:
         qs = qs.annotate(**{name: func(datetime_key)})
-    return qs.annotate(period=Period(*fields))
+    qs = qs.annotate(period=Period(*fields))
+    return qs
+
+
+def generate_period_list(qs, datetime_key, *fields, separator="-"):
+    date_range = qs.aggregate(start=Min(datetime_key), end=Max(datetime_key))
+    start, end = date_range["start"], date_range["end"]
+    if timezone.is_naive(start):
+        start = timezone.make_aware(start)
+    if timezone.is_naive(end):
+        end = timezone.make_aware(end)
+    if not start or not end:
+        return
+
+    periods = []
+
+    def make_label(dt):
+        parts = []
+        for f in fields:
+            if f == "year":
+                parts.append(str(dt.year))
+            elif f == "month":
+                parts.append(f"{dt.month:02d}")
+            elif f == "day":
+                parts.append(f"{dt.day:02d}")
+            elif f == "quarter":
+                parts.append(f"Q{(dt.month - 1) // 3 + 1}")
+            elif f == "week":
+                parts.append(f"W{dt.isocalendar().week:02d}")
+            elif f == "weekday":
+                parts.append(f"D{dt.weekday() + 1}")
+        return separator.join(parts)
+
+    # Handle field type by extracting unique values
+    if fields == ("year",):
+        for year in range(start.year, end.year + 1):
+            periods.append(str(year))
+
+    elif fields == ("year", "quarter"):
+        for year in range(start.year, end.year + 1):
+            for q in range(1, 5):
+                periods.append(f"{year}-Q{q}")
+
+    elif fields == ("year", "day"):
+        current = datetime(start.year, start.month, start.day)
+        if timezone.is_naive(current):
+            current = timezone.make_aware(current)
+        while current <= end:
+            periods.append(
+                f"{current.year}-{current.timetuple().tm_yday:03d}"
+            )  # 001–365
+            current += relativedelta(days=1)
+
+    elif fields == ("year", "month", "day"):
+        current = datetime(start.year, start.month, start.day)
+        if timezone.is_naive(current):
+            current = timezone.make_aware(current)
+        while current <= end:
+            periods.append(f"{current.year}-{current.month:02d}-{current.day:02d}")
+            current += relativedelta(days=1)
+
+    elif fields == ("year", "week"):
+        current = start
+        seen = set()
+        while current <= end:
+            year, week, _ = current.isocalendar()
+            label = f"{year}-W{week:02d}"
+            if label not in seen:
+                seen.add(label)
+                periods.append(label)
+            current += relativedelta(days=1)
+
+    elif fields == ("year", "day"):
+        current = datetime(start.year, start.month, start.day)
+        while current <= end:
+            periods.append(f"{current.year}-{current.month:02d}-{current.day:02d}")
+            current += relativedelta(days=1)
+
+    else:
+        # fallback for custom mixes like ("year", "weekday"), etc.
+        current = start
+        seen = set()
+        while current <= end:
+            label = make_label(current)
+            if label not in seen:
+                seen.add(label)
+                periods.append(label)
+            current += relativedelta(days=1)
+    print(periods)
+    return periods
 
 
 class LPAD(Func):

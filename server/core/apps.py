@@ -8,6 +8,7 @@ class CoreConfig(AppConfig):
     def ready(self):
         from . import signals
         import sys
+        import core.admin
 
         if "runserver" in sys.argv:
             print("Welcome Daniel!")

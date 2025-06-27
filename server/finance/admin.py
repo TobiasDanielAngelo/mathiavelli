@@ -1,44 +1,29 @@
-from django.contrib import admin
-from .models import *
+from core.admin import CustomAdmin
 
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class CategoryAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Transaction)
-class TransactionAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class TransactionAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Receivable)
-class ReceivableAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class ReceivableAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(Payable)
-class PayableAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class PayableAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(InventoryCategory)
-class InventoryCategoryAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class InventoryCategoryAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(PersonalItem)
-class PersonalItemAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class PersonalItemAdmin(CustomAdmin):
+    pass
 
 
-@admin.register(BuyListItem)
-class BuyListItemAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
+class BuyListItemAdmin(CustomAdmin):
+    pass
