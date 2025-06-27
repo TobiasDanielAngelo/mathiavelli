@@ -26,6 +26,7 @@ import { toMoneyShortened, toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field } from "../../constants/interfaces";
 import { AccountForm } from "./AccountComponents";
+import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 
 export const {
   Context: TransactionViewContext,
@@ -143,6 +144,7 @@ export const TransactionDashboard = observer(
             )}
             nameKey="category"
             dataKey="total"
+            traceKey="categoryNature"
             itemMap={itemMap}
             formatter={(value: number, name: string) => [
               toMoneyShortened(value),
@@ -283,6 +285,11 @@ export const TransactionView = observer(() => {
           key: "category",
           values: categoryStore.items,
           label: "title",
+        },
+        {
+          key: "categoryNature",
+          values: CATEGORY_CHOICES,
+          label: "",
         },
       ] satisfies KV<any>[],
     [

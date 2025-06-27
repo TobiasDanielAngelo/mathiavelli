@@ -36,22 +36,28 @@ class TransactionAnalyticsViewSet(viewsets.ViewSet):
             accounts[row["receiver"]][period]["incoming"] += amount
             accounts[row["transmitter"]][period]["outgoing"] += amount
 
+        line_result = []
+        cumulative = defaultdict(lambda: {"incoming": 0, "outgoing": 0})
+
         for period in period_list:
-            print(period)
             for acc, periods in accounts.items():
-                print(periods)
                 vals = periods.get(period, {})
-                incoming = vals.get("incoming", 0)
-                outgoing = vals.get("outgoing", 0)
+                inc = vals.get("incoming", 0)
+                out = vals.get("outgoing", 0)
+
+                # Add to cumulative tracker
+                cumulative[acc]["incoming"] += inc
+                cumulative[acc]["outgoing"] += out
 
                 line_result.append(
                     {
                         "graph": "line",
                         "account": acc,
                         "period": period,
-                        "incoming": incoming,
-                        "outgoing": outgoing,
-                        "total": incoming - outgoing,
+                        "incoming": cumulative[acc]["incoming"],
+                        "outgoing": cumulative[acc]["outgoing"],
+                        "total": cumulative[acc]["incoming"]
+                        - cumulative[acc]["outgoing"],
                         "id": f"{acc}_{period}",
                     }
                 )
@@ -59,13 +65,14 @@ class TransactionAnalyticsViewSet(viewsets.ViewSet):
         line_result = sorted(line_result, key=lambda x: x["period"])
 
         # Prepare the pie graph data
-        pie_result = queryset.values("category").annotate(
+        pie_result = queryset.values("category", "category__nature").annotate(
             total=Sum("amount"), id=F("category")
         )
         pie_result = [
             {
                 "graph": "pie",  # Annotating as pie graph data
                 "category": row["category"],
+                "category_nature": row["category__nature"],
                 "total": row["total"],
                 "id": row["id"],
             }

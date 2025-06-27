@@ -51,7 +51,7 @@ export const MyLineChart = observer(
       useTrendChart(data, traceKey, xKey, yKey, itemMap, excludedFromTotal);
 
     return (
-      <div className="w-full h-full">
+      <div className="w-full h-full p-2">
         <MyMultiDropdownSelector
           value={shownFields}
           onChangeValue={(t) => setShownFields(t as string[])}

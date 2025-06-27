@@ -18,6 +18,7 @@ const props = {
   id: prop<string>(""),
   graph: prop<GraphType>("pie"),
   category: prop<number | null>(null),
+  categoryNature: prop<number | null>(null),
   account: prop<number | null>(null),
   period: prop<string | null>(null),
   incoming: prop<number>(0),

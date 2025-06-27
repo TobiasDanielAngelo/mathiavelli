@@ -37,7 +37,7 @@ export const getOrdinal = (n: number) => {
 
 export function toMoneyShortened(val: number) {
   const value = Math.abs(val);
-  const negative = value < 0;
+  const negative = val < 0;
   if (value < 1000)
     return `\u20b1${
       negative ? "(" + value.toFixed(2) + ")" : value.toFixed(2)

@@ -8,6 +8,8 @@ import {
   Tooltip,
 } from "recharts";
 import { MyCircleChartProps, useCircleChart } from ".";
+import { formatValue } from "../../constants/helpers";
+import { MyDropdownSelector } from "../MyDropdownSelector";
 import { MyCustomTooltip } from "./MyCustomToolTip";
 
 // Custom label component
@@ -92,17 +94,41 @@ export const MyPieChart = observer(
   <T extends Record<string, any>>({
     data,
     width = "100%",
-    height = "100%",
+    height = "85%",
     colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042"],
     dataKey,
     nameKey,
+    traceKey,
     itemMap,
     formatter,
+    selectionLabel,
   }: MyCircleChartProps<T>) => {
-    const { resolvedData } = useCircleChart(data, nameKey, dataKey, itemMap);
+    const { selectedField, setSelectedField, resolvedData } = useCircleChart(
+      data,
+      nameKey,
+      dataKey,
+      traceKey,
+      itemMap
+    );
 
     return (
-      <div className="w-full h-full">
+      <div className="w-full h-full p-4">
+        <MyDropdownSelector
+          value={selectedField}
+          onChangeValue={setSelectedField}
+          options={Array.from(
+            new Set(data.map((s) => s[traceKey as string]))
+          ).map((s) => ({
+            id: s,
+            name: formatValue(
+              s,
+              traceKey as string,
+              [],
+              itemMap?.find((s) => s.key === traceKey)
+            ),
+          }))}
+          label={selectionLabel ?? "Traces"}
+        />
         <ResponsiveContainer width={width} height={height}>
           <PieChart>
             <Tooltip content={<MyCustomTooltip />} formatter={formatter} />

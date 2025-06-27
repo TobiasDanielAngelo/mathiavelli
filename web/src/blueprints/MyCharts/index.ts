@@ -18,6 +18,7 @@ export type MyTrendChartProps<T extends Record<string, any>> = {
 
 export type MyCircleChartProps<T extends Record<string, any>> = {
   data: T[];
+  traceKey: keyof T;
   nameKey: keyof T;
   dataKey: keyof T;
   width?: string | number;
@@ -25,6 +26,7 @@ export type MyCircleChartProps<T extends Record<string, any>> = {
   colors?: string[];
   itemMap?: KV<any>[];
   formatter?: (value: number, name: string) => string[];
+  selectionLabel?: string;
 };
 
 export function moveKeysToFront(obj: Record<string, any>, keys: string[]) {
@@ -48,8 +50,6 @@ export function transformForTrendChart<T extends Record<string, any>>(
 ) {
   const result: Record<string, any> = {};
 
-  const cumTotalTitle = "Cum. Total";
-
   data.forEach((item) => {
     const x = item[xAxis];
     const trace = item[traceKey];
@@ -66,11 +66,8 @@ export function transformForTrendChart<T extends Record<string, any>>(
     String(a[xAxis]).localeCompare(String(b[xAxis]))
   );
 
-  let cum = 0;
   const reordered = sorted.map((item) => {
-    cum += item[totalTitle];
-    item[cumTotalTitle] = cum;
-    return moveKeysToFront(item, [totalTitle, cumTotalTitle]);
+    return moveKeysToFront(item, [totalTitle]);
   });
 
   return reordered;
@@ -153,8 +150,11 @@ export const useCircleChart = <T extends Record<string, any>>(
   data: T[],
   nameKey: keyof T,
   dataKey: keyof T,
+  traceKey: keyof T,
   itemMap?: KV<any>[]
 ) => {
+  const [selectedField, setSelectedField] = useState(-1);
+
   const cleanedData = useMemo(
     () =>
       !data?.length
@@ -170,15 +170,18 @@ export const useCircleChart = <T extends Record<string, any>>(
   );
 
   const kv = itemMap?.find((s) => s.key === nameKey);
-  const resolvedData = cleanedData.map((s) => ({
-    [nameKey]:
-      kv?.label === ""
-        ? kv.values.find((_, i) => i === s[nameKey])
-        : kv?.values.find((v) => v.id === s[nameKey])?.[kv.label] ??
-          "—" ??
-          s[nameKey],
-    [dataKey]: s[dataKey],
-  }));
+  const resolvedData = cleanedData
+    .filter((s) => s[traceKey] === selectedField)
+    .map((s) => ({
+      [nameKey]:
+        kv?.label === ""
+          ? kv.values.find((_, i) => i === s[nameKey])
+          : kv?.values.find((v) => v.id === s[nameKey])?.[kv.label] ??
+            "—" ??
+            s[nameKey],
+      [dataKey]: s[dataKey],
+      [traceKey]: s[traceKey],
+    }));
 
-  return { resolvedData };
+  return { resolvedData, selectedField, setSelectedField };
 };
