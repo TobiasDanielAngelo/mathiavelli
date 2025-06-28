@@ -1,4 +1,5 @@
 from django.db import models
+from . import fields
 
 
 class CustomModel(models.Model):
@@ -12,3 +13,9 @@ class CustomModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Setting(CustomModel):
+    key = fields.ShortCharField(unique=True, display=True)
+    value = fields.MediumCharField()
+    description = fields.MediumCharField()

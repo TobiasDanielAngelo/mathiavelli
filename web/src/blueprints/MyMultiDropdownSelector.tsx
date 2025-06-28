@@ -85,7 +85,7 @@ export const MyMultiDropdownSelector = (props: {
           className="mt-1 absolute z-10 left-0 right-0 border rounded-lg bg-white dark:bg-gray-900 shadow-lg max-h-60 overflow-y-auto"
           style={{ position: relative ? "relative" : "absolute" }}
         >
-          <label className="flex items-center gap-2 p-2 text-sm hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer text-white">
+          <label className="flex items-center gap-2 p-2 text-sm hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer dark:text-white">
             <input
               type="checkbox"
               checked={selectAll}
@@ -97,7 +97,7 @@ export const MyMultiDropdownSelector = (props: {
           {options.map((opt) => (
             <label
               key={opt.id}
-              className="flex items-center gap-2 p-2 text-sm hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer text-white"
+              className="flex items-center gap-2 p-2 text-sm hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer dark:text-white"
             >
               <input
                 type="checkbox"

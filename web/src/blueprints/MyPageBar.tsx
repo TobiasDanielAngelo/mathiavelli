@@ -59,7 +59,9 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
           ({count} items)
         </span>
       )}
-      <span className="font-bold text-gray-400">{title.toUpperCase()}</span>
+      <span className="font-bold dark:text-gray-400">
+        {title.toUpperCase()}
+      </span>
       <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 cursor-pointer">
         {currentPage === 1 ? (
           <></>
@@ -67,7 +69,7 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
           <li>
             <div
               onClick={onClickPrev}
-              className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-teal border border-teal-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
             >
               Prev
             </div>
@@ -81,10 +83,10 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
               {typeof item === "number" ? (
                 <div
                   onClick={() => onClickPage(item)}
-                  className={`flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ${
+                  className={`flex items-center justify-center px-3 h-8 leading-tight border border-teal-300 ${
                     item === currentPage
-                      ? "text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:bg-gray-700 dark:border-gray-700 dark:text-white"
-                      : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                      ? "text-blue-600 bg-teal-200 hover:bg-white hover:text-teal-700 dark:bg-gray-700 dark:border-gray-700 dark:text-white"
+                      : "text-gray-500 bg-teal-100 hover:bg-white hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                   }`}
                 >
                   {item}
@@ -103,7 +105,7 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
           ) : (
             <div
               onClick={onClickNext}
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-teal border border-teal-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
             >
               Next
             </div>

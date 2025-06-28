@@ -51,7 +51,7 @@ export const MyGenericRecursiveCard = observer(
 
     return (
       <div
-        className="m-3 border-gray-700 rounded-lg p-5"
+        className="m-3 dark:border-gray-700 border-teal-300 rounded-lg p-5"
         style={{ borderWidth: border ? 1 : 0 }}
       >
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
@@ -107,7 +107,7 @@ export const MyGenericRecursiveCard = observer(
           </div>
         </div>
         {showChildren && subItems.length > 0 && (
-          <div className="ml-8 mt-2 space-y-2 border-l-2 border-gray-500 pl-2">
+          <div className="ml-8 mt-2 space-y-2 border-l-2 border-teal-500 pl-2">
             {subItems.map((s) => (
               <MyGenericRecursiveCard
                 key={s.id}

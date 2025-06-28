@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, hashers, password_validation
 from django.contrib.auth.models import User
 from django.db.models import Field
 from django.db.models import ForeignKey, OneToOneField, ManyToManyField
+from .models import *
 
 
 class LoginSerializer(serializers.Serializer):
@@ -157,3 +158,9 @@ class CustomSerializer(serializers.ModelSerializer):
                     )
 
         return fields
+
+
+class SettingSerializer(CustomSerializer):
+    class Meta:
+        model = Setting
+        fields = "__all__"

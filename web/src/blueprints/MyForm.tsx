@@ -184,7 +184,7 @@ export const MyForm = observer(
           objectName={objectName}
           actionName="Delete"
         />
-        <h1 className="text-xl mb-2 font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+        <h1 className="text-xl mb-2 font-bold leading-tight tracking-tight text-teal-900 md:text-2xl dark:text-white">
           {title}
         </h1>
         {fields.map((row, rowIdx) => (

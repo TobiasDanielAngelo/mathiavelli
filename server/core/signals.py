@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from finance.models import *
 from personal.models import *
 from productivity.models import *
+from .models import *
 
 
 @receiver(post_migrate)
@@ -28,6 +29,7 @@ def create_default_accounts(sender, **kwargs):
         (Platform, 1000009, {"name": "Steam"}),
         (Platform, 1000010, {"name": "Spotify"}),
         (Tag, 1000001, {"name": "Habit"}),
+        (Setting, 1000001, {"key": "Theme", "value": "dark"}),
     ]
 
     for model, id, fields in defaults:

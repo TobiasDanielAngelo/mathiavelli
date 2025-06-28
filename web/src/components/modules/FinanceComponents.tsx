@@ -4,6 +4,7 @@ import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { TransactionDashboard } from "../modules/TransactionComponents";
+import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 
 export const FinanceView = observer(() => {
   const { transactionStore, categoryStore, accountStore } = useStore();
@@ -29,6 +30,11 @@ export const FinanceView = observer(() => {
           key: "category",
           values: categoryStore.items,
           label: "title",
+        },
+        {
+          key: "categoryNature",
+          values: CATEGORY_CHOICES,
+          label: "",
         },
       ] as KV<any>[],
     [

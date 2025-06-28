@@ -27,6 +27,7 @@ import { ScheduleStore } from "./ScheduleStore";
 import { HabitStore } from "./HabitStore";
 import { HabitLogStore } from "./HabitLogStore";
 import { InventoryCategoryStore } from "./InventoryCategoryStore";
+import { SettingStore } from "./SettingStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -57,6 +58,7 @@ export class Store extends Model({
   scheduleStore: prop<ScheduleStore>(),
   habitStore: prop<HabitStore>(),
   habitLogStore: prop<HabitLogStore>(),
+  settingStore: prop<SettingStore>(),
 }) {}
 
 export const createStore = () =>
@@ -88,6 +90,7 @@ export const createStore = () =>
     scheduleStore: new ScheduleStore({}),
     habitStore: new HabitStore({}),
     habitLogStore: new HabitLogStore({}),
+    settingStore: new SettingStore({}),
   });
 
 export const StoreContext = createContext<Store | null>(null);

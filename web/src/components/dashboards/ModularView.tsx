@@ -14,7 +14,7 @@ const ModuleCard = ({ title, path }: { title: string; path: ViewPath }) => {
   ) : null;
 
   return (
-    <div className="mx-5 my-2 md:my-8 flex flex-row rounded-full shadow-md h-[100px] p-2 shrink-0 border border-gray-800 bg-gray-900">
+    <div className="mx-5 my-2 md:my-8 flex flex-row rounded-full shadow-md h-[100px] p-2 shrink-0 border dark:border-gray-800 dark:bg-gray-900">
       <div className="w-20 relative rounded-full border-2 items-center my-auto p-3 mx-5 bg-gradient-to-br from-blue-900 via-blue-500 to-blue-700">
         <Link
           to={path.mainLink === "back" ? "" : path.mainLink}

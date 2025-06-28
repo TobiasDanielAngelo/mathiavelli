@@ -29,6 +29,7 @@ import waistMeasure from "/images/waist-measure.png";
 import weighIns from "/images/weigh-ins.png";
 import wishlist from "/images/wishlist.png";
 import workouts from "/images/workouts.png";
+import settings from "/images/settings.png";
 import { useState } from "react";
 import { MyIcon } from "./MyIcon";
 
@@ -63,6 +64,7 @@ const IMAGES: Record<string, string> = {
   waistMeasure,
   weighIns,
   wishlist,
+  settings,
   workouts,
 };
 

@@ -122,7 +122,7 @@ export const useTrendChart = <T extends Record<string, any>>(
 
   const totalTitle = `Total${
     excludedFromTotal && excludedFromTotal.length > 0
-      ? " excl. " + excludedFromTotal.join(",")
+      ? " excl. " + excludedFromTotal.join(", ")
       : ""
   }`;
 

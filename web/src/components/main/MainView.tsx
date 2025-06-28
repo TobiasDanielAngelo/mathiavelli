@@ -11,6 +11,7 @@ import { BuyListItemView } from "../modules/BuyListItemComponents";
 import { CategoryView } from "../modules/CategoryComponents";
 import { CredentialView } from "../modules/CredentialComponents";
 import { EventView } from "../modules/EventComponents";
+import { FinanceView } from "../modules/FinanceComponents";
 import { FollowUpView } from "../modules/FollowUpComponents";
 import { GoalView } from "../modules/GoalComponents";
 import { HabitView } from "../modules/HabitComponents";
@@ -24,6 +25,7 @@ import { PersonalItemView } from "../modules/PersonalItemComponents";
 import { PlatformView } from "../modules/PlatformComponents";
 import { ReceivableView } from "../modules/ReceivableComponents";
 import { ScheduleView } from "../modules/ScheduleComponents";
+import { SettingView } from "../modules/SettingComponents";
 import { TagView } from "../modules/TagComponents";
 import { TaskView } from "../modules/TaskComponents";
 import { TransactionView } from "../modules/TransactionComponents";
@@ -31,7 +33,6 @@ import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { WeighInView } from "../modules/WeighInComponents";
 import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
-import { FinanceView } from "../modules/FinanceComponents";
 
 export const MainView = observer(() => {
   const [open, setOpen] = useState(false);
@@ -48,6 +49,7 @@ export const MainView = observer(() => {
     inventoryCategoryStore,
     transactionAnalyticsStore,
     scheduleStore,
+    settingStore,
   } = useStore();
 
   const navigate = useNavigate();
@@ -72,6 +74,7 @@ export const MainView = observer(() => {
       jobStore.fetchAll("page=all&status__lte=3");
       taskStore.fetchAll("page=all&is_archived=0");
       scheduleStore.fetchAll("page=all");
+      settingStore.fetchAll("page=all");
     }
   };
 
@@ -82,8 +85,16 @@ export const MainView = observer(() => {
     };
   }, []);
 
+  useEffect(() => {
+    if (settingStore.theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [settingStore.theme]);
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen dark:bg-[#242424] bg-teal-100 text-teal-700 dark:text-gray-400">
       <NavBar open={open} setOpen={setOpen} />
       <Routes>
         <Route path="" element={<ModularView />} />
@@ -115,6 +126,7 @@ export const MainView = observer(() => {
         <Route path="habits" element={<HabitView />} />
         <Route path="logs" element={<HabitLogView />} />
         <Route path="schedules" element={<ScheduleView />} />
+        <Route path="settings" element={<SettingView />} />
       </Routes>
     </div>
   );

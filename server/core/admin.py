@@ -32,6 +32,10 @@ class CustomAdmin(admin.ModelAdmin):
         return [field.name for field in self.model._meta.fields]
 
 
+class SettingAdmin(CustomAdmin):
+    pass
+
+
 for app_config in apps.get_app_configs():
     try:
         importlib.import_module(f"{app_config.name}.admin")

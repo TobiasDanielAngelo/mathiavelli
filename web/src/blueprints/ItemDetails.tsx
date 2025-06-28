@@ -23,9 +23,9 @@ export interface ItemDetailsProps<T> {
 }
 
 const sectionStyles: Record<string, string> = {
-  Header: "text-sm text-gray-400 flex flex-row",
-  Important: "font-bold text-3xl text-white px-3 rounded",
-  Body: "text-gray-400 text-lg px-7",
+  Header: "text-sm flex flex-row",
+  Important: "font-bold text-3xl px-3 rounded",
+  Body: "text-lg px-7",
 };
 
 export const ItemDetails = observer(

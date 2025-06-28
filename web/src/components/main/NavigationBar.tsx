@@ -42,6 +42,11 @@ export const allViewPaths = [
     title: "Health",
     items: ["meals", "weigh-ins", "body-fats", "waist-measure", "workouts"],
   },
+  {
+    title: "Settings",
+    items: ["settings"],
+    mainLink: "settings",
+  },
 ] as ViewPath[];
 
 export const NavBar = observer(

@@ -31,6 +31,8 @@ import Sort from "@mui/icons-material/Sort";
 import Today from "@mui/icons-material/Today";
 import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBox from "@mui/icons-material/CheckBox";
+import DarkMode from "@mui/icons-material/DarkMode";
+import LightMode from "@mui/icons-material/LightMode";
 import Settings from "@mui/icons-material/Settings";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
@@ -59,6 +61,8 @@ const iconMap = {
   Timeline,
   TableChart,
   Padding,
+  DarkMode,
+  LightMode,
   Today,
   BarChart,
   ExpandMore,
@@ -86,7 +90,10 @@ export const MyIcon: React.FC<MyIconProps> = ({ icon, label, ...props }) => {
 
   return (
     <div className="flex flex-col items-center">
-      <IconComponent className="cursor-pointer text-gray-400" {...props} />
+      <IconComponent
+        className="cursor-pointer dark:text-gray-400 text-teal-700"
+        {...props}
+      />
       <div className="text-xs text-gray-500 font-bold">{label}</div>
     </div>
   );

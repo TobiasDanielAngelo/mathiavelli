@@ -9,7 +9,7 @@ export const MyCustomTooltip = ({
   if (!active || !payload || !payload.length) return null;
 
   return (
-    <div className="p-2 rounded bg-gray-700 shadow text-sm text-white">
+    <div className="p-2 rounded bg-teal-100 dark:bg-gray-700 border border-teal-400 gray-shadow text-sm dark:text-white">
       <p className="font-semibold mb-1">{label}</p>
       {payload.map((entry, index) => {
         const formatted = formatter

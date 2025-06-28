@@ -99,14 +99,14 @@ export const ResponsiveDrawer = observer(
 
 const NavLink = ({ page }: { page: Page }) => {
   return (
-    <div className="relative group px-2 py-1">
+    <div className="relative group px-2 py-1 cursor-pointer">
       {page.link ? (
         <Link
           to={page.link}
           className={
             page.selected
-              ? "md:text-gray-300 font-bold"
-              : "md:text-blue-500 font-bold"
+              ? "dark:text-gray-300 text-teal-900 font-bold"
+              : "dark:text-blue-500 text-teal-500 font-bold"
           }
         >
           {page.title}
@@ -115,8 +115,8 @@ const NavLink = ({ page }: { page: Page }) => {
         <span
           className={
             page.selected
-              ? "md:text-gray-300 font-bold cursor-default"
-              : "md:text-blue-500 font-bold cursor-default"
+              ? "dark:text-gray-300 text-teal-900 font-bold"
+              : "dark:text-blue-500 text-teal-500 font-bold"
           }
         >
           {page.title}
@@ -124,12 +124,12 @@ const NavLink = ({ page }: { page: Page }) => {
       )}
 
       {page.children && page.children?.length > 0 && (
-        <div className="absolute top-full left-0 z-20 hidden group-hover:block bg-gray-800 rounded shadow-lg min-w-[150px] py-2">
+        <div className="absolute top-full left-0 z-20 hidden group-hover:block dark:bg-gray-800 bg-teal-100 rounded shadow-lg min-w-[150px] py-2">
           {page.children.map((child, idx) => (
             <Link
               key={idx}
               to={child.link ?? ""}
-              className="block px-4 py-2 text-sm text-white hover:bg-gray-100"
+              className="block px-4 py-2 text-sm dark:text-white text-teal-700 hover:bg-teal-200 dark:hover:bg-gray-400"
             >
               {child.title}
             </Link>
@@ -150,6 +150,7 @@ export const MyNavBar = observer(
   }) => {
     const { title, drawerOpen, setDrawerOpen, profileUrl, paths } = props;
 
+    const { settingStore } = useStore();
     const navigate = useNavigate();
 
     const [open2, setOpen2] = useState(false);
@@ -173,7 +174,7 @@ export const MyNavBar = observer(
     });
 
     return (
-      <nav className="relative bg-white border-gray-200 dark:bg-gray-900">
+      <nav className="relative bg-teal-200 border-teal-200 dark:bg-gray-900">
         <ResponsiveDrawer
           open={drawerOpen}
           setOpen={setDrawerOpen}
@@ -194,7 +195,7 @@ export const MyNavBar = observer(
           </div>
 
           <div className="md:w-auto" id="navbar-default">
-            <ul className="font-medium flex flex-col items-center justify-center md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <ul className="font-medium flex items-center justify-center md:p-0 mt-4 border border-teal-100 rounded-lg flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 dark:border-gray-700">
               {paths?.map((s, ind) => (
                 <div key={ind} className="hidden lg:block">
                   <NavLink page={s} />
@@ -222,6 +223,11 @@ export const MyNavBar = observer(
                       },
                     })) ?? []),
                     {
+                      title: "Toggle Theme",
+                      selected: false,
+                      onClick: settingStore.toggleTheme,
+                    },
+                    {
                       title: "Logout",
                       selected: false,
                       onClick: onClickLogout,
@@ -229,6 +235,19 @@ export const MyNavBar = observer(
                   ]}
                 />
               </div>
+              <li>
+                <div
+                  className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                  onClick={settingStore.toggleTheme}
+                >
+                  <MyIcon
+                    icon={
+                      settingStore.theme === "dark" ? "DarkMode" : "LightMode"
+                    }
+                  />
+                </div>
+              </li>
+
               <li>
                 <div
                   className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"

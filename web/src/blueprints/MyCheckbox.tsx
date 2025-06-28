@@ -1,3 +1,5 @@
+import { MyIcon } from "./MyIcon";
+
 export const MyCheckBox = (props: {
   hidden?: boolean;
   label?: string;
@@ -9,13 +11,12 @@ export const MyCheckBox = (props: {
   if (hidden) return null;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-left justify-start">
       <label className="text-xs text-blue-600">{label ?? "Select Items"}</label>
-      <input
-        type="checkbox"
-        checked={value}
-        onChange={(e) => onChangeValue?.(e.target.checked)}
-        className="form-checkbox h-5 w-5 text-blue-600 m-2"
+      <MyIcon
+        icon={value ? "CheckBox" : "CheckBoxOutlineBlank"}
+        onClick={() => onChangeValue?.(!value)}
+        fontSize="large"
       />
       {msg && (
         <label className="block text-xs font-medium dark:text-white mt-1 text-red-600">

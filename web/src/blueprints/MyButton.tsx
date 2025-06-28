@@ -12,7 +12,7 @@ export const MyButton: React.FC<ButtonProps> = ({ ...props }) => {
     <div className="px-5 py-2.5">
       <button
         {...foo}
-        className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+        className="dark:text-white bg-gray-300 hover:bg-gray-300 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
       >
         {props.isLoading ? (
           <svg

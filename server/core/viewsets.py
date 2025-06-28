@@ -116,3 +116,8 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         if queryset is not None:
             serializer = self.get_serializer(queryset, many=True)
             return self.get_paginated_response(serializer.data)
+
+
+class SettingViewSet(CustomModelViewSet):
+    queryset = Setting.objects.all()
+    serializer_class = SettingSerializer
