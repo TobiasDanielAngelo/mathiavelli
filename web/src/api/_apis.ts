@@ -1,4 +1,4 @@
-import { getToken } from "./_apiHelpers";
+import { getCookie } from "./_apiHelpers";
 
 export async function guidedRequest(
   endpoint: string,
@@ -9,14 +9,13 @@ export async function guidedRequest(
     params?: string;
   }
 ): Promise<string> {
-  const token = getToken();
-
   let url = `${import.meta.env.VITE_BASE_URL}/${endpoint}`;
 
   const headers: Record<string, string> = {
     "Content-type": "application/json",
-    Authorization: `Token ${token}`,
     "ngrok-skip-browser-warning": "any",
+    credentials: "include",
+    "X-CSRFToken": getCookie("csrftoken"),
   };
 
   const response = await fetch(url, {

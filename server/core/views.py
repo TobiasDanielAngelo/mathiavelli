@@ -4,14 +4,15 @@ from knox.models import AuthToken
 from django.contrib.auth.models import User
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import permissions, response, status, generics
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from knox.auth import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 import os
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.http import JsonResponse
+from .viewsets import KnoxCookieAuth
 
 
 class CustomAPIView(APIView):
@@ -24,55 +25,56 @@ class CustomAPIView(APIView):
     ]
 
 
-class LoginAPI(KnoxLoginView):
-    serializer_class = LoginSerializer
-    permission_classes = [
-        permissions.AllowAny,
-    ]
-    api_view = ["POST", "GET"]
+# Depreciated
+# class LoginAPI(KnoxLoginView):
+#     serializer_class = LoginSerializer
+#     permission_classes = [
+#         permissions.AllowAny,
+#     ]
+#     api_view = ["POST", "GET"]
 
-    def get(self, request):
-        content = {
-            "username": ["This field is required,"],
-            "password": ["This field is required,"],
-        }
-        return response.Response(content)
+#     def get(self, request):
+#         content = {
+#             "username": ["This field is required,"],
+#             "password": ["This field is required,"],
+#         }
+#         return response.Response(content)
 
-    def post(self, request, *args, **kwargs):
-        user = User.objects.filter(username=request.data.get("username")).first()
-        if user != None:
-            serializer = LoginSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            user = serializer.validated_data["user"]
-            _, token = AuthToken.objects.create(user)
-            authenticated_user = authenticate(
-                request, username=user.username, password=request.data["password"]
-            )
-            if authenticated_user.is_authenticated:
-                data = {
-                    "key": token,
-                    "user": {
-                        "id": -1 if user is None else user.id,
-                        "username": user.username,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                    },
-                }
-                return response.Response(data)
-            else:
-                return response.Response(
-                    {
-                        "error": "Wrong password",
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        else:
-            return response.Response(
-                {
-                    "error": "User does not exist",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+#     def post(self, request, *args, **kwargs):
+#         user = User.objects.filter(username=request.data.get("username")).first()
+#         if user != None:
+#             serializer = LoginSerializer(data=request.data)
+#             serializer.is_valid(raise_exception=True)
+#             user = serializer.validated_data["user"]
+#             _, token = AuthToken.objects.create(user)
+#             authenticated_user = authenticate(
+#                 request, username=user.username, password=request.data["password"]
+#             )
+#             if authenticated_user.is_authenticated:
+#                 data = {
+#                     "key": token,
+#                     "user": {
+#                         "id": -1 if user is None else user.id,
+#                         "username": user.username,
+#                         "first_name": user.first_name,
+#                         "last_name": user.last_name,
+#                     },
+#                 }
+#                 return response.Response(data)
+#             else:
+#                 return response.Response(
+#                     {
+#                         "error": "Wrong password",
+#                     },
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
+#         else:
+#             return response.Response(
+#                 {
+#                     "error": "User does not exist",
+#                 },
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -117,35 +119,36 @@ class RegistrationAPI(generics.GenericAPIView):
         )
 
 
-class ReauthAPI(APIView):
-    permission_classes = [
-        permissions.AllowAny,
-    ]
+# Depreciated
+# class ReauthAPI(APIView):
+#     permission_classes = [
+#         permissions.AllowAny,
+#     ]
 
-    def post(self, request):
-        token_key = request.headers["Authorization"].split(" ")[1][0:15]
-        try:
-            auth_token = AuthToken.objects.get(token_key=token_key)
-        except:
-            return response.Response(
-                {
-                    "error": "Login not recognized",
-                },
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        if auth_token is not None:
-            user = User.objects.get(id=auth_token.user_id)
-            login(request, user)
-            data = {
-                "key": request.headers["Authorization"].split(" ")[1],
-                "user": {
-                    "id": -1 if user is None else user.id,
-                    "username": user.username,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                },
-            }
-            return response.Response(data)
+#     def post(self, request):
+#         token_key = request.headers["Authorization"].split(" ")[1][0:15]
+#         try:
+#             auth_token = AuthToken.objects.get(token_key=token_key)
+#         except:
+#             return response.Response(
+#                 {
+#                     "error": "Login not recognized",
+#                 },
+#                 status=status.HTTP_401_UNAUTHORIZED,
+#             )
+#         if auth_token is not None:
+#             user = User.objects.get(id=auth_token.user_id)
+#             login(request, user)
+#             data = {
+#                 "key": request.headers["Authorization"].split(" ")[1],
+#                 "user": {
+#                     "id": -1 if user is None else user.id,
+#                     "username": user.username,
+#                     "first_name": user.first_name,
+#                     "last_name": user.last_name,
+#                 },
+#             }
+#             return response.Response(data)
 
 
 class CookieLoginView(KnoxLoginView):
@@ -170,44 +173,91 @@ class CookieLoginView(KnoxLoginView):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
+        # _, token = AuthToken.objects.create(user)
         login(request, user)
-
-        # Let Knox generate the token
         response = super().post(request, format=None)
-        token = response.data.get("token")
-        expiry = response.data.get("expiry")
-
-        # Prepare the cookie response
-        cookie_response = JsonResponse({"success": True})
-        cookie_response.set_cookie(
-            key="knox_token",
-            value=token,
-            httponly=True,
-            secure=os.environ.get("COOKIE_SECURE_BOOL"),
-            samesite="Strict",
-            expires=expiry,
-        )
-        return cookie_response
+        # authenticated_user = authenticate(
+        #     request, username=user.username, password=request.data["password"]
+        # )
+        if user:
+            response = super().post(request, format=None)
+            token = response.data.get("token")
+            expiry = response.data.get("expiry")
+            cookie_response = JsonResponse(
+                {
+                    "key": "",
+                    "user": {
+                        "id": -1 if user is None else user.id,
+                        "username": user.username,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                    },
+                }
+            )
+            cookie_response.set_cookie(
+                key="knox_token",
+                value=token,
+                httponly=True,
+                secure=os.environ.get("COOKIE_SECURE_BOOL"),
+                samesite="Strict",
+                expires=expiry,
+            )
+            return cookie_response
+        else:
+            return response.Response(
+                {
+                    "error": "Wrong username/password.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class CookieReauthView(APIView):
     permission_classes = [IsAuthenticated]
+    authentication_classes = (KnoxCookieAuth,)
 
     def post(self, request):
         # Delete old tokens (optional cleanup)
-        # AuthToken.objects.filter(user=request.user).delete()
+        AuthToken.objects.filter(user=request.user).delete()
 
         # Create new token
         instance, token = AuthToken.objects.create(request.user)
 
+        user = request.user  # already fully loaded user
+
+        response = JsonResponse(
+            {
+                "key": "",
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                },
+            }
+        )
+
         # Set token in secure cookie
-        response = Response({"refreshed": True})
         response.set_cookie(
             key="knox_token",
             value=token,
             httponly=True,
-            secure=True,
-            samesite="Strict",
+            secure=False,  # set False for local http, True in prod HTTPS
+            samesite="Lax",  # Lax works better across ports on localhost
             expires=instance.expiry,
         )
         return response
+
+
+class CookieLogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (KnoxCookieAuth,)
+
+    def post(self, request):
+        if request._auth:
+            request._auth.delete()
+            response = Response({"success": True})
+            response.delete_cookie("knox_token")
+            return response
+        else:
+            return Response({"success": False})

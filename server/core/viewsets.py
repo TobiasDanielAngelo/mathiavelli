@@ -10,6 +10,14 @@ import json
 from lzstring import LZString
 
 
+class KnoxCookieAuth(TokenAuthentication):
+    def authenticate(self, request):
+        token = request.COOKIES.get("knox_token")
+        if token:
+            return self.authenticate_credentials(token.encode("utf-8"))
+        return None
+
+
 def decode_query_param(encoded_param):
     lz = LZString()
     return json.loads(lz.decompressFromEncodedURIComponent(encoded_param))
@@ -21,7 +29,7 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         IsAuthenticated,
         CustomDjangoModelPermission,
     ]
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (KnoxCookieAuth,)
 
     def list(self, request, *args, **kwargs):
         params = self.request.query_params.copy()
@@ -44,7 +52,6 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         for key, value in params.items():
             base_key = key.split("__")[0]
             if base_key not in model_fields:
-                # print(f"Skipping field: {key}")
                 continue
             if "__search" in key:
                 field_name = key.replace("__search", "")

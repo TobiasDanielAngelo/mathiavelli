@@ -3,6 +3,7 @@ import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
 import {
   deleteItemRequest,
   fetchItemsRequest,
+  getCookie,
   postItemRequest,
   updateItemRequest,
 } from "./_apiHelpers";
@@ -179,10 +180,6 @@ export class UserStore extends Model({
 
   @modelFlow
   fetchUser = _async(function* (this: UserStore, userId: string) {
-    let token: string;
-
-    token = localStorage.getItem("@userToken") ?? "";
-
     let response: Response;
 
     try {
@@ -191,9 +188,9 @@ export class UserStore extends Model({
           method: "GET",
           headers: {
             "Content-type": "application/json",
-            Authorization: `Token ${token}`,
             "ngrok-skip-browser-warning": "any",
           },
+          credentials: "include",
         })
       );
     } catch (error) {
@@ -241,12 +238,14 @@ export class UserStore extends Model({
 
     try {
       response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
+        fetch(`${import.meta.env.VITE_BASE_URL}/cookie-login`, {
           method: "POST",
           body: JSON.stringify(credentials),
           headers: {
             "Content-type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
           },
+          credentials: "include",
         })
       );
     } catch (error) {
@@ -275,8 +274,8 @@ export class UserStore extends Model({
     try {
       const resp = yield* _await(response.json());
       json = resp.user;
-      localStorage.setItem("@userToken", resp.key);
-      localStorage.setItem("@currentUser", JSON.stringify(json));
+      // localStorage.setItem("@userToken", resp.key);
+      // localStorage.setItem("@currentUser", JSON.stringify(json));
     } catch (error) {
       console.error("Parsing Error", error);
       return { details: "Parsing Error", ok: false, data: null };
@@ -289,20 +288,17 @@ export class UserStore extends Model({
 
   @modelFlow
   logoutUser = _async(function* (this: UserStore) {
-    let token: string;
-
-    token = localStorage.getItem("@userToken") ?? "";
-
     let response: Response;
 
     try {
       response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/logout`, {
+        fetch(`${import.meta.env.VITE_BASE_URL}/cookie-logout`, {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-type": "application/json",
-            Authorization: `Token ${token}`,
             "ngrok-skip-browser-warning": "any",
+            "X-CSRFToken": getCookie("csrftoken"),
           },
         })
       );
@@ -327,32 +323,24 @@ export class UserStore extends Model({
       return { details: msg, ok: false, data: null };
     }
 
-    localStorage.removeItem("@userToken");
-    localStorage.removeItem("@currentUser");
+    this.currentLogger = new User({});
 
     return { details: "", ok: true, data: null };
   });
 
   @modelFlow
   reauthUser = _async(function* (this: UserStore) {
-    let token: string;
-
-    token = localStorage.getItem("@userToken") ?? "";
-
-    if (token === "") {
-      return { details: `No token available.`, ok: false, data: null };
-    }
-
     let response: Response;
 
     try {
       response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/reauth`, {
+        fetch(`${import.meta.env.VITE_BASE_URL}/cookie-reauth`, {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-type": "application/json",
-            Authorization: `Token ${token}`,
             "ngrok-skip-browser-warning": "any",
+            "X-CSRFToken": getCookie("csrftoken"),
           },
         })
       );
@@ -366,8 +354,6 @@ export class UserStore extends Model({
     }
 
     if (!response.ok) {
-      localStorage.clear();
-
       let msg = yield* _await(response.json()) as any;
 
       if (msg.nonFieldErrors || msg.detail) {

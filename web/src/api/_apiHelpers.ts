@@ -1,6 +1,15 @@
 import { PaginatedResponse } from "../constants/interfaces";
 
-export const getToken = () => localStorage.getItem("@userToken") ?? "";
+export function getCookie(name: string): string {
+  const cookies = document.cookie ? document.cookie.split(";") : [];
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith(name + "=")) {
+      return decodeURIComponent(cookie.substring(name.length + 1));
+    }
+  }
+  return "";
+}
 
 export async function guidedRequest<T>(
   endpoint: string,
@@ -11,8 +20,6 @@ export async function guidedRequest<T>(
     params?: string;
   }
 ): Promise<{ details: any; ok: boolean; data: T | null }> {
-  const token = getToken();
-
   const input = new URLSearchParams(options.params);
   const filtered = new URLSearchParams();
 
@@ -26,12 +33,13 @@ export async function guidedRequest<T>(
 
   const headers: Record<string, string> = {
     "Content-type": "application/json",
-    Authorization: `Token ${token}`,
     "ngrok-skip-browser-warning": "any",
+    "X-CSRFToken": getCookie("csrftoken"),
   };
 
   const response = await fetch(url, {
     method: options.method,
+    credentials: "include",
     body: options.body ? JSON.stringify(options.body) : undefined,
     headers,
   });

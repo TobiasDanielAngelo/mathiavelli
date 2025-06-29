@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Transaction
 from collections import defaultdict
 from core.utils import annotate_period, generate_period_list
+from core.viewsets import KnoxCookieAuth
 
 
 class TransactionAnalyticsViewSet(viewsets.ViewSet):
@@ -12,7 +13,7 @@ class TransactionAnalyticsViewSet(viewsets.ViewSet):
         IsAuthenticated,
     ]
 
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (KnoxCookieAuth,)
 
     def list(self, request):
         queryset = Transaction.objects.all()
