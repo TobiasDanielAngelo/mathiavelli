@@ -8,8 +8,12 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: rgb(204 251 241);
+  transition: background-color 0.5s, color 0.5s;
+}
 
+.dark {
+    background-color: #242424; /* or any dark color */
 }
 
 a {

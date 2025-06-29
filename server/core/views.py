@@ -10,6 +10,8 @@ from knox.auth import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 import os
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from django.http import JsonResponse
 
 
 class CustomAPIView(APIView):
@@ -144,3 +146,68 @@ class ReauthAPI(APIView):
                 },
             }
             return response.Response(data)
+
+
+class CookieLoginView(KnoxLoginView):
+    """
+    Logs in a user and sets the token in an HTTP-only cookie.
+    """
+
+    serializer_class = LoginSerializer
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+    api_view = ["POST", "GET"]
+
+    def get(self, request):
+        content = {
+            "username": ["This field is required,"],
+            "password": ["This field is required,"],
+        }
+        return response.Response(content)
+
+    def post(self, request, format=None):
+        serializer = AuthTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        login(request, user)
+
+        # Let Knox generate the token
+        response = super().post(request, format=None)
+        token = response.data.get("token")
+        expiry = response.data.get("expiry")
+
+        # Prepare the cookie response
+        cookie_response = JsonResponse({"success": True})
+        cookie_response.set_cookie(
+            key="knox_token",
+            value=token,
+            httponly=True,
+            secure=os.environ.get("COOKIE_SECURE_BOOL"),
+            samesite="Strict",
+            expires=expiry,
+        )
+        return cookie_response
+
+
+class CookieReauthView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Delete old tokens (optional cleanup)
+        # AuthToken.objects.filter(user=request.user).delete()
+
+        # Create new token
+        instance, token = AuthToken.objects.create(request.user)
+
+        # Set token in secure cookie
+        response = Response({"refreshed": True})
+        response.set_cookie(
+            key="knox_token",
+            value=token,
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+            expires=instance.expiry,
+        )
+        return response

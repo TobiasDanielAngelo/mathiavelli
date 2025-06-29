@@ -30,7 +30,7 @@ export const MyDropdownSelector = (props: {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            className=" bg-gray-50 border border-teal-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-teal-100 border border-teal-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
           {search && !options?.map((s) => s.name).includes(search) && (
             <ul className="absolute flex-1 w-full z-50 border border-teal-400 bg-gray-800  rounded-b-xl rounded-t-md">
@@ -60,7 +60,7 @@ export const MyDropdownSelector = (props: {
           <select
             value={value}
             onChange={(e) => onChangeValue(parseInt(e.target.value))}
-            className="bg-gray-50 border border-teal-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-teal-100 border border-teal-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value={undefined}>Select {label}</option>
             {options?.map((s, ind) => (

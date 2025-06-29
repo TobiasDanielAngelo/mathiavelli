@@ -94,7 +94,7 @@ export const MainView = observer(() => {
   }, [settingStore.theme]);
 
   return (
-    <div className="flex flex-col min-h-screen dark:bg-[#242424] bg-teal-100 text-teal-700 dark:text-gray-400">
+    <div className="flex flex-col min-h-screen text-teal-700 dark:text-gray-400">
       <NavBar open={open} setOpen={setOpen} />
       <Routes>
         <Route path="" element={<ModularView />} />

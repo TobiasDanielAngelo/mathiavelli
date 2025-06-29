@@ -78,7 +78,9 @@ export const NavBar = observer(
         ...(items.length > 1
           ? {
               children: items.map((item) => ({
-                title: item.charAt(0).toUpperCase() + item.slice(1),
+                title:
+                  item.charAt(0).toUpperCase() +
+                  item.slice(1).replace("-", " "),
                 link: `/${item}`,
               })),
             }

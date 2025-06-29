@@ -14,6 +14,8 @@ import { useKeyPress } from "../constants/hooks";
 import { Page, StateSetter } from "../constants/interfaces";
 import { MyDropdownMenu } from "./MyDropdownMenu";
 import { MyIcon } from "./MyIcon";
+import { MyImage } from "./MyImages";
+import { titleToCamel } from "../constants/helpers";
 
 const drawerWidth = 240;
 
@@ -40,7 +42,7 @@ export const ResponsiveDrawer = observer(
           open={open}
           onClose={setOpen && (() => setOpen(false))}
         >
-          <div className="dark:bg-gray-900 dark:text-gray-400">
+          <div className="bg-teal-100 dark:bg-gray-900 dark:text-gray-400">
             <Toolbar />
             <List>
               <ListItem disablePadding>
@@ -51,7 +53,7 @@ export const ResponsiveDrawer = observer(
                   }}
                 >
                   <ListItemIcon>
-                    <MyIcon icon="Inbox" color="primary" />
+                    <MyImage image="dashboard" className="w-10" />
                   </ListItemIcon>
                   <ListItemText primary={"Dashboard"} secondary={""} />
                 </ListItemButton>
@@ -65,7 +67,10 @@ export const ResponsiveDrawer = observer(
                     }}
                   >
                     <ListItemIcon>
-                      <MyIcon icon="Inbox" color="primary" />
+                      <MyImage
+                        image={titleToCamel(s.title).replace("-", "")}
+                        className="w-10"
+                      />
                     </ListItemIcon>
                     <ListItemText primary={s.title} secondary={""} />
                   </ListItemButton>
@@ -83,7 +88,7 @@ export const ResponsiveDrawer = observer(
                     }}
                   >
                     <ListItemIcon>
-                      <MyIcon icon="Inbox" color="primary" />
+                      <MyImage image="logout" className="w-10" />
                     </ListItemIcon>
                     <ListItemText primary={s} secondary={""} />
                   </ListItemButton>

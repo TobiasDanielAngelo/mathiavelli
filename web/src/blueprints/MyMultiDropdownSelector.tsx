@@ -70,7 +70,7 @@ export const MyMultiDropdownSelector = (props: {
 
       <div
         onClick={() => setOpen(!isOpen)}
-        className="cursor-pointer border bg-white dark:bg-gray-800 dark:border-gray-600 p-2 rounded-lg text-sm text-gray-700 dark:text-white flex justify-between items-center"
+        className="cursor-pointer border bg-teal-100 dark:bg-gray-800 dark:border-gray-600 p-2 rounded-lg text-sm text-gray-700 dark:text-white flex justify-between items-center"
       >
         <span className="truncate">
           {!value || value.length === 0

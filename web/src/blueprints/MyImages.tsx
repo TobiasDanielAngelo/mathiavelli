@@ -27,7 +27,9 @@ import tasks from "/images/tasks.png";
 import transactions from "/images/transactions.png";
 import waistMeasure from "/images/waist-measure.png";
 import weighIns from "/images/weigh-ins.png";
+import logout from "/images/logout.png";
 import wishlist from "/images/wishlist.png";
+import dashboard from "/images/dashboard.png";
 import workouts from "/images/workouts.png";
 import settings from "/images/settings.png";
 import { useState } from "react";
@@ -45,8 +47,10 @@ const IMAGES: Record<string, string> = {
   back,
   goals,
   logs,
+  logout,
   habits,
   health,
+  dashboard,
   inventoryTypes,
   jobs,
   journals,
@@ -70,9 +74,13 @@ const IMAGES: Record<string, string> = {
 
 type MyImageProps = {
   image?: keyof typeof IMAGES;
+  className?: string;
 };
 
-export const MyImage = ({ image = "accounts" }: MyImageProps) => {
+export const MyImage = ({
+  image = "accounts",
+  className = "",
+}: MyImageProps) => {
   const [loading, setLoading] = useState(true);
 
   return (
@@ -84,7 +92,7 @@ export const MyImage = ({ image = "accounts" }: MyImageProps) => {
           setLoading(false);
           console.error("Image failed to load.");
         }}
-        className="w-full h-full object-contain"
+        className={className ?? "w-full h-full object-contain"}
       />
       {loading ? <MyIcon icon="RestartAlt" style={{ fontSize: 48 }} /> : <></>}
     </>
