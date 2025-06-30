@@ -24,24 +24,32 @@ export const SideBySideView = observer(
               width >= 1024 ? (reversed ? "row-reverse" : "row") : "column",
           }}
         >
-          <div
-            className="lg:overflow-scroll m-2 border border-teal-500 dark:border-gray-700 rounded-lg"
-            style={{
-              width: width >= 1024 ? widthA : "100%",
-              display: width >= 1024 || SideA ? "block" : "none",
-            }}
-          >
-            {SideA}
-          </div>
-          <div
-            className="lg:overflow-scroll m-2 min-h-[40vh] border border-teal-500 dark:border-gray-700 rounded-lg items-center justify-center"
-            style={{
-              width: width >= 1024 ? widthB : "100%",
-              // display: SideB ? "block" : "none",
-            }}
-          >
-            {SideB}
-          </div>
+          {!SideA ? (
+            <></>
+          ) : (
+            <div
+              className="lg:overflow-scroll m-2 border border-teal-500 dark:border-gray-700 rounded-lg"
+              style={{
+                width: width >= 1024 ? widthA : "100%",
+                display: width >= 1024 || SideA ? "block" : "none",
+              }}
+            >
+              {SideA}
+            </div>
+          )}
+          {!SideB ? (
+            <></>
+          ) : (
+            <div
+              className="lg:overflow-scroll m-2 min-h-[60vh] border border-teal-500 dark:border-gray-700 rounded-lg items-center justify-center"
+              style={{
+                width: width >= 1024 ? widthB : "100%",
+                // display: SideB ? "block" : "none",
+              }}
+            >
+              {SideB}
+            </div>
+          )}
         </div>
       </div>
     );

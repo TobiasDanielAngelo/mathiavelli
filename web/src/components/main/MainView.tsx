@@ -17,6 +17,8 @@ import { GoalView } from "../modules/GoalComponents";
 import { HabitView } from "../modules/HabitComponents";
 import { HabitLogView } from "../modules/HabitLogComponents";
 import { InventoryCategoryView } from "../modules/InventoryCategoryComponents";
+import { IssueCommentView } from "../modules/IssueCommentComponents";
+import { IssueTagView } from "../modules/IssueTagComponents";
 import { JobView } from "../modules/JobComponents";
 import { JournalView } from "../modules/JournalComponents";
 import { MealView } from "../modules/MealComponents";
@@ -28,6 +30,7 @@ import { ScheduleView } from "../modules/ScheduleComponents";
 import { SettingView } from "../modules/SettingComponents";
 import { TagView } from "../modules/TagComponents";
 import { TaskView } from "../modules/TaskComponents";
+import { TicketView } from "../modules/TicketComponents";
 import { TransactionView } from "../modules/TransactionComponents";
 import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { WeighInView } from "../modules/WeighInComponents";
@@ -127,6 +130,9 @@ export const MainView = observer(() => {
         <Route path="logs" element={<HabitLogView />} />
         <Route path="schedules" element={<ScheduleView />} />
         <Route path="settings" element={<SettingView />} />
+        <Route path="issue-comments" element={<IssueCommentView />} />
+        <Route path="issue-tags" element={<IssueTagView />} />
+        <Route path="tickets" element={<TicketView />} />
       </Routes>
     </div>
   );

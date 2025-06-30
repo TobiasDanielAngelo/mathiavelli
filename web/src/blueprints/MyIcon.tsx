@@ -33,6 +33,8 @@ import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBox from "@mui/icons-material/CheckBox";
 import DarkMode from "@mui/icons-material/DarkMode";
 import LightMode from "@mui/icons-material/LightMode";
+import DisabledVisible from "@mui/icons-material/DisabledVisible";
+import RemoveRedEye from "@mui/icons-material/RemoveRedEye";
 import Settings from "@mui/icons-material/Settings";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
@@ -72,6 +74,8 @@ const iconMap = {
   Settings,
   Sort,
   CheckBox,
+  DisabledVisible,
+  RemoveRedEye,
   CheckBoxOutlineBlank,
   Search,
 } as const;

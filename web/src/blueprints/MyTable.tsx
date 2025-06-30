@@ -7,12 +7,10 @@ export const MyTable = (props: {
   return hidden ? (
     <></>
   ) : matrix.length < 2 ? (
-    <div className="text-center text-white">No entries.</div>
+    <div className="text-center dark:text-white">No entries.</div>
   ) : (
-    <div
-      className={"relative overflow-x-auto shadow-md sm:rounded-lg mt-4 mx-5"}
-    >
-      <table className="m-auto min-w-[50%] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <div className={"relative mt-4 mx-5"}>
+      <table className="m-auto min-w-[50%] shadow-md sm:rounded-lg overflow-x-auto text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead className="text-md text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             {matrix[0].map((s, ind) => (
@@ -30,12 +28,28 @@ export const MyTable = (props: {
             >
               <th
                 scope="row"
-                className="px-6 py-4 font-bold text-gray-900 whitespace-nowrap dark:text-white"
+                style={{
+                  whiteSpace:
+                    typeof s[0] === "string"
+                      ? s[0].includes(`\n`)
+                        ? "pre-wrap"
+                        : "none"
+                      : "none",
+                }}
+                className="px-6 py-4 font-bold text-gray-900 dark:text-white"
               >
                 {s[0]}
               </th>
               {s.slice(1).map((t, ind) => (
                 <td
+                  style={{
+                    whiteSpace:
+                      typeof t === "string"
+                        ? t.includes(`\n`)
+                          ? "pre-wrap"
+                          : "none"
+                        : "none",
+                  }}
                   className="px-6 py-4 justify-between border-solid"
                   key={ind}
                 >

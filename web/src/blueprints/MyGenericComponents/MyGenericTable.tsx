@@ -4,6 +4,7 @@ import {
   camelToSnakeCase,
   formatValue,
   getStoreSignature,
+  toRomanWithExponents,
   toTitleCase,
 } from "../../constants/helpers";
 import { StateSetter } from "../../constants/interfaces";
@@ -89,6 +90,7 @@ export const MyGenericTable = observer(
     };
 
     const matrix = useMemo(() => {
+      if (!items.length) return [];
       const header = [
         ...shownFields
           .filter((s) => Object.keys(items[0].$view).includes(s))
@@ -105,7 +107,9 @@ export const MyGenericTable = observer(
             .filter((s) => Object.keys(items[0].$view).includes(s))
             .map((key) => {
               const kv = itemMap?.find((s) => s.key === key);
-              return formatValue(item[key], key, priceFields, kv);
+              return key === "id"
+                ? toRomanWithExponents(item[key])
+                : formatValue(item[key], key, priceFields, kv);
             }),
           renderActions(item),
         ]);

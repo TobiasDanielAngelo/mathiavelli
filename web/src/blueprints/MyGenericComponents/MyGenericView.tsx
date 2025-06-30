@@ -178,7 +178,7 @@ export const MyGenericView = observer(
         return acc;
       }, {} as Record<GraphType, { icon: IconName; label: string }>);
 
-    const [view, setView] = useState<"card" | "table">("card");
+    const [view, setView] = useState<"card" | "table">("table");
 
     const toggleView = () => {
       setView((prev) => (prev === "card" ? "table" : "card"));

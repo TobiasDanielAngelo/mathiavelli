@@ -1,6 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { sortAndFilterByIds } from "../../constants/helpers";
 import { PaginatedDetails } from "../../constants/interfaces";
+import { MyIcon } from "../MyIcon";
+import { useVisible, useWindowWidth } from "../../constants/hooks";
+import { useEffect } from "react";
 
 export const MyGenericCollection = observer(
   <T extends { id: number } & object>(props: {
@@ -13,22 +16,42 @@ export const MyGenericCollection = observer(
     title: string;
   }) => {
     const { PageBar, items, pageDetails, CardComponent, title } = props;
+    const { isVisible1, setVisible1 } = useVisible();
+    const width = useWindowWidth();
+
+    useEffect(() => {
+      setVisible1(true);
+    }, [width > 1024]);
 
     return (
-      <div className="flex flex-col min-h-[85vh]">
-        <div className="sticky font-bold top-0 z-10 text-lg border dark:border-gray-600 border-teal-400 p-2 text-center bg-teal-100 dark:bg-[#242424]">
-          {title.toUpperCase()}
+      <div
+        className="flex flex-col"
+        style={{
+          minHeight: isVisible1 ? "85vh" : undefined,
+        }}
+      >
+        <div className="flex flex-row sticky font-bold top-0 z-10 text-lg border dark:border-gray-600 border-teal-400 p-2 text-center bg-teal-100 dark:bg-[#242424]">
+          <div className="flex-1">{title.toUpperCase()}</div>
+          <MyIcon
+            icon={isVisible1 ? "RemoveRedEye" : "DisabledVisible"}
+            onClick={() => setVisible1((t) => !t)}
+          />
         </div>
-        <PageBar />
-        <div className="flex-1">
-          {sortAndFilterByIds(
-            items,
-            pageDetails?.ids ?? items.map((s) => s.id),
-            (s) => s.id
-          ).map((s) => (
-            <CardComponent item={s} key={s.id} />
-          ))}
-        </div>
+
+        {isVisible1 && (
+          <>
+            <PageBar />
+            <div className="flex-1">
+              {sortAndFilterByIds(
+                items,
+                pageDetails?.ids ?? items.map((s) => s.id),
+                (s) => s.id
+              ).map((s) => (
+                <CardComponent item={s} key={s.id} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     );
   }

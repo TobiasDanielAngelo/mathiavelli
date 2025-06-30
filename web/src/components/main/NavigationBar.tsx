@@ -43,9 +43,8 @@ export const allViewPaths = [
     items: ["meals", "weigh-ins", "body-fats", "waist-measure", "workouts"],
   },
   {
-    title: "Settings",
-    items: ["settings"],
-    mainLink: "settings",
+    title: "Support",
+    items: ["tickets", "issue-comments", "issue-tags", "settings"],
   },
 ] as ViewPath[];
 

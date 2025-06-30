@@ -32,6 +32,10 @@ import wishlist from "/images/wishlist.png";
 import dashboard from "/images/dashboard.png";
 import workouts from "/images/workouts.png";
 import settings from "/images/settings.png";
+import issueTags from "/images/issue-tags.png";
+import issueComments from "/images/issue-comments.png";
+import support from "/images/support.png";
+import tickets from "/images/tickets.png";
 import { useState } from "react";
 import { MyIcon } from "./MyIcon";
 
@@ -54,7 +58,11 @@ const IMAGES: Record<string, string> = {
   inventoryTypes,
   jobs,
   journals,
+  support,
   meals,
+  issueComments,
+  issueTags,
+  tickets,
   payables,
   inventory,
   personal,
@@ -78,16 +86,18 @@ type MyImageProps = {
 };
 
 export const MyImage = ({
-  image = "accounts",
+  image = "journals",
   className = "",
 }: MyImageProps) => {
   const [loading, setLoading] = useState(true);
-
   return (
     <>
       <img
-        src={IMAGES[image]}
-        onLoad={() => setLoading(false)}
+        src={IMAGES[image] || journals}
+        onLoad={() => {
+          setLoading(false);
+          console.log("Image loaded.", IMAGES[image]);
+        }}
         onError={() => {
           setLoading(false);
           console.error("Image failed to load.");
