@@ -10,7 +10,7 @@ import json
 from lzstring import LZString
 
 
-class KnoxCookieAuth(TokenAuthentication):
+class CustomAuthentication(TokenAuthentication):
     def authenticate(self, request):
         token = request.COOKIES.get("knox_token")
         if token:
@@ -29,7 +29,7 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         IsAuthenticated,
         CustomDjangoModelPermission,
     ]
-    authentication_classes = (KnoxCookieAuth,)
+    authentication_classes = (CustomAuthentication,)
 
     def list(self, request, *args, **kwargs):
         params = self.request.query_params.copy()

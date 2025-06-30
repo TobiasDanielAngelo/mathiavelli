@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 import os
 from django.http import JsonResponse
-from .viewsets import KnoxCookieAuth
+from .viewsets import CustomAuthentication
 
 
 class CustomAPIView(APIView):
@@ -21,7 +21,7 @@ class CustomAPIView(APIView):
         # AllowAny
     ]
     authentication_classes = [
-        TokenAuthentication,
+        CustomAuthentication,
     ]
 
 
@@ -214,7 +214,7 @@ class CookieLoginView(KnoxLoginView):
 
 class CookieReauthView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = (KnoxCookieAuth,)
+    authentication_classes = (CustomAuthentication,)
 
     def post(self, request):
         # Delete old tokens (optional cleanup)
@@ -236,13 +236,14 @@ class CookieReauthView(APIView):
                 },
             }
         )
-
         # Set token in secure cookie
         response.set_cookie(
             key="knox_token",
             value=token,
             httponly=True,
-            secure=False,  # set False for local http, True in prod HTTPS
+            secure=os.environ.get(
+                "COOKIE_SECURE_BOOL"
+            ),  # set False for local http, True in prod HTTPS
             samesite="Lax",  # Lax works better across ports on localhost
             expires=instance.expiry,
         )
@@ -251,7 +252,7 @@ class CookieReauthView(APIView):
 
 class CookieLogoutView(APIView):
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (KnoxCookieAuth,)
+    authentication_classes = (CustomAuthentication,)
 
     def post(self, request):
         if request._auth:

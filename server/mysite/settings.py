@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "career",
     "personal",
     "productivity",
+    "issues",
 ]
 
 MIDDLEWARE = [
@@ -187,4 +188,4 @@ REST_KNOX = {
     "TOKEN_TTL": None,
 }
 
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
