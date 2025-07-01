@@ -42,11 +42,11 @@ Then edit `.env` and fill in your actual values. Example:
 
 ```bash
 SECRET_KEY=your-django-secret
-DB_NAME=yourdb
-DB_USER=youruser
-DB_PASS=yourpass
-DB_HOST=db
-DB_PORT=5432
+DATABASE_NAME=yourdb
+DATABASE_USER=youruser
+DATABASE_PASS=yourpass
+DATABASE_HOST=db
+DATABASE_PORT=5432
 ALLOWED_HOSTS=localhost,127.0.0.1
 CSRF_TRUSTED_ORIGINS=http://localhost:3000
 COOKIE_SECURE_BOOL=False
