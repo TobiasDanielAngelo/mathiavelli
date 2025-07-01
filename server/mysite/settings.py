@@ -66,7 +66,7 @@ MIDDLEWARE = [
     "djangorestframework_camel_case.middleware.CamelCaseMiddleWare",
 ]
 
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 ROOT_URLCONF = "mysite.urls"
 
@@ -164,10 +164,10 @@ REST_FRAMEWORK = {
     "COERCE_DECIMAL_TO_STRING": False,
 }
 
-CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS").split(",")
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+print("CORS_ALLOWED_ORIGINS =", CORS_ALLOWED_ORIGINS)
 
 CORS_ALLOW_HEADERS = [
     "accept",
