@@ -85,6 +85,23 @@ This will:
 - Gather static assets into the /static folder so they’re served by Nginx
 - Create an admin user for backend
 
+Additional docker commands:
+
+| Command                           | Description                                |
+| --------------------------------- | ------------------------------------------ |
+| `docker compose up`               | Builds (if needed) & starts the services.  |
+| `docker compose up -d`            | Same, but runs in background (detached).   |
+| `docker compose down`             | Stops & removes containers, networks.      |
+| `docker compose build`            | Only builds the images.                    |
+| `docker compose ps`               | Lists running containers.                  |
+| `docker compose logs`             | Shows logs.                                |
+| `docker compose restart backend`  | Restarts only the `backend` service.       |
+| `docker compose restart frontend` | Restarts only the `frontend` service.      |
+| `docker compose top`              | Shows processes running inside containers. |
+| `docker compose events`           | Streams real-time events from containers.  |
+| `docker stats`                    | Shows live resource usage (CPU, mem, etc). |
+| `docker compose exec backend env` | Prints env of `backend` service            |
+
 ### ✅ 5. Access your app in the browser
 
 Once everything is up:
