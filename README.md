@@ -1,4 +1,107 @@
-February 9, 2024
+July 1, 2025
+
+# 🚀 Mathiavelli App
+
+A **Dockerized full-stack project** with:
+
+- 🐍 Django backend (w/ Postgres)
+- ⚛️ React frontend (served by Nginx)
+- 🐘 PostgreSQL database
+- Managed by Docker Compose for easy replication
+
+---
+
+## ⚠️ Before you start
+
+Make sure you have:
+
+✅ **Docker** installed  
+➡️ [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
+
+✅ **Docker Compose** (included with Docker Desktop)  
+➡️ [https://docs.docker.com/compose/](https://docs.docker.com/compose/)
+
+## 🚀 Quickstart
+
+### ✅ 1. Clone the repository
+
+```bash
+git clone https://https://github.com/TobiasDanielAngelo/mathiavelli.git
+cd mathiavelli
+```
+
+### ✅ 2. Setup environment variables
+
+Create your local `.env` file by copying the example:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and fill in your actual values. Example:
+
+```bash
+SECRET_KEY=your-django-secret
+DB_NAME=yourdb
+DB_USER=youruser
+DB_PASS=yourpass
+DB_HOST=db
+DB_PORT=5432
+ALLOWED_HOSTS=localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=http://localhost:3000
+COOKIE_SECURE_BOOL=False
+VITE_BASE_URL=http://localhost:8000
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
+
+### ✅ 3. Build and start the containers
+
+Use Docker Compose to build the images and start all services in the background:
+
+```bash
+docker compose up -d --build
+```
+
+This will:
+
+- Build the React app and bundle it with Nginx
+- Build the Django backend with all Python dependencies
+- Start the PostgreSQL database
+- Connect everything on a private Docker network
+
+### ✅ 4. Run Django database setup
+
+Run the following commands to apply database migrations and collect static files inside the backend container:
+
+```bash
+docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py collectstatic --noinput
+docker compose exec backend python manage.py createsuperuser
+```
+
+This will:
+
+- Create all necessary database tables
+- Gather static assets into the /static folder so they’re served by Nginx
+- Create an admin user for backend
+
+### ✅ 5. Access your app in the browser
+
+Once everything is up:
+
+| Service  | URL                                            |
+| -------- | ---------------------------------------------- |
+| Frontend | [http://localhost:3000](http://localhost:3000) |
+| Backend  | [http://localhost:8000](http://localhost:8000) |
+
+You can now:
+
+- Visit the frontend in your browser at **http://localhost:3000**
+- Access the Django API directly at **http://localhost:8000**
+
+---
+
+February 9, 2025
 
 # Backend Packages
 
@@ -64,3 +167,7 @@ February 9, 2024
 | typescript-eslint           | ESLint support for TypeScript       |
 | vite                        | Fast bundler/dev server             |
 | vitest                      | Unit testing framework              |
+
+```
+
+```
