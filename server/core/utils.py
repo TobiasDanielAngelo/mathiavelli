@@ -42,12 +42,15 @@ def annotate_period(qs, datetime_key, *fields, separator="-"):
 def generate_period_list(qs, datetime_key, *fields, separator="-"):
     date_range = qs.aggregate(start=Min(datetime_key), end=Max(datetime_key))
     start, end = date_range["start"], date_range["end"]
+
+    if not start or not end:
+        return []
     if timezone.is_naive(start):
         start = timezone.make_aware(start)
     if timezone.is_naive(end):
         end = timezone.make_aware(end)
     if not start or not end:
-        return
+        return []
 
     periods = []
 
