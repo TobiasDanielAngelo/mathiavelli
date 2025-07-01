@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../../api/Store";
 import { DashboardView } from "../dashboards/DashboardView";
@@ -38,8 +38,6 @@ import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
 
 export const MainView = observer(() => {
-  const [open, setOpen] = useState(false);
-
   const {
     userStore,
     accountStore,
@@ -83,9 +81,6 @@ export const MainView = observer(() => {
 
   useEffect(() => {
     reauthUser();
-    return () => {
-      setOpen(false);
-    };
   }, []);
 
   useEffect(() => {
@@ -98,7 +93,7 @@ export const MainView = observer(() => {
 
   return (
     <div className="flex flex-col min-h-screen text-teal-700 dark:text-gray-400">
-      <NavBar open={open} setOpen={setOpen} />
+      <NavBar />
       <Routes>
         <Route path="" element={<ModularView />} />
         <Route path="dashboard" element={<DashboardView />} />

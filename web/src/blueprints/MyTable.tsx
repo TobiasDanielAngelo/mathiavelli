@@ -10,7 +10,7 @@ export const MyTable = (props: {
     <div className="text-center dark:text-white">No entries.</div>
   ) : (
     <div className={"relative mt-4 mx-5"}>
-      <table className="m-auto min-w-[50%] shadow-md sm:rounded-lg overflow-x-auto text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <table className="rounded-lg m-auto min-w-[50%] shadow-md sm:rounded-lg overflow-x-auto text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead className="text-md text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             {matrix[0].map((s, ind) => (
@@ -35,6 +35,14 @@ export const MyTable = (props: {
                         ? "pre-wrap"
                         : "none"
                       : "none",
+                  textAlign:
+                    typeof s[0] === "string"
+                      ? s[0].includes(`\n`)
+                        ? "left"
+                        : s[0].includes(`\u20b1`)
+                        ? "right"
+                        : "center"
+                      : "center",
                 }}
                 className="px-6 py-4 font-bold text-gray-900 dark:text-white"
               >
@@ -49,6 +57,14 @@ export const MyTable = (props: {
                           ? "pre-wrap"
                           : "none"
                         : "none",
+                    textAlign:
+                      typeof t === "string"
+                        ? t.includes(`\n`)
+                          ? "left"
+                          : t.includes(`\u20b1`)
+                          ? "right"
+                          : "center"
+                        : "center",
                   }}
                   className="px-6 py-4 justify-between border-solid"
                   key={ind}

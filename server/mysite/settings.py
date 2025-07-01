@@ -166,13 +166,8 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://raspberrypi.local",
-    "https://mathiavelli.com",
-    "https://www.mathiavelli.com",
-]
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS").split(",")
+print(CORS_ALLOWED_ORIGINS)
 
 CORS_ALLOW_HEADERS = [
     "accept",

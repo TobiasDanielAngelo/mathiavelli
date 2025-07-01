@@ -43,7 +43,7 @@ export const MyModal = (
     >
       <div
         ref={ref}
-        className="dark:bg-gray-900 overflow-y-scroll scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-rounded-[12px] scrollbar-mx-10 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-900"
+        className="dark:bg-gray-900 bg-teal-100 overflow-y-scroll scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-rounded-[12px] scrollbar-mx-10 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-900"
       >
         <div className="flex justify-between items-center m-2">
           <div>

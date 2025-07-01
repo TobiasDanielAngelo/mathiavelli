@@ -30,7 +30,7 @@ export const MyGenericCollection = observer(
           minHeight: isVisible1 ? "85vh" : undefined,
         }}
       >
-        <div className="flex flex-row sticky font-bold top-0 z-10 text-lg border dark:border-gray-600 border-teal-400 p-2 text-center bg-teal-100 dark:bg-[#242424]">
+        <div className="flex rounded-md flex-row sticky font-bold top-0 z-10 text-lg border-b-2 dark:border-gray-600 border-teal-400 p-2 text-center bg-teal-100 dark:bg-[#242424]">
           <div className="flex-1">{title.toUpperCase()}</div>
           <MyIcon
             icon={isVisible1 ? "RemoveRedEye" : "DisabledVisible"}
