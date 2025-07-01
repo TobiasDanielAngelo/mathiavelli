@@ -26,7 +26,7 @@ Make sure you have:
 ### ✅ 1. Clone the repository
 
 ```bash
-git clone https://https://github.com/TobiasDanielAngelo/mathiavelli.git
+git clone https://github.com/TobiasDanielAngelo/mathiavelli.git
 cd mathiavelli
 ```
 
