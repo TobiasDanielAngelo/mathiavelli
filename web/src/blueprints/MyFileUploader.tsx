@@ -23,7 +23,9 @@ export const MyFileUploader = (props: {
       if (file) {
         if (file.type.startsWith("image/")) {
           setImage(URL.createObjectURL(e.target.files[0]));
+          setNonImageFile("");
         } else {
+          setImage("");
           setNonImageFile(URL.createObjectURL(e.target.files[0]));
         }
       }

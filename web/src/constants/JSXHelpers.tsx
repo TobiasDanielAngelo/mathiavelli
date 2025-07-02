@@ -1,6 +1,8 @@
 import moment from "moment";
-import { isDatetimeValue, isDateValue, toMoney } from "./helpers";
 import { KV } from "../blueprints/ItemDetails";
+import { GuidedDiv } from "../blueprints/MyGuidedDiv";
+import { isDatetimeValue, isDateValue, toMoney } from "./helpers";
+import ReactMarkdown from "react-markdown";
 
 export const formatValue = (
   value: any,
@@ -34,6 +36,7 @@ export const formatValue = (
   };
 
   const fileExtensionRegex = /\.(jpg|jpeg|png|gif|pdf|docx?|xlsx?|txt)$/i;
+  const imageExtensions = /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i;
 
   if (kv) {
     const lookup = (val: any) =>
@@ -61,9 +64,15 @@ export const formatValue = (
     );
   } else if (typeof value === "string" && value.match(fileExtensionRegex)) {
     return (
-      <a href={value} target="_blank" rel="noopener noreferrer">
-        🔗 Link
-      </a>
+      <GuidedDiv
+        title={
+          imageExtensions.test(value) ? <img src={value} width={200} /> : value
+        }
+      >
+        <a href={value} target="_blank" rel="noopener noreferrer">
+          🔗 Link
+        </a>
+      </GuidedDiv>
     );
   }
 
@@ -88,5 +97,5 @@ export const formatValue = (
     }
   }
 
-  return value?.toString() || "—";
+  return <ReactMarkdown>{value || "—"}</ReactMarkdown>;
 };

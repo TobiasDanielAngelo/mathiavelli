@@ -42,7 +42,7 @@ export const MyTable = (props: {
                         : s[0].includes(`\u20b1`)
                         ? "right"
                         : "center"
-                      : "center",
+                      : "left",
                 }}
                 className="px-6 py-4 font-bold text-gray-900 dark:text-white"
               >
@@ -64,7 +64,7 @@ export const MyTable = (props: {
                           : t.includes(`\u20b1`)
                           ? "right"
                           : "center"
-                        : "center",
+                        : "left",
                   }}
                   className="px-6 py-4 justify-between border-solid"
                   key={ind}
