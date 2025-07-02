@@ -194,13 +194,12 @@ class CookieLoginView(KnoxLoginView):
                     },
                 }
             )
-            secure_cookie = os.environ.get("COOKIE_SECURE_BOOL") == "True"
-            response.set_cookie(
+            cookie_response.set_cookie(
                 key="knox_token",
                 value=token,
                 httponly=True,
-                secure=secure_cookie,
-                samesite="None",
+                secure=os.environ.get("COOKIE_SECURE_BOOL"),
+                samesite="Strict",
                 expires=expiry,
             )
             return cookie_response
@@ -237,13 +236,15 @@ class CookieReauthView(APIView):
                 },
             }
         )
-        secure_cookie = os.environ.get("COOKIE_SECURE_BOOL") == "True"
+        # Set token in secure cookie
         response.set_cookie(
             key="knox_token",
             value=token,
             httponly=True,
-            secure=secure_cookie,
-            samesite="None",
+            secure=os.environ.get(
+                "COOKIE_SECURE_BOOL"
+            ),  # set False for local http, True in prod HTTPS
+            samesite="Lax",  # Lax works better across ports on localhost
             expires=instance.expiry,
         )
         return response
