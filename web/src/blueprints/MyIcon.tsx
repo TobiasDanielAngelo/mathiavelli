@@ -36,6 +36,7 @@ import LightMode from "@mui/icons-material/LightMode";
 import DisabledVisible from "@mui/icons-material/DisabledVisible";
 import RemoveRedEye from "@mui/icons-material/RemoveRedEye";
 import Settings from "@mui/icons-material/Settings";
+import FilePresent from "@mui/icons-material/FilePresent";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
 // 1. Map icons to names
@@ -55,6 +56,7 @@ const iconMap = {
   Payment,
   Print,
   RestartAlt,
+  FilePresent,
   VisibilityOff,
   FilterListAlt,
   ViewList,

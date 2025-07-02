@@ -33,6 +33,8 @@ export const formatValue = (
     return list + suffix + finalDate;
   };
 
+  const fileExtensionRegex = /\.(jpg|jpeg|png|gif|pdf|docx?|xlsx?|txt)$/i;
+
   if (kv) {
     const lookup = (val: any) =>
       kv.label === ""
@@ -57,10 +59,7 @@ export const formatValue = (
         ⬇️ Download file
       </a>
     );
-  } else if (
-    typeof value === "string" &&
-    value.match(/\.(jpg|jpeg|png|gif|pdf|docx?)$/i)
-  ) {
+  } else if (typeof value === "string" && value.match(fileExtensionRegex)) {
     return (
       <a href={value} target="_blank" rel="noopener noreferrer">
         🔗 Link
