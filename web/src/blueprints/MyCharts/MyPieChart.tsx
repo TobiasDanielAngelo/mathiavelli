@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "recharts";
 import { MyCircleChartProps, useCircleChart } from ".";
-import { formatValue } from "../../constants/helpers";
+import { formatValue } from "../../constants/JSXHelpers";
 import { MyDropdownSelector } from "../MyDropdownSelector";
 import { MyCustomTooltip } from "./MyCustomToolTip";
 

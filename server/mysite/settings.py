@@ -141,6 +141,10 @@ STATIC_URL = "static/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+MEDIA_URL = "/uploads/"
+
+MEDIA_ROOT = BASE_DIR / "uploads"
+
 # MEDIA_URL = "/images/"
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
@@ -181,5 +185,3 @@ CORS_ALLOW_HEADERS = [
 REST_KNOX = {
     "TOKEN_TTL": None,
 }
-
-# CORS_ALLOW_CREDENTIALS = True

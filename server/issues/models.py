@@ -35,3 +35,11 @@ class Comment(CustomModel):
     user = fields.CascadeRequiredForeignKey(User)
     content = fields.LongCharField()
     created_at = fields.AutoCreatedAtField()
+
+
+class Note(CustomModel):
+    title = fields.ShortCharField(display=True)
+    body = fields.LongCharField()
+    file = fields.FileField("notes/")
+    created_at = fields.AutoCreatedAtField()
+    updated_at = fields.AutoUpdatedAtField()

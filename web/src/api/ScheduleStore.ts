@@ -8,10 +8,10 @@ import {
   updateItemRequest,
 } from "./_apiHelpers";
 import {
-  formatValue,
   generateCollidingDates,
   generateScheduleDefinition,
 } from "../constants/helpers";
+import { formatValue } from "../constants/JSXHelpers";
 
 const slug = "productivity/schedules";
 

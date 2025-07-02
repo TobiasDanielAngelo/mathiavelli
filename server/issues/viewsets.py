@@ -15,3 +15,8 @@ class TagViewSet(CustomModelViewSet):
 class CommentViewSet(CustomModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+
+class NoteViewSet(CustomModelViewSet):
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer

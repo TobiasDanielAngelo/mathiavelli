@@ -18,3 +18,9 @@ class CommentSerializer(CustomSerializer):
     class Meta:
         model = Comment
         fields = "__all__"
+
+
+class NoteSerializer(CustomSerializer):
+    class Meta:
+        model = Note
+        fields = "__all__"

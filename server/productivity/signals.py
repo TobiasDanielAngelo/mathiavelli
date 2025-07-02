@@ -105,6 +105,8 @@ def sync_habit_from_task(sender, instance, **kwargs):
         return
 
     habit = instance.habit
+    if habit is None:
+        return
     updated = False
 
     for field in SYNC_FIELDS:

@@ -82,7 +82,6 @@ export function MyGenericForm<T>({
         copy[k] = moment(val as any, "h:mm A").format("HH:mm:ss") as any;
       }
     });
-
     return copy;
     // cleanObject(copy as Record<string, any>) as T;
   };

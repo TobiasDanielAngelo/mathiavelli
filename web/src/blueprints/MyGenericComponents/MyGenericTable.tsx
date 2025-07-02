@@ -2,12 +2,12 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo } from "react";
 import {
   camelToSnakeCase,
-  formatValue,
   getStoreSignature,
   toRomanWithExponents,
   toTitleCase,
 } from "../../constants/helpers";
 import { StateSetter } from "../../constants/interfaces";
+import { formatValue } from "../../constants/JSXHelpers";
 import { KV } from "../ItemDetails";
 import { MyTable } from "../MyTable";
 

@@ -4,7 +4,6 @@ import moment from "moment";
 import { Options, RRule, Weekday } from "rrule";
 import { GoalInterface } from "../api/GoalStore";
 import { Schedule, ScheduleInterface } from "../api/ScheduleStore";
-import { KV } from "../blueprints/ItemDetails";
 import { Option } from "./interfaces";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
@@ -370,70 +369,6 @@ export const isDateValue = (val: any) => {
   return (
     !isNaN(parsed) && /^\d{4}-\d{2}-\d{2}$/.test(val) // exact date format: YYYY-MM-DD
   );
-};
-
-export const formatValue = (
-  value: any,
-  key: string,
-  prices?: string[],
-  kv?: KV<any>,
-  arrayIsInfinite?: boolean
-) => {
-  const formatList = (
-    value: Date[],
-    formatStr: string,
-    suffixLabel: string
-  ): string => {
-    const list = value
-      .slice(0, 3)
-      .map((s) => moment(s).format(formatStr))
-      .join("\n");
-
-    const remaining = value.length - 4;
-    const suffix = arrayIsInfinite
-      ? `${suffixLabel}ad infinitum...`
-      : value.length >= 4
-      ? `${suffixLabel}and ${remaining} more...`
-      : "";
-
-    const finalDate = !arrayIsInfinite
-      ? `\nup to ${moment(value[value.length - 1]).format(formatStr)}`
-      : "";
-
-    return list + suffix + finalDate;
-  };
-
-  if (kv) {
-    const lookup = (val: any) =>
-      kv.label === ""
-        ? kv.values.find((_, i) => i === val)
-        : kv.values.find((v) => v.id === val)?.[kv.label] ?? "—";
-
-    return Array.isArray(value) ? value.map(lookup).join(",") : lookup(value);
-  }
-  if (prices?.includes(key)) return toMoney(value);
-  if (typeof value === "boolean") {
-    return value ? "✅ Yes" : "❌ No";
-  }
-  if (Array.isArray(value) && value.length > 0) {
-    if (isDatetimeValue(value[0])) {
-      return formatList(value, "MMM D, YYYY h:mm A, Z", "\n");
-    }
-    if (isDateValue(value[0])) {
-      return formatList(value, "MMM D, YYYY", "and ");
-    } else {
-      return value.join(", ");
-    }
-  } else {
-    if (isDatetimeValue(value)) {
-      return moment(value).format("MMM D, YYYY h:mm A, Z");
-    }
-    if (isDateValue(value)) {
-      return moment(value).format("MMM D, YYYY");
-    }
-  }
-
-  return value?.toString() || "—";
 };
 
 /**

@@ -11,3 +11,7 @@ class TicketAdmin(CustomAdmin):
 
 class CommentAdmin(CustomAdmin):
     pass
+
+
+class NoteAdmin(CustomAdmin):
+    pass

@@ -31,6 +31,7 @@ import { UserStore } from "./UserStore";
 import { WaistMeasurementStore } from "./WaistMeasurementStore";
 import { WeighInStore } from "./WeighInStore";
 import { WorkoutStore } from "./WorkoutStore";
+import { NoteStore } from "./NoteStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -65,6 +66,7 @@ export class Store extends Model({
   ticketStore: prop<TicketStore>(),
   issueTagStore: prop<IssueTagStore>(),
   issueCommentStore: prop<IssueCommentStore>(),
+  noteStore: prop<NoteStore>(),
 }) {}
 
 export const createStore = () =>
@@ -100,6 +102,7 @@ export const createStore = () =>
     issueTagStore: new IssueTagStore({}),
     issueCommentStore: new IssueCommentStore({}),
     ticketStore: new TicketStore({}),
+    noteStore: new NoteStore({}),
   });
 
 export const StoreContext = createContext<Store | null>(null);

@@ -16,6 +16,7 @@ import {
   MyMultiSelector,
   MyTextArea,
 } from "./";
+import { MyFileUploader } from "./MyFileUploader";
 import { MyIcon } from "./MyIcon";
 
 const getMsg = (msg: any, name: string) =>
@@ -103,6 +104,14 @@ const renderField = (
     case "image":
       return (
         <MyImageUploader
+          value={details[t.name]}
+          onChangeValue={(u: any) => onChangeValue(u, t.name)}
+          key={key}
+        />
+      );
+    case "file":
+      return (
+        <MyFileUploader
           value={details[t.name]}
           onChangeValue={(u: any) => onChangeValue(u, t.name)}
           key={key}

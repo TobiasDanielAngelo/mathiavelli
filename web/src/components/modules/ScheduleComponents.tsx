@@ -26,7 +26,6 @@ import {
 import { MyLockedCard } from "../../blueprints/MyLockedCard";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import {
-  formatValue,
   generateCollidingDates,
   generateScheduleDefinition,
   range,
@@ -34,6 +33,7 @@ import {
 } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field, StateSetter } from "../../constants/interfaces";
+import { formatValue } from "../../constants/JSXHelpers";
 
 export const { Context: ScheduleViewContext, useGenericView: useScheduleView } =
   createGenericViewContext<ScheduleInterface>();

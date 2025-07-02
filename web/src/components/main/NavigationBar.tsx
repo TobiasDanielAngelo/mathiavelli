@@ -43,7 +43,7 @@ export const allViewPaths = [
   },
   {
     title: "Support",
-    items: ["tickets", "issue-comments", "issue-tags", "settings"],
+    items: ["notes", "tickets", "issue-comments", "issue-tags", "settings"],
   },
 ] as ViewPath[];
 

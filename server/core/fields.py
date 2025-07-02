@@ -623,3 +623,8 @@ class ChoicesNumberArrayField(BaseArrayField):
         if self.max_items is not None:
             kwargs["max_items"] = self.max_items
         return name, path, args, kwargs
+
+
+class FileField(models.FileField):
+    def __init__(self, upload_to, *args, **kwargs):
+        super().__init__(upload_to=upload_to, *args, **kwargs)

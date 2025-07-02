@@ -1,10 +1,7 @@
 import { observer } from "mobx-react-lite";
-import {
-  formatValue,
-  toRomanWithExponents,
-  toTitleCase,
-} from "../constants/helpers";
+import { toRomanWithExponents, toTitleCase } from "../constants/helpers";
 import { StateSetter } from "../constants/interfaces";
+import { formatValue } from "../constants/JSXHelpers";
 
 export interface KV<U extends Record<string, any>> {
   key: string;

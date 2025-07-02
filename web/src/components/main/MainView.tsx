@@ -36,6 +36,7 @@ import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { WeighInView } from "../modules/WeighInComponents";
 import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
+import { NoteView } from "../modules/NoteComponents";
 
 export const MainView = observer(() => {
   const {
@@ -128,6 +129,7 @@ export const MainView = observer(() => {
         <Route path="issue-comments" element={<IssueCommentView />} />
         <Route path="issue-tags" element={<IssueTagView />} />
         <Route path="tickets" element={<TicketView />} />
+        <Route path="notes" element={<NoteView />} />
       </Routes>
     </div>
   );

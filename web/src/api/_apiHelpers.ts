@@ -1,5 +1,42 @@
 import { PaginatedResponse } from "../constants/interfaces";
 
+export function autoFormData(body: Record<string, any>) {
+  let needsFormData = false;
+  const fileExtensionRegex = /\.(jpg|jpeg|png|gif|pdf|docx?|xlsx?|txt)$/i;
+
+  for (const value of Object.values(body)) {
+    if (value instanceof File || value instanceof Blob) {
+      needsFormData = true;
+      break;
+    }
+  }
+
+  if (!needsFormData) {
+    // strip keys with file-like strings even in JSON
+    const filtered: Record<string, any> = {};
+    for (const key in body) {
+      if (
+        !(typeof body[key] === "string" && fileExtensionRegex.test(body[key]))
+      ) {
+        filtered[key] = body[key];
+      }
+    }
+    return filtered;
+  }
+
+  // Build FormData, skip existing file links
+  const formData = new FormData();
+  for (const key in body) {
+    const value = body[key];
+    if (typeof value === "string" && fileExtensionRegex.test(value)) {
+      continue;
+    }
+    formData.append(key, value);
+  }
+
+  return formData;
+}
+
 export function getCookie(name: string): string {
   const cookies = document.cookie ? document.cookie.split(";") : [];
   for (let cookie of cookies) {
@@ -31,16 +68,26 @@ export async function guidedRequest<T>(
   if (options.itemId) url += `${options.itemId}/`;
   if (options.params) url += `?${filtered.toString()}`;
 
+  const preparedBody = options.body ? autoFormData(options.body) : undefined;
+  const isFormData = preparedBody instanceof FormData;
+
   const headers: Record<string, string> = {
-    "Content-type": "application/json",
     "ngrok-skip-browser-warning": "any",
     "X-CSRFToken": getCookie("csrftoken"),
   };
 
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const response = await fetch(url, {
     method: options.method,
     credentials: "include",
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: preparedBody
+      ? isFormData
+        ? preparedBody
+        : JSON.stringify(preparedBody)
+      : undefined,
     headers,
   });
 

@@ -192,7 +192,7 @@ export function MyEisenhowerChart<T>({ items }: Props<T>) {
               const { item } = payload[0].payload;
 
               return (
-                <div className="p-2 bg-gray-800 text-white text-xs rounded shadow">
+                <div className="p-2 dark:bg-gray-800 bg-teal-100 dark:text-white text-xs rounded shadow">
                   <div>
                     <b>{item.name}</b>
                   </div>

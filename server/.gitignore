@@ -18,6 +18,7 @@ env/
 # Media
 media/
 staticfiles/
+uploads/
 
 # IDEs & Editors
 .vscode/
