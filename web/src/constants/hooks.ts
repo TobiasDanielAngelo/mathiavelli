@@ -69,17 +69,18 @@ export function useSettings<T>(
   });
 
   useEffect(() => {
-    if (!settingStore || !settingStore.items.length) return;
-    console.log(setting?.id);
+    if (!settingStore.itemsLoaded) return;
+    const currentSetting = settingStore.items.find((s) => s.key === key);
     localStorage.setItem(key, JSON.stringify(state));
-    if (setting && setting.id) {
-      console.log("UPDATE");
-      settingStore.updateItem(setting.id, { value: JSON.stringify(state) });
-    } else {
-      console.log("ADD");
+
+    if (currentSetting && currentSetting.id) {
+      settingStore.updateItem(currentSetting.id, {
+        value: JSON.stringify(state),
+      });
+    } else if (!currentSetting) {
       settingStore.addItem({ key, value: JSON.stringify(state) });
     }
-  }, [key, state, setting, settingStore.items.length]);
+  }, [key, state, settingStore.itemsLoaded]);
 
   return [state, setState] as const;
 }

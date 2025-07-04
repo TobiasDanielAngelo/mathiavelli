@@ -49,6 +49,7 @@ export class Setting extends Model(props) {
 @model("myApp/SettingStore")
 export class SettingStore extends Model({
   items: prop<Setting[]>(() => []),
+  itemsLoaded: prop<boolean>(false),
 }) {
   @computed
   get itemsSignature() {
@@ -110,6 +111,8 @@ export class SettingStore extends Model({
         this.items.find((t) => t.id === s.id)?.update(s);
       }
     });
+
+    this.itemsLoaded = true;
 
     return result;
   });
