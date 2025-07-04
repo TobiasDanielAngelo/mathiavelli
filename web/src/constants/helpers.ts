@@ -697,13 +697,6 @@ export function generateCollidingDates(
   const rule = buildRRule(schedule);
   if (!rule) return [];
 
-  if (window) {
-    console.log(
-      sched.name,
-      window,
-      rule.between(window.startDate, window.endDate)
-    );
-  }
   return window
     ? rule.between(window.startDate, window.endDate).map(fromUTCForRRule)
     : sched.count
@@ -792,15 +785,13 @@ export function rruleToDetailedText(rule: RRule): string {
 
   const interval =
     options.interval > 1
-      ? `every ${options.interval} ${freqLabel
+      ? `Every ${options.interval} ${freqLabel
           .toLowerCase()
           .replace("ly", "")}s`
-      : freqLabel.toLowerCase();
+      : freqLabel;
 
   const parts = [];
-  if (options.dtstart) {
-    parts.push(`Starting ${moment(options.dtstart).format("MMM D, YYYY")},`);
-  }
+
   if (interval) parts.push(interval);
   if (byDay) parts.push("on " + byDay);
   if (byWeekNo) parts.push(byWeekNo);
@@ -814,8 +805,13 @@ export function rruleToDetailedText(rule: RRule): string {
     parts.push(`indefinitely`);
   }
 
+  if (options.dtstart) {
+    parts.push(`[ ${moment(options.dtstart).format("MMM D, YYYY")} -`);
+  }
   if (options.until) {
-    parts.push(`until ${moment(options.until).format("MMM D, YYYY")}`);
+    parts.push(`until ${moment(options.until).format("MMM D, YYYY")} ]`);
+  } else {
+    parts.push(`]`);
   }
 
   return parts.join(" ");

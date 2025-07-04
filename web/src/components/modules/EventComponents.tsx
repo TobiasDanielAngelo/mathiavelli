@@ -266,9 +266,13 @@ export const { Context: MoreEventContext, useGeneric: useMoreEventView } =
   createGenericContext<Props>();
 
 export const EventView = observer(() => {
-  const { eventStore, tagStore, taskStore } = useStore();
+  const { eventStore, tagStore, taskStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
-  const values = useViewValues<EventInterface, Event>("Event", new Event({}));
+  const values = useViewValues<EventInterface, Event>(
+    settingStore,
+    "Event",
+    new Event({})
+  );
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>("month");
   const range =

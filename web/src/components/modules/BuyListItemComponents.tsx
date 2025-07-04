@@ -177,9 +177,10 @@ export const BuyListItemTable = observer(() => {
 });
 
 export const BuyListItemView = observer(() => {
-  const { buyListItemStore } = useStore();
+  const { buyListItemStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<BuyListItemInterface, BuyListItem>(
+    settingStore,
     "BuyListItem",
     new BuyListItem({})
   );

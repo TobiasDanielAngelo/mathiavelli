@@ -199,9 +199,13 @@ export const JobTable = observer(() => {
 });
 
 export const JobView = observer(() => {
-  const { jobStore } = useStore();
+  const { jobStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
-  const values = useViewValues<JobInterface, Job>("Job", new Job({}));
+  const values = useViewValues<JobInterface, Job>(
+    settingStore,
+    "Job",
+    new Job({})
+  );
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await jobStore.fetchAll(params.toString());

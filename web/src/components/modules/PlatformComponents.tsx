@@ -164,9 +164,10 @@ export const PlatformTable = observer(() => {
 });
 
 export const PlatformView = observer(() => {
-  const { platformStore } = useStore();
+  const { platformStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<PlatformInterface, Platform>(
+    settingStore,
     "Platform",
     new Platform({})
   );

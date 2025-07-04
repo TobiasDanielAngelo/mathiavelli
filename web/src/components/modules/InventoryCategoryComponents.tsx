@@ -159,9 +159,10 @@ export const InventoryCategoryTable = observer(() => {
 });
 
 export const InventoryCategoryView = observer(() => {
-  const { inventoryCategoryStore } = useStore();
+  const { inventoryCategoryStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<InventoryCategoryInterface, InventoryCategory>(
+    settingStore,
     "InventoryCategory",
     new InventoryCategory({})
   );

@@ -165,9 +165,10 @@ export const WorkoutTable = observer(() => {
 });
 
 export const WorkoutView = observer(() => {
-  const { workoutStore } = useStore();
+  const { workoutStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<WorkoutInterface, Workout>(
+    settingStore,
     "Workout",
     new Workout({})
   );

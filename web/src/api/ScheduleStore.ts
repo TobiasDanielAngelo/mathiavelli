@@ -143,7 +143,14 @@ export class ScheduleStore extends Model({
     }
 
     if (!result.ok || !result.data) {
-      return result;
+      Swal.fire({
+        icon: "error",
+        title: "An error has occurred.",
+      });
+
+      if (!result.ok || !result.data) {
+        return { details: "An error has occurred", ok: false, data: null };
+      }
     }
 
     result.data.forEach((s) => {
@@ -172,7 +179,14 @@ export class ScheduleStore extends Model({
     }
 
     if (!result.ok || !result.data) {
-      return result;
+      Swal.fire({
+        icon: "error",
+        title: "An error has occurred.",
+      });
+
+      if (!result.ok || !result.data) {
+        return { details: "An error has occurred", ok: false, data: null };
+      }
     }
 
     const item = new Schedule(result.data);
@@ -202,7 +216,14 @@ export class ScheduleStore extends Model({
     }
 
     if (!result.ok || !result.data) {
-      return result;
+      Swal.fire({
+        icon: "error",
+        title: "An error has occurred.",
+      });
+
+      if (!result.ok || !result.data) {
+        return { details: "An error has occurred", ok: false, data: null };
+      }
     }
 
     this.allItems.get(result.data.id ?? -1)?.update(result.data);

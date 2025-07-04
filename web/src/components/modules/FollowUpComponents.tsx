@@ -164,9 +164,10 @@ export const FollowUpTable = observer(() => {
 });
 
 export const FollowUpView = observer(() => {
-  const { followUpStore, jobStore } = useStore();
+  const { followUpStore, jobStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<FollowUpInterface, FollowUp>(
+    settingStore,
     "FollowUp",
     new FollowUp({})
   );

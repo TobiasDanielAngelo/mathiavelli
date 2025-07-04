@@ -83,7 +83,14 @@ export class TransactionAnalyticsStore extends Model({
     }
 
     if (!result.ok || !result.data) {
-      return result;
+      Swal.fire({
+        icon: "error",
+        title: "An error has occurred.",
+      });
+
+      if (!result.ok || !result.data) {
+        return { details: "An error has occurred", ok: false, data: null };
+      }
     }
 
     this.resetItems();

@@ -226,9 +226,14 @@ export const TaskTable = observer(() => {
 });
 
 export const TaskView = observer(() => {
-  const { taskStore, goalStore, scheduleStore, habitStore } = useStore();
+  const { taskStore, goalStore, scheduleStore, habitStore, settingStore } =
+    useStore();
   const { isVisible, setVisible } = useVisible();
-  const values = useViewValues<TaskInterface, Task>("Task", new Task({}));
+  const values = useViewValues<TaskInterface, Task>(
+    settingStore,
+    "Task",
+    new Task({})
+  );
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await taskStore.fetchAll(params.toString());

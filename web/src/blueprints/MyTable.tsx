@@ -10,8 +10,8 @@ export const MyTable = (props: {
     <div className="text-center dark:text-white">No entries.</div>
   ) : (
     <div className={"relative mt-4 mx-5"}>
-      <table className="rounded-lg m-auto min-w-[50%] shadow-md sm:rounded-lg overflow-x-auto text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead className="text-md text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <table className="border-separate border-spacing-0.5 rounded-lg m-auto min-w-[50%] shadow-md sm:rounded-lg overflow-x-auto text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="sticky top-0 text-md text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             {matrix[0].map((s, ind) => (
               <th scope="col" className="px-2 py-1 text-center" key={ind}>

@@ -173,9 +173,10 @@ export const PersonalItemTable = observer(() => {
 });
 
 export const PersonalItemView = observer(() => {
-  const { personalItemStore } = useStore();
+  const { personalItemStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<PersonalItemInterface, PersonalItem>(
+    settingStore,
     "PersonalItem",
     new PersonalItem({})
   );

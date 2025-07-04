@@ -48,7 +48,15 @@ export const MyRadarChart = observer(
     selectionLabel,
   }: MyTrendChartProps<T>) => {
     const { allTraceKeys, transformedData, shownFields, setShownFields } =
-      useTrendChart(data, traceKey, xKey, yKey, itemMap, excludedFromTotal);
+      useTrendChart(
+        data,
+        traceKey ?? "",
+        xKey,
+        yKey,
+        itemMap,
+        excludedFromTotal
+      );
+
     return (
       <div className="w-full h-full">
         <MyMultiDropdownSelector

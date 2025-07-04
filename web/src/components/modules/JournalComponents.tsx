@@ -176,9 +176,10 @@ export const JournalTable = observer(() => {
 });
 
 export const JournalView = observer(() => {
-  const { journalStore } = useStore();
+  const { journalStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<JournalInterface, Journal>(
+    settingStore,
     "Journal",
     new Journal({})
   );

@@ -21,7 +21,7 @@ class Ticket(CustomModel):
     ]
 
     title = fields.MediumCharField(display=True)
-    tags = fields.ManyToManyField(Tag)
+    tags = fields.OptionalManyToManyField(Tag)
     description = fields.LongCharField()
     status = fields.ChoiceIntegerField(STATUS_CHOICES)
     priority = fields.ChoiceIntegerField(PRIORITY_CHOICES)

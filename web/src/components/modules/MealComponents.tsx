@@ -161,9 +161,13 @@ export const MealTable = observer(() => {
 });
 
 export const MealView = observer(() => {
-  const { mealStore } = useStore();
+  const { mealStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
-  const values = useViewValues<MealInterface, Meal>("Meal", new Meal({}));
+  const values = useViewValues<MealInterface, Meal>(
+    settingStore,
+    "Meal",
+    new Meal({})
+  );
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await mealStore.fetchAll(params.toString());

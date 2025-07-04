@@ -197,9 +197,13 @@ export const GoalTable = observer(() => {
 });
 
 export const GoalView = observer(() => {
-  const { goalStore } = useStore();
+  const { goalStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
-  const values = useViewValues<GoalInterface, Goal>("Goal", new Goal({}));
+  const values = useViewValues<GoalInterface, Goal>(
+    settingStore,
+    "Goal",
+    new Goal({})
+  );
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await goalStore.fetchAll(params.toString());

@@ -138,7 +138,13 @@ export const MyGenericTable = observer(
         <div className="sticky top-0">
           <PageBar />
         </div>
-        <div className="flex-1 overflow-scroll">
+        <div
+          className="flex-1 overflow-scroll"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
           <MyTable matrix={matrix} hidden={!shownFields.length} />
         </div>
       </div>

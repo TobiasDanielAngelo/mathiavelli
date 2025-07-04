@@ -247,9 +247,11 @@ export const TransactionView = observer(() => {
     accountStore,
     categoryStore,
     transactionAnalyticsStore,
+    settingStore,
   } = useStore();
   const { setVisible4, isVisible, setVisible } = useVisible();
   const values = useViewValues<TransactionInterface, Transaction>(
+    settingStore,
     "Transaction",
     new Transaction({})
   );

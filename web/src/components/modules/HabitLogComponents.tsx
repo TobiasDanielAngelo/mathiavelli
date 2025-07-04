@@ -165,9 +165,10 @@ export const HabitLogTable = observer(() => {
 });
 
 export const HabitLogView = observer(() => {
-  const { habitLogStore, habitStore } = useStore();
+  const { habitLogStore, habitStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<HabitLogInterface, HabitLog>(
+    settingStore,
     "HabitLog",
     new HabitLog({})
   );

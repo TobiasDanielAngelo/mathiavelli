@@ -153,9 +153,10 @@ export const BodyFatTable = observer(() => {
 });
 
 export const BodyFatView = observer(() => {
-  const { bodyFatStore } = useStore();
+  const { bodyFatStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<BodyFatInterface, BodyFat>(
+    settingStore,
     "BodyFat",
     new BodyFat({})
   );

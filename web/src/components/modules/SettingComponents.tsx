@@ -165,6 +165,7 @@ export const SettingView = observer(() => {
   const { settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<SettingInterface, Setting>(
+    settingStore,
     "Setting",
     new Setting({})
   );

@@ -212,9 +212,10 @@ export const ReceivableTable = observer(() => {
 });
 
 export const ReceivableView = observer(() => {
-  const { receivableStore, transactionStore } = useStore();
+  const { receivableStore, transactionStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<ReceivableInterface, Receivable>(
+    settingStore,
     "Receivable",
     new Receivable({})
   );

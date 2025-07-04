@@ -22,6 +22,7 @@ import { IssueTagView } from "../modules/IssueTagComponents";
 import { JobView } from "../modules/JobComponents";
 import { JournalView } from "../modules/JournalComponents";
 import { MealView } from "../modules/MealComponents";
+import { NoteView } from "../modules/NoteComponents";
 import { PayableView } from "../modules/PayableComponents";
 import { PersonalItemView } from "../modules/PersonalItemComponents";
 import { PlatformView } from "../modules/PlatformComponents";
@@ -36,11 +37,10 @@ import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { WeighInView } from "../modules/WeighInComponents";
 import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
-import { NoteView } from "../modules/NoteComponents";
 
 export const MainView = observer(() => {
   const {
-    userStore,
+    // userStore,
     accountStore,
     categoryStore,
     goalStore,
@@ -50,38 +50,35 @@ export const MainView = observer(() => {
     taskStore,
     inventoryCategoryStore,
     transactionAnalyticsStore,
+    weighInAnalyticsStore,
     scheduleStore,
     settingStore,
   } = useStore();
 
   const navigate = useNavigate();
 
-  const adminElements = document.getElementsByClassName("admin");
-  for (let i = 0; i < adminElements.length; i++) {
-    adminElements[i].className = "hidden";
-  }
-
-  const reauthUser = async () => {
-    const resp = await userStore.reauthUser();
-    if (!resp.ok) {
+  const fetchAll = async () => {
+    const arr = await Promise.all([
+      transactionAnalyticsStore.fetchAll(),
+      weighInAnalyticsStore.fetchAll(),
+      platformStore.fetchAll("page=all"),
+      accountStore.fetchAll("page=all"),
+      categoryStore.fetchAll("page=all"),
+      tagStore.fetchAll("page=all"),
+      inventoryCategoryStore.fetchAll("page=all"),
+      goalStore.fetchAll("page=all&is_archived=0"),
+      jobStore.fetchAll("page=all&status__lte=3"),
+      taskStore.fetchAll("page=all&is_archived=0"),
+      scheduleStore.fetchAll("page=all"),
+      settingStore.fetchAll("page=all"),
+    ]);
+    if (!arr.every((item) => item.ok)) {
       navigate("/login");
-    } else {
-      transactionAnalyticsStore.fetchAll();
-      platformStore.fetchAll("page=all");
-      accountStore.fetchAll("page=all");
-      categoryStore.fetchAll("page=all");
-      tagStore.fetchAll("page=all");
-      inventoryCategoryStore.fetchAll("page=all");
-      goalStore.fetchAll("page=all&is_archived=0");
-      jobStore.fetchAll("page=all&status__lte=3");
-      taskStore.fetchAll("page=all&is_archived=0");
-      scheduleStore.fetchAll("page=all");
-      settingStore.fetchAll("page=all");
     }
   };
 
   useEffect(() => {
-    reauthUser();
+    fetchAll();
   }, []);
 
   useEffect(() => {

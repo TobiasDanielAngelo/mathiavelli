@@ -338,9 +338,10 @@ export const ScheduleTable = observer(() => {
 });
 
 export const ScheduleView = observer(() => {
-  const { scheduleStore } = useStore();
+  const { scheduleStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<ScheduleInterface, Schedule>(
+    settingStore,
     "Schedule",
     new Schedule({})
   );

@@ -48,6 +48,12 @@ export function getCookie(name: string): string {
   return "";
 }
 
+export const fetchCSRF = async () => {
+  return await guidedRequest("csrf", {
+    method: "GET",
+  });
+};
+
 export async function guidedRequest<T>(
   endpoint: string,
   options: {

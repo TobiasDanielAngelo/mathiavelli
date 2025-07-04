@@ -170,9 +170,10 @@ export const IssueCommentTable = observer(() => {
 });
 
 export const IssueCommentView = observer(() => {
-  const { issueCommentStore } = useStore();
+  const { issueCommentStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<IssueCommentInterface, IssueComment>(
+    settingStore,
     "Category",
     new IssueComment({})
   );

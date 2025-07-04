@@ -154,9 +154,10 @@ export const IssueTagTable = observer(() => {
 });
 
 export const IssueTagView = observer(() => {
-  const { issueTagStore } = useStore();
+  const { issueTagStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<IssueTagInterface, IssueTag>(
+    settingStore,
     "IssueTag",
     new IssueTag({})
   );

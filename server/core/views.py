@@ -14,6 +14,14 @@ import os
 from django.http import JsonResponse
 from .viewsets import CustomAuthentication
 
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+
+
+@ensure_csrf_cookie
+def csrf(request):
+    return JsonResponse({"detail": "CSRF cookie set"})
+
 
 class CustomAPIView(APIView):
     permission_classes = [
@@ -200,7 +208,7 @@ class CookieLoginView(KnoxLoginView):
                 httponly=True,
                 secure=os.environ.get("COOKIE_SECURE_BOOL"),
                 samesite="Strict",
-                expires=expiry,
+                expires=60 * 60 * 24 * 7,
             )
             return cookie_response
         else:
@@ -245,7 +253,7 @@ class CookieReauthView(APIView):
                 "COOKIE_SECURE_BOOL"
             ),  # set False for local http, True in prod HTTPS
             samesite="Lax",  # Lax works better across ports on localhost
-            expires=instance.expiry,
+            expires=60 * 60 * 24 * 7,
         )
         return response
 

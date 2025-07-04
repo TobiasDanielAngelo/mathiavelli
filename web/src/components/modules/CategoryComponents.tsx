@@ -177,9 +177,10 @@ export const CategoryTable = observer(() => {
 });
 
 export const CategoryView = observer(() => {
-  const { categoryStore } = useStore();
+  const { categoryStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<CategoryInterface, Category>(
+    settingStore,
     "Category",
     new Category({})
   );

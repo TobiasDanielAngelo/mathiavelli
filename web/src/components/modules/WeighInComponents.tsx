@@ -7,7 +7,7 @@ import {
   WeighInInterface,
 } from "../../api/WeighInStore";
 import { KV } from "../../blueprints/ItemDetails";
-import MyTimelineChart from "../../blueprints/MyCharts/MyTimelineChart";
+import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -85,7 +85,17 @@ export const WeighInCard = observer((props: { item: WeighIn }) => {
 });
 
 export const WeighInDashboard = observer(() => {
-  return <MyTimelineChart />;
+  const { weighInAnalyticsStore } = useStore();
+
+  return (
+    <MyLineChart
+      data={weighInAnalyticsStore.items}
+      xKey="period"
+      yKey="aveWeight"
+      formatter={(value: number, name: string) => [`${value} kg`, name]}
+      noTotal
+    />
+  );
 });
 
 export const WeighInCollection = observer(() => {
@@ -157,9 +167,10 @@ export const WeighInTable = observer(() => {
 });
 
 export const WeighInView = observer(() => {
-  const { weighInStore } = useStore();
+  const { weighInStore, weighInAnalyticsStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<WeighInInterface, WeighIn>(
+    settingStore,
     "WeighIn",
     new WeighIn({})
   );
@@ -170,6 +181,7 @@ export const WeighInView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
+    weighInAnalyticsStore.fetchAll();
   };
 
   const itemMap = useMemo(() => [] satisfies KV<any>[], []);

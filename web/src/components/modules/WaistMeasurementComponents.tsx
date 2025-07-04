@@ -159,9 +159,10 @@ export const WaistMeasurementTable = observer(() => {
 });
 
 export const WaistMeasurementView = observer(() => {
-  const { waistMeasurementStore } = useStore();
+  const { waistMeasurementStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<WaistMeasurementInterface, WaistMeasurement>(
+    settingStore,
     "WaistMeasurement",
     new WaistMeasurement({})
   );

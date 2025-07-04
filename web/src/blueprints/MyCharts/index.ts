@@ -4,7 +4,7 @@ import { getStoreSignature } from "../../constants/helpers";
 
 export type MyTrendChartProps<T extends Record<string, any>> = {
   data: T[];
-  traceKey: keyof T;
+  traceKey?: keyof T;
   xKey: keyof T;
   yKey: keyof T;
   width?: string | number;
@@ -14,6 +14,7 @@ export type MyTrendChartProps<T extends Record<string, any>> = {
   formatter?: (value: number, name: string) => string[];
   excludedFromTotal?: string[];
   selectionLabel?: string;
+  noTotal?: boolean;
 };
 
 export type MyCircleChartProps<T extends Record<string, any>> = {
@@ -46,7 +47,8 @@ export function transformForTrendChart<T extends Record<string, any>>(
   xAxis: keyof T,
   yAxis: keyof T,
   totalTitle: string,
-  excludedFromTotal?: string[]
+  excludedFromTotal?: string[],
+  noTotal?: boolean
 ) {
   const result: Record<string, any> = {};
 
@@ -55,10 +57,14 @@ export function transformForTrendChart<T extends Record<string, any>>(
     const trace = item[traceKey];
     const y = item[yAxis];
 
-    if (!result[x]) result[x] = { [xAxis]: x, [totalTitle as string]: 0 };
+    if (!result[x])
+      result[x] = noTotal
+        ? { [xAxis]: x }
+        : { [xAxis]: x, [totalTitle as string]: 0 };
     result[x][trace] = y;
-    result[x][totalTitle] +=
-      typeof y === "number" && !excludedFromTotal?.includes(trace) ? y : 0;
+    if (!noTotal)
+      result[x][totalTitle] +=
+        typeof y === "number" && !excludedFromTotal?.includes(trace) ? y : 0;
   });
 
   // Sort xAxis and compute cumulative
@@ -91,7 +97,8 @@ export const useTrendChart = <T extends Record<string, any>>(
   xKey: keyof T,
   yKey: keyof T,
   itemMap?: KV<any>[],
-  excludedFromTotal?: string[]
+  excludedFromTotal?: string[],
+  noTotal?: boolean
 ) => {
   const [shownFields, setShownFields] = useState<string[]>([]);
   const cleanedData = useMemo(
@@ -132,7 +139,8 @@ export const useTrendChart = <T extends Record<string, any>>(
     xKey,
     yKey,
     totalTitle,
-    excludedFromTotal
+    excludedFromTotal,
+    noTotal
   );
 
   const allTraceKeys = Array.from(

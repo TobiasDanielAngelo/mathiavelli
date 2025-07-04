@@ -160,9 +160,13 @@ export const TagTable = observer(() => {
 });
 
 export const TagView = observer(() => {
-  const { tagStore } = useStore();
+  const { tagStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
-  const values = useViewValues<TagInterface, Tag>("Tag", new Tag({}));
+  const values = useViewValues<TagInterface, Tag>(
+    settingStore,
+    "Tag",
+    new Tag({})
+  );
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await tagStore.fetchAll(params.toString());

@@ -33,4 +33,5 @@ urlpatterns = [
     path("cookie-logout", views.CookieLogoutView.as_view(), name="cookie-logout"),
     path("cookie-login", views.CookieLoginView.as_view(), name="cookie-login"),
     path("cookie-reauth", views.CookieReauthView.as_view(), name="cookie-reauth"),
+    path("csrf/", views.csrf),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

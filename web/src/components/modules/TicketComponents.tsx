@@ -184,9 +184,10 @@ export const TicketTable = observer(() => {
 });
 
 export const TicketView = observer(() => {
-  const { ticketStore } = useStore();
+  const { ticketStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<TicketInterface, Ticket>(
+    settingStore,
     "Ticket",
     new Ticket({})
   );

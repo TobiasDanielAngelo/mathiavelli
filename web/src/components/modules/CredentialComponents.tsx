@@ -206,9 +206,11 @@ export const CredentialTable = observer(() => {
 });
 
 export const CredentialView = observer(() => {
-  const { credentialStore, platformStore, accountStore } = useStore();
+  const { credentialStore, platformStore, accountStore, settingStore } =
+    useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<CredentialInterface, Credential>(
+    settingStore,
     "Credential",
     new Credential({})
   );

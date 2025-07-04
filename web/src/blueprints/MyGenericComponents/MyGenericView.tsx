@@ -2,11 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { SetURLSearchParams, useSearchParams } from "react-router-dom";
 import { toTitleCase } from "../../constants/helpers";
-import {
-  useKeyPress,
-  useLocalStorageState,
-  VisibleMap,
-} from "../../constants/hooks";
+import { useKeyPress, useSettings, VisibleMap } from "../../constants/hooks";
 import { PaginatedDetails, StateSetter } from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
 import { IconName, MyIcon } from "../MyIcon";
@@ -15,6 +11,7 @@ import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
 import { MyPageBar } from "../MyPageBar";
 import { MySpeedDial } from "../MySpeedDial";
 import { GenericViewProps } from "./MyGenericProps";
+import { SettingStore } from "../../api/SettingStore";
 
 export const graphTypes = ["pie", "line", "bar", "area"] as const;
 
@@ -31,6 +28,7 @@ export const useViewValues = <
   U extends Object & { id?: number | null },
   T extends { $view: Record<string, any> }
 >(
+  settingStore: SettingStore,
   name: string,
   obj: T,
   graphs: GraphType[] = ["pie", "line"]
@@ -42,11 +40,13 @@ export const useViewValues = <
   const availableGraphs = graphs as GraphType[];
   const objWithFields = obj.$view;
   const [graph, setGraph] = useState<GraphType>("pie");
-  const [shownFields, setShownFields] = useLocalStorageState(
+  const [shownFields, setShownFields] = useSettings(
+    settingStore,
     Object.keys(objWithFields) as (keyof U)[],
     `shownFields${name}`
   );
-  const [sortFields, setSortFields] = useLocalStorageState(
+  const [sortFields, setSortFields] = useSettings(
+    settingStore,
     [] as string[],
     `sortFields${name}`
   );

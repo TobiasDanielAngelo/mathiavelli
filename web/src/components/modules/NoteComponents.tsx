@@ -158,9 +158,13 @@ export const NoteTable = observer(() => {
 });
 
 export const NoteView = observer(() => {
-  const { noteStore } = useStore();
+  const { noteStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
-  const values = useViewValues<NoteInterface, Note>("Note", new Note({}));
+  const values = useViewValues<NoteInterface, Note>(
+    settingStore,
+    "Note",
+    new Note({})
+  );
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await noteStore.fetchAll(params.toString());

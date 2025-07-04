@@ -1,8 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "../../api/Store";
 import { useKeyPress } from "../../constants/hooks";
+import { fetchCSRF } from "../../api/_apiHelpers";
 
 export const LoginView = observer(() => {
   const { userStore } = useStore();
@@ -26,6 +27,10 @@ export const LoginView = observer(() => {
     }
     navigate("/");
   };
+
+  useEffect(() => {
+    fetchCSRF();
+  }, []);
 
   useKeyPress(["Enter"], loginUser);
 

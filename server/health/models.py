@@ -4,17 +4,17 @@ from core import fields
 
 class WeighIn(CustomModel):
     weight_kg = fields.DecimalField()
-    date = fields.AutoCreatedAtField()
+    date = fields.DefaultNowField()
 
 
 class BodyFat(CustomModel):
     body_fat_percent = fields.DecimalField()
-    date = fields.AutoCreatedAtField()
+    date = fields.DefaultNowField()
 
 
 class WaistMeasurement(CustomModel):
     waist_cm = fields.DecimalField()
-    date = fields.AutoCreatedAtField()
+    date = fields.DefaultNowField()
 
 
 class Meal(CustomModel):

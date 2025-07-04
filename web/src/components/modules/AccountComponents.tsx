@@ -159,9 +159,10 @@ export const AccountTable = observer(() => {
 });
 
 export const AccountView = observer(() => {
-  const { accountStore } = useStore();
+const { accountStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<AccountInterface, Account>(
+    settingStore,
     "Account",
     new Account({})
   );

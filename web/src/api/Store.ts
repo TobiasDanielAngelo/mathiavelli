@@ -32,6 +32,7 @@ import { WaistMeasurementStore } from "./WaistMeasurementStore";
 import { WeighInStore } from "./WeighInStore";
 import { WorkoutStore } from "./WorkoutStore";
 import { NoteStore } from "./NoteStore";
+import { WeighInAnalyticsStore } from "../analytics/WeighInAnalyticsStore";
 
 @model("myApp/Store")
 export class Store extends Model({
@@ -57,6 +58,7 @@ export class Store extends Model({
   mealStore: prop<MealStore>(),
   workoutStore: prop<WorkoutStore>(),
   transactionAnalyticsStore: prop<TransactionAnalyticsStore>(),
+  weighInAnalyticsStore: prop<WeighInAnalyticsStore>(),
   personalItemStore: prop<PersonalItemStore>(),
   inventoryCategoryStore: prop<InventoryCategoryStore>(),
   scheduleStore: prop<ScheduleStore>(),
@@ -93,6 +95,7 @@ export const createStore = () =>
     mealStore: new MealStore({}),
     workoutStore: new WorkoutStore({}),
     transactionAnalyticsStore: new TransactionAnalyticsStore({}),
+    weighInAnalyticsStore: new WeighInAnalyticsStore({}),
     personalItemStore: new PersonalItemStore({}),
     inventoryCategoryStore: new InventoryCategoryStore({}),
     scheduleStore: new ScheduleStore({}),

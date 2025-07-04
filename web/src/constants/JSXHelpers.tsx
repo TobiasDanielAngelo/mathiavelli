@@ -81,7 +81,7 @@ export const formatValue = (
   }
   if (Array.isArray(value) && value.length > 0) {
     if (isDatetimeValue(value[0])) {
-      return formatList(value, "MMM D, YYYY h:mm A, Z", "\n");
+      return formatList(value, "MMM D, YYYY h:mm A", "\n");
     }
     if (isDateValue(value[0])) {
       return formatList(value, "MMM D, YYYY", "and ");
@@ -90,12 +90,12 @@ export const formatValue = (
     }
   } else {
     if (isDatetimeValue(value)) {
-      return moment(value).format("MMM D, YYYY h:mm A, Z");
+      return moment(value).format("MMM D, YYYY h:mm A");
     }
     if (isDateValue(value)) {
       return moment(value).format("MMM D, YYYY");
     }
   }
 
-  return <ReactMarkdown>{value || "—"}</ReactMarkdown>;
+  return <ReactMarkdown>{String(value) || "—"}</ReactMarkdown>;
 };

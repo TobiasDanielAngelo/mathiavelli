@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SettingStore } from "../api/SettingStore";
 import { handleKeyDown } from "./helpers";
 import { StateSetter } from "./interfaces";
 
@@ -50,7 +51,7 @@ export const useWindowWidth = () => {
   return width;
 };
 
-export function useLocalStorageState<T>(defaultValue: T, key: string) {
+export function useSettings2<T>(defaultValue: T, key: string) {
   const [state, setState] = useState<T>(() => {
     try {
       const stored = localStorage.getItem(key);
@@ -63,6 +64,37 @@ export function useLocalStorageState<T>(defaultValue: T, key: string) {
   useEffect(() => {
     localStorage.setItem(key, JSON.stringify(state));
   }, [key, state]);
+
+  return [state, setState] as const;
+}
+
+export function useSettings<T>(
+  settingStore: SettingStore,
+  defaultValue: T,
+  key: string
+) {
+  const setting = settingStore.items.find((s) => s.key === key);
+  const [state, setState] = useState<T>(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      return stored
+        ? (JSON.parse(stored) as T)
+        : (JSON.parse(setting?.value ?? "[]") as T) ?? defaultValue;
+    } catch {
+      return (JSON.parse(setting?.value ?? "[]") as T) ?? defaultValue;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(state));
+    if (setting) {
+      if (setting.id) {
+        settingStore.updateItem(setting.id, { value: JSON.stringify(state) });
+      } else {
+        settingStore.addItem({ key, value: JSON.stringify(state) });
+      }
+    }
+  }, [key, state, setting, settingStore.items.length]);
 
   return [state, setState] as const;
 }
@@ -151,3 +183,20 @@ export const useIsUnhoverable = () => {
 
   return isUnhoverable;
 };
+
+export function useLocalStorageState<T>(defaultValue: T, key: string) {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      return stored ? (JSON.parse(stored) as T) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(state));
+  }, [key, state]);
+
+  return [state, setState] as const;
+}

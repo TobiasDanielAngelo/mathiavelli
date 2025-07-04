@@ -178,9 +178,13 @@ export const HabitTable = observer(() => {
 });
 
 export const HabitView = observer(() => {
-  const { habitStore } = useStore();
+  const { habitStore, settingStore, scheduleStore } = useStore();
   const { isVisible, setVisible, setVisible4 } = useVisible();
-  const values = useViewValues<HabitInterface, Habit>("Habit", new Habit({}));
+  const values = useViewValues<HabitInterface, Habit>(
+    settingStore,
+    "Habit",
+    new Habit({})
+  );
   const { params, setPageDetails } = values;
   const fetchFcn = async () => {
     const resp = await habitStore.fetchAll(params.toString());
@@ -188,9 +192,22 @@ export const HabitView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
+
+    const scheds = resp.data.map((s) => s.schedule);
+    scheduleStore.fetchAll(`page=all&id__in=${scheds.join(",")}`);
   };
 
-  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
+  const itemMap = useMemo(
+    () =>
+      [
+        {
+          key: "schedule",
+          values: scheduleStore.items,
+          label: "definition",
+        },
+      ] satisfies KV<any>[],
+    [scheduleStore.items.length]
+  );
 
   const actionModalDefs = [
     {

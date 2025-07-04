@@ -211,9 +211,10 @@ export const PayableTable = observer(() => {
 });
 
 export const PayableView = observer(() => {
-  const { payableStore, transactionStore } = useStore();
+  const { payableStore, transactionStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<PayableInterface, Payable>(
+    settingStore,
     "Payable",
     new Payable({})
   );

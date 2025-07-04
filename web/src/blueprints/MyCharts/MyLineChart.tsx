@@ -46,9 +46,18 @@ export const MyLineChart = observer(
     formatter,
     excludedFromTotal,
     selectionLabel,
+    noTotal,
   }: MyTrendChartProps<T>) => {
     const { allTraceKeys, transformedData, shownFields, setShownFields } =
-      useTrendChart(data, traceKey, xKey, yKey, itemMap, excludedFromTotal);
+      useTrendChart(
+        data,
+        traceKey ?? "",
+        xKey,
+        yKey,
+        itemMap,
+        excludedFromTotal,
+        noTotal
+      );
 
     return (
       <div className="w-full h-full p-2">
@@ -64,7 +73,7 @@ export const MyLineChart = observer(
             <CartesianGrid strokeDasharray={"5 10"} />
             <Legend />
             <XAxis dataKey={xKey as string} />
-            <YAxis />
+            <YAxis domain={["auto", "auto"]} />
             <Tooltip content={<MyCustomTooltip />} formatter={formatter} />
             {allTraceKeys
               .filter((s) => shownFields.includes(s))
@@ -74,6 +83,7 @@ export const MyLineChart = observer(
                   type="monotone"
                   dataKey={key}
                   stroke={colors[i % colors.length]}
+                  connectNulls={true}
                 />
               ))}
           </LineChart>
