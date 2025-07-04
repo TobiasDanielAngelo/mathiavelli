@@ -79,7 +79,9 @@ export class PayableStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Payable({}).$) as (keyof PayableInterface)[];
+    const keys = Object.keys(
+      new Payable({}).$view
+    ) as (keyof PayableInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

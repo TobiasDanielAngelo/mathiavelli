@@ -119,7 +119,7 @@ export class TaskStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Task({}).$) as (keyof TaskInterface)[];
+    const keys = Object.keys(new Task({}).$view) as (keyof TaskInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

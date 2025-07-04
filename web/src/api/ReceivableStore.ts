@@ -80,7 +80,7 @@ export class ReceivableStore extends Model({
   @computed
   get itemsSignature() {
     const keys = Object.keys(
-      new Receivable({}).$
+      new Receivable({}).$view
     ) as (keyof ReceivableInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))

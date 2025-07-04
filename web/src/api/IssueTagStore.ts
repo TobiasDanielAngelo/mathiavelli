@@ -49,7 +49,9 @@ export class IssueTagStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new IssueTag({}).$) as (keyof IssueTagInterface)[];
+    const keys = Object.keys(
+      new IssueTag({}).$view
+    ) as (keyof IssueTagInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

@@ -53,7 +53,9 @@ export class SettingStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Setting({}).$) as (keyof SettingInterface)[];
+    const keys = Object.keys(
+      new Setting({}).$view
+    ) as (keyof SettingInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

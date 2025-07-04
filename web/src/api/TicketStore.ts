@@ -95,7 +95,7 @@ export class TicketStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Ticket({}).$) as (keyof TicketInterface)[];
+    const keys = Object.keys(new Ticket({}).$view) as (keyof TicketInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

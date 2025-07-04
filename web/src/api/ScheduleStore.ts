@@ -115,7 +115,9 @@ export class ScheduleStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Schedule({}).$) as (keyof ScheduleInterface)[];
+    const keys = Object.keys(
+      new Schedule({}).$view
+    ) as (keyof ScheduleInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

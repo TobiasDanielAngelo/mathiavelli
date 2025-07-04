@@ -69,7 +69,9 @@ export class HabitLogStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new HabitLog({}).$) as (keyof HabitLogInterface)[];
+    const keys = Object.keys(
+      new HabitLog({}).$view
+    ) as (keyof HabitLogInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

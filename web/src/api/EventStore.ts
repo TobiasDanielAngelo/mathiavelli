@@ -99,7 +99,7 @@ export class EventStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Event({}).$) as (keyof EventInterface)[];
+    const keys = Object.keys(new Event({}).$view) as (keyof EventInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

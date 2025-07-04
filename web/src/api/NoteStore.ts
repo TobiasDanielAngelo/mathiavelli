@@ -53,7 +53,7 @@ export class NoteStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Note({}).$) as (keyof NoteInterface)[];
+    const keys = Object.keys(new Note({}).$view) as (keyof NoteInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

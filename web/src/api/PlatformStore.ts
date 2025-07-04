@@ -49,7 +49,9 @@ export class PlatformStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Platform({}).$) as (keyof PlatformInterface)[];
+    const keys = Object.keys(
+      new Platform({}).$view
+    ) as (keyof PlatformInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

@@ -50,7 +50,9 @@ export class BodyFatStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new BodyFat({}).$) as (keyof BodyFatInterface)[];
+    const keys = Object.keys(
+      new BodyFat({}).$view
+    ) as (keyof BodyFatInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

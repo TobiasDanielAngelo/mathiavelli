@@ -84,7 +84,7 @@ export class IssueCommentStore extends Model({
   @computed
   get itemsSignature() {
     const keys = Object.keys(
-      new IssueComment({}).$
+      new IssueComment({}).$view
     ) as (keyof IssueCommentInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))

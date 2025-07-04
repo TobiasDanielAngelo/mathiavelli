@@ -50,7 +50,7 @@ export class TagStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Tag({}).$) as (keyof TagInterface)[];
+    const keys = Object.keys(new Tag({}).$view) as (keyof TagInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

@@ -87,7 +87,7 @@ export class GoalStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Goal({}).$) as (keyof GoalInterface)[];
+    const keys = Object.keys(new Goal({}).$view) as (keyof GoalInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

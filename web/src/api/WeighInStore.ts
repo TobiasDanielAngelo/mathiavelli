@@ -50,7 +50,9 @@ export class WeighInStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new WeighIn({}).$) as (keyof WeighInInterface)[];
+    const keys = Object.keys(
+      new WeighIn({}).$view
+    ) as (keyof WeighInInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

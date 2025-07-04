@@ -50,7 +50,9 @@ export class AccountStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Account({}).$) as (keyof AccountInterface)[];
+    const keys = Object.keys(
+      new Account({}).$view
+    ) as (keyof AccountInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

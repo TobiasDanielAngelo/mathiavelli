@@ -81,7 +81,7 @@ export class PersonalItemStore extends Model({
   @computed
   get itemsSignature() {
     const keys = Object.keys(
-      new PersonalItem({}).$
+      new PersonalItem({}).$view
     ) as (keyof PersonalItemInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))

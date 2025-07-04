@@ -60,7 +60,7 @@ export class MealStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Meal({}).$) as (keyof MealInterface)[];
+    const keys = Object.keys(new Meal({}).$view) as (keyof MealInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

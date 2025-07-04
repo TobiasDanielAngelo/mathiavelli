@@ -64,7 +64,9 @@ export class CategoryStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Category({}).$) as (keyof CategoryInterface)[];
+    const keys = Object.keys(
+      new Category({}).$view
+    ) as (keyof CategoryInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

@@ -113,7 +113,7 @@ export class CredentialStore extends Model({
   @computed
   get itemsSignature() {
     const keys = Object.keys(
-      new Credential({}).$
+      new Credential({}).$view
     ) as (keyof CredentialInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))

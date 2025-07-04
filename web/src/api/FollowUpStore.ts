@@ -86,7 +86,9 @@ export class FollowUpStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new FollowUp({}).$) as (keyof FollowUpInterface)[];
+    const keys = Object.keys(
+      new FollowUp({}).$view
+    ) as (keyof FollowUpInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

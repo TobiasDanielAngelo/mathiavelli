@@ -53,7 +53,7 @@ export class InventoryCategoryStore extends Model({
   @computed
   get itemsSignature() {
     const keys = Object.keys(
-      new InventoryCategory({}).$
+      new InventoryCategory({}).$view
     ) as (keyof InventoryCategoryInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))

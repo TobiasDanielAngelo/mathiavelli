@@ -71,7 +71,7 @@ export class BuyListItemStore extends Model({
   @computed
   get itemsSignature() {
     const keys = Object.keys(
-      new BuyListItem({}).$
+      new BuyListItem({}).$view
     ) as (keyof BuyListItemInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))

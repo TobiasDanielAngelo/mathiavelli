@@ -51,7 +51,9 @@ export class JournalStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Journal({}).$) as (keyof JournalInterface)[];
+    const keys = Object.keys(
+      new Journal({}).$view
+    ) as (keyof JournalInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");

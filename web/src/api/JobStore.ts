@@ -111,7 +111,7 @@ export class JobStore extends Model({
 }) {
   @computed
   get itemsSignature() {
-    const keys = Object.keys(new Job({}).$) as (keyof JobInterface)[];
+    const keys = Object.keys(new Job({}).$view) as (keyof JobInterface)[];
     return this.items
       .map((item) => keys.map((key) => String(item[key])).join("|"))
       .join("::");
