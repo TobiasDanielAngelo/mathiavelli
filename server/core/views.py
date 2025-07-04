@@ -207,7 +207,7 @@ class CookieLoginView(KnoxLoginView):
                 value=token,
                 httponly=True,
                 secure=os.environ.get("COOKIE_SECURE_BOOL"),
-                samesite="Strict",
+                samesite="None",
                 expires=60 * 60 * 24 * 7,
             )
             return cookie_response
@@ -252,7 +252,7 @@ class CookieReauthView(APIView):
             secure=os.environ.get(
                 "COOKIE_SECURE_BOOL"
             ),  # set False for local http, True in prod HTTPS
-            samesite="Lax",  # Lax works better across ports on localhost
+            samesite="None",  # Lax works better across ports on localhost
             expires=60 * 60 * 24 * 7,
         )
         return response
