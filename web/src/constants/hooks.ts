@@ -62,9 +62,13 @@ export function useSettings<T>(
       const stored = localStorage.getItem(key);
       return stored
         ? (JSON.parse(stored) as T)
-        : (JSON.parse(setting?.value ?? "[]") as T) ?? defaultValue;
+        : (JSON.parse(setting?.value ?? JSON.stringify(defaultValue)) as T) ??
+            defaultValue;
     } catch {
-      return (JSON.parse(setting?.value ?? "[]") as T) ?? defaultValue;
+      return (
+        (JSON.parse(setting?.value ?? JSON.stringify(defaultValue)) as T) ??
+        defaultValue
+      );
     }
   });
 
