@@ -51,23 +51,6 @@ export const useWindowWidth = () => {
   return width;
 };
 
-export function useSettings2<T>(defaultValue: T, key: string) {
-  const [state, setState] = useState<T>(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      return stored ? (JSON.parse(stored) as T) : defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(state));
-  }, [key, state]);
-
-  return [state, setState] as const;
-}
-
 export function useSettings<T>(
   settingStore: SettingStore,
   defaultValue: T,
@@ -86,13 +69,15 @@ export function useSettings<T>(
   });
 
   useEffect(() => {
+    if (!settingStore || !settingStore.items.length) return;
+    console.log(setting?.id);
     localStorage.setItem(key, JSON.stringify(state));
-    if (setting) {
-      if (setting.id) {
-        settingStore.updateItem(setting.id, { value: JSON.stringify(state) });
-      } else {
-        settingStore.addItem({ key, value: JSON.stringify(state) });
-      }
+    if (setting && setting.id) {
+      console.log("UPDATE");
+      settingStore.updateItem(setting.id, { value: JSON.stringify(state) });
+    } else {
+      console.log("ADD");
+      settingStore.addItem({ key, value: JSON.stringify(state) });
     }
   }, [key, state, setting, settingStore.items.length]);
 
