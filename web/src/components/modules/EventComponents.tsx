@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Event, EventFields, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
@@ -15,6 +14,7 @@ import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericFor
 import {
   createGenericContext,
   createGenericViewContext,
+  defaultViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
@@ -24,12 +24,15 @@ import {
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { IconName } from "../../blueprints/MyIcon";
-import { MyLockedCard } from "../../blueprints/MyLockedCard";
 import { SideBySideView } from "../../blueprints/SideBySideView";
-import { sortAndFilterByIds, toOptions } from "../../constants/helpers";
-import { useVisible } from "../../constants/hooks";
-import { Field, StateSetter } from "../../constants/interfaces";
 import { TwoDates } from "../../constants/classes";
+import { sortAndFilterByIds, toOptions } from "../../constants/helpers";
+import {
+  CalendarProps,
+  useCalendarProps,
+  useVisible,
+} from "../../constants/hooks";
+import { Field, StateSetter } from "../../constants/interfaces";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -124,7 +127,15 @@ export const EventForm = ({
 
 export const EventCard = observer((props: { item: Event }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useEventView();
+  let fetchingFcn = defaultViewValues.fetchFcn;
+  let fields: (keyof typeof item)[] = ["id", "title", "dateStart"];
+  try {
+    const { fetchFcn, shownFields } = useEventView();
+    fetchingFcn = fetchFcn;
+    fields = shownFields;
+  } catch {
+    console.log("No event view context");
+  }
   const { eventStore } = useStore();
 
   const moreActions = [
@@ -143,13 +154,13 @@ export const EventCard = observer((props: { item: Event }) => {
   return (
     <MyGenericCard
       item={item}
-      shownFields={shownFields}
+      shownFields={fields}
       header={["id"]}
       important={["title"]}
       prices={EventFields.pricesFields}
       FormComponent={EventForm}
       deleteItem={eventStore.deleteItem}
-      fetchFcn={fetchFcn}
+      fetchFcn={fetchingFcn}
       moreActions={moreActions}
     />
   );
@@ -164,21 +175,33 @@ export const EventDashboard = observer(
     range: string;
   }) => {
     const { eventStore } = useStore();
-    const { pageDetails } = useEventView();
+    let pageIds: number[] | undefined = undefined;
+
+    try {
+      const { pageDetails } = useEventView();
+      pageIds = pageDetails?.ids;
+    } catch {
+      console.log("No Event View Props Returned");
+    }
 
     return (
-      <MyLockedCard isUnlocked>
-        <MyCalendar
-          {...props}
-          noIcon
-          events={sortAndFilterByIds(
-            eventStore.items,
-            pageDetails?.ids ?? eventStore.items.map((s) => s.id),
-            (s) => s.id
-          ).filter((s) => !s.isArchived)}
-        />
-      </MyLockedCard>
+      <MyCalendar
+        {...props}
+        noIcon
+        events={sortAndFilterByIds(
+          eventStore.items,
+          pageIds ?? eventStore.items.map((s) => s.id),
+          (s) => s.id
+        ).filter((s) => !s.isArchived)}
+      />
     );
+  }
+);
+
+export const EventDisplay = observer(
+  (props: { calendarProps: CalendarProps }) => {
+    const { calendarProps } = props;
+    return <EventDashboard {...calendarProps} />;
   }
 );
 
@@ -273,19 +296,8 @@ export const EventView = observer(() => {
     "Event",
     new Event({})
   );
-  const [date, setDate] = useState(new Date());
-  const [view, setView] = useState<CalendarView>("month");
-  const range =
-    view === "month"
-      ? moment(date).format("YYYY-MM")
-      : view === "year"
-      ? moment(date).format("YYYY")
-      : "month";
-  // : `${Math.floor(moment(date).year() / 10)}X`;
-
-  const start = moment(date).startOf("day");
-  const end = moment(date).endOf("day");
-
+  const calendarProps = useCalendarProps();
+  const { start, end, date } = calendarProps;
   const { setParams, setPageDetails } = values;
 
   const fetchFcn = async () => {
@@ -330,16 +342,8 @@ export const EventView = observer(() => {
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
-  const value = {
-    date,
-    setDate,
-    view,
-    setView,
-    range,
-  };
-
   return (
-    <MoreEventContext.Provider value={value}>
+    <MoreEventContext.Provider value={calendarProps}>
       <MyGenericView<EventInterface>
         title={title}
         Context={EventViewContext}

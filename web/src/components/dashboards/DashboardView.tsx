@@ -1,35 +1,94 @@
 import { observer } from "mobx-react-lite";
-import { PropsWithChildren } from "react";
+import { useEffect, useMemo } from "react";
+import { CATEGORY_CHOICES } from "../../api/CategoryStore";
+import { useStore } from "../../api/Store";
+import { KV } from "../../blueprints/ItemDetails";
+import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
+import { TwoDates } from "../../constants/classes";
+import { useCalendarProps } from "../../constants/hooks";
+import { EventCard, EventDisplay } from "../modules/EventComponents";
+import { TaskDashboard } from "../modules/TaskComponents";
+import { TransactionDashboard } from "../modules/TransactionComponents";
+import { WeighInDashboard } from "../modules/WeighInComponents";
 
-export const DashboardCard = (
-  props: PropsWithChildren<{
-    stats: number;
-    title: string;
-    change?: number;
-  }>
-) => {
-  const { stats, title, change, children } = props;
+export const DashboardView = observer(() => {
+  const { transactionStore, categoryStore, accountStore, eventStore } =
+    useStore();
+
+  const itemMap = useMemo(
+    () =>
+      [
+        {
+          key: "transmitter",
+          values: accountStore.items,
+          label: "name",
+        },
+        {
+          key: "receiver",
+          values: accountStore.items,
+          label: "name",
+        },
+        {
+          key: "account",
+          values: accountStore.items,
+          label: "name",
+        },
+        {
+          key: "category",
+          values: categoryStore.items,
+          label: "title",
+        },
+        {
+          key: "categoryNature",
+          values: CATEGORY_CHOICES,
+          label: "",
+        },
+      ] as KV<any>[],
+    [
+      transactionStore.items.length,
+      categoryStore.items.length,
+      accountStore.items.length,
+    ]
+  );
+
+  const calendarProps = useCalendarProps();
+  const { start, end, date } = calendarProps;
+
+  const fetchFcn = async () => {
+    const newParams = new URLSearchParams({
+      page: "all",
+      date_start__gte: start.toISOString(),
+      date_start__lte: end.toISOString(),
+      order_by: "date_start",
+    });
+    const resp = await eventStore.fetchAll(newParams.toString());
+    if (!resp.ok || !resp.data) {
+      return;
+    }
+  };
+
+  useEffect(() => {
+    eventStore
+      .fetchMissingEvents(
+        `start=${start.toISOString()}&end=${end.toISOString()}`
+      )
+      .then(fetchFcn);
+  }, [date]);
 
   return (
-    <div
-      className="flex flex-row rounded-xl shadow-md h-[100px] p-2 shrink-0 border border-teal-800 dark:bg-gray-900"
-      style={{ boxShadow: "6px 6px 12px black" }}
-    >
-      <div className="rounded-lg border-2 items-center my-auto p-5 mx-5 bg-gradient-to-br from-blue-900 via-blue-500 to-blue-700">
-        {children}
-      </div>
-      <div>
-        <div className="text-sm text-gray-500 font-bold">{title}</div>
-        <div className="text-lg">
-          <span className="font-bold">{stats.toFixed(2)}</span>
-          <span className="text-md text-gray-500">
-            {change ? ` (+${change?.toFixed(1)})` : ""}
-          </span>
-        </div>
-      </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 m-2 gap-5">
+      <EventDisplay calendarProps={calendarProps} />
+      <MyGenericCollection
+        items={eventStore.items.filter(
+          (s) => !s.isArchived && new TwoDates(s.dateStart, date).isEqualDate
+        )}
+        CardComponent={EventCard}
+        title="Events"
+      />
+      <TaskDashboard />
+      <TransactionDashboard graph="pie" itemMap={itemMap} />
+      <TransactionDashboard graph="line" itemMap={itemMap} />
+      <WeighInDashboard />
     </div>
   );
-};
-export const DashboardView = observer(() => {
-  return <div className="m-2"></div>;
 });

@@ -93,7 +93,8 @@ export const MainView = observer(() => {
     <div className="flex flex-col min-h-screen text-teal-700 dark:text-gray-400">
       <NavBar />
       <Routes>
-        <Route path="" element={<ModularView />} />
+        <Route path="menu" element={<ModularView />} />
+        <Route path="" element={<DashboardView />} />
         <Route path="dashboard" element={<DashboardView />} />
         <Route path="journals" element={<JournalView />} />
         <Route path="transactions" element={<TransactionView />} />

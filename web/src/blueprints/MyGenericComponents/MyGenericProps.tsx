@@ -19,6 +19,21 @@ export interface GenericViewProps<T> {
   graph?: GraphType;
 }
 
+export const defaultViewValues: GenericViewProps<{}> = {
+  shownFields: [],
+  setShownFields: () => {},
+  sortFields: [],
+  setSortFields: () => {},
+  params: new URLSearchParams(),
+  setParams: () => {},
+  setPageDetails: () => {},
+  fetchFcn: () => {},
+  itemMap: [],
+  graph: "line",
+  pageDetails: undefined,
+  PageBar: () => <></>,
+};
+
 export function createGenericViewContext<T>() {
   const Context = createContext<GenericViewProps<T> | null>(null);
 

@@ -12,6 +12,7 @@ import { MyPageBar } from "../MyPageBar";
 import { MySpeedDial } from "../MySpeedDial";
 import { GenericViewProps } from "./MyGenericProps";
 import { SettingStore } from "../../api/SettingStore";
+import { useStore } from "../../api/Store";
 
 export const graphTypes = ["pie", "line", "bar", "area"] as const;
 
@@ -39,7 +40,11 @@ export const useViewValues = <
   const [params, setParams] = useSearchParams();
   const availableGraphs = graphs as GraphType[];
   const objWithFields = obj.$view;
-  const [graph, setGraph] = useState<GraphType>("pie");
+  const [graph, setGraph] = useSettings<GraphType>(
+    settingStore,
+    "pie",
+    `graph${name}`
+  );
   const [shownFields, setShownFields] = useSettings(
     settingStore,
     Object.keys(objWithFields) as (keyof U)[],
@@ -122,6 +127,7 @@ export const MyGenericView = observer(
       title,
     } = props;
 
+    const { settingStore } = useStore();
     const setVisibleForIndex = (index: number) => {
       return (value: boolean) => {
         setVisible(index, value); // Use setVisible with the given index
@@ -178,7 +184,11 @@ export const MyGenericView = observer(
         return acc;
       }, {} as Record<GraphType, { icon: IconName; label: string }>);
 
-    const [view, setView] = useState<"card" | "table">("table");
+    const [view, setView] = useSettings<"card" | "table">(
+      settingStore,
+      "table",
+      `view${title.replace(" ", "")}`
+    );
 
     const toggleView = () => {
       setView((prev) => (prev === "card" ? "table" : "card"));

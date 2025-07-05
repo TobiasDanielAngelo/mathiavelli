@@ -37,7 +37,7 @@ export const MyBarChart = observer(
   <T extends Record<string, any>>({
     data,
     width = "100%",
-    height = "85%",
+    height = "80%",
     colors = COLORS,
     traceKey,
     xKey,
@@ -46,6 +46,7 @@ export const MyBarChart = observer(
     formatter,
     excludedFromTotal,
     selectionLabel,
+    title = "",
   }: MyTrendChartProps<T>) => {
     const { allTraceKeys, transformedData, shownFields, setShownFields } =
       useTrendChart(
@@ -58,7 +59,8 @@ export const MyBarChart = observer(
       );
 
     return (
-      <div className="w-full h-full">
+      <div className="w-full h-full rounded-xl shadow-xl">
+        <h5 className="text-xl font-bold m-2">{title}</h5>
         <MyMultiDropdownSelector
           value={shownFields}
           onChangeValue={(t) => setShownFields(t as string[])}

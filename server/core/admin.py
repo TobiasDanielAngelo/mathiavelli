@@ -31,6 +31,11 @@ class CustomAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.fields]
 
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.pk > 1000000:
+            return False
+        return super().has_delete_permission(request, obj)
+
 
 class SettingAdmin(CustomAdmin):
     pass

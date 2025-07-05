@@ -94,7 +94,7 @@ export const MyPieChart = observer(
   <T extends Record<string, any>>({
     data,
     width = "100%",
-    height = "85%",
+    height = "80%",
     colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042"],
     dataKey,
     nameKey,
@@ -102,6 +102,7 @@ export const MyPieChart = observer(
     itemMap,
     formatter,
     selectionLabel,
+    title = "",
   }: MyCircleChartProps<T>) => {
     const { selectedField, setSelectedField, resolvedData } = useCircleChart(
       data,
@@ -112,7 +113,8 @@ export const MyPieChart = observer(
     );
 
     return (
-      <div className="w-full h-full p-4">
+      <div className="w-full h-full p-4 rounded-xl shadow-xl">
+        <h5 className="text-xl font-bold m-2">{title}</h5>
         <MyDropdownSelector
           value={selectedField}
           onChangeValue={setSelectedField}

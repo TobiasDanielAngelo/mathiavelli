@@ -27,6 +27,9 @@ type Item<T> = T & {
 
 type Props<T> = {
   items: Item<T>[];
+  title?: string;
+  width?: string | number;
+  height?: string | number;
 };
 
 const renderFullImportanceScale = (
@@ -70,7 +73,12 @@ const compress = (value: number, factor = 0.9) => {
   return 50 + (value - 50) * factor;
 };
 
-export function MyEisenhowerChart<T>({ items }: Props<T>) {
+export function MyEisenhowerChart<T>({
+  items,
+  title = "",
+  width = "100%",
+  height = "85%",
+}: Props<T>) {
   const [selectedItem, setSelectedItem] = useState<Item<T>>();
   const { isVisible1, setVisible1 } = useVisible();
 
@@ -97,20 +105,21 @@ export function MyEisenhowerChart<T>({ items }: Props<T>) {
   if (items.length === 0) return <div></div>;
 
   return (
-    <>
+    <div className="w-full h-full min-h-[450px] max-h-[650px] rounded-xl shadow-xl">
+      <h5 className="text-xl font-bold m-2">{title}</h5>
       <MyModal
         isVisible={isVisible1 && isTouch}
         setVisible={setVisible1}
         title={selectedItem?.name}
       >
-        <div className="text-white">
+        <div className="dark:text-white">
           <div>Due: {moment(selectedItem?.dueDate).format("lll")}</div>
           <div>
             Importance: {renderFullImportanceScale(selectedItem?.importance)}
           </div>
         </div>
       </MyModal>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width={width} height={height}>
         <ScatterChart margin={{ top: 30, right: 30, bottom: -10, left: -30 }}>
           {/* X-axis (horizontal) */}
           <XAxis
@@ -218,6 +227,6 @@ export function MyEisenhowerChart<T>({ items }: Props<T>) {
           <ZAxis dataKey="z" range={[10, 50]} />
         </ScatterChart>
       </ResponsiveContainer>
-    </>
+    </div>
   );
 }

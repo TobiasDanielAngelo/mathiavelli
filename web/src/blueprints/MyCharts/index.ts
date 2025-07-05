@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { KV } from "../ItemDetails";
-import { getStoreSignature } from "../../constants/helpers";
+import { camelCaseToWords, getStoreSignature } from "../../constants/helpers";
 
 export type MyTrendChartProps<T extends Record<string, any>> = {
   data: T[];
@@ -15,6 +15,7 @@ export type MyTrendChartProps<T extends Record<string, any>> = {
   excludedFromTotal?: string[];
   selectionLabel?: string;
   noTotal?: boolean;
+  title?: string;
 };
 
 export type MyCircleChartProps<T extends Record<string, any>> = {
@@ -28,6 +29,7 @@ export type MyCircleChartProps<T extends Record<string, any>> = {
   itemMap?: KV<any>[];
   formatter?: (value: number, name: string) => string[];
   selectionLabel?: string;
+  title?: string;
 };
 
 export function moveKeysToFront(obj: Record<string, any>, keys: string[]) {
@@ -123,7 +125,7 @@ export const useTrendChart = <T extends Record<string, any>>(
       kv?.label === ""
         ? kv.values.find((_, i) => i === s[traceKey])
         : kv?.values.find((v) => v.id === s[traceKey])?.[kv.label] ??
-          "—" ??
+          camelCaseToWords(yKey as string) ??
           s[traceKey],
   }));
 
@@ -190,6 +192,12 @@ export const useCircleChart = <T extends Record<string, any>>(
       [dataKey]: s[dataKey],
       [traceKey]: s[traceKey],
     }));
+
+  useEffect(() => {
+    if (cleanedData.length > 0) {
+      setSelectedField(cleanedData[0][traceKey]);
+    }
+  }, [cleanedData]);
 
   return { resolvedData, selectedField, setSelectedField };
 };

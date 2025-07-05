@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { SettingStore } from "../api/SettingStore";
 import { handleKeyDown } from "./helpers";
 import { StateSetter } from "./interfaces";
+import moment from "moment";
+import { CalendarView } from "../blueprints/MyCalendar";
 
 export const useKeyPress = (keys: string[], callbackFcn: () => void) => {
   useEffect(() => {
@@ -190,3 +192,21 @@ export function useLocalStorageState<T>(defaultValue: T, key: string) {
 
   return [state, setState] as const;
 }
+
+export const useCalendarProps = () => {
+  const [date, setDate] = useState(new Date());
+  const [view, setView] = useState<CalendarView>("month");
+  const range =
+    view === "month"
+      ? moment(date).format("YYYY-MM")
+      : view === "year"
+      ? moment(date).format("YYYY")
+      : "month";
+
+  const start = moment(date).startOf("day");
+  const end = moment(date).endOf("day");
+
+  return { date, setDate, view, setView, range, start, end };
+};
+
+export type CalendarProps = ReturnType<typeof useCalendarProps>;

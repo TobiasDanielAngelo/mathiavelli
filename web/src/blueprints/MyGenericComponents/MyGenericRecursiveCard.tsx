@@ -107,7 +107,7 @@ export const MyGenericRecursiveCard = observer(
           </div>
         </div>
         {showChildren && subItems.length > 0 && (
-          <div className="ml-8 mt-2 space-y-2 border-l-2 border-teal-500 pl-2">
+          <div className="ml-8 mt-2 space-y-2 border-l-2 border-teal-500 dark:border-gray-600 pl-2">
             {subItems.map((s) => (
               <MyGenericRecursiveCard
                 key={s.id}

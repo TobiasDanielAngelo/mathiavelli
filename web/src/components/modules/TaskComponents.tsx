@@ -155,7 +155,7 @@ export const TaskDashboard = observer(() => {
 
   return (
     <>
-      <MyEisenhowerChart items={tasks} />
+      <MyEisenhowerChart items={tasks} title="Tasks" />
     </>
   );
 });

@@ -1,10 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
+import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
-import { SideBySideView } from "../../blueprints/SideBySideView";
 import { TransactionDashboard } from "../modules/TransactionComponents";
-import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 
 export const FinanceView = observer(() => {
   const { transactionStore, categoryStore, accountStore } = useStore();
@@ -45,11 +44,9 @@ export const FinanceView = observer(() => {
   );
 
   return (
-    <div className="m-2">
-      <SideBySideView
-        SideA={<TransactionDashboard graph="pie" itemMap={itemMap} />}
-        SideB={<TransactionDashboard graph="line" itemMap={itemMap} />}
-      />
+    <div className="m-2 grid grid-cols-2">
+      <TransactionDashboard graph="pie" itemMap={itemMap} />
+      <TransactionDashboard graph="line" itemMap={itemMap} />
     </div>
   );
 });

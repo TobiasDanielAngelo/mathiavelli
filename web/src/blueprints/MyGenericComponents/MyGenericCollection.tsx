@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 export const MyGenericCollection = observer(
   <T extends { id: number } & object>(props: {
-    PageBar: React.FC;
+    PageBar?: React.FC;
     pageDetails?: PaginatedDetails | undefined; // set page details to undefined if you don't want any filters
     items: T[];
     CardComponent: React.ComponentType<{
@@ -25,9 +25,10 @@ export const MyGenericCollection = observer(
 
     return (
       <div
-        className="flex flex-col"
+        className="flex flex-col overflow-scroll shadow-xl rounded-lg"
         style={{
           minHeight: isVisible1 ? "85vh" : undefined,
+          maxHeight: isVisible1 ? "85vh" : undefined,
         }}
       >
         <div className="flex rounded-md flex-row sticky font-bold top-0 z-10 text-lg border-b-2 dark:border-gray-600 border-teal-400 p-2 text-center bg-teal-100 dark:bg-[#242424]">
@@ -40,7 +41,7 @@ export const MyGenericCollection = observer(
 
         {isVisible1 && (
           <>
-            <PageBar />
+            {PageBar ? <PageBar /> : <></>}
             <div className="flex-1">
               {sortAndFilterByIds(
                 items,

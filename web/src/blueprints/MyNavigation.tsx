@@ -45,19 +45,6 @@ export const ResponsiveDrawer = observer(
           <div className="bg-teal-100 dark:bg-gray-900 dark:text-gray-400">
             <Toolbar />
             <List>
-              <ListItem disablePadding>
-                <ListItemButton
-                  onClick={() => {
-                    navigate("/");
-                    setOpen?.(false);
-                  }}
-                >
-                  <ListItemIcon>
-                    <MyImage image="dashboard" className="w-10" />
-                  </ListItemIcon>
-                  <ListItemText primary={"Dashboard"} secondary={""} />
-                </ListItemButton>
-              </ListItem>
               {paths?.map((s, ind) => (
                 <ListItem key={ind} disablePadding>
                   <ListItemButton
@@ -187,7 +174,7 @@ export const MyNavBar = observer(
         />
         <div className="flex flex-wrap items-center justify-between mx-auto p-4">
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <Link to={"/"}>
+            <Link to={"/menu"}>
               <MyIcon
                 icon="InsertChart"
                 fontSize="large"

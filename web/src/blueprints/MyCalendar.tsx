@@ -103,7 +103,7 @@ export const MyCalendar = observer(
         moment(start).add(i, "day")
       );
       return (
-        <div className="grid grid-cols-7 gap-4">
+        <div className="grid grid-cols-7 gap-4 h-[90%]">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d, i) => (
             <div
               key={d}
@@ -168,7 +168,7 @@ export const MyCalendar = observer(
     }, [getStoreSignature(events), currentDate, date, events.length]);
 
     const renderYearView = () => (
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 h-[90%]">
         {Array.from({ length: 12 }, (_, i) => (
           <div
             key={i}
@@ -185,7 +185,7 @@ export const MyCalendar = observer(
     );
 
     const renderDecadeView = () => (
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-3 gap-5 h-[90%]">
         {Array.from({ length: 12 }, (_, i) => startDecade - 1 + i).map(
           (year) => (
             <div
@@ -206,7 +206,7 @@ export const MyCalendar = observer(
     );
 
     return (
-      <div className="m-5 p-4 rounded-xl shadow-xl">
+      <div className="p-4 rounded-xl shadow-xl h-full">
         <div className="flex justify-between items-center mb-4">
           <div onClick={handlePrev}>
             <MyIcon icon="KeyboardArrowLeft" fontSize="large" />
@@ -227,7 +227,6 @@ export const MyCalendar = observer(
             <MyIcon icon="KeyboardArrowRight" fontSize="large" />
           </div>
         </div>
-
         {view === "month" && renderMonthView()}
         {view === "year" && renderYearView()}
         {view === "decade" && renderDecadeView()}

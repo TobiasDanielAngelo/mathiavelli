@@ -12,6 +12,11 @@ export type ViewPath = {
 
 export const allViewPaths = [
   {
+    title: "Dashboard",
+    items: ["dashboard"],
+    mainLink: "dashboard",
+  },
+  {
     title: "Finance",
     items: [
       "transactions",

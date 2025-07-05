@@ -78,7 +78,15 @@ def generate_period_list(qs, datetime_key, *fields, separator="-"):
 
     elif fields == ("year", "quarter"):
         for year in range(start.year, end.year + 1):
-            for q in range(1, 5):
+            q_start = 1
+            q_end = 4
+
+            if year == start.year:
+                q_start = (start.month - 1) // 3 + 1
+            if year == end.year:
+                q_end = (end.month - 1) // 3 + 1
+
+            for q in range(q_start, q_end + 1):
                 periods.append(f"{year}-Q{q}")
 
     elif fields == ("year", "day"):
@@ -115,6 +123,17 @@ def generate_period_list(qs, datetime_key, *fields, separator="-"):
         while current <= end:
             periods.append(f"{current.year}-{current.month:02d}-{current.day:02d}")
             current += relativedelta(days=1)
+
+    elif fields == ("year", "month"):
+        for year in range(start.year, end.year + 1):
+            m_start = 1
+            m_end = 12
+            if year == start.year:
+                m_start = start.month
+            if year == end.year:
+                m_end = end.month
+            for m in range(m_start, m_end + 1):
+                periods.append(f"{year}-{m:02}")
 
     else:
         # fallback for custom mixes like ("year", "weekday"), etc.

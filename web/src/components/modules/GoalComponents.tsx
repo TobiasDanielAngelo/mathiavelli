@@ -19,6 +19,7 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { getDescendantIds, toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field } from "../../constants/interfaces";
+import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 
 export const { Context: GoalViewContext, useGenericView: useGoalView } =
   createGenericViewContext<GoalInterface>();
@@ -110,6 +111,24 @@ export const GoalForm = ({
   );
 };
 
+export const GoalDashboard = observer(() => {
+  const { goalStore } = useStore();
+  const goals = goalStore.items
+    .filter((s) => !s.dateCompleted && !s.isArchived)
+    .map((s) => ({
+      id: s.id,
+      name: s.title,
+      importance: 10,
+      dueDate: new Date(s.dateEnd),
+    }));
+
+  return (
+    <>
+      <MyEisenhowerChart items={goals} title="Goals" />
+    </>
+  );
+});
+
 export const GoalCard = observer((props: { item: Goal }) => {
   const { item } = props;
   const { fetchFcn, shownFields } = useGoalView();
@@ -119,6 +138,7 @@ export const GoalCard = observer((props: { item: Goal }) => {
     <MyGenericRecursiveCard
       item={item}
       shownFields={shownFields}
+      header={["id", "dateCreated"]}
       important={["title"]}
       prices={GoalFields.pricesFields}
       FormComponent={GoalForm}
@@ -146,7 +166,7 @@ export const GoalCollection = observer(() => {
           items={goalStore.items.filter((s) => s.parentGoal == null)}
         />
       }
-      SideA=""
+      SideA={<GoalDashboard />}
       ratio={0.7}
     />
   );

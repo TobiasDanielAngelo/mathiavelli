@@ -14,8 +14,13 @@ class CustomModel(models.Model):
     class Meta:
         abstract = True
 
+    def delete(self, *args, **kwargs):
+        if self.pk > 1000000:
+            raise Exception("This item is read-only and cannot be deleted.")
+        super().delete(*args, **kwargs)
+
 
 class Setting(CustomModel):
     key = fields.ShortCharField(unique=True, display=True)
-    value = fields.MediumCharField()
+    value = fields.LongCharField()
     description = fields.MediumCharField()

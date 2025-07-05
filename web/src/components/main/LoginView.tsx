@@ -25,7 +25,7 @@ export const LoginView = observer(() => {
       setMsg(response.details);
       return;
     }
-    navigate("/");
+    navigate("/dashboard");
   };
 
   useEffect(() => {

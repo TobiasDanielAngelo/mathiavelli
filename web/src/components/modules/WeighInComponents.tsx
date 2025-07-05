@@ -94,6 +94,7 @@ export const WeighInDashboard = observer(() => {
       yKey="aveWeight"
       formatter={(value: number, name: string) => [`${value} kg`, name]}
       noTotal
+      title="Weigh In (kg)"
     />
   );
 });

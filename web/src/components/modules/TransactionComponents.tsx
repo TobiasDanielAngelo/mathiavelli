@@ -150,6 +150,7 @@ export const TransactionDashboard = observer(
               toMoneyShortened(value),
               name,
             ]}
+            title="Transactions"
           />
         ) : (
           <MyLineChart
@@ -166,6 +167,7 @@ export const TransactionDashboard = observer(
             itemMap={itemMap}
             excludedFromTotal={["Operations", "Initial"]}
             selectionLabel="Accounts"
+            title="Transactions"
           />
         )}
       </>

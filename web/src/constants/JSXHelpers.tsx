@@ -97,5 +97,9 @@ export const formatValue = (
     }
   }
 
-  return <ReactMarkdown>{String(value) || "—"}</ReactMarkdown>;
+  return value && value !== "—" ? (
+    <ReactMarkdown>{String(value) || "—"}</ReactMarkdown>
+  ) : (
+    "—"
+  );
 };

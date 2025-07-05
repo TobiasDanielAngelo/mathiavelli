@@ -18,10 +18,14 @@ class TransactionAnalyticsViewSet(viewsets.ViewSet):
     def list(self, request):
         queryset = Transaction.objects.all()
         queryset = annotate_period(
-            queryset, "datetime_transacted", *("year", "month", "day")
+            queryset,
+            "datetime_transacted",
+            *("year", "week"),
         )
         period_list = generate_period_list(
-            queryset, "datetime_transacted", *("year", "month", "day")
+            queryset,
+            "datetime_transacted",
+            *("year", "week"),
         )
 
         result = []
