@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../api/Store";
 import anon from "../assets/anon.jpg";
-import { useKeyPress } from "../constants/hooks";
+import { useIsUnhoverable, useKeyPress } from "../constants/hooks";
 import { Page, StateSetter } from "../constants/interfaces";
 import { MyDropdownMenu } from "./MyDropdownMenu";
 import { MyIcon } from "./MyIcon";
@@ -90,7 +90,10 @@ export const ResponsiveDrawer = observer(
 );
 
 const NavLink = ({ page }: { page: Page }) => {
-  return (
+  const isTouch = useIsUnhoverable();
+  return isTouch ? (
+    <></>
+  ) : (
     <div className="relative group px-2 py-1 cursor-pointer">
       {page.link ? (
         <Link
