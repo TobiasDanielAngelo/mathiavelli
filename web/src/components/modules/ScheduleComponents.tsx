@@ -259,7 +259,9 @@ export const ScheduleCollection = observer(() => {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>("month");
   const range =
-    view === "month"
+    view === "week"
+      ? moment(date).format("YYYY-MM-DD")
+      : view === "month"
       ? moment(date).format("YYYY-MM")
       : view === "year"
       ? moment(date).format("YYYY")

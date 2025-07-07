@@ -30,6 +30,11 @@ const title = "Settings";
 
 export const SettingIdMap = {
   Theme: 1000001,
+  UGW: 1000002,
+  GW4: 1000003,
+  GW3: 1000004,
+  GW2: 1000005,
+  GW1: 1000006,
 } as const;
 
 export const SettingForm = ({

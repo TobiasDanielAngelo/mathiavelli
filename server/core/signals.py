@@ -11,6 +11,8 @@ def create_default_accounts(sender, **kwargs):
     if sender.name != "core":
         return
 
+    created_goals = {}
+
     defaults = [
         (Account, 1000001, {"name": "Wallet"}),
         (Account, 1000002, {"name": "Coins"}),
@@ -30,7 +32,25 @@ def create_default_accounts(sender, **kwargs):
         (Platform, 1000010, {"name": "Spotify"}),
         (Tag, 1000001, {"name": "Habit"}),
         (Setting, 1000001, {"key": "Theme", "value": "dark"}),
+        (Setting, 1000002, {"key": "UGW"}),
+        (Setting, 1000003, {"key": "GW4"}),
+        (Setting, 1000004, {"key": "GW3"}),
+        (Setting, 1000005, {"key": "GW2"}),
+        (Setting, 1000006, {"key": "GW1"}),
+        (Goal, 1000001, {"title": "UGW", "parent_goal": None}),
+        (Goal, 1000002, {"title": "GW4", "parent_id": 1000001}),
+        (Goal, 1000003, {"title": "GW3", "parent_id": 1000002}),
+        (Goal, 1000004, {"title": "GW2", "parent_id": 1000003}),
+        (Goal, 1000005, {"title": "GW1", "parent_id": 1000004}),
+        (Goal, 1000006, {"title": "To UGW", "parent_id": 1000001}),
+        (Goal, 1000007, {"title": "To GW4", "parent_id": 1000002}),
+        (Goal, 1000008, {"title": "To GW3", "parent_id": 1000003}),
+        (Goal, 1000009, {"title": "To GW2", "parent_id": 1000004}),
     ]
 
     for model, id, fields in defaults:
-        model.objects.get_or_create(id=id, defaults=fields)
+        parent_id = fields.pop("parent_id", None)
+        if parent_id:
+            fields["parent_goal"] = created_goals.get(parent_id)
+        obj, _ = model.objects.get_or_create(id=id, defaults=fields)
+        created_goals[id] = obj

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { SettingStore } from "../api/SettingStore";
 import { handleKeyDown } from "./helpers";
-import { StateSetter } from "./interfaces";
+import { KeyboardCodes, StateSetter } from "./interfaces";
 import moment from "moment";
 import { CalendarView } from "../blueprints/MyCalendar";
 
-export const useKeyPress = (keys: string[], callbackFcn: () => void) => {
+export const useKeyPress = (keys: KeyboardCodes[], callbackFcn: () => void) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const held = new Set<string>();
@@ -75,18 +75,15 @@ export function useSettings<T>(
   });
 
   useEffect(() => {
-    if (!settingStore.itemsLoaded) return;
-    const currentSetting = settingStore.items.find((s) => s.key === key);
-    localStorage.setItem(key, JSON.stringify(state));
-
-    if (currentSetting && currentSetting.id) {
-      settingStore.updateItem(currentSetting.id, {
-        value: JSON.stringify(state),
-      });
-    } else if (!currentSetting) {
-      settingStore.addItem({ key, value: JSON.stringify(state) });
+    if (!settingStore.itemsLoaded) {
+      return;
     }
-  }, [key, state, settingStore.itemsLoaded]);
+    const settingId = settingStore.items.find((s) => s.key === key)?.id;
+    settingId
+      ? settingStore.updateItem(settingId, { value: JSON.stringify(state) })
+      : settingStore.addItem({ key, value: JSON.stringify(state) });
+    localStorage.setItem(key, JSON.stringify(state));
+  }, [state, settingStore.itemsLoaded]);
 
   return [state, setState] as const;
 }
@@ -197,14 +194,16 @@ export const useCalendarProps = () => {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>("month");
   const range =
-    view === "month"
+    view === "week"
+      ? moment(date).format("YYYY-MM-DD")
+      : view === "month"
       ? moment(date).format("YYYY-MM")
       : view === "year"
       ? moment(date).format("YYYY")
       : "month";
 
-  const start = moment(date).startOf("day");
-  const end = moment(date).endOf("day");
+  const start = moment(date).startOf("week");
+  const end = moment(date).endOf("week");
 
   return { date, setDate, view, setView, range, start, end };
 };

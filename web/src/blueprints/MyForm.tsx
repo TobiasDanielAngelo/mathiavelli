@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { DAYS_OF_WEEK_CHOICES } from "../constants/constants";
 import { toOptions } from "../constants/helpers";
 import { useKeyPress, useVisible, useWindowWidth } from "../constants/hooks";
-import { Field } from "../constants/interfaces";
+import { Field, KeyboardCodes } from "../constants/interfaces";
 import {
   MyButton,
   MyCheckBox,
@@ -170,7 +170,15 @@ export const MyForm = observer(
     msg,
     isLoading,
   }: FormProps) => {
-    useKeyPress(["Enter"], onClickSubmit);
+    const hasTextarea = fields.some((row) =>
+      row.some((field) => field?.type === "textarea")
+    );
+
+    const formHotKeys = (
+      hasTextarea ? ["Shift", "Enter"] : ["Enter"]
+    ) as KeyboardCodes[];
+
+    useKeyPress(formHotKeys, onClickSubmit);
     const { isVisible1, setVisible1 } = useVisible();
     const width = useWindowWidth();
 

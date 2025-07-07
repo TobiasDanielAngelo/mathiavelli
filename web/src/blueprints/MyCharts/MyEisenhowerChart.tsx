@@ -17,6 +17,7 @@ import {
 } from "../../constants/hooks";
 import { useState } from "react";
 import { MyModal } from "../MyModal";
+import { addDays } from "date-fns";
 
 type Item<T> = T & {
   id: string | number;
@@ -42,7 +43,7 @@ const renderFullImportanceScale = (
   return filled.repeat(count) + empty.repeat(total - count);
 };
 
-const SunPoint = ({ cx, cy, payload }: any) => {
+const SunPoint = ({ cx, cy, payload, late }: any) => {
   const z = payload.z ?? 1;
 
   const vw = useWindowWidth();
@@ -57,12 +58,14 @@ const SunPoint = ({ cx, cy, payload }: any) => {
       cx={cx}
       cy={cy}
       r={radius}
-      fill="#facc15"
-      stroke="#fbbf24"
+      fill={!late ? "#facc15" : "darkred"}
+      stroke={!late ? "#fbbf24" : "darkred"}
       strokeWidth={1}
       opacity={opacity}
       style={{
-        filter: `drop-shadow(0 0 ${glow}px #facc15)`,
+        filter: !late
+          ? `drop-shadow(0 0 ${glow}px #facc15)`
+          : `drop-shadow(0 0 ${glow}px darkred)`,
       }}
     />
   );
@@ -93,7 +96,9 @@ export function MyEisenhowerChart<T>({
     const importance = item.importance;
     const x = compress(urgency); // X = urgency (0–100)
     const y = compress(importance); // Y = importance (0–100)
+    const late = item.dueDate < addDays(new Date(), -1);
     return {
+      late,
       x: x,
       y: y,
       z: (importance * urgency) / 100, // Normalize for reasonable size

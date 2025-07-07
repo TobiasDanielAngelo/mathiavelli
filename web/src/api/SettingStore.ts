@@ -135,14 +135,11 @@ export class SettingStore extends Model({
     }
 
     if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "An error has occurred.",
+      // });
+      return { details: "An error has occurred", ok: false, data: null };
     }
 
     const item = new Setting(result.data);

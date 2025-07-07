@@ -16,13 +16,53 @@ type CalendarEvent = {
   dateCompleted?: string;
 };
 
+const HourItem = (props: {
+  hour: number;
+  modalContent: React.ReactNode;
+  noIcon?: boolean;
+  disabled?: boolean;
+  events?: CalendarEvent[];
+}) => {
+  const { events, modalContent, hour } = props;
+  const { isVisible1, setVisible1 } = useVisible();
+
+  return (
+    <>
+      <MyModal
+        isVisible={isVisible1}
+        setVisible={setVisible1}
+        title="Events"
+        disableClose
+      >
+        {modalContent}
+      </MyModal>
+      <div
+        className="flex flex-col p-1"
+        onDoubleClick={() => setVisible1(true)}
+      >
+        <div className="text-xs text-center font-semibold">{`${
+          hour % 12 === 0 ? 12 : hour % 12
+        }${hour >= 12 ? "P" : "A"}M`}</div>
+        <div className="text-center text-xs cursor-pointer font-bold">
+          {events?.length
+            ? String(events?.filter((s) => s.dateCompleted).length) +
+              "/" +
+              String(events?.length)
+            : "-"}
+        </div>
+      </div>
+    </>
+  );
+};
+
 const EventItem = (props: {
   label: string;
   modalContent: React.ReactNode;
   noIcon?: boolean;
-  date: number;
+  title: string;
+  disabled?: boolean;
 }) => {
-  const { label, modalContent, noIcon, date } = props;
+  const { label, modalContent, noIcon, title, disabled } = props;
   const { isVisible1, setVisible1 } = useVisible();
   const width = useWindowWidth();
 
@@ -36,20 +76,21 @@ const EventItem = (props: {
       >
         {modalContent}
       </MyModal>
-      <span onDoubleClick={() => setVisible1(true)}>{date}</span>
+      <span onDoubleClick={() => setVisible1(true)}>{title}</span>
       {!noIcon && (
         <MyIcon
           icon="Event"
           fontSize="small"
           label={width > 1024 ? label : ""}
           onDoubleClick={() => setVisible1(true)}
+          disabled={disabled}
         />
       )}
     </>
   );
 };
 
-export type CalendarView = "month" | "year" | "decade";
+export type CalendarView = "week" | "month" | "year" | "decade";
 
 export const MyCalendar = observer(
   (props: {
@@ -71,7 +112,9 @@ export const MyCalendar = observer(
 
     const handlePrev = () => {
       const newDate =
-        view === "month"
+        view === "week"
+          ? moment(currentDate).subtract(1, "week")
+          : view === "month"
           ? moment(currentDate).subtract(1, "month")
           : view === "year"
           ? moment(currentDate).subtract(1, "year")
@@ -83,7 +126,9 @@ export const MyCalendar = observer(
 
     const handleNext = () => {
       const newDate =
-        view === "month"
+        view === "week"
+          ? moment(currentDate).add(1, "week").startOf("week")
+          : view === "month"
           ? moment(currentDate).add(1, "month").startOf("month")
           : view === "year"
           ? moment(currentDate).add(1, "year").startOf("year")
@@ -96,6 +141,94 @@ export const MyCalendar = observer(
 
       setCurrentDate(newDate);
     };
+
+    const renderWeekView = useCallback(() => {
+      const start = moment(currentDate).startOf("week"); // Starting point of the week
+      const days = Array.from({ length: 7 }, (_, i) =>
+        moment(start).add(i, "day")
+      );
+
+      // Hourly range for the day (0-23, representing 24 hours)
+      const hours = Array.from({ length: 24 }, (_, i) => i);
+
+      return (
+        <div className="grid grid-cols-7 gap-4 h-[90%] overflow-scroll">
+          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+            <div key={d} className="text-center font-bold">
+              {d}
+            </div>
+          ))}
+
+          {/* Render each day with hour-by-hour schedule */}
+          {days.map((day, i) => {
+            const isToday = day.isSame(moment(), "day");
+            const isSelected = day.isSame(date, "day");
+
+            // Filter events for the specific day
+            const dayEvents = sortByKey(events, "dateStart").filter(
+              (e) =>
+                day.format("YYYY-MM-DD") ===
+                  moment(e.dateStart).format("YYYY-MM-DD") ||
+                day.format("YYYY-MM-DD") ===
+                  moment(e.dateEnd).format("YYYY-MM-DD")
+            );
+
+            // Group events by hour
+            const eventsByHour = hours.map((hour) => {
+              return dayEvents.filter(
+                (e) =>
+                  moment(e.dateStart).hour() === hour ||
+                  moment(e.dateEnd).hour() === hour
+              );
+            });
+
+            return (
+              <div key={i} className="flex flex-col">
+                <div
+                  onClick={() => setDate(day.toDate())}
+                  className={`text-center p-2 rounded cursor-pointer ${
+                    isToday ? "text-blue-500 dark:text-white" : ""
+                  } ${isSelected ? "bg-teal-300 text-black" : ""}`}
+                >
+                  <div>{day.format("D")}</div>
+                </div>
+                {/* Hour blocks */}
+                <div className="grid grid-rows-24 gap-1 text-sm">
+                  {hours.map((hour, index) => {
+                    // Get events for the specific hour
+                    const hourlyEvents = eventsByHour[index];
+                    return (
+                      <HourItem
+                        events={hourlyEvents}
+                        hour={hour}
+                        modalContent={
+                          <MyTable
+                            matrix={[
+                              ["Event", "Time", "Completed?"],
+                              ...hourlyEvents.map((s) => [
+                                s.title,
+                                moment(s.dateStart).format("h:mm A"),
+                                <MyIcon
+                                  icon={
+                                    s.dateCompleted
+                                      ? "CheckBox"
+                                      : "CheckBoxOutlineBlank"
+                                  }
+                                />,
+                              ]),
+                            ]}
+                          />
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }, [getStoreSignature(events), currentDate, date, events.length]);
 
     const renderMonthView = useCallback(() => {
       const start = moment(currentDate).startOf("month").startOf("week");
@@ -139,8 +272,12 @@ export const MyCalendar = observer(
               >
                 <EventItem
                   noIcon={noIcon || !dayEvents.length}
-                  date={day.date()}
-                  label={String(dayEvents.length)}
+                  title={day.date().toString()}
+                  label={
+                    String(dayEvents.filter((s) => s.dateCompleted).length) +
+                    "/" +
+                    String(dayEvents.length)
+                  }
                   modalContent={
                     <MyTable
                       matrix={[
@@ -168,7 +305,7 @@ export const MyCalendar = observer(
     }, [getStoreSignature(events), currentDate, date, events.length]);
 
     const renderYearView = () => (
-      <div className="grid grid-cols-3 gap-2 h-[90%]">
+      <div className="grid grid-cols-3 gap-2 h-full">
         {Array.from({ length: 12 }, (_, i) => (
           <div
             key={i}
@@ -206,7 +343,7 @@ export const MyCalendar = observer(
     );
 
     return (
-      <div className="p-4 rounded-xl shadow-xl h-full">
+      <div className="p-4 rounded-xl h-full shadow-xl">
         <div className="flex justify-between items-center mb-4">
           <div onClick={handlePrev}>
             <MyIcon icon="KeyboardArrowLeft" fontSize="large" />
@@ -214,11 +351,19 @@ export const MyCalendar = observer(
           <div
             onClick={() =>
               setView(
-                view === "month" ? "year" : view === "year" ? "decade" : "month"
+                view === "week"
+                  ? "month"
+                  : view === "month"
+                  ? "year"
+                  : view === "year"
+                  ? "decade"
+                  : "week"
               )
             }
             className="font-bold"
           >
+            {view === "week" &&
+              `${currentDate.format("YYYY")} Week ${currentDate.week()}`}
             {view === "month" && currentDate.format("MMMM YYYY")}
             {view === "year" && currentDate.format("YYYY")}
             {view === "decade" && `${startDecade} - ${startDecade + 9}`}
@@ -227,6 +372,7 @@ export const MyCalendar = observer(
             <MyIcon icon="KeyboardArrowRight" fontSize="large" />
           </div>
         </div>
+        {view === "week" && renderWeekView()}
         {view === "month" && renderMonthView()}
         {view === "year" && renderYearView()}
         {view === "decade" && renderDecadeView()}

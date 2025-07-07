@@ -319,7 +319,7 @@ export const MyGenericFilter = <T extends Record<string, any>>({
 
   return (
     <div className="m-2">
-      <h1 className="text-xl mb-2 font-bold tracking-tight md:text-2xl text-white">
+      <h1 className="text-xl mb-2 font-bold tracking-tight md:text-2xl dark:text-white">
         {title}
       </h1>
       <MyMultiDropdownSelector

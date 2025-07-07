@@ -149,46 +149,6 @@ export class EventStore extends Model({
     return result;
   });
 
-  // Special
-  @modelFlow
-  fetchMissingEvents = _async(function* (this: EventStore, params?: string) {
-    let result;
-
-    try {
-      result = yield* _await(
-        fetchItemsRequest<Event>("productivity/generate-events", params)
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    result.data.forEach((s) => {
-      if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new Event(s));
-      } else {
-        this.items.find((t) => t.id === s.id)?.update(s);
-      }
-    });
-
-    return result;
-  });
-
   @modelFlow
   addItem = _async(function* (this: EventStore, details: EventInterface) {
     let result;

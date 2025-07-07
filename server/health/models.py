@@ -6,15 +6,30 @@ class WeighIn(CustomModel):
     weight_kg = fields.DecimalField()
     date = fields.DefaultNowField()
 
+    def save(self, *args, **kwargs):
+        if self.pk and self.__class__.objects.filter(pk=self.pk).exists():
+            return
+        super().save(*args, **kwargs)
+
 
 class BodyFat(CustomModel):
     body_fat_percent = fields.DecimalField()
     date = fields.DefaultNowField()
 
+    def save(self, *args, **kwargs):
+        if self.pk and self.__class__.objects.filter(pk=self.pk).exists():
+            return
+        super().save(*args, **kwargs)
+
 
 class WaistMeasurement(CustomModel):
     waist_cm = fields.DecimalField()
     date = fields.DefaultNowField()
+
+    def save(self, *args, **kwargs):
+        if self.pk and self.__class__.objects.filter(pk=self.pk).exists():
+            return
+        super().save(*args, **kwargs)
 
 
 class Meal(CustomModel):

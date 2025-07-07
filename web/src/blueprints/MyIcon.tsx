@@ -89,15 +89,30 @@ export type IconName = keyof typeof iconMap;
 interface MyIconProps extends SvgIconProps {
   icon: IconName;
   label?: string;
+  hidden?: boolean;
+  disabled?: boolean;
 }
 
-export const MyIcon: React.FC<MyIconProps> = ({ icon, label, ...props }) => {
+export const MyIcon: React.FC<MyIconProps> = ({
+  icon,
+  label,
+  hidden,
+  disabled,
+  ...props
+}) => {
   const IconComponent = iconMap[icon];
 
-  return (
+  return hidden ? (
+    <></>
+  ) : (
     <div className="flex flex-col items-center">
       <IconComponent
-        className="cursor-pointer dark:text-gray-400 text-teal-700"
+        className={`cursor-pointer ${
+          disabled
+            ? "text-gray-400 dark:text-gray-700"
+            : "text-teal-700 dark:text-gray-400"
+        }`}
+        onClick={disabled ? () => {} : props.onClick}
         {...props}
       />
       <div className="text-xs text-gray-500 font-bold">{label}</div>

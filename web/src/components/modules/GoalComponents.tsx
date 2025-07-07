@@ -138,7 +138,7 @@ export const GoalCard = observer((props: { item: Goal }) => {
     <MyGenericRecursiveCard
       item={item}
       shownFields={shownFields}
-      header={["id", "dateCreated"]}
+      header={["id"]}
       important={["title"]}
       prices={GoalFields.pricesFields}
       FormComponent={GoalForm}

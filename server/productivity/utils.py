@@ -144,8 +144,8 @@ def generate_missing_events(params=None):
     from .models import Task, Event
 
     try:
-        start = safe_parse_datetime(params.get("start", None))
-        end = safe_parse_datetime(params.get("end", None))
+        start = safe_parse_datetime(params.get("date_start__gte", None))
+        end = safe_parse_datetime(params.get("date_start__lte", None))
     except:
         return []
 
@@ -166,7 +166,7 @@ def generate_missing_events(params=None):
         if task.schedule:
             datetimes = get_datetimes(task.schedule, start, end)
         else:
-            datetimes = []
+            datetimes = [task.date_start.isoformat()]
         updated = (
             Event.objects.filter(task=task, date_start__gte=start, date_start__lte=end)
             .exclude(date_start__in=datetimes)
@@ -180,7 +180,7 @@ def generate_missing_events(params=None):
         print(
             f"Archived {updated} incorrect events for task {task.pk} - {list(
                 Event.objects.filter(task=task, date_start__gte=start, date_start__lte=end)
-            .exclude(date_start__in=datetimes)
+            .exclude(date_start__in=datetimes).values_list("id", flat=True)
             )}."
         )
         print(f"Deleted {deleted} archived events that were not completed.")

@@ -4,6 +4,24 @@ import { GuidedDiv } from "../blueprints/MyGuidedDiv";
 import { isDatetimeValue, isDateValue, toMoney } from "./helpers";
 import ReactMarkdown from "react-markdown";
 
+export function isValidJSON(str: string): boolean {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function prettifyJSON(str: string): string {
+  try {
+    const obj = JSON.parse(str);
+    return JSON.stringify(obj, null, 2); // 2-space indent
+  } catch {
+    return str; // or throw an error, or return '', up to you
+  }
+}
+
 export const formatValue = (
   value: any,
   key: string,
@@ -98,7 +116,7 @@ export const formatValue = (
   }
 
   return value && value !== "—" ? (
-    <ReactMarkdown>{String(value) || "—"}</ReactMarkdown>
+    <ReactMarkdown>{prettifyJSON(String(value)) || "—"}</ReactMarkdown>
   ) : (
     "—"
   );

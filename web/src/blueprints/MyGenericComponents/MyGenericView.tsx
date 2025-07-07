@@ -3,7 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { SetURLSearchParams, useSearchParams } from "react-router-dom";
 import { toTitleCase } from "../../constants/helpers";
 import { useKeyPress, useSettings, VisibleMap } from "../../constants/hooks";
-import { PaginatedDetails, StateSetter } from "../../constants/interfaces";
+import {
+  KeyboardCodes,
+  PaginatedDetails,
+  StateSetter,
+} from "../../constants/interfaces";
 import { KV } from "../ItemDetails";
 import { IconName, MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
@@ -281,10 +285,11 @@ export const MyGenericView = observer(
     );
 
     actions.forEach((s, ind) =>
-      useKeyPress(["Alt", `Digit${ind + 1}`], s.onClick)
+      useKeyPress(["AltLeft", `Digit${ind + 1}` as KeyboardCodes], s.onClick)
     );
 
     useEffect(() => {
+      console.log("New params!!");
       fetchFcn();
     }, [params]);
 

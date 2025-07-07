@@ -1,5 +1,7 @@
 from django.db import models
 from . import fields
+from decimal import Decimal
+from django.core.exceptions import ValidationError
 
 
 class CustomModel(models.Model):
@@ -24,3 +26,26 @@ class Setting(CustomModel):
     key = fields.ShortCharField(unique=True, display=True)
     value = fields.LongCharField()
     description = fields.MediumCharField()
+
+    def clean(self):
+        if self.key not in ["UGW", "GW4", "GW3", "GW2", "GW1"]:
+            return  # skip non-goal settings
+        if self.value is None:
+            return
+
+        keys_order = ["UGW", "GW4", "GW3", "GW2", "GW1"]
+        settings = {s.key: s.value for s in Setting.objects.filter(key__in=keys_order)}
+
+        # include this instance’s current value
+        settings[self.key] = self.value
+
+        last_value = None
+        for k in keys_order:
+            val = settings.get(k)
+            if val is None:
+                continue  # skip if no value
+            if last_value is not None and Decimal(val) <= Decimal(last_value):
+                raise ValidationError(
+                    f"{k} must be greater than previous non-empty goal."
+                )
+            last_value = val

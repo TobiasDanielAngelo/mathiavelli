@@ -164,3 +164,32 @@ class SettingSerializer(CustomSerializer):
     class Meta:
         model = Setting
         fields = "__all__"
+
+    def validate(self, data):
+        # only validate UGW, GW4, GW3, GW2, GW1
+        if data.get("key") not in ["UGW", "GW4", "GW3", "GW2", "GW1"]:
+            return data
+
+        if data.get("value") is None or data.get("value") == "":
+            return data
+
+        keys_order = ["UGW", "GW4", "GW3", "GW2", "GW1"]
+
+        # load existing settings
+        settings = {s.key: s.value for s in Setting.objects.filter(key__in=keys_order)}
+
+        # use this new value for current key
+        settings[data["key"]] = data.get("value")
+
+        last_value = None
+        for k in keys_order:
+            val = settings.get(k)
+            if val is None:
+                continue
+            if last_value is not None and Decimal(val) <= Decimal(last_value):
+                raise serializers.ValidationError(
+                    f"{k} must be greater than previous non-empty goal."
+                )
+            last_value = val
+
+        return data

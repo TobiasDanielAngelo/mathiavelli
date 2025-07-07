@@ -1,6 +1,7 @@
 from .models import *
 from .serializers import *
 from core.viewsets import CustomModelViewSet
+from .utils import generate_missing_events
 
 
 class ScheduleViewSet(CustomModelViewSet):
@@ -31,6 +32,11 @@ class TagViewSet(CustomModelViewSet):
 class EventViewSet(CustomModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+    def list(self, request, *args, **kwargs):
+        params = self.request.query_params.copy()
+        generate_missing_events(params)
+        return super().list(request, *args, **kwargs)
 
 
 class HabitLogViewSet(CustomModelViewSet):

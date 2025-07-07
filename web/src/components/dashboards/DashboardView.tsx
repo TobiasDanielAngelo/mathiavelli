@@ -68,11 +68,7 @@ export const DashboardView = observer(() => {
   };
 
   useEffect(() => {
-    eventStore
-      .fetchMissingEvents(
-        `start=${start.toISOString()}&end=${end.toISOString()}`
-      )
-      .then(fetchFcn);
+    fetchFcn();
   }, [date]);
 
   return (

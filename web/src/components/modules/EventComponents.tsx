@@ -187,7 +187,7 @@ export const EventDashboard = observer(
     return (
       <MyCalendar
         {...props}
-        noIcon
+        // noIcon
         events={sortAndFilterByIds(
           eventStore.items,
           pageIds ?? eventStore.items.map((s) => s.id),
@@ -297,18 +297,12 @@ export const EventView = observer(() => {
     new Event({})
   );
   const calendarProps = useCalendarProps();
-  const { start, end, date } = calendarProps;
-  const { setParams, setPageDetails } = values;
+  const { start, end } = calendarProps;
+  const { params, setPageDetails, setParams } = values;
 
   const fetchFcn = async () => {
-    const newParams = new URLSearchParams({
-      page: "all",
-      date_start__gte: start.toISOString(),
-      date_start__lte: end.toISOString(),
-      order_by: "date_start",
-    });
-    setParams(newParams);
-    const resp = await eventStore.fetchAll(newParams.toString());
+    if (!params) return;
+    const resp = await eventStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
       return;
     }
@@ -316,12 +310,14 @@ export const EventView = observer(() => {
   };
 
   useEffect(() => {
-    eventStore
-      .fetchMissingEvents(
-        `start=${start.toISOString()}&end=${end.toISOString()}`
-      )
-      .then(fetchFcn);
-  }, [date]);
+    const newParams = new URLSearchParams({
+      page: "all",
+      date_start__gte: start.toISOString(),
+      date_start__lte: end.toISOString(),
+      order_by: "date_start",
+    });
+    setParams(newParams);
+  }, [start, end]);
 
   const itemMap = useMemo(
     () =>

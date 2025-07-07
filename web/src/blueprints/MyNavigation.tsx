@@ -29,7 +29,7 @@ export const ResponsiveDrawer = observer(
     const navigate = useNavigate();
     const { userStore } = useStore();
 
-    useKeyPress(["q", "Shift"], () => setOpen?.(false));
+    useKeyPress(["KeyQ", "ShiftLeft"], () => setOpen?.(false));
 
     return (
       <div style={{ display: "flex" }}>
