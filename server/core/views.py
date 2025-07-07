@@ -1,21 +1,17 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
 from .serializers import *
 from knox.models import AuthToken
-from django.contrib.auth.models import User
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import permissions, response, status, generics
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from knox.auth import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 import os
 from django.http import JsonResponse
 from .viewsets import CustomAuthentication
-
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.http import JsonResponse
 
 
 @ensure_csrf_cookie
@@ -31,58 +27,6 @@ class CustomAPIView(APIView):
     authentication_classes = [
         CustomAuthentication,
     ]
-
-
-# Depreciated
-# class LoginAPI(KnoxLoginView):
-#     serializer_class = LoginSerializer
-#     permission_classes = [
-#         permissions.AllowAny,
-#     ]
-#     api_view = ["POST", "GET"]
-
-#     def get(self, request):
-#         content = {
-#             "username": ["This field is required,"],
-#             "password": ["This field is required,"],
-#         }
-#         return response.Response(content)
-
-#     def post(self, request, *args, **kwargs):
-#         user = User.objects.filter(username=request.data.get("username")).first()
-#         if user != None:
-#             serializer = LoginSerializer(data=request.data)
-#             serializer.is_valid(raise_exception=True)
-#             user = serializer.validated_data["user"]
-#             _, token = AuthToken.objects.create(user)
-#             authenticated_user = authenticate(
-#                 request, username=user.username, password=request.data["password"]
-#             )
-#             if authenticated_user.is_authenticated:
-#                 data = {
-#                     "key": token,
-#                     "user": {
-#                         "id": -1 if user is None else user.id,
-#                         "username": user.username,
-#                         "first_name": user.first_name,
-#                         "last_name": user.last_name,
-#                     },
-#                 }
-#                 return response.Response(data)
-#             else:
-#                 return response.Response(
-#                     {
-#                         "error": "Wrong password",
-#                     },
-#                     status=status.HTTP_400_BAD_REQUEST,
-#                 )
-#         else:
-#             return response.Response(
-#                 {
-#                     "error": "User does not exist",
-#                 },
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -125,38 +69,6 @@ class RegistrationAPI(generics.GenericAPIView):
                 "token": AuthToken.objects.create(user)[1],
             }
         )
-
-
-# Depreciated
-# class ReauthAPI(APIView):
-#     permission_classes = [
-#         permissions.AllowAny,
-#     ]
-
-#     def post(self, request):
-#         token_key = request.headers["Authorization"].split(" ")[1][0:15]
-#         try:
-#             auth_token = AuthToken.objects.get(token_key=token_key)
-#         except:
-#             return response.Response(
-#                 {
-#                     "error": "Login not recognized",
-#                 },
-#                 status=status.HTTP_401_UNAUTHORIZED,
-#             )
-#         if auth_token is not None:
-#             user = User.objects.get(id=auth_token.user_id)
-#             login(request, user)
-#             data = {
-#                 "key": request.headers["Authorization"].split(" ")[1],
-#                 "user": {
-#                     "id": -1 if user is None else user.id,
-#                     "username": user.username,
-#                     "first_name": user.first_name,
-#                     "last_name": user.last_name,
-#                 },
-#             }
-#             return response.Response(data)
 
 
 class CookieLoginView(KnoxLoginView):

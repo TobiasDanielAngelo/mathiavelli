@@ -37,6 +37,8 @@ import DisabledVisible from "@mui/icons-material/DisabledVisible";
 import RemoveRedEye from "@mui/icons-material/RemoveRedEye";
 import Settings from "@mui/icons-material/Settings";
 import FilePresent from "@mui/icons-material/FilePresent";
+import Star from "@mui/icons-material/Star";
+import DisplaySettings from "@mui/icons-material/DisplaySettings";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
 // 1. Map icons to names
@@ -55,6 +57,7 @@ const iconMap = {
   Menu,
   Payment,
   Print,
+  DisplaySettings,
   RestartAlt,
   FilePresent,
   VisibilityOff,
@@ -74,6 +77,7 @@ const iconMap = {
   KeyboardArrowLeft,
   KeyboardArrowRight,
   Settings,
+  Star,
   Sort,
   CheckBox,
   DisabledVisible,

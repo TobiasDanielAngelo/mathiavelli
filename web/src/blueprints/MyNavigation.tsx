@@ -101,7 +101,7 @@ const NavLink = ({ page }: { page: Page }) => {
           className={
             page.selected
               ? "dark:text-gray-300 text-teal-900 font-bold"
-              : "dark:text-blue-500 text-teal-500 font-bold"
+              : "dark:text-teal-500 text-teal-500 font-bold"
           }
         >
           {page.title}
@@ -111,7 +111,7 @@ const NavLink = ({ page }: { page: Page }) => {
           className={
             page.selected
               ? "dark:text-gray-300 text-teal-900 font-bold"
-              : "dark:text-blue-500 text-teal-500 font-bold"
+              : "dark:text-teal-500 text-teal-500 font-bold"
           }
         >
           {page.title}

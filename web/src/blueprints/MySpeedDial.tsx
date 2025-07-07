@@ -1,5 +1,6 @@
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import { MySpeedDialProps } from "../constants/interfaces";
+import { MyIcon } from "./MyIcon";
 
 export const MySpeedDial = (props: {
   actions?: MySpeedDialProps[];
@@ -29,7 +30,12 @@ export const MySpeedDial = (props: {
           padding: 4,
         },
       }}
-      icon={<SpeedDialIcon sx={{ transform: "scale(1.5)" }} />}
+      icon={
+        <SpeedDialIcon
+          icon={<MyIcon icon={leftSide ? "DisplaySettings" : "Star"} />}
+          sx={{ transform: "scale(1.5)" }}
+        />
+      }
     >
       {actions?.map(
         (action) =>
