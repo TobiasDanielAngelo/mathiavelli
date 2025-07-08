@@ -8,7 +8,7 @@ export const MyConfirmModal = (props: {
   onClickCheck: () => void;
   objectName?: string;
   actionName?: string;
-  msg?: object | string;
+  msg?: Object;
   isLoading?: boolean;
 }) => {
   const {
@@ -36,13 +36,13 @@ export const MyConfirmModal = (props: {
       <label className="block text-sm font-medium dark:text-white text-red-600">
         <div>
           {msg &&
-          !`${msg["nonFieldErrors" as keyof object]}`.includes("undefined")
-            ? `${msg["nonFieldErrors" as keyof object]}`
+          !`${msg["nonFieldErrors" as keyof Object]}`.includes("undefined")
+            ? `${msg["nonFieldErrors" as keyof Object]}`
             : ""}
         </div>
         <div>
-          {msg && !`${msg["detail" as keyof object]}`.includes("undefined")
-            ? `${msg["detail" as keyof object]}`
+          {msg && !`${msg["detail" as keyof Object]}`.includes("undefined")
+            ? `${msg["detail" as keyof Object]}`
             : ""}
         </div>
       </label>

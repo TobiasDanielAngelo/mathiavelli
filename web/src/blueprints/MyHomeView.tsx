@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-export const HomeView = (props: PropsWithChildren) => {
+export const HomeView = (props: PropsWithChildren<{}>) => {
   const { children } = props;
 
   return (

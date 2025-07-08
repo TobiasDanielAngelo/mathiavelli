@@ -105,8 +105,7 @@ export const TaskForm = ({
           },
         ],
       ] satisfies Field[][],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [goalStore.items, scheduleStore.items, item?.id]
+    [goalStore.items.length, scheduleStore.items.length, item?.id]
   );
 
   return (
@@ -265,7 +264,11 @@ export const TaskView = observer(() => {
           label: "title",
         },
       ] satisfies KV<any>[],
-    [goalStore.items, scheduleStore.items, habitStore.items]
+    [
+      goalStore.items.length,
+      scheduleStore.items.length,
+      habitStore.items.length,
+    ]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

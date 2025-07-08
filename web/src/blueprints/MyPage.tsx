@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-export const MyPage = (props: PropsWithChildren) => {
+export const MyPage = (props: PropsWithChildren<{}>) => {
   const { children } = props;
   return (
     <div className="py-5 px-5">

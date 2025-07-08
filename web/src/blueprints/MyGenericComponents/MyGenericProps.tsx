@@ -19,7 +19,7 @@ export interface GenericViewProps<T> {
   graph?: GraphType;
 }
 
-export const defaultViewValues: GenericViewProps<object> = {
+export const defaultViewValues: GenericViewProps<{}> = {
   shownFields: [],
   setShownFields: () => {},
   sortFields: [],

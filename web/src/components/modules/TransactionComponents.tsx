@@ -93,7 +93,7 @@ export const TransactionForm = ({
           },
         ],
       ] satisfies Field[][],
-    [accountStore.items, categoryStore.items]
+    [accountStore.items.length, categoryStore.items.length]
   );
 
   return (
@@ -296,7 +296,11 @@ export const TransactionView = observer(() => {
           label: "",
         },
       ] satisfies KV<any>[],
-    [categoryStore.items, accountStore.items]
+    [
+      transactionStore.items.length,
+      categoryStore.items.length,
+      accountStore.items.length,
+    ]
   );
 
   const actionModalDefs = [

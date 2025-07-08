@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getStoreSignature, sortByKey } from "../constants/helpers";
 import { useVisible, useWindowWidth } from "../constants/hooks";
 import { StateSetter } from "../constants/interfaces";
@@ -96,16 +96,13 @@ export const MyCalendar = observer(
       props;
     const [currentDate, setCurrentDate] = useState(moment());
 
-    const startDecade = useMemo(
-      () => Math.floor(currentDate.year() / 10) * 10,
-      [currentDate]
-    );
+    const startDecade = Math.floor(currentDate.year() / 10) * 10;
 
     useEffect(() => {
       setDate(currentDate.toDate());
-    }, [currentDate, setDate]);
+    }, [currentDate]);
 
-    const handlePrev = useCallback(() => {
+    const handlePrev = () => {
       const newDate =
         view === "week"
           ? moment(currentDate).subtract(1, "week")
@@ -117,9 +114,9 @@ export const MyCalendar = observer(
           ? moment(currentDate).subtract(10, "year").startOf("year")
           : moment(currentDate);
       setCurrentDate(newDate);
-    }, [view, currentDate]);
+    };
 
-    const handleNext = useCallback(() => {
+    const handleNext = () => {
       const newDate =
         view === "week"
           ? moment(currentDate).add(1, "week").startOf("week")
@@ -135,7 +132,7 @@ export const MyCalendar = observer(
           : moment(currentDate);
 
       setCurrentDate(newDate);
-    }, [view, currentDate]);
+    };
 
     const renderWeekView = useCallback(() => {
       const start = moment(currentDate).startOf("week"); // Starting point of the week
@@ -230,15 +227,7 @@ export const MyCalendar = observer(
           })}
         </div>
       );
-    }, [
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      getStoreSignature(events),
-      currentDate,
-      date,
-      events,
-      noCompletion,
-      setDate,
-    ]);
+    }, [getStoreSignature(events), currentDate, date, events.length]);
 
     const renderMonthView = useCallback(() => {
       const start = moment(currentDate).startOf("month").startOf("week");
@@ -322,59 +311,44 @@ export const MyCalendar = observer(
           })}
         </div>
       );
-    }, [
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      getStoreSignature(events),
-      currentDate,
-      date,
-      events,
-      noCompletion,
-      noIcon,
-      setDate,
-    ]);
+    }, [getStoreSignature(events), currentDate, date, events.length]);
 
-    const renderYearView = useCallback(
-      () => (
-        <div className="grid grid-cols-3 gap-2 h-full">
-          {Array.from({ length: 12 }, (_, i) => (
-            <div
-              key={i}
-              onClick={() => {
-                setCurrentDate(moment(currentDate).month(i));
-                setView("month");
-              }}
-              className="p-4 text-center rounded shadow cursor-pointer dark:hover:bg-gray-500 hover:bg-teal-200"
-            >
-              {moment().month(i).format("MMM")}
-            </div>
-          ))}
-        </div>
-      ),
-      [currentDate, setView]
+    const renderYearView = () => (
+      <div className="grid grid-cols-3 gap-2 h-full">
+        {Array.from({ length: 12 }, (_, i) => (
+          <div
+            key={i}
+            onClick={() => {
+              setCurrentDate(moment(currentDate).month(i));
+              setView("month");
+            }}
+            className="p-4 text-center rounded shadow cursor-pointer dark:hover:bg-gray-500 hover:bg-teal-200"
+          >
+            {moment().month(i).format("MMM")}
+          </div>
+        ))}
+      </div>
     );
 
-    const renderDecadeView = useCallback(
-      () => (
-        <div className="grid grid-cols-3 gap-5 h-[90%]">
-          {Array.from({ length: 12 }, (_, i) => startDecade - 1 + i).map(
-            (year) => (
-              <div
-                key={year}
-                onClick={() => {
-                  setCurrentDate(moment(currentDate).year(year));
-                  setView("year");
-                }}
-                className={`p-4 text-center rounded cursor-pointer shadow ${
-                  year === currentDate.year() ? "bg-blue-400" : ""
-                }`}
-              >
-                {year}
-              </div>
-            )
-          )}
-        </div>
-      ),
-      [currentDate, setView, startDecade]
+    const renderDecadeView = () => (
+      <div className="grid grid-cols-3 gap-5 h-[90%]">
+        {Array.from({ length: 12 }, (_, i) => startDecade - 1 + i).map(
+          (year) => (
+            <div
+              key={year}
+              onClick={() => {
+                setCurrentDate(moment(currentDate).year(year));
+                setView("year");
+              }}
+              className={`p-4 text-center rounded cursor-pointer shadow ${
+                year === currentDate.year() ? "bg-blue-400" : ""
+              }`}
+            >
+              {year}
+            </div>
+          )
+        )}
+      </div>
     );
 
     return (
@@ -405,7 +379,6 @@ export const MyCalendar = observer(
                 .format("MMM D")} - ${currentDate
                 .endOf("week")
                 .format("MMM D")})`}
-
             {view === "month" && currentDate.format("MMMM YYYY")}
             {view === "year" && currentDate.format("YYYY")}
             {view === "decade" && `${startDecade} - ${startDecade + 9}`}

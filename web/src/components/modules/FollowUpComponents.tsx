@@ -59,7 +59,7 @@ export const FollowUpForm = ({
         [{ name: "status", label: "Status", type: "number" }],
         [{ name: "reply", label: "Reply", type: "textarea" }],
       ] satisfies Field[][],
-    [jobStore.items]
+    [jobStore.items.length]
   );
   return (
     <MyGenericForm<FollowUpInterface>
@@ -194,7 +194,7 @@ export const FollowUpView = observer(() => {
           label: "",
         },
       ] satisfies KV<any>[],
-    [jobStore.items]
+    [jobStore.items.length]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

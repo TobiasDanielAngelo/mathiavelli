@@ -83,7 +83,7 @@ export const replaceCumulative = (
   find: string[],
   replace: string
 ): string => {
-  for (let i = 0; i < find.length; i++)
+  for (var i = 0; i < find.length; i++)
     str = str.replace(new RegExp(find[i], "g"), replace);
   return str.replace(/\s/g, "") !== "" ? str : "-";
 };
@@ -135,14 +135,14 @@ export const isSubset = (smallArr: string[], largeArr: string[]) => {
 };
 
 export const addDays = (date: Date, days: number) => {
-  const result = new Date(date);
+  let result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
 };
 
 export const timeDifferenceTime = (startTime: string, endTime: string) => {
-  const start = new Date(moment(startTime, "hh:mm A").toISOString());
-  const end = new Date(moment(endTime, "hh:mm A").toISOString());
+  let start = new Date(moment(startTime, "hh:mm A").toISOString());
+  let end = new Date(moment(endTime, "hh:mm A").toISOString());
 
   return end.getTime() > start.getTime()
     ? (end.getTime() - start.getTime()) / (1000 * 60 * 60)
@@ -209,7 +209,7 @@ export const toOptions = <T>(items: T[], keyName?: keyof T): Option[] => {
 };
 
 export const timeDifference = (start: Date | string, end?: Date | string) => {
-  const td = new Date(end ?? "").getTime() - new Date(start).getTime();
+  let td = new Date(end ?? "").getTime() - new Date(start).getTime();
   return moment(new Date(td)).utc(false).format("H[h] mm[m]");
 };
 
@@ -312,7 +312,7 @@ export const getDatesFromSched = (
   frequency: number
 ) => {
   return createArrayFromN(count).map((s) => {
-    const date = new Date(dateStart);
+    let date = new Date(dateStart);
     date.setMonth(date.getMonth() + s * frequency);
     date.setDate(
       Math.min(
@@ -544,7 +544,6 @@ const WEEKDAY_MAP: Record<string, Weekday> = {
 export function cleanObject<T extends Record<string, any>>(obj: T): Partial<T> {
   return Object.fromEntries(
     Object.entries(obj).filter(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ([_, v]) =>
         v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0)
     )
@@ -573,7 +572,7 @@ function normalizeDate(dateStr: string | null | Date | undefined): string {
   }
   try {
     return dateStr;
-  } catch {
+  } catch (_) {
     return "";
   }
 }
@@ -589,7 +588,7 @@ function normalizeTime(timeStr: string | null | Date | undefined): string {
   }
   try {
     return format(timeStr, "HH:mm:ss");
-  } catch {
+  } catch (_) {
     return "";
   }
 }

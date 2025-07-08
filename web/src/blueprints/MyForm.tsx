@@ -20,10 +20,10 @@ import { MyFileUploader } from "./MyFileUploader";
 import { MyIcon } from "./MyIcon";
 
 const getMsg = (msg: any, name: string) =>
-  msg && !`${msg[name as keyof object]}`.includes("undefined")
-    ? `${msg[name as keyof object]}`.includes("Invalid pk")
+  msg && !`${msg[name as keyof Object]}`.includes("undefined")
+    ? `${msg[name as keyof Object]}`.includes("Invalid pk")
       ? "Select one that applies"
-      : `${msg[name as keyof object]}`
+      : `${msg[name as keyof Object]}`
     : "";
 
 const renderField = (
@@ -149,11 +149,11 @@ type FormProps = {
   onClickSubmitAdd: () => void;
   hasDelete?: boolean;
   onDelete?: () => Promise<void>;
-  msg?: object;
+  msg?: Object;
   isLoading?: boolean;
 };
 
-export type MyFormProps<T extends object & { id: number | null }> = {
+export type MyFormProps<T extends Object & { id: number | null }> = {
   item?: T;
   setVisible?: (t: boolean) => void;
   fetchFcn?: () => void;

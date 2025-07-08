@@ -107,7 +107,7 @@ export const EventForm = ({
           },
         ],
       ] satisfies Field[][],
-    [tagStore.items]
+    [tagStore.items.length]
   );
 
   return (
@@ -307,21 +307,16 @@ export const EventView = observer(() => {
     }
     setPageDetails(resp.pageDetails);
   };
-  const newParams = useMemo(
-    () =>
-      new URLSearchParams({
-        page: "all",
-        date_start__gte: start.toISOString(),
-        date_start__lte: end.toISOString(),
-        order_by: "date_start",
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [date]
-  );
 
   useEffect(() => {
+    const newParams = new URLSearchParams({
+      page: "all",
+      date_start__gte: start.toISOString(),
+      date_start__lte: end.toISOString(),
+      order_by: "date_start",
+    });
     setParams(newParams);
-  }, [newParams, setParams]);
+  }, [date]);
 
   const itemMap = useMemo(
     () =>
@@ -337,7 +332,7 @@ export const EventView = observer(() => {
           label: "title",
         },
       ] satisfies KV<any>[],
-    [tagStore.items, taskStore.items]
+    [tagStore.items.length, taskStore.items.length]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

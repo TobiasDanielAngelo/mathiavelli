@@ -93,7 +93,7 @@ export const GoalForm = ({
           },
         ],
       ] satisfies Field[][],
-    [goalStore.items, item?.id]
+    [goalStore.items.length, item?.id]
   );
 
   return (
@@ -242,7 +242,7 @@ export const GoalView = observer(() => {
           label: "title",
         },
       ] satisfies KV<any>[],
-    [goalStore.items]
+    [goalStore.items.length]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

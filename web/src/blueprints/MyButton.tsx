@@ -6,7 +6,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const MyButton: React.FC<ButtonProps> = ({ ...props }) => {
-  const { ...foo } = props;
+  const { isLoading, ...foo } = props;
 
   return (
     <div className="px-5 py-2.5">

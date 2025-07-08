@@ -26,7 +26,7 @@ const sectionStyles: Record<string, string> = {
 };
 
 export const ItemDetails = observer(
-  <T extends Record<string, unknown>>({
+  <T extends Record<string, any>>({
     item,
     shownFields = [],
     header = [],
@@ -57,7 +57,7 @@ export const ItemDetails = observer(
       const keyTitle = key === "id" ? "ID" : toTitleCase(key as string);
       const body =
         key === "id"
-          ? toRomanWithExponents(value as number)
+          ? toRomanWithExponents(value)
           : formatValue(value, String(key), prices as string[]);
 
       return body === "—" ? (

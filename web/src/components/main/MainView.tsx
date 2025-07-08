@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../../api/Store";
 import { DashboardView } from "../dashboards/DashboardView";
@@ -57,7 +57,7 @@ export const MainView = observer(() => {
 
   const navigate = useNavigate();
 
-  const fetchAll = useCallback(async () => {
+  const fetchAll = async () => {
     const arr = await Promise.all([
       transactionAnalyticsStore.fetchAll(),
       weighInAnalyticsStore.fetchAll(),
@@ -75,25 +75,11 @@ export const MainView = observer(() => {
     if (!arr.every((item) => item.ok)) {
       navigate("/login");
     }
-  }, [
-    accountStore,
-    categoryStore,
-    goalStore,
-    inventoryCategoryStore,
-    jobStore,
-    navigate,
-    platformStore,
-    scheduleStore,
-    settingStore,
-    tagStore,
-    taskStore,
-    transactionAnalyticsStore,
-    weighInAnalyticsStore,
-  ]);
+  };
 
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+  }, []);
 
   useEffect(() => {
     if (settingStore.theme === "dark") {
