@@ -36,7 +36,7 @@ export const useFilterParams = (keys: string[], callbackFcn: () => void) => {
         handleKeyDown(e, keys, () => callbackFcn)
       );
     };
-  }, []);
+  }, [callbackFcn, keys]);
 };
 
 export const useWindowWidth = () => {
@@ -78,12 +78,13 @@ export function useSettings<T>(
     if (!settingStore.itemsLoaded) {
       return;
     }
-    const settingId = settingStore.items.find((s) => s.key === key)?.id;
-    settingId
-      ? settingStore.updateItem(settingId, { value: JSON.stringify(state) })
-      : settingStore.addItem({ key, value: JSON.stringify(state) });
+    const setting = settingStore.items.find((s) => s.key === key);
+    const settingId = setting?.id;
+    if (settingId)
+      settingStore.updateItem(settingId, { value: JSON.stringify(state) });
+    else settingStore.addItem({ key, value: JSON.stringify(state) });
     localStorage.setItem(key, JSON.stringify(state));
-  }, [state, settingStore.itemsLoaded]);
+  }, [state, settingStore.itemsLoaded, key, settingStore]);
 
   return [state, setState] as const;
 }

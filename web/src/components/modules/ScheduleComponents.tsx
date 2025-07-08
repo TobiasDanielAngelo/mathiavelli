@@ -224,8 +224,8 @@ export const ScheduleDashboard = observer(
       .map((s) => s.$view)
       .flatMap((s) =>
         generateCollidingDates(s, {
-          startDate: moment(date).startOf("month").toDate(),
-          endDate: moment(date).endOf("month").toDate(),
+          startDate: moment(date).startOf("month").subtract(1, "day").toDate(),
+          endDate: moment(date).endOf("month").add(1, "day").toDate(),
         }).map((date) => ({
           ...s,
           collidingDate: date,
@@ -233,6 +233,13 @@ export const ScheduleDashboard = observer(
       )
       .filter((s) => {
         const m = moment(s.collidingDate);
+        if (view === "week")
+          return m.isBetween(
+            moment(range).startOf("week"),
+            moment(range).endOf("week"),
+            null,
+            "[]"
+          );
         if (view === "month") return m.format("YYYY-MM") === range;
         if (view === "year") return m.format("YYYY") === range;
         if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;
@@ -243,11 +250,12 @@ export const ScheduleDashboard = observer(
         title: s.name,
         dateStart: s.collidingDate.toISOString(),
         dateEnd: s.collidingDate.toISOString(),
+        dateCompleted: s.collidingDate.toISOString(),
       }));
 
     return (
       <MyLockedCard isUnlocked>
-        <MyCalendar {...props} events={items} />
+        <MyCalendar {...props} events={items} noCompletion />
       </MyLockedCard>
     );
   }

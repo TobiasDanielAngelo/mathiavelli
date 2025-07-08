@@ -82,7 +82,7 @@ export const ReceivableForm = ({
         ],
         [{ name: "isActive", label: "Is Active", type: "check" }],
       ] satisfies Field[][],
-    [transactionStore.items.length]
+    [transactionStore.items]
   );
 
   return (
@@ -236,8 +236,8 @@ export const ReceivableView = observer(() => {
           values: transactionStore.items,
           label: "description",
         },
-      ] as KV<any>[],
-    [transactionStore.items.length]
+      ] satisfies KV<any>[],
+    [transactionStore.items]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

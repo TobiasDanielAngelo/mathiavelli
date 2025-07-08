@@ -15,17 +15,17 @@ export class DayInPercent {
     return Math.round(this.num * 24 * 60) / 100;
   }
   get asHumanTime() {
-    let date = new Date(864000 * this.num);
+    const date = new Date(864000 * this.num);
     return moment(date).utc(false).format("h:mm A");
   }
   asWorkDays(workingHours: number) {
-    let u = Math.round(this.num * (24 / workingHours)) / 100;
+    const u = Math.round(this.num * (24 / workingHours)) / 100;
     return `${u} days`;
   }
 
   get timeDuration() {
-    let end = moment(this.num * 864000);
-    let duration = moment.duration(end.diff(0));
+    const end = moment(this.num * 864000);
+    const duration = moment.duration(end.diff(0));
     return duration;
   }
 
@@ -70,8 +70,8 @@ export class TwoDates {
     dt1: string | Date | number | undefined,
     dt2: string | Date | number | undefined
   ) {
-    let d1 = new Date(dt1 ?? "");
-    let d2 = new Date(dt2 ?? "");
+    const d1 = new Date(dt1 ?? "");
+    const d2 = new Date(dt2 ?? "");
     this.start = d1 > d2 ? d2 : d1;
     this.end = d1 > d2 ? d1 : d2;
   }
@@ -109,7 +109,7 @@ export class TwoDates {
 
   get datesBetween() {
     const dateArr = [];
-    let curr = new Date(this.start);
+    const curr = new Date(this.start);
     let next = new Date(this.start);
     while (curr <= this.end) {
       dateArr.push(next);
@@ -120,11 +120,11 @@ export class TwoDates {
   }
 
   get hoursByTimeRegion() {
-    let startDateOnly = new Date(this.start);
+    const startDateOnly = new Date(this.start);
     startDateOnly.setHours(0, 0, 0, 0);
-    let startTimeSE =
+    const startTimeSE =
       (this.start.getTime() - startDateOnly.getTime()) / (1000 * 60 * 60);
-    let endTimeSE =
+    const endTimeSE =
       (this.end.getTime() - startDateOnly.getTime()) / (1000 * 60 * 60);
 
     let curr = startTimeSE,
@@ -133,8 +133,8 @@ export class TwoDates {
       night = 0;
 
     while (curr <= endTimeSE) {
-      let modCurr = curr % 24;
-      let quoCurr = Math.floor(curr / 24);
+      const modCurr = curr % 24;
+      const quoCurr = Math.floor(curr / 24);
       if (modCurr >= 0 && modCurr < 6) {
         next = quoCurr * 24 + 6;
         night += (next < endTimeSE ? quoCurr * 24 + 6 : endTimeSE) - curr;
@@ -160,9 +160,9 @@ export class TwoDates {
   }
 
   get timeDelta() {
-    let start = moment(this.start);
-    let end = moment(this.end);
-    let duration = moment.duration(end.diff(start));
+    const start = moment(this.start);
+    const end = moment(this.end);
+    const duration = moment.duration(end.diff(start));
     return duration;
   }
 
@@ -224,8 +224,8 @@ export class TwoDates {
 
   numberOfSpecifiedDay(dayNum: number) {
     let weekendDayCount = 0;
-    let fromDate = this.start;
-    let toDate = this.end;
+    const fromDate = this.start;
+    const toDate = this.end;
     while (fromDate < toDate) {
       fromDate.setDate(fromDate.getDate() + 1);
       if (fromDate.getDay() === dayNum) {

@@ -41,17 +41,13 @@ export function fillMissingDatesWithNulls(
   return result;
 }
 
-interface Props {
-  //   data: { date: string; events: number }[];
-}
-
 const timelineData = fillMissingDatesWithNulls(
   rawData,
   "2025-06-01",
   "2025-06-05"
 );
 
-export default function MyTimelineChart({}: Props) {
+export default function MyTimelineChart() {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={timelineData}>

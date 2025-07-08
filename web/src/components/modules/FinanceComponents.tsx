@@ -6,7 +6,7 @@ import { KV } from "../../blueprints/ItemDetails";
 import { TransactionDashboard } from "../modules/TransactionComponents";
 
 export const FinanceView = observer(() => {
-  const { transactionStore, categoryStore, accountStore } = useStore();
+  const { categoryStore, accountStore } = useStore();
   const itemMap = useMemo(
     () =>
       [
@@ -36,11 +36,7 @@ export const FinanceView = observer(() => {
           label: "",
         },
       ] as KV<any>[],
-    [
-      transactionStore.items.length,
-      categoryStore.items.length,
-      accountStore.items.length,
-    ]
+    [categoryStore.items, accountStore.items]
   );
 
   return (

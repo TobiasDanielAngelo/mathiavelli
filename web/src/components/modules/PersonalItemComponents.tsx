@@ -63,7 +63,7 @@ export const PersonalItemForm = ({
         [{ name: "notes", label: "Notes", type: "textarea" }],
         [{ name: "isImportant", label: "Is Important", type: "check" }],
       ] satisfies Field[][],
-    [inventoryCategoryStore.items.length]
+    [inventoryCategoryStore.items]
   );
 
   return (

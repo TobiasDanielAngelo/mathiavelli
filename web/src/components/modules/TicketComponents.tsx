@@ -77,7 +77,7 @@ export const TicketForm = ({
           },
         ],
       ] satisfies Field[][],
-    [userStore.items.length]
+    [userStore.items]
   );
 
   return (

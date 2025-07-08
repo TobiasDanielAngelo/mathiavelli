@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo } from "react";
 import {
@@ -121,6 +122,12 @@ export const MyGenericTable = observer(
       shownFields.length,
       Number(pageIds.map(String).join("")),
       itemMap,
+      HeaderWithSort,
+      items,
+      pageIds,
+      priceFields,
+      renderActions,
+      shownFields,
     ]);
 
     useEffect(() => {

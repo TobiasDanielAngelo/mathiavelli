@@ -44,9 +44,10 @@ export const MyToolTip = (
     return () => {
       parentRef?.current?.removeEventListener("mousemove", handleMouseMove);
       parentRef?.current?.removeEventListener("mouseenter", () => setOv(true));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       parentRef?.current?.removeEventListener("mouseleave", () => setOv(false));
     };
-  }, []);
+  }, [parentRef]);
 
   return !children || hidden || !ov ? (
     <></>

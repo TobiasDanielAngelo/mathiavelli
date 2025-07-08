@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SetURLSearchParams, useSearchParams } from "react-router-dom";
 import { toTitleCase } from "../../constants/helpers";
 import { useKeyPress, useSettings, VisibleMap } from "../../constants/hooks";
@@ -30,7 +30,7 @@ export type ActionModalDef = {
 };
 
 export const useViewValues = <
-  U extends Object & { id?: number | null },
+  U extends object & { id?: number | null },
   T extends { $view: Record<string, any> }
 >(
   settingStore: SettingStore,
@@ -194,17 +194,17 @@ export const MyGenericView = observer(
       `view${title.replace(" ", "")}`
     );
 
-    const toggleView = () => {
+    const toggleView = useCallback(() => {
       setView((prev) => (prev === "card" ? "table" : "card"));
-    };
+    }, [setView]);
 
-    const toggleGraph = () => {
+    const toggleGraph = useCallback(() => {
       setGraph((prev) => {
         const currentIndex = availableGraphs.indexOf(prev);
         const nextIndex = (currentIndex + 1) % availableGraphs.length;
         return availableGraphs[nextIndex];
       });
-    };
+    }, [availableGraphs, setGraph]);
 
     const updatePage = (updateFn: (curr: number) => number) => {
       setParams((t) => {
@@ -269,7 +269,7 @@ export const MyGenericView = observer(
           onClick: toggleGraph,
         },
       ],
-      [view, graph]
+      [view, graph, graphIconMap, toggleGraph, toggleView]
     );
 
     const actions = useMemo(
@@ -285,13 +285,12 @@ export const MyGenericView = observer(
     );
 
     actions.forEach((s, ind) =>
-      useKeyPress(["AltLeft", `Digit${ind + 1}` as KeyboardCodes], s.onClick)
+      useKeyPress(["Alt", `Digit${ind + 1}` as KeyboardCodes], s.onClick)
     );
 
     useEffect(() => {
-      console.log("New params!!");
       fetchFcn();
-    }, [params]);
+    }, [params, fetchFcn]);
 
     const value = {
       shownFields,

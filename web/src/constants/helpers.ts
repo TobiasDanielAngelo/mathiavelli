@@ -34,6 +34,18 @@ export const getOrdinal = (n: number) => {
   return ord;
 };
 
+export function getOrdinalName(n: number): string {
+  const abs = Math.abs(n);
+  let suffix = "th";
+  if (abs % 10 === 1 && abs % 100 !== 11) suffix = "st";
+  else if (abs % 10 === 2 && abs % 100 !== 12) suffix = "nd";
+  else if (abs % 10 === 3 && abs % 100 !== 13) suffix = "rd";
+
+  if (n === -1) return "last";
+  if (n < -1) return `${abs}${suffix} last`;
+  return `${abs}${suffix}`;
+}
+
 export function toMoneyShortened(val: number) {
   const value = Math.abs(val);
   const negative = val < 0;
@@ -71,7 +83,7 @@ export const replaceCumulative = (
   find: string[],
   replace: string
 ): string => {
-  for (var i = 0; i < find.length; i++)
+  for (let i = 0; i < find.length; i++)
     str = str.replace(new RegExp(find[i], "g"), replace);
   return str.replace(/\s/g, "") !== "" ? str : "-";
 };
@@ -123,14 +135,14 @@ export const isSubset = (smallArr: string[], largeArr: string[]) => {
 };
 
 export const addDays = (date: Date, days: number) => {
-  let result = new Date(date);
+  const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
 };
 
 export const timeDifferenceTime = (startTime: string, endTime: string) => {
-  let start = new Date(moment(startTime, "hh:mm A").toISOString());
-  let end = new Date(moment(endTime, "hh:mm A").toISOString());
+  const start = new Date(moment(startTime, "hh:mm A").toISOString());
+  const end = new Date(moment(endTime, "hh:mm A").toISOString());
 
   return end.getTime() > start.getTime()
     ? (end.getTime() - start.getTime()) / (1000 * 60 * 60)
@@ -197,7 +209,7 @@ export const toOptions = <T>(items: T[], keyName?: keyof T): Option[] => {
 };
 
 export const timeDifference = (start: Date | string, end?: Date | string) => {
-  let td = new Date(end ?? "").getTime() - new Date(start).getTime();
+  const td = new Date(end ?? "").getTime() - new Date(start).getTime();
   return moment(new Date(td)).utc(false).format("H[h] mm[m]");
 };
 
@@ -300,7 +312,7 @@ export const getDatesFromSched = (
   frequency: number
 ) => {
   return createArrayFromN(count).map((s) => {
-    let date = new Date(dateStart);
+    const date = new Date(dateStart);
     date.setMonth(date.getMonth() + s * frequency);
     date.setDate(
       Math.min(
@@ -532,6 +544,7 @@ const WEEKDAY_MAP: Record<string, Weekday> = {
 export function cleanObject<T extends Record<string, any>>(obj: T): Partial<T> {
   return Object.fromEntries(
     Object.entries(obj).filter(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ([_, v]) =>
         v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0)
     )
@@ -560,7 +573,7 @@ function normalizeDate(dateStr: string | null | Date | undefined): string {
   }
   try {
     return dateStr;
-  } catch (_) {
+  } catch {
     return "";
   }
 }
@@ -576,7 +589,7 @@ function normalizeTime(timeStr: string | null | Date | undefined): string {
   }
   try {
     return format(timeStr, "HH:mm:ss");
-  } catch (_) {
+  } catch {
     return "";
   }
 }
@@ -772,6 +785,7 @@ export function rruleToDetailedText(rule: RRule): string {
 
   const hours = options.byhour || [];
   const minutes = options.byminute || [0];
+  const bySetPos = options.bysetpos || [];
 
   const times: string[] = [];
   for (const hour of hours) {
@@ -793,7 +807,13 @@ export function rruleToDetailedText(rule: RRule): string {
   const parts = [];
 
   if (interval) parts.push(interval);
-  if (byDay) parts.push("on " + byDay);
+  if (byDay) {
+    if (bySetPos.length > 0) {
+      parts.push(`on the ${bySetPos.map(getOrdinalName).join(", ")} ${byDay}`);
+    } else {
+      parts.push("on " + byDay);
+    }
+  }
   if (byWeekNo) parts.push(byWeekNo);
   if (byMonthDay) parts.push(byMonthDay);
   if (byYearDay) parts.push(byYearDay);

@@ -165,14 +165,6 @@ def maybe_complete_task(sender, instance, **kwargs):
     task.save()
 
 
-@receiver(post_save, sender=Task)
-def create_events_for_task(sender, instance, created, **kwargs):
-    if created:
-        from .utils import generate_missing_events
-
-        generate_missing_events()
-
-
 @receiver(post_save, sender=Event)
 def sync_habitlog_from_event(sender, instance, **kwargs):
     try:

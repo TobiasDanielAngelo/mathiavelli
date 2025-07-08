@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getStoreSignature, sortByKey } from "../constants/helpers";
 import { useVisible, useWindowWidth } from "../constants/hooks";
 import { StateSetter } from "../constants/interfaces";
@@ -22,29 +22,24 @@ const HourItem = (props: {
   noIcon?: boolean;
   disabled?: boolean;
   events?: CalendarEvent[];
+  noCompletion?: boolean;
 }) => {
-  const { events, modalContent, hour } = props;
+  const { events, modalContent, hour, noCompletion } = props;
   const { isVisible1, setVisible1 } = useVisible();
 
   return (
     <>
-      <MyModal
-        isVisible={isVisible1}
-        setVisible={setVisible1}
-        title="Events"
-        disableClose
-      >
+      <MyModal isVisible={isVisible1} setVisible={setVisible1} title="Events">
         {modalContent}
       </MyModal>
-      <div
-        className="flex flex-col p-1"
-        onDoubleClick={() => setVisible1(true)}
-      >
+      <div className="flex flex-col p-1" onClick={() => setVisible1(true)}>
         <div className="text-xs text-center font-semibold">{`${
           hour % 12 === 0 ? 12 : hour % 12
         }${hour >= 12 ? "P" : "A"}M`}</div>
         <div className="text-center text-xs cursor-pointer font-bold">
-          {events?.length
+          {!noCompletion
+            ? `[${String(events?.length)}]`
+            : events?.length
             ? String(events?.filter((s) => s.dateCompleted).length) +
               "/" +
               String(events?.length)
@@ -68,21 +63,16 @@ const EventItem = (props: {
 
   return (
     <>
-      <MyModal
-        isVisible={isVisible1}
-        setVisible={setVisible1}
-        title="Events"
-        disableClose
-      >
+      <MyModal isVisible={isVisible1} setVisible={setVisible1} title="Events">
         {modalContent}
       </MyModal>
-      <span onDoubleClick={() => setVisible1(true)}>{title}</span>
+      <span onClick={() => setVisible1(true)}>{title}</span>
       {!noIcon && (
         <MyIcon
           icon="Event"
           fontSize="small"
           label={width > 1024 ? label : ""}
-          onDoubleClick={() => setVisible1(true)}
+          onClick={() => setVisible1(true)}
           disabled={disabled}
         />
       )}
@@ -100,17 +90,22 @@ export const MyCalendar = observer(
     setView: StateSetter<CalendarView>;
     events: CalendarEvent[];
     noIcon?: boolean;
+    noCompletion?: boolean;
   }) => {
-    const { date, setDate, view, setView, events, noIcon } = props;
+    const { date, setDate, view, setView, events, noIcon, noCompletion } =
+      props;
     const [currentDate, setCurrentDate] = useState(moment());
 
-    const startDecade = Math.floor(currentDate.year() / 10) * 10;
+    const startDecade = useMemo(
+      () => Math.floor(currentDate.year() / 10) * 10,
+      [currentDate]
+    );
 
     useEffect(() => {
       setDate(currentDate.toDate());
-    }, [currentDate]);
+    }, [currentDate, setDate]);
 
-    const handlePrev = () => {
+    const handlePrev = useCallback(() => {
       const newDate =
         view === "week"
           ? moment(currentDate).subtract(1, "week")
@@ -122,9 +117,9 @@ export const MyCalendar = observer(
           ? moment(currentDate).subtract(10, "year").startOf("year")
           : moment(currentDate);
       setCurrentDate(newDate);
-    };
+    }, [view, currentDate]);
 
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
       const newDate =
         view === "week"
           ? moment(currentDate).add(1, "week").startOf("week")
@@ -140,7 +135,7 @@ export const MyCalendar = observer(
           : moment(currentDate);
 
       setCurrentDate(newDate);
-    };
+    }, [view, currentDate]);
 
     const renderWeekView = useCallback(() => {
       const start = moment(currentDate).startOf("week"); // Starting point of the week
@@ -199,22 +194,29 @@ export const MyCalendar = observer(
                     const hourlyEvents = eventsByHour[index];
                     return (
                       <HourItem
+                        key={index}
                         events={hourlyEvents}
                         hour={hour}
                         modalContent={
                           <MyTable
                             matrix={[
-                              ["Event", "Time", "Completed?"],
+                              [
+                                "Event",
+                                "Time",
+                                !noCompletion ? "Completed?" : undefined,
+                              ],
                               ...hourlyEvents.map((s) => [
                                 s.title,
                                 moment(s.dateStart).format("h:mm A"),
-                                <MyIcon
-                                  icon={
-                                    s.dateCompleted
-                                      ? "CheckBox"
-                                      : "CheckBoxOutlineBlank"
-                                  }
-                                />,
+                                !noCompletion ? (
+                                  <MyIcon
+                                    icon={
+                                      s.dateCompleted
+                                        ? "CheckBox"
+                                        : "CheckBoxOutlineBlank"
+                                    }
+                                  />
+                                ) : undefined,
                               ]),
                             ]}
                           />
@@ -228,7 +230,15 @@ export const MyCalendar = observer(
           })}
         </div>
       );
-    }, [getStoreSignature(events), currentDate, date, events.length]);
+    }, [
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      getStoreSignature(events),
+      currentDate,
+      date,
+      events,
+      noCompletion,
+      setDate,
+    ]);
 
     const renderMonthView = useCallback(() => {
       const start = moment(currentDate).startOf("month").startOf("week");
@@ -274,24 +284,34 @@ export const MyCalendar = observer(
                   noIcon={noIcon || !dayEvents.length}
                   title={day.date().toString()}
                   label={
-                    String(dayEvents.filter((s) => s.dateCompleted).length) +
-                    "/" +
-                    String(dayEvents.length)
+                    !noCompletion
+                      ? String(
+                          dayEvents.filter((s) => s.dateCompleted).length
+                        ) +
+                        "/" +
+                        String(dayEvents.length)
+                      : `[${String(dayEvents.length)}]`
                   }
                   modalContent={
                     <MyTable
                       matrix={[
-                        ["Event", "Time", "Completed?"],
+                        [
+                          "Event",
+                          "Time",
+                          !noCompletion ? "Completed?" : undefined,
+                        ],
                         ...sortByKey(dayEvents, "dateStart").map((s) => [
                           s.title,
                           moment(s.dateStart).format("h:mm A"),
-                          <MyIcon
-                            icon={
-                              s.dateCompleted
-                                ? "CheckBox"
-                                : "CheckBoxOutlineBlank"
-                            }
-                          />,
+                          !noCompletion ? (
+                            <MyIcon
+                              icon={
+                                s.dateCompleted
+                                  ? "CheckBox"
+                                  : "CheckBoxOutlineBlank"
+                              }
+                            />
+                          ) : undefined,
                         ]),
                       ]}
                     />
@@ -302,44 +322,59 @@ export const MyCalendar = observer(
           })}
         </div>
       );
-    }, [getStoreSignature(events), currentDate, date, events.length]);
+    }, [
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      getStoreSignature(events),
+      currentDate,
+      date,
+      events,
+      noCompletion,
+      noIcon,
+      setDate,
+    ]);
 
-    const renderYearView = () => (
-      <div className="grid grid-cols-3 gap-2 h-full">
-        {Array.from({ length: 12 }, (_, i) => (
-          <div
-            key={i}
-            onClick={() => {
-              setCurrentDate(moment(currentDate).month(i));
-              setView("month");
-            }}
-            className="p-4 text-center rounded shadow cursor-pointer hover:bg-gray-500"
-          >
-            {moment().month(i).format("MMM")}
-          </div>
-        ))}
-      </div>
+    const renderYearView = useCallback(
+      () => (
+        <div className="grid grid-cols-3 gap-2 h-full">
+          {Array.from({ length: 12 }, (_, i) => (
+            <div
+              key={i}
+              onClick={() => {
+                setCurrentDate(moment(currentDate).month(i));
+                setView("month");
+              }}
+              className="p-4 text-center rounded shadow cursor-pointer dark:hover:bg-gray-500 hover:bg-teal-200"
+            >
+              {moment().month(i).format("MMM")}
+            </div>
+          ))}
+        </div>
+      ),
+      [currentDate, setView]
     );
 
-    const renderDecadeView = () => (
-      <div className="grid grid-cols-3 gap-5 h-[90%]">
-        {Array.from({ length: 12 }, (_, i) => startDecade - 1 + i).map(
-          (year) => (
-            <div
-              key={year}
-              onClick={() => {
-                setCurrentDate(moment(currentDate).year(year));
-                setView("year");
-              }}
-              className={`p-4 text-center rounded cursor-pointer shadow ${
-                year === currentDate.year() ? "bg-blue-400" : ""
-              }`}
-            >
-              {year}
-            </div>
-          )
-        )}
-      </div>
+    const renderDecadeView = useCallback(
+      () => (
+        <div className="grid grid-cols-3 gap-5 h-[90%]">
+          {Array.from({ length: 12 }, (_, i) => startDecade - 1 + i).map(
+            (year) => (
+              <div
+                key={year}
+                onClick={() => {
+                  setCurrentDate(moment(currentDate).year(year));
+                  setView("year");
+                }}
+                className={`p-4 text-center rounded cursor-pointer shadow ${
+                  year === currentDate.year() ? "bg-blue-400" : ""
+                }`}
+              >
+                {year}
+              </div>
+            )
+          )}
+        </div>
+      ),
+      [currentDate, setView, startDecade]
     );
 
     return (
@@ -360,10 +395,17 @@ export const MyCalendar = observer(
                   : "week"
               )
             }
-            className="font-bold"
+            className="font-bold cursor-pointer"
           >
             {view === "week" &&
-              `${currentDate.format("YYYY")} Week ${currentDate.week()}`}
+              `${currentDate.format(
+                "YYYY"
+              )} Week ${currentDate.week()} (${currentDate
+                .startOf("week")
+                .format("MMM D")} - ${currentDate
+                .endOf("week")
+                .format("MMM D")})`}
+
             {view === "month" && currentDate.format("MMMM YYYY")}
             {view === "year" && currentDate.format("YYYY")}
             {view === "decade" && `${startDecade} - ${startDecade + 9}`}

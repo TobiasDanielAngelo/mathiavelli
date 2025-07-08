@@ -101,7 +101,7 @@ export const CredentialForm = ({
         [{ name: "notes", label: "Notes", type: "textarea" }],
         [{ name: "addedAt", label: "Added At", type: "datetime" }],
       ] satisfies Field[][],
-    [platformStore.items.length, accountStore.items.length]
+    [platformStore.items, accountStore.items]
   );
   return (
     <MyGenericForm<CredentialInterface>
@@ -242,7 +242,7 @@ export const CredentialView = observer(() => {
           label: "",
         },
       ] satisfies KV<any>[],
-    [platformStore.items.length, accountStore.items.length]
+    [platformStore.items, accountStore.items]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

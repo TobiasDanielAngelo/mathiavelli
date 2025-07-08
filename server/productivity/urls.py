@@ -10,7 +10,6 @@ from django.conf.urls.static import static
 from . import viewsets as vs_module
 
 router = DefaultRouter()
-
 inflector = inflect.engine()
 
 
@@ -26,5 +25,4 @@ for attr_name in dir(vs_module):
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("generate-events/", views.GenerateEventsView.as_view(), name="gen_events"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

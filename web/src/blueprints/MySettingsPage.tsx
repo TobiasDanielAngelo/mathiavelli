@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-export const MySettingsPage = (props: PropsWithChildren<{}>) => {
+export const MySettingsPage = (props: PropsWithChildren) => {
   const { children } = props;
   return (
     <div className="min-w-2xl min-h-[70vh] mx-auto bg-gray-50 p-4 rounded-lg dark:bg-gray-800 border-b border-teal-200 dark:border-gray-700">

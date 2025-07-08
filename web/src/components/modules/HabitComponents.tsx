@@ -71,7 +71,7 @@ export const HabitForm = ({
         [{ name: "dateEnd", label: "Date End", type: "datetime" }],
         [{ name: "isArchived", label: "Is Archived", type: "check" }],
       ] satisfies Field[][],
-    [goalStore.items.length, scheduleStore.items.length]
+    [goalStore.items, scheduleStore.items]
   );
 
   return (
@@ -206,7 +206,7 @@ export const HabitView = observer(() => {
           label: "definition",
         },
       ] satisfies KV<any>[],
-    [scheduleStore.items.length]
+    [scheduleStore.items]
   );
 
   const actionModalDefs = [

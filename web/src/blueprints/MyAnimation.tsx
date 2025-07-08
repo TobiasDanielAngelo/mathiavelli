@@ -1,4 +1,4 @@
-let colors = ["blue", "green", "red"];
+const colors = ["blue", "green", "red"];
 
 export const MyAnime = () => (
   <>

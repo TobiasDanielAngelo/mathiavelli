@@ -93,7 +93,10 @@ export type KeyboardCodes =
       | "X"
       | "Y"
       | "Z"}`
-  | `${"Alt" | "Bracket" | "Control" | "Shift" | "Meta"}${"Left" | "Right"}`
+  | `${"Alt" | "Bracket" | "Control" | "Shift" | "Meta"}${
+      | ""
+      | "Left"
+      | "Right"}`
   | "Backquote"
   | "Quote"
   | "Backslash"

@@ -21,7 +21,8 @@ export const MyGenericCollection = observer(
 
     useEffect(() => {
       setVisible1(true);
-    }, [width > 1024]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [width > 1024, setVisible1]);
 
     return (
       <div

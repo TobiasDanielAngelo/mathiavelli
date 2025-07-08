@@ -107,7 +107,7 @@ export const EventForm = ({
           },
         ],
       ] satisfies Field[][],
-    [tagStore.items.length]
+    [tagStore.items]
   );
 
   return (
@@ -297,27 +297,31 @@ export const EventView = observer(() => {
     new Event({})
   );
   const calendarProps = useCalendarProps();
-  const { start, end } = calendarProps;
+  const { date, start, end } = calendarProps;
   const { params, setPageDetails, setParams } = values;
 
   const fetchFcn = async () => {
-    if (!params) return;
     const resp = await eventStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
       return;
     }
     setPageDetails(resp.pageDetails);
   };
+  const newParams = useMemo(
+    () =>
+      new URLSearchParams({
+        page: "all",
+        date_start__gte: start.toISOString(),
+        date_start__lte: end.toISOString(),
+        order_by: "date_start",
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [date]
+  );
 
   useEffect(() => {
-    const newParams = new URLSearchParams({
-      page: "all",
-      date_start__gte: start.toISOString(),
-      date_start__lte: end.toISOString(),
-      order_by: "date_start",
-    });
     setParams(newParams);
-  }, [start, end]);
+  }, [newParams, setParams]);
 
   const itemMap = useMemo(
     () =>
@@ -333,7 +337,7 @@ export const EventView = observer(() => {
           label: "title",
         },
       ] satisfies KV<any>[],
-    [tagStore.items.length, taskStore.items.length]
+    [tagStore.items, taskStore.items]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

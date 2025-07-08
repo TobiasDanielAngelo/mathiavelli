@@ -55,7 +55,7 @@ export const HabitLogForm = ({
         ],
         [{ name: "dateCreated", label: "Created At", type: "datetime" }],
       ] satisfies Field[][],
-    [habitStore.items.length]
+    [habitStore.items]
   );
 
   return (
@@ -180,7 +180,7 @@ export const HabitLogView = observer(() => {
     }
     setPageDetails(resp.pageDetails);
     const habits = resp.data.map((s) => s.habit);
-    if (habits.length) {
+    if (habits) {
       habitStore.fetchAll(`id__in=${habits.join(",")}`);
     }
   };

@@ -83,13 +83,13 @@ export function MyGenericForm<T>({
       }
     });
     return copy;
-    // cleanObject(copy as Record<string, any>) as T;
+    // cleanobject(copy as Record<string, any>) as T;
   };
 
   const [details, setDetails] = useState<T>(() =>
     item ? transformFrom(item as T) : ({} as T)
   );
-  const [msg, setMsg] = useState<Object>();
+  const [msg, setMsg] = useState<object>();
   const [isLoading, setLoading] = useState(false);
 
   const onClickCreate = async () => {

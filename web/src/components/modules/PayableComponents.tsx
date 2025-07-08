@@ -80,7 +80,7 @@ export const PayableForm = ({
         ],
         [{ name: "isActive", label: "Is Active", type: "check" }],
       ] satisfies Field[][],
-    [transactionStore.items.length]
+    [transactionStore.items]
   );
 
   return (
@@ -236,7 +236,7 @@ export const PayableView = observer(() => {
           label: "description",
         },
       ] as KV<any>[],
-    [transactionStore.items.length]
+    [transactionStore.items]
   );
 
   const actionModalDefs = [] satisfies ActionModalDef[];

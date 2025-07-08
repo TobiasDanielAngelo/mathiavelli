@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
 import { KV } from "../../blueprints/ItemDetails";
@@ -12,8 +12,7 @@ import { TransactionDashboard } from "../modules/TransactionComponents";
 import { WeighInDashboard } from "../modules/WeighInComponents";
 
 export const DashboardView = observer(() => {
-  const { transactionStore, categoryStore, accountStore, eventStore } =
-    useStore();
+  const { categoryStore, accountStore, eventStore } = useStore();
 
   const itemMap = useMemo(
     () =>
@@ -44,17 +43,13 @@ export const DashboardView = observer(() => {
           label: "",
         },
       ] as KV<any>[],
-    [
-      transactionStore.items.length,
-      categoryStore.items.length,
-      accountStore.items.length,
-    ]
+    [categoryStore.items, accountStore.items]
   );
 
   const calendarProps = useCalendarProps();
   const { start, end, date } = calendarProps;
 
-  const fetchFcn = async () => {
+  const fetchFcn = useCallback(async () => {
     const newParams = new URLSearchParams({
       page: "all",
       date_start__gte: start.toISOString(),
@@ -65,11 +60,12 @@ export const DashboardView = observer(() => {
     if (!resp.ok || !resp.data) {
       return;
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventStore, date]);
 
   useEffect(() => {
     fetchFcn();
-  }, [date]);
+  }, [date, fetchFcn]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 m-2 gap-5">

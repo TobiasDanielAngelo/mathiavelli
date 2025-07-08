@@ -20,10 +20,10 @@ import { MyFileUploader } from "./MyFileUploader";
 import { MyIcon } from "./MyIcon";
 
 const getMsg = (msg: any, name: string) =>
-  msg && !`${msg[name as keyof Object]}`.includes("undefined")
-    ? `${msg[name as keyof Object]}`.includes("Invalid pk")
+  msg && !`${msg[name as keyof object]}`.includes("undefined")
+    ? `${msg[name as keyof object]}`.includes("Invalid pk")
       ? "Select one that applies"
-      : `${msg[name as keyof Object]}`
+      : `${msg[name as keyof object]}`
     : "";
 
 const renderField = (
@@ -45,7 +45,7 @@ const renderField = (
       return (
         <div
           key={key}
-          className="text-white whitespace-pre-line items-center text-center"
+          className="dark:text-white whitespace-pre-line items-center text-center"
         >
           <label className="block text-xs text-left font-medium md:mt-1 text-blue-600">
             {t.label}
@@ -129,7 +129,10 @@ const renderField = (
       );
     default:
       return (
-        <div className="text-gray-300 items-center justify-center" key={key}>
+        <div
+          className="dark:text-gray-300 items-center justify-center"
+          key={key}
+        >
           {t.label}
         </div>
       );
@@ -146,11 +149,11 @@ type FormProps = {
   onClickSubmitAdd: () => void;
   hasDelete?: boolean;
   onDelete?: () => Promise<void>;
-  msg?: Object;
+  msg?: object;
   isLoading?: boolean;
 };
 
-export type MyFormProps<T extends Object & { id: number | null }> = {
+export type MyFormProps<T extends object & { id: number | null }> = {
   item?: T;
   setVisible?: (t: boolean) => void;
   fetchFcn?: () => void;

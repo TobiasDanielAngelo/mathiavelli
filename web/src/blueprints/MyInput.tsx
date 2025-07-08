@@ -24,7 +24,7 @@ export const MyInput = (props: {
   } = props;
 
   const onChangeCorrect = (t: string) => {
-    let newVal = corrector ? corrector(t) : t;
+    const newVal = corrector ? corrector(t) : t;
     onChangeValue?.(newVal);
   };
 

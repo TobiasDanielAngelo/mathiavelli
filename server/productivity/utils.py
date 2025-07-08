@@ -141,6 +141,9 @@ def ensure_aware(dt):
 
 
 def generate_missing_events(params=None):
+    if not params:
+        return []
+
     from .models import Task, Event
 
     try:

@@ -12,6 +12,7 @@ export const LoginView = observer(() => {
     username: "",
     password: "",
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, setMsg] = useState("");
   const navigate = useNavigate();
 
