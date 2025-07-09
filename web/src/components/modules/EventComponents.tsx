@@ -14,7 +14,6 @@ import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericFor
 import {
   createGenericContext,
   createGenericViewContext,
-  defaultViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericProps";
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
@@ -127,15 +126,7 @@ export const EventForm = ({
 
 export const EventCard = observer((props: { item: Event }) => {
   const { item } = props;
-  let fetchingFcn = defaultViewValues.fetchFcn;
-  let fields: (keyof typeof item)[] = ["id", "title", "dateStart"];
-  try {
-    const { fetchFcn, shownFields } = useEventView();
-    fetchingFcn = fetchFcn;
-    fields = shownFields;
-  } catch {
-    console.log("No event view context");
-  }
+  const { fetchFcn, shownFields } = useEventView();
   const { eventStore } = useStore();
 
   const moreActions = [
@@ -154,13 +145,15 @@ export const EventCard = observer((props: { item: Event }) => {
   return (
     <MyGenericCard
       item={item}
-      shownFields={fields}
+      shownFields={
+        shownFields.length ? shownFields : ["id", "title", "dateStart"]
+      }
       header={["id"]}
       important={["title"]}
       prices={EventFields.pricesFields}
       FormComponent={EventForm}
       deleteItem={eventStore.deleteItem}
-      fetchFcn={fetchingFcn}
+      fetchFcn={fetchFcn}
       moreActions={moreActions}
     />
   );

@@ -33,7 +33,7 @@ export const MyDropdownSelector = (props: {
             className="bg-teal-100 border border-teal-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
           {search && !options?.map((s) => s.name).includes(search) && (
-            <ul className="absolute flex-1 w-full z-50 border border-teal-400 bg-gray-800  rounded-b-xl rounded-t-md">
+            <ul className="absolute flex-1 w-full z-50 border border-teal-400 dark:bg-gray-800 bg-teal-100 rounded-b-xl rounded-t-md">
               {filteredOptions?.map((opt) => (
                 <li
                   key={opt.id}
@@ -41,7 +41,7 @@ export const MyDropdownSelector = (props: {
                     onChangeValue(Number(opt.id));
                     setSearch(opt.name); // or "" if you want to reset
                   }}
-                  className="text-sm z-49 cursor-pointer px-4 py-2 dark:text-white text-black rounded-md hover:bg-gray-600 "
+                  className="text-sm z-49 cursor-pointer px-4 py-2 dark:text-white text-black rounded-md dark:hover:bg-gray-600 hover:bg-teal-200"
                 >
                   {opt.name}
                 </li>

@@ -39,8 +39,7 @@ export function createGenericViewContext<T>() {
 
   const useGenericView = () => {
     const ctx = useContext(Context);
-    if (!ctx)
-      throw new Error("useGenericView must be used within its provider");
+    if (!ctx) return defaultViewValues;
     return ctx;
   };
 

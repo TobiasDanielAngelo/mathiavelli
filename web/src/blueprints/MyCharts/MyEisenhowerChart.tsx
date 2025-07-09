@@ -90,9 +90,13 @@ export function MyEisenhowerChart<T>({
   const minDate = Math.min(...items.map((i) => i.dueDate.getTime()));
   const maxDate = Math.max(...items.map((i) => i.dueDate.getTime()));
 
-  const data = items.map((item) => {
+  if (items.length === 0) return <div></div>;
+
+  const data = items.map((item, _, arr) => {
     const urgency =
-      100 - ((item.dueDate.getTime() - minDate) / (maxDate - minDate)) * 100;
+      arr.length > 1 && maxDate !== minDate
+        ? 100 - ((item.dueDate.getTime() - minDate) / (maxDate - minDate)) * 100
+        : 100;
     const importance = item.importance;
     const x = compress(urgency); // X = urgency (0–100)
     const y = compress(importance); // Y = importance (0–100)
@@ -106,8 +110,6 @@ export function MyEisenhowerChart<T>({
       item,
     };
   });
-
-  if (items.length === 0) return <div></div>;
 
   return (
     <div className="w-full h-full min-h-[450px] max-h-[650px] rounded-xl shadow-xl">

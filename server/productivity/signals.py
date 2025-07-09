@@ -127,7 +127,12 @@ def maybe_complete_task(sender, instance, **kwargs):
     except ObjectDoesNotExist:
         return
 
-    if not task or not task.schedule:
+    if not task:
+        return
+
+    if not task.schedule and task.date_start:
+        task.date_completed = instance.date_completed
+        task.save()
         return
 
     if not task.schedule.count:

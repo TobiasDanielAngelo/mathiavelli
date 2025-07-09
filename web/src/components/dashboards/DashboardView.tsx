@@ -13,7 +13,6 @@ import { EventCard, EventDisplay } from "../modules/EventComponents";
 import { TaskDashboard } from "../modules/TaskComponents";
 import { TransactionDashboard } from "../modules/TransactionComponents";
 import { WeighInDashboard } from "../modules/WeighInComponents";
-
 import { MyDropdownSelector } from "../../blueprints";
 import { camelCaseToWords } from "../../constants/helpers";
 import { AccountForm } from "../modules/AccountComponents";
@@ -48,36 +47,36 @@ import { WeighInForm } from "../modules/WeighInComponents";
 import { WorkoutForm } from "../modules/WorkoutComponents";
 
 const AllForms = {
-  JournalForm: JournalForm,
-  AccountForm: AccountForm,
-  BodyFatForm: BodyFatForm,
-  BuyListItemForm: BuyListItemForm,
-  CategoryForm: CategoryForm,
-  CredentialForm: CredentialForm,
-  EventForm: EventForm,
-  FollowUpForm: FollowUpForm,
-  GoalForm: GoalForm,
-  HabitForm: HabitForm,
-  HabitLogForm: HabitLogForm,
-  InventoryCategoryForm: InventoryCategoryForm,
-  IssueCommentForm: IssueCommentForm,
-  IssueTagForm: IssueTagForm,
-  JobForm: JobForm,
-  MealForm: MealForm,
-  NoteForm: NoteForm,
-  PayableForm: PayableForm,
-  PersonalItemForm: PersonalItemForm,
-  PlatformForm: PlatformForm,
-  ReceivableForm: ReceivableForm,
-  ScheduleForm: ScheduleForm,
-  SettingForm: SettingForm,
-  TagForm: TagForm,
-  TaskForm: TaskForm,
-  TicketForm: TicketForm,
-  TransactionForm: TransactionForm,
-  WaistMeasurementForm: WaistMeasurementForm,
-  WeighInForm: WeighInForm,
-  WorkoutForm: WorkoutForm,
+  JournalForm,
+  AccountForm,
+  BodyFatForm,
+  BuyListItemForm,
+  CategoryForm,
+  CredentialForm,
+  EventForm,
+  FollowUpForm,
+  GoalForm,
+  HabitForm,
+  HabitLogForm,
+  InventoryCategoryForm,
+  IssueCommentForm,
+  IssueTagForm,
+  JobForm,
+  MealForm,
+  NoteForm,
+  PayableForm,
+  PersonalItemForm,
+  PlatformForm,
+  ReceivableForm,
+  ScheduleForm,
+  SettingForm,
+  TagForm,
+  TaskForm,
+  TicketForm,
+  TransactionForm,
+  WaistMeasurementForm,
+  WeighInForm,
+  WorkoutForm,
 };
 
 const FormNames = Object.keys(AllForms);
@@ -85,7 +84,7 @@ const FormNames = Object.keys(AllForms);
 export const DashboardView = observer(() => {
   const { transactionStore, categoryStore, accountStore, eventStore } =
     useStore();
-  const { setVisible1, isVisible1, setVisible2, isVisible2 } = useVisible();
+  const { setVisible1, isVisible1 } = useVisible();
 
   const [selectedForm, setSelectedForm] = useState(0);
 
@@ -151,13 +150,8 @@ export const DashboardView = observer(() => {
   const actions = useMemo(
     () => [
       {
-        icon: <MyIcon icon={"DarkMode"} fontSize="large" label={"PM"} />,
-        name: "Evening",
-        onClick: () => setVisible2(true),
-      },
-      {
-        icon: <MyIcon icon={"Sunny"} fontSize="large" label={"AM"} />,
-        name: "Morning",
+        icon: <MyIcon icon={"DynamicForm"} fontSize="large" label={"FORMS"} />,
+        name: "All Forms",
         onClick: () => setVisible1(true),
       },
     ],
@@ -177,9 +171,6 @@ export const DashboardView = observer(() => {
           />
         </div>
         <FormComponent />
-      </MyModal>
-      <MyModal isVisible={isVisible2} setVisible={setVisible2}>
-        <JournalForm />
       </MyModal>
       <EventDisplay calendarProps={calendarProps} />
       <MyGenericCollection

@@ -40,6 +40,7 @@ import Sunny from "@mui/icons-material/Sunny";
 import FilePresent from "@mui/icons-material/FilePresent";
 import Star from "@mui/icons-material/Star";
 import DisplaySettings from "@mui/icons-material/DisplaySettings";
+import DynamicForm from "@mui/icons-material/DynamicForm";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
 // 1. Map icons to names
@@ -73,6 +74,7 @@ const iconMap = {
   LightMode,
   Today,
   Sunny,
+  DynamicForm,
   BarChart,
   ExpandMore,
   ExpandLess,
