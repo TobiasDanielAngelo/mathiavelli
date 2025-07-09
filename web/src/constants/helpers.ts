@@ -669,8 +669,10 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     ? null
     : `${normalizeDate(endDate)}T${normalizeTime(endTime)}`;
 
+  console.log(Number(schedule.freq));
+
   const ruleOptions = {
-    freq: Number(schedule.freq) || RRule.DAILY,
+    freq: schedule.freq ?? RRule.DAILY,
     interval: Number(schedule.interval) || 1,
     byweekday: schedule.byWeekDay
       ?.map((d) => WEEKDAY_MAP[d])
@@ -710,7 +712,12 @@ export function generateCollidingDates(
   if (!rule) return [];
 
   return window
-    ? rule.between(window.startDate, window.endDate).map(fromUTCForRRule)
+    ? rule
+        .between(
+          toUTCForRRule(window.startDate) ?? new Date(),
+          toUTCForRRule(window.endDate) ?? new Date()
+        )
+        .map(fromUTCForRRule)
     : sched.count
     ? rule.all().map(fromUTCForRRule)
     : new RRule({ ...rule.options, count: 5 }).all().map(fromUTCForRRule);
@@ -798,9 +805,11 @@ export function rruleToDetailedText(rule: RRule): string {
 
   const interval =
     options.interval > 1
-      ? `Every ${options.interval} ${freqLabel
-          .toLowerCase()
-          .replace("ly", "")}s`
+      ? `Every ${options.interval} ${
+          freqLabel.toLowerCase() === "daily"
+            ? "days"
+            : freqLabel.toLowerCase().replace("ly", "") + "s"
+        }`
       : freqLabel;
 
   const parts = [];

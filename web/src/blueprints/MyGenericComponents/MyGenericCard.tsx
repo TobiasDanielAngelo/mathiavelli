@@ -32,6 +32,7 @@ interface MyGenericCardProps<T> extends ItemDetailsProps<T> {
   deleteItem: (id: number) => Promise<{ ok: boolean; details?: string }>;
   fetchFcn: () => void;
   moreActions?: IAction[];
+  dropdownActions?: Page[];
 }
 
 export const MyGenericCard = observer(
@@ -45,6 +46,7 @@ export const MyGenericCard = observer(
     deleteItem,
     fetchFcn,
     moreActions,
+    dropdownActions,
   }: MyGenericCardProps<T>) => {
     const {
       isVisible1,
@@ -70,6 +72,7 @@ export const MyGenericCard = observer(
     const actions = [
       { onClick: () => setVisible1(true), title: "Edit" },
       { onClick: () => setVisible2(true), title: "Delete" },
+      ...(dropdownActions ?? []),
     ] satisfies Page[];
 
     return (

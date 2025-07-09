@@ -42,13 +42,14 @@ export const formatValue = (
     const remaining = value.length - 4;
     const suffix = arrayIsInfinite
       ? `${suffixLabel}ad infinitum...`
-      : value.length >= 4
+      : value.length > 4
       ? `${suffixLabel}and ${remaining} more...`
       : "";
 
-    const finalDate = !arrayIsInfinite
-      ? `\nup to ${moment(value[value.length - 1]).format(formatStr)}`
-      : "";
+    const finalDate =
+      !arrayIsInfinite && value.length > 3
+        ? `\nup to ${moment(value[value.length - 1]).format(formatStr)}`
+        : "";
 
     return list + suffix + finalDate;
   };

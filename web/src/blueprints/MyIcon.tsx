@@ -36,6 +36,7 @@ import LightMode from "@mui/icons-material/LightMode";
 import DisabledVisible from "@mui/icons-material/DisabledVisible";
 import RemoveRedEye from "@mui/icons-material/RemoveRedEye";
 import Settings from "@mui/icons-material/Settings";
+import Sunny from "@mui/icons-material/Sunny";
 import FilePresent from "@mui/icons-material/FilePresent";
 import Star from "@mui/icons-material/Star";
 import DisplaySettings from "@mui/icons-material/DisplaySettings";
@@ -71,6 +72,7 @@ const iconMap = {
   DarkMode,
   LightMode,
   Today,
+  Sunny,
   BarChart,
   ExpandMore,
   ExpandLess,

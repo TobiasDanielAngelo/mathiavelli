@@ -1,5 +1,13 @@
 import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
+import {
+  Model,
+  _async,
+  _await,
+  getRoot,
+  model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
 import Swal from "sweetalert2";
 import {
   deleteItemRequest,
@@ -12,6 +20,7 @@ import {
   generateScheduleDefinition,
 } from "../constants/helpers";
 import { formatValue } from "../constants/JSXHelpers";
+import { Store } from "./Store";
 
 const slug = "productivity/schedules";
 
@@ -97,6 +106,20 @@ export class Schedule extends Model(props) {
   get definition() {
     return generateScheduleDefinition(this);
   }
+
+  get associatedTask() {
+    return (
+      getRoot<Store>(this)?.taskStore?.items.find((s) => s.schedule === this.id)
+        ?.id ?? "—"
+    );
+  }
+  get associatedHabit() {
+    return (
+      getRoot<Store>(this)?.habitStore?.items.find(
+        (s) => s.schedule === this.id
+      )?.id ?? "—"
+    );
+  }
   get $view() {
     return {
       ...this.$,
@@ -105,6 +128,14 @@ export class Schedule extends Model(props) {
         WEEKDAY_CHOICES.find((_, ind) => ind === this.weekStart) ?? "—",
       collidingDates: this.collidingDates,
       definition: this.definition,
+      associatedTask:
+        getRoot<Store>(this)?.taskStore?.items.find(
+          (s) => s.schedule === this.id
+        )?.id ?? "—",
+      associatedHabit:
+        getRoot<Store>(this)?.habitStore?.items.find(
+          (s) => s.schedule === this.id
+        )?.id ?? "—",
     };
   }
 }

@@ -96,11 +96,9 @@ export const MyImage = ({
         src={IMAGES[image] || journals}
         onLoad={() => {
           setLoading(false);
-          console.log("Image loaded.", IMAGES[image]);
         }}
         onError={() => {
           setLoading(false);
-          console.error("Image failed to load.");
         }}
         className={className ?? "w-full h-full object-contain"}
       />

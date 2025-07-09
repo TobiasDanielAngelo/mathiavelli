@@ -8,11 +8,11 @@ import { MyIcon } from "./MyIcon";
 import { MyModal } from "./MyModal";
 import { MyTable } from "./MyTable";
 
-type CalendarEvent = {
+export type CalendarEvent = {
   id: string | number;
   title: string;
   dateStart: string;
-  dateEnd: string;
+  dateEnd?: string;
   dateCompleted?: string;
 };
 
@@ -254,9 +254,7 @@ export const MyCalendar = observer(
             const dayEvents = sortByKey(events, "dateStart").filter(
               (e) =>
                 day.format("YYYY-MM-DD") ===
-                  moment(e.dateStart).format("YYYY-MM-DD") ||
-                day.format("YYYY-MM-DD") ===
-                  moment(e.dateEnd).format("YYYY-MM-DD")
+                moment(e.dateStart).format("YYYY-MM-DD")
             );
 
             return (
@@ -352,7 +350,7 @@ export const MyCalendar = observer(
     );
 
     return (
-      <div className="p-4 rounded-xl h-full shadow-xl">
+      <div className="p-4 rounded-xl h-full">
         <div className="flex justify-between items-center mb-4">
           <div onClick={handlePrev}>
             <MyIcon icon="KeyboardArrowLeft" fontSize="large" />

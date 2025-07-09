@@ -297,7 +297,7 @@ export const EventView = observer(() => {
     new Event({})
   );
   const calendarProps = useCalendarProps();
-  const { date, start, end } = calendarProps;
+  const { start, end } = calendarProps;
   const { params, setPageDetails, setParams } = values;
 
   const fetchFcn = async () => {
@@ -316,7 +316,7 @@ export const EventView = observer(() => {
       order_by: "date_start",
     });
     setParams(newParams);
-  }, [date]);
+  }, [start.toISOString()]);
 
   const itemMap = useMemo(
     () =>

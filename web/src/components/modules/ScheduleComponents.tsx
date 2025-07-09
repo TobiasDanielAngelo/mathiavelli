@@ -193,7 +193,30 @@ export const ScheduleForm = ({
 export const ScheduleCard = observer((props: { item: Schedule }) => {
   const { item } = props;
   const { fetchFcn, shownFields } = useScheduleView();
-  const { scheduleStore } = useStore();
+  const { scheduleStore, taskStore, habitStore } = useStore();
+
+  const dropdownActions =
+    item.associatedTask === "—" && item.associatedHabit === "—"
+      ? [
+          {
+            onClick: () =>
+              taskStore.addItem({
+                title: item.name,
+                schedule: item.id,
+                importance: 5,
+              }),
+            title: "Add to Tasks",
+          },
+          {
+            onClick: () =>
+              habitStore.addItem({
+                title: item.name,
+                schedule: item.id,
+              }),
+            title: "Add to Habits",
+          },
+        ]
+      : [];
 
   return (
     <MyGenericCard
@@ -205,6 +228,7 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
       FormComponent={ScheduleForm}
       deleteItem={scheduleStore.deleteItem}
       fetchFcn={fetchFcn}
+      dropdownActions={dropdownActions}
     />
   );
 });
@@ -218,41 +242,41 @@ export const ScheduleDashboard = observer(
     range: string;
   }) => {
     const { range, view, date } = props;
+
     const { scheduleStore } = useStore();
 
-    const items = scheduleStore.items
-      .map((s) => s.$view)
-      .flatMap((s) =>
-        generateCollidingDates(s, {
-          startDate: moment(date).startOf("month").subtract(1, "day").toDate(),
-          endDate: moment(date).endOf("month").add(1, "day").toDate(),
-        }).map((date) => ({
-          ...s,
-          collidingDate: date,
-        }))
-      )
-      .filter((s) => {
-        const m = moment(s.collidingDate);
-        if (view === "week")
-          return m.isBetween(
-            moment(range).startOf("week"),
-            moment(range).endOf("week"),
-            null,
-            "[]"
-          );
-        if (view === "month") return m.format("YYYY-MM") === range;
-        if (view === "year") return m.format("YYYY") === range;
-        if (view === "decade") return `${Math.floor(m.year() / 10)}X` === range;
-        return false;
-      })
-      .map((s, ind) => ({
-        id: ind,
-        title: s.name,
-        dateStart: s.collidingDate.toISOString(),
-        dateEnd: s.collidingDate.toISOString(),
-        dateCompleted: s.collidingDate.toISOString(),
-      }));
-
+    const items = !["week", "month"].includes(view)
+      ? []
+      : scheduleStore.items
+          .map((s) => s.$view)
+          .flatMap((s) =>
+            generateCollidingDates(s, {
+              startDate: moment(date).startOf("week").toDate(),
+              endDate: moment(date).add(7, "days").endOf("week").toDate(),
+            }).map((date) => ({
+              ...s,
+              collidingDate: date,
+            }))
+          )
+          .filter((s) => {
+            const m = moment(s.collidingDate);
+            if (view === "week")
+              return m.isBetween(
+                moment(range).startOf("week"),
+                moment(range).endOf("week"),
+                null,
+                "[]"
+              );
+            if (view === "month") return m.format("YYYY-MM") === range;
+            return false;
+          })
+          .map((s, ind) => ({
+            id: ind,
+            title: s.name,
+            dateStart: s.collidingDate.toISOString(),
+            dateEnd: s.collidingDate.toISOString(),
+            dateCompleted: s.collidingDate.toISOString(),
+          }));
     return (
       <MyLockedCard isUnlocked>
         <MyCalendar {...props} events={items} noCompletion />
@@ -348,7 +372,7 @@ export const ScheduleTable = observer(() => {
 });
 
 export const ScheduleView = observer(() => {
-  const { scheduleStore, settingStore } = useStore();
+  const { scheduleStore, settingStore, taskStore, habitStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<ScheduleInterface, Schedule>(
     settingStore,
@@ -361,6 +385,9 @@ export const ScheduleView = observer(() => {
     if (!resp.ok || !resp.data) {
       return;
     }
+    const schedIds = resp.data.map((s) => s.id);
+    taskStore.fetchAll(`schedule__in=${schedIds.join(",")}`);
+    habitStore.fetchAll(`schedule__in=${schedIds.join(",")}`);
     setPageDetails(resp.pageDetails);
   };
 
