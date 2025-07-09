@@ -32,6 +32,7 @@ const props = {
   tags: prop<number[] | null>(null),
   dateCreated: prop<string>(""),
   task: prop<number | null>(null),
+  excuse: prop<string>(""),
 };
 
 export type EventInterface = {

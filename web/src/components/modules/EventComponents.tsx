@@ -105,6 +105,15 @@ export const EventForm = ({
             options: toOptions(tagStore.items, "name"),
           },
         ],
+        item
+          ? [
+              {
+                name: "excuse",
+                label: "Excuse for Incompletion",
+                type: "textarea",
+              },
+            ]
+          : [],
       ] satisfies Field[][],
     [tagStore.items.length]
   );

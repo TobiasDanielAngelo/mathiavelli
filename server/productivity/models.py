@@ -1,6 +1,7 @@
 from core.models import CustomModel
 from core import fields
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class Productivity(CustomModel):
@@ -130,10 +131,18 @@ class Event(Productivity):
     location = fields.ShortCharField()
     tags = fields.OptionalManyToManyField(Tag)
     task = fields.CascadeOptionalForeignKey(Task)
+    excuse = fields.MediumCharField()
 
     def clean(self):
         if self.date_start and self.date_end and self.date_start >= self.date_end:
             raise ValidationError("Start time must be before end time.")
+
+    def save(self, *args, **kwargs):
+        if self.excuse:
+            self.date_completed = timezone.now()
+        if not self.date_completed:
+            self.excuse = ""
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} ({self.date_start} - {self.date_end})"
