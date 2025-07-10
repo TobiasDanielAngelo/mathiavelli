@@ -41,6 +41,8 @@ import FilePresent from "@mui/icons-material/FilePresent";
 import Star from "@mui/icons-material/Star";
 import DisplaySettings from "@mui/icons-material/DisplaySettings";
 import DynamicForm from "@mui/icons-material/DynamicForm";
+import WarningAmber from "@mui/icons-material/WarningAmber";
+import Warning from "@mui/icons-material/Warning";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
 // 1. Map icons to names
@@ -52,6 +54,7 @@ const iconMap = {
   Check,
   Close,
   CloudUpload,
+  WarningAmber,
   Event,
   FilterAlt,
   Inbox,
@@ -72,6 +75,7 @@ const iconMap = {
   Padding,
   DarkMode,
   LightMode,
+  Warning,
   Today,
   Sunny,
   DynamicForm,

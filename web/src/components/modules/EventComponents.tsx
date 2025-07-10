@@ -145,7 +145,9 @@ export const EventCard = observer((props: { item: Event }) => {
           dateCompleted: item.dateCompleted ? null : new Date().toISOString(),
         }),
       icon: (item.dateCompleted
-        ? "CheckBox"
+        ? item.excuse === ""
+          ? "CheckBox"
+          : "Warning"
         : "CheckBoxOutlineBlank") as IconName,
       color: item.dateCompleted ? "success" : "inherit",
     },
@@ -155,7 +157,9 @@ export const EventCard = observer((props: { item: Event }) => {
     <MyGenericCard
       item={item}
       shownFields={
-        shownFields.length ? shownFields : ["id", "title", "dateStart"]
+        shownFields.length
+          ? shownFields
+          : ["id", "title", "dateStart", "excuse"]
       }
       header={["id"]}
       important={["title"]}

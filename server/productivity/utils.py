@@ -180,13 +180,15 @@ def generate_missing_events(params=None):
             .filter(date_completed=None, is_archived=True)
             .delete()
         )
-        print(
-            f"Archived {updated} incorrect events for task {task.pk} - {list(
-                Event.objects.filter(task=task, date_start__gte=start, date_start__lte=end)
-            .exclude(date_start__in=datetimes).values_list("id", flat=True)
-            )}."
-        )
-        print(f"Deleted {deleted} archived events that were not completed.")
+        if updated > 0:
+            print(
+                f"Archived {updated} incorrect events for task {task.pk} - {list(
+                    Event.objects.filter(task=task, date_start__gte=start, date_start__lte=end)
+                .exclude(date_start__in=datetimes).values_list("id", flat=True)
+                )}."
+            )
+        if deleted > 0:
+            print(f"Deleted {deleted} archived events that were not completed.")
 
         filtered_datetimes = [
             safe_parse_datetime(dt) for dt in datetimes if is_in_range(dt)

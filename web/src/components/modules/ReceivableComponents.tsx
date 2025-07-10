@@ -228,6 +228,8 @@ export const ReceivableView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
+  console.log(receivableStore.items.map((s) => s.paymentTotal));
+
   const itemMap = useMemo(
     () =>
       [
