@@ -36,7 +36,7 @@ interface MyGenericCardProps<T> extends ItemDetailsProps<T> {
 }
 
 export const MyGenericCard = observer(
-  <T extends object & { id: number }>({
+  <T extends object & { id: number; $view: any }>({
     item,
     shownFields,
     header,
@@ -96,7 +96,7 @@ export const MyGenericCard = observer(
         <div className="flex justify-between">
           <div className="flex-1">
             <ItemDetails<T>
-              item={item}
+              item={item.$view}
               shownFields={shownFields}
               header={header}
               important={important}

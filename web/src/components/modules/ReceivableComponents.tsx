@@ -226,6 +226,11 @@ export const ReceivableView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
+    const payments = resp.data
+      .map((s) => s.payment)
+      .flat(1)
+      .filter((s) => typeof s === "number");
+    transactionStore.fetchAll(`id__in=${payments.join(",")}`);
   };
 
   const itemMap = useMemo(

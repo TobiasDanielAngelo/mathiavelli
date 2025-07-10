@@ -1,6 +1,10 @@
 import { model, prop } from "mobx-keystone";
 import { PropsToInterface } from "../constants/interfaces";
-import { createGenericModel, createGenericStore } from "./GenericStore";
+import {
+  createGenericModel,
+  createGenericStore,
+  getStoreItem,
+} from "./GenericStore";
 
 const slug = "finance/receivables";
 const keyName = "Receivable";
@@ -20,8 +24,20 @@ const props = {
 
 export type ReceivableInterface = PropsToInterface<typeof props>;
 
-@model("myApp/Receivable")
-export class Receivable extends createGenericModel(props) {}
+const extendView = (item: ReceivableInterface) => ({
+  paymentDescription: item.payment?.map(
+    (s) => getStoreItem(item, "transactionStore", s)?.description ?? ""
+  ),
+});
+
+@model(`myApp/${keyName}`)
+export class Receivable extends createGenericModel(props, extendView) {}
+
+@model(`myApp/${keyName}Store`)
+export class ReceivableStore extends createGenericStore<
+  ReceivableInterface,
+  Receivable
+>(Receivable, slug) {}
 
 export const ReceivableFields: Record<string, (keyof ReceivableInterface)[]> = {
   datetimeFields: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
@@ -29,9 +45,3 @@ export const ReceivableFields: Record<string, (keyof ReceivableInterface)[]> = {
   timeFields: [] as const,
   pricesFields: ["lentAmount", "paymentTotal"] as const,
 };
-
-@model(`myApp/${keyName}Store`)
-export class ReceivableStore extends createGenericStore<
-  ReceivableInterface,
-  Receivable
->(Receivable, slug) {}
