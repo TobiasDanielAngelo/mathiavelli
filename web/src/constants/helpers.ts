@@ -669,8 +669,6 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     ? null
     : `${normalizeDate(endDate)}T${normalizeTime(endTime)}`;
 
-  console.log(Number(schedule.freq));
-
   const ruleOptions = {
     freq: schedule.freq ?? RRule.DAILY,
     interval: Number(schedule.interval) || 1,

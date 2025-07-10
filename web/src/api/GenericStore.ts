@@ -1,21 +1,77 @@
 import { computed } from "mobx";
-import { Model, _async, _await, modelFlow, prop } from "mobx-keystone";
+import {
+  _async,
+  _await,
+  AnyModelProp,
+  getRoot,
+  Model,
+  modelFlow,
+  prop,
+} from "mobx-keystone";
 import Swal from "sweetalert2";
+import { PropsToInterface } from "../constants/interfaces";
 import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
   updateItemRequest,
 } from "./_apiHelpers";
+import { Store } from "./Store";
 
-type KeystoneModel = {
+type KeystoneModel<U> = {
   $view: Record<string, any>;
-  update: (data: any) => void;
+  update: (data: U) => void;
 };
+
+type StoreItemType<K extends keyof Store> = Store[K] extends {
+  items: (infer U)[];
+}
+  ? U
+  : never;
+
+function hasAllItems(obj: any): obj is { allItems: Map<number, any> } {
+  return obj && typeof obj === "object" && "allItems" in obj;
+}
+
+export function getStoreItem<K extends keyof Store>(
+  self: any,
+  storeKey: K,
+  id: number
+): StoreItemType<K> | undefined {
+  const targetedStore = getRoot<Store>(self)?.[storeKey];
+  if (typeof targetedStore === "string" || typeof targetedStore === "function")
+    return;
+  if (hasAllItems(targetedStore)) {
+    const item = targetedStore.allItems.get(id);
+    return item as StoreItemType<K>;
+  }
+}
+
+export function createGenericModel(
+  props: Record<string, AnyModelProp>,
+  extendView?: (self: any) => any
+) {
+  type GenericInterface = PropsToInterface<typeof props>;
+
+  class GenericModel extends Model(props) implements GenericInterface {
+    id!: number;
+    update(details: GenericInterface) {
+      Object.assign(this, details);
+    }
+
+    get $view() {
+      return {
+        ...this.$,
+        ...(extendView && extendView(this)),
+      };
+    }
+  }
+  return GenericModel;
+}
 
 export function createGenericStore<
   U extends { id?: number | null },
-  T extends KeystoneModel
+  T extends KeystoneModel<U> & { id: number }
 >(
   modelClass: {
     new (...args: any[]): T;
@@ -25,6 +81,13 @@ export function createGenericStore<
   class GenericStore extends Model({
     items: prop<T[]>(() => []),
   }) {
+    @computed
+    get allItems() {
+      const map = new Map<number, T>();
+      this.items.forEach((item) => map.set(item.id, item));
+      return map;
+    }
+
     @computed
     get itemsSignature() {
       function computeItemsSignature<T extends { $view: Record<string, any> }>(

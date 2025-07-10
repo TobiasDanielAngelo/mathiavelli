@@ -1,8 +1,9 @@
-import { Model, getRoot, model, prop } from "mobx-keystone";
-import { createGenericStore } from "./GenericStore";
-import { Store } from "./Store";
+import { model, prop } from "mobx-keystone";
+import { PropsToInterface } from "../constants/interfaces";
+import { createGenericModel, createGenericStore } from "./GenericStore";
 
 const slug = "finance/receivables";
+const keyName = "Receivable";
 
 const props = {
   id: prop<number>(-1),
@@ -17,13 +18,10 @@ const props = {
   paymentTotal: prop<number>(0),
 };
 
-export type ReceivableInterface = {
-  [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
-    typeof prop<infer T>
-  >
-    ? T
-    : never;
-};
+export type ReceivableInterface = PropsToInterface<typeof props>;
+
+@model("myApp/Receivable")
+export class Receivable extends createGenericModel(props) {}
 
 export const ReceivableFields: Record<string, (keyof ReceivableInterface)[]> = {
   datetimeFields: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
@@ -32,33 +30,7 @@ export const ReceivableFields: Record<string, (keyof ReceivableInterface)[]> = {
   pricesFields: ["lentAmount", "paymentTotal"] as const,
 };
 
-@model("myApp/Receivable")
-export class Receivable extends Model(props) {
-  update(details: ReceivableInterface) {
-    Object.assign(this, details);
-  }
-
-  // get paymentDescription() {
-  //   return this.payment?.map(
-  //     (s) =>
-  //       getRoot<Store>(this)?.transactionStore?.allItems.get(s)?.description ??
-  //       ""
-  //   );
-  // }
-
-  get $view() {
-    return {
-      ...this.$,
-      paymentDescription: this.payment?.map(
-        (s) =>
-          getRoot<Store>(this)?.transactionStore?.allItems.get(s)
-            ?.description ?? ""
-      ),
-    };
-  }
-}
-
-@model("myApp/ReceivableStore")
+@model(`myApp/${keyName}Store`)
 export class ReceivableStore extends createGenericStore<
   ReceivableInterface,
   Receivable

@@ -1,3 +1,9 @@
+import { prop } from "mobx-keystone";
+
+export type PropsToInterface<P> = {
+  [K in keyof P]?: P[K] extends ReturnType<typeof prop<infer T>> ? T : never;
+};
+
 export interface Option {
   id: number | string;
   name: string;
