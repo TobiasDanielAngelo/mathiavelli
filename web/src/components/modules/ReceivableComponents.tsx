@@ -220,6 +220,7 @@ export const ReceivableView = observer(() => {
     new Receivable({})
   );
   const { params, setPageDetails } = values;
+
   const fetchFcn = async () => {
     const resp = await receivableStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {

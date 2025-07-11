@@ -4,6 +4,10 @@ export type PropsToInterface<P> = {
   [K in keyof P]?: P[K] extends ReturnType<typeof prop<infer T>> ? T : never;
 };
 
+export type InterfaceToProps<T> = {
+  [K in keyof T]: ReturnType<typeof prop<T[K]>>;
+};
+
 export interface Option {
   id: number | string;
   name: string;
@@ -120,3 +124,8 @@ export type KeyboardCodes =
   | "Period"
   | "Semicolon"
   | "Tab";
+
+export type ViewFields<T> = Record<
+  `${"datetime" | "date" | "time" | "prices"}Fields`,
+  (keyof T)[]
+>;

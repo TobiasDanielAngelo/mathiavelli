@@ -2,10 +2,12 @@ import { computed } from "mobx";
 import {
   _async,
   _await,
-  AnyModelProp,
   getRoot,
+  model,
   Model,
+  ModelClass,
   modelFlow,
+  ModelProps,
   prop,
 } from "mobx-keystone";
 import Swal from "sweetalert2";
@@ -19,8 +21,9 @@ import {
 import { Store } from "./Store";
 
 type KeystoneModel<U> = {
-  $view: Record<string, any>;
-  update: (data: U) => void;
+  id: number | null;
+  $view: Required<U>;
+  update: (details: Partial<U>) => void;
 };
 
 type StoreItemType<K extends keyof Store> = Store[K] extends {
@@ -28,6 +31,10 @@ type StoreItemType<K extends keyof Store> = Store[K] extends {
 }
   ? U
   : never;
+
+type NullableProps<T> = {
+  [K in keyof T]: T[K] | null;
+};
 
 function hasAllItems(obj: any): obj is { allItems: Map<number, any> } {
   return obj && typeof obj === "object" && "allItems" in obj;
@@ -47,59 +54,71 @@ export function getStoreItem<K extends keyof Store>(
   }
 }
 
-export function createGenericModel(
-  props: Record<string, AnyModelProp>,
-  extendView?: (self: any) => any
+export function GenerateModel<TProps extends ModelProps, TView>(
+  props: TProps,
+  derivedProps: (self: any) => TView = () => ({} as TView),
+  keyName: string
 ) {
   type GenericInterface = PropsToInterface<typeof props>;
 
-  class GenericModel extends Model(props) implements GenericInterface {
-    id!: number;
+  const Base = Model(props) as new (...args: any[]) => object;
+
+  // @ts-expect-error mobx-keystone decorator returns new class
+  @model(`myApp/${keyName}`)
+  class GenericModel extends Base {
     update(details: GenericInterface) {
       Object.assign(this, details);
     }
 
-    get $view() {
+    get $() {
+      return this;
+    }
+
+    get $view(): TView {
       return {
         ...this.$,
-        ...(extendView && extendView(this)),
+        ...derivedProps(this),
       };
     }
   }
-  return GenericModel;
+
+  return GenericModel as ModelClass<
+    InstanceType<ReturnType<typeof Model<TProps>>> &
+      KeystoneModel<PropsToInterface<TProps> & TView> &
+      TView
+  >;
 }
 
-export function createGenericStore<
-  U extends { id?: number | null },
-  T extends KeystoneModel<U> & { id: number }
->(
-  modelClass: {
+export function GenerateStore<T extends KeystoneModel<{ id?: number | null }>>(
+  ModelClass: {
     new (...args: any[]): T;
   },
-  slug: string
+  slug: string,
+  keyName: string
 ) {
+  @model(`myApp/${keyName}Store`)
   class GenericStore extends Model({
     items: prop<T[]>(() => []),
   }) {
     @computed
     get allItems() {
       const map = new Map<number, T>();
-      this.items.forEach((item) => map.set(item.id, item));
+      this.items.forEach((item) => map.set(item.id ?? -1, item));
       return map;
     }
 
     @computed
     get itemsSignature() {
       function computeItemsSignature<T extends { $view: Record<string, any> }>(
-        modelClass: { new (...args: any[]): T },
+        ModelClass: { new (...args: any[]): T },
         items: T[]
       ): string {
-        const keys = Object.keys(new modelClass({}).$view);
+        const keys = Object.keys(new ModelClass({}).$view);
         return items
           .map((item) => keys.map((key) => String(item.$view[key])).join("|"))
           .join("::");
       }
-      return computeItemsSignature(modelClass, this.items);
+      return computeItemsSignature(ModelClass, this.items);
     }
 
     @modelFlow
@@ -107,7 +126,7 @@ export function createGenericStore<
       let result;
 
       try {
-        result = yield* _await(fetchItemsRequest<U>(slug, params));
+        result = yield* _await(fetchItemsRequest<Partial<T>>(slug, params));
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -124,9 +143,10 @@ export function createGenericStore<
         return { details: "An error has occurred", ok: false, data: null };
       }
 
-      result.data.forEach((s: U) => {
+      result.data.forEach((s: Partial<T>) => {
+        if (!s.id) return;
         if (!this.items.map((i) => i.$view.id).includes(s.id)) {
-          this.items.push(new modelClass(s));
+          this.items.push(new ModelClass(s));
         } else {
           this.items.find((t) => t.$view.id === s.id)?.update(s);
         }
@@ -136,10 +156,15 @@ export function createGenericStore<
     });
 
     @modelFlow
-    addItem = _async(function* (this: GenericStore, details: U) {
+    addItem = _async(function* (
+      this: GenericStore,
+      details: NullableProps<Partial<T>>
+    ) {
       let result;
       try {
-        result = yield* _await(postItemRequest<U>(slug, details));
+        result = yield* _await(
+          postItemRequest<NullableProps<Partial<T>>>(slug, details)
+        );
       } catch {
         Swal.fire({ icon: "error", title: "Network Error" });
         return { details: "Network Error", ok: false, data: null };
@@ -150,7 +175,7 @@ export function createGenericStore<
         return { details: "An error has occurred", ok: false, data: null };
       }
 
-      const item = new modelClass(result.data);
+      const item = new ModelClass(result.data);
       this.items.push(item);
 
       return { details: "", ok: true, data: item };
@@ -160,7 +185,7 @@ export function createGenericStore<
     updateItem = _async(function* (
       this: GenericStore,
       itemId: number,
-      details: U
+      details: NullableProps<Partial<T>>
     ) {
       let result;
       try {

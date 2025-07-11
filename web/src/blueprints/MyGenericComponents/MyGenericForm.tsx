@@ -11,7 +11,7 @@ export interface MyGenericFormProps<T> {
   fields: Field[][];
   objectName: string;
   store: {
-    addItem: (item: T) => Promise<any>;
+    addItem: (details: T) => Promise<any>;
     updateItem: (id: number, item: T) => Promise<any>;
     deleteItem: (id: number) => Promise<any>;
   };
