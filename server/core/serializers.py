@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate, hashers, password_validation
 from django.contrib.auth.models import User
-from django.db.models import Field
-from django.db.models import ForeignKey, OneToOneField, ManyToManyField
 from .models import *
 
 
@@ -90,75 +88,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CustomSerializer(serializers.ModelSerializer):
-    def get_fields(self):
-        fields = super().get_fields()
-        return fields
-
-        for field_name, field in list(fields.items()):
-
-            if field_name.endswith(".name"):
-                continue
-
-            if isinstance(field, serializers.PrimaryKeyRelatedField):
-                name_field = f"{field_name}.name"
-                fields[name_field] = serializers.SerializerMethodField()
-                if not hasattr(self.__class__, f"get_{name_field}"):
-
-                    def make_single_getter(fn):
-                        return lambda self_, obj: (
-                            str(getattr(obj, fn)) if getattr(obj, fn) else None
-                        )
-
-                    setattr(
-                        self.__class__,
-                        f"get_{name_field}",
-                        make_single_getter(field_name),
-                    )
-
-            # Handle ManyToMany
-            elif isinstance(field, serializers.ManyRelatedField):
-                name_field = f"{field_name}.name"
-                fields[name_field] = serializers.SerializerMethodField()
-                if not hasattr(self.__class__, f"get_{name_field}"):
-
-                    def make_list_getter(fn):
-                        return lambda self_, obj: (
-                            [str(item) for item in getattr(obj, fn).all()]
-                            if getattr(obj, fn)
-                            else []
-                        )
-
-                    setattr(
-                        self.__class__,
-                        f"get_{name_field}",
-                        make_list_getter(field_name),
-                    )
-
-            elif isinstance(field, serializers.ChoiceField):
-                name_field = f"{field_name}.name"
-                fields[name_field] = serializers.SerializerMethodField()
-                if not hasattr(self.__class__, f"get_{name_field}"):
-
-                    def make_choice_getter(fn):
-                        def getter(self_, obj):
-                            try:
-                                model_field: Field = self_.Meta.model._meta.get_field(
-                                    fn
-                                )
-                                value = getattr(obj, fn)
-                                return dict(model_field.flatchoices).get(value, None)
-                            except Exception:
-                                return None
-
-                        return getter
-
-                    setattr(
-                        self.__class__,
-                        f"get_{name_field}",
-                        make_choice_getter(field_name),
-                    )
-
-        return fields
+    pass
 
 
 class SettingSerializer(CustomSerializer):

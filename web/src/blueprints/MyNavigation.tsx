@@ -237,7 +237,7 @@ export const MyNavBar = observer(
                 >
                   <MyIcon
                     icon={
-                      settingStore.theme === "dark" ? "DarkMode" : "LightMode"
+                      settingStore.theme() === "dark" ? "DarkMode" : "LightMode"
                     }
                   />
                 </div>

@@ -1,11 +1,11 @@
 import { format, isValid, parse } from "date-fns";
 import LZString from "lz-string";
+import { prop } from "mobx-keystone";
 import moment from "moment";
 import { Options, RRule, Weekday } from "rrule";
 import { GoalInterface } from "../api/GoalStore";
-import { Schedule, ScheduleInterface } from "../api/ScheduleStore";
+import { ScheduleInterface } from "../api/ScheduleStore";
 import { DjangoField, djangoToJsType, JsType, Option } from "./interfaces";
-import { prop } from "mobx-keystone";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -844,13 +844,12 @@ export function rruleToDetailedText(rule: RRule): string {
   return parts.join(" ");
 }
 
-export function generateScheduleDefinition(sched: Schedule): string {
-  const schedule = sched.$ ?? sched;
+export function generateScheduleDefinition(sched: ScheduleInterface): string {
+  const schedule = sched;
   const rule = buildRRule(schedule);
   if (!rule) return "";
 
   return rruleToDetailedText(rule);
-  // .map((dt) => moment(dt).format("lll"));
 }
 
 export function range(a: number, b: number): number[] {
@@ -882,6 +881,10 @@ export function toRoman(num: number): string {
     }
   }
   return result;
+}
+
+export function findByIndex<T>(arr: T[], index: number): T | undefined {
+  return arr[index];
 }
 
 export function toSuperscript(n: number | string): string {

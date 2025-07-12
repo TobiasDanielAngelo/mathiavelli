@@ -5,6 +5,7 @@ import {
   getRoot,
   model,
   Model,
+  modelAction,
   ModelClass,
   modelFlow,
   ModelProps,
@@ -32,7 +33,7 @@ type StoreItemType<K extends keyof Store> = Store[K] extends {
   ? U
   : never;
 
-type NullableProps<T> = {
+export type NullableProps<T> = {
   [K in keyof T]: T[K] | null;
 };
 
@@ -43,8 +44,9 @@ function hasAllItems(obj: any): obj is { allItems: Map<number, any> } {
 export function getStoreItem<K extends keyof Store>(
   self: any,
   storeKey: K,
-  id: number
+  id?: number | null
 ): StoreItemType<K> | undefined {
+  if (!id || id === null) return;
   const targetedStore = getRoot<Store>(self)?.[storeKey];
   if (typeof targetedStore === "string" || typeof targetedStore === "function")
     return;
@@ -227,6 +229,11 @@ export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
 
       return result;
     });
+
+    @modelAction
+    resetItems = function (this: GenericStore) {
+      this.items = [];
+    };
   }
 
   return GenericStore;

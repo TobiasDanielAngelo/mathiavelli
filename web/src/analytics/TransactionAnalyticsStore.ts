@@ -11,6 +11,7 @@ import {
 import { fetchItemsRequest } from "../api/_apiHelpers";
 import Swal from "sweetalert2";
 import { GraphType } from "../blueprints/MyGenericComponents/MyGenericView";
+import { PropsToInterface } from "../constants/interfaces";
 
 const slug = "finance/analytics/transactions";
 
@@ -26,13 +27,7 @@ const props = {
   total: prop<number>(0),
 };
 
-export type TransactionAnalyticsInterface = {
-  [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
-    typeof prop<infer T>
-  >
-    ? T
-    : never;
-};
+export type TransactionAnalyticsInterface = PropsToInterface<typeof props>;
 
 @model("myApp/TransactionAnalytics")
 export class TransactionAnalytics extends Model(props) {

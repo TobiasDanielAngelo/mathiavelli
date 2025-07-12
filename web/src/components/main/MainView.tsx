@@ -82,12 +82,12 @@ export const MainView = observer(() => {
   }, []);
 
   useEffect(() => {
-    if (settingStore.theme === "dark") {
+    if (settingStore.theme() === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [settingStore.theme]);
+  }, [settingStore.theme()]);
 
   return (
     <div className="flex flex-col min-h-screen text-teal-700 dark:text-gray-400">

@@ -11,6 +11,7 @@ import {
 import { fetchItemsRequest } from "../api/_apiHelpers";
 import Swal from "sweetalert2";
 import { GraphType } from "../blueprints/MyGenericComponents/MyGenericView";
+import { PropsToInterface } from "../constants/interfaces";
 
 const slug = "health/analytics/weigh-ins";
 
@@ -21,13 +22,7 @@ const props = {
   period: prop<string | null>(null),
 };
 
-export type WeighInAnalyticsInterface = {
-  [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
-    typeof prop<infer T>
-  >
-    ? T
-    : never;
-};
+export type WeighInAnalyticsInterface = PropsToInterface<typeof props>;
 
 @model("myApp/WeighInAnalytics")
 export class WeighInAnalytics extends Model(props) {

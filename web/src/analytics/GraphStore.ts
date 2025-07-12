@@ -25,13 +25,7 @@ const props = {
   total: prop<number>(0),
 };
 
-export type TransactionAnalyticsInterface = {
-  [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
-    typeof prop<infer T>
-  >
-    ? T
-    : never;
-};
+export type TransactionAnalyticsInterface = PropsToInterface<typeof props>;
 
 @model("myApp/TransactionAnalytics")
 export class TransactionAnalytics extends Model(props) {

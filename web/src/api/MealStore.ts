@@ -1,15 +1,11 @@
-import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
-import {
-  deleteItemRequest,
-  fetchItemsRequest,
-  postItemRequest,
-  updateItemRequest,
-} from "./_apiHelpers";
-import Swal from "sweetalert2";
+import { prop } from "mobx-keystone";
+import { PropsToInterface, ViewFields } from "../constants/interfaces";
+import { MyModel, MyStore } from "./GenericStore";
+
+export const MEAL_CATEGORY_CHOICES = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
 const slug = "health/meals";
-
+const keyName = "Meal";
 const props = {
   id: prop<number>(-1),
   name: prop<string>(""),
@@ -18,191 +14,17 @@ const props = {
   date: prop<string>(""),
 };
 
-export const MEAL_CATEGORY_CHOICES = ["Breakfast", "Lunch", "Dinner", "Snack"];
+const derivedProps = (item: MealInterface) => ({
+  categoryName:
+    MEAL_CATEGORY_CHOICES.find((_, ind) => ind === item.category) ?? "—",
+});
 
-export type MealInterface = {
-  [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
-    typeof prop<infer T>
-  >
-    ? T
-    : never;
-};
-
-export const MealFields: Record<string, (keyof MealInterface)[]> = {
+export type MealInterface = PropsToInterface<typeof props>;
+export class Meal extends MyModel(keyName, props, derivedProps) {}
+export class MealStore extends MyStore(keyName, Meal, slug) {}
+export const MealFields: ViewFields<MealInterface> = {
   datetimeFields: ["date"] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: [] as const,
 };
-
-@model("myApp/Meal")
-export class Meal extends Model(props) {
-  update(details: MealInterface) {
-    Object.assign(this, details);
-  }
-
-  get categoryName() {
-    return MEAL_CATEGORY_CHOICES.find((_, ind) => ind === this.category) ?? "—";
-  }
-
-  get $view() {
-    return {
-      ...this.$,
-      categoryName:
-        MEAL_CATEGORY_CHOICES.find((_, ind) => ind === this.category) ?? "—",
-    };
-  }
-}
-
-@model("myApp/MealStore")
-export class MealStore extends Model({
-  items: prop<Meal[]>(() => []),
-}) {
-  @computed
-  get itemsSignature() {
-    const keys = Object.keys(new Meal({}).$view) as (keyof MealInterface)[];
-    return this.items
-      .map((item) => keys.map((key) => String(item[key])).join("|"))
-      .join("::");
-  }
-
-  @computed
-  get allItems() {
-    const map = new Map<number, Meal>();
-    this.items.forEach((item) => map.set(item.id, item));
-    return map;
-  }
-
-  @modelFlow
-  fetchAll = _async(function* (this: MealStore, params?: string) {
-    let result;
-
-    try {
-      result = yield* _await(fetchItemsRequest<Meal>(slug, params));
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    result.data.forEach((s) => {
-      if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new Meal(s));
-      } else {
-        this.items.find((t) => t.id === s.id)?.update(s);
-      }
-    });
-
-    return result;
-  });
-
-  @modelFlow
-  addItem = _async(function* (this: MealStore, details: MealInterface) {
-    let result;
-
-    try {
-      result = yield* _await(postItemRequest<MealInterface>(slug, details));
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    const item = new Meal(result.data);
-    this.items.push(item);
-
-    return { details: "", ok: true, data: item };
-  });
-
-  @modelFlow
-  updateItem = _async(function* (
-    this: MealStore,
-    itemId: number,
-    details: MealInterface
-  ) {
-    let result;
-
-    try {
-      result = yield* _await(
-        updateItemRequest<MealInterface>(slug, itemId, details)
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    this.allItems.get(result.data.id ?? -1)?.update(result.data);
-
-    return { details: "", ok: true, data: result.data };
-  });
-
-  @modelFlow
-  deleteItem = _async(function* (this: MealStore, itemId: number) {
-    let result;
-
-    try {
-      result = yield* _await(deleteItemRequest(slug, itemId));
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok) {
-      return result;
-    }
-
-    const indexOfItem = this.items.findIndex((s) => s.id === itemId);
-    if (indexOfItem !== -1) {
-      this.items.splice(indexOfItem, 1);
-    }
-
-    return result;
-  });
-}

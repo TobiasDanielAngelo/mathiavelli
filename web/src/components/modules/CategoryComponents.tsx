@@ -194,7 +194,17 @@ export const CategoryView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
+  const itemMap = useMemo(
+    () =>
+      [
+        {
+          key: "nature",
+          values: CATEGORY_CHOICES,
+          label: "",
+        },
+      ] satisfies KV<any>[],
+    []
+  );
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 

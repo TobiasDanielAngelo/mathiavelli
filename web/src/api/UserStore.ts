@@ -8,6 +8,7 @@ import {
   updateItemRequest,
 } from "./_apiHelpers";
 import Swal from "sweetalert2";
+import { PropsToInterface } from "../constants/interfaces";
 
 const slug = "users";
 
@@ -20,13 +21,7 @@ const props = {
   isSuperuser: prop<boolean>(true),
 };
 
-export type UserInterface = {
-  [K in keyof typeof props]?: (typeof props)[K] extends ReturnType<
-    typeof prop<infer T>
-  >
-    ? T
-    : never;
-};
+export type UserInterface = PropsToInterface<typeof props>;
 
 export interface SignupInterface extends UserInterface {
   password?: string;
@@ -200,54 +195,6 @@ export class UserStore extends Model({
   });
 
   @modelFlow
-  fetchUser = _async(function* (this: UserStore, userId: string) {
-    let response: Response;
-
-    try {
-      response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/${slug}/?id=${userId}`, {
-          method: "GET",
-          headers: {
-            "Content-type": "application/json",
-            "ngrok-skip-browser-warning": "any",
-          },
-          credentials: "include",
-        })
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!response.ok) {
-      let msg: any = yield* _await(response.json());
-      if (msg.nonFieldErrors || msg.detail) {
-        return {
-          details: msg,
-          ok: false,
-          data: null,
-        };
-      }
-      return { details: msg, ok: false, data: null };
-    }
-
-    let json: User;
-    try {
-      const resp = yield* _await(response.json());
-      json = resp[0];
-    } catch (error) {
-      console.error("Parsing Error", error);
-      return { details: "Parsing Error", ok: false, data: null };
-    }
-
-    return { details: "", ok: true, data: json };
-  });
-
-  @modelFlow
   loginUser = _async(function* (
     this: UserStore,
     credentials: {
@@ -295,8 +242,6 @@ export class UserStore extends Model({
     try {
       const resp = yield* _await(response.json());
       json = resp.user;
-      // localStorage.setItem("@userToken", resp.key);
-      // localStorage.setItem("@currentUser", JSON.stringify(json));
     } catch (error) {
       console.error("Parsing Error", error);
       return { details: "Parsing Error", ok: false, data: null };

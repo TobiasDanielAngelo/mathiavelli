@@ -75,7 +75,7 @@ export function useSettings<T>(
   });
 
   useEffect(() => {
-    if (!settingStore.itemsLoaded) {
+    if (settingStore.items.length === 0) {
       return;
     }
     const setting = settingStore.items.find((s) => s.key === key);
@@ -84,7 +84,7 @@ export function useSettings<T>(
       ? settingStore.updateItem(settingId, { value: JSON.stringify(state) })
       : settingStore.addItem({ key, value: JSON.stringify(state) });
     localStorage.setItem(key, JSON.stringify(state));
-  }, [state, settingStore.itemsLoaded]);
+  }, [state]);
 
   return [state, setState] as const;
 }

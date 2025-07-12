@@ -1,5 +1,5 @@
 import { prop } from "mobx-keystone";
-import { PropsToInterface } from "../constants/interfaces";
+import { PropsToInterface, ViewFields } from "../constants/interfaces";
 import { MyModel, MyStore } from "./GenericStore";
 
 export const PRIORITY_CHOICES = ["Low", "Medium", "High"];
@@ -27,10 +27,9 @@ const derivedProps = (item: BuyListItemInterface) => ({
 export type BuyListItemInterface = PropsToInterface<typeof props>;
 export class BuyListItem extends MyModel(keyName, props, derivedProps) {}
 export class BuyListItemStore extends MyStore(keyName, BuyListItem, slug) {}
-export const BuyListItemFields: Record<string, (keyof BuyListItemInterface)[]> =
-  {
-    datetimeFields: ["addedAt"] as const,
-    dateFields: ["plannedDate"] as const,
-    timeFields: [] as const,
-    pricesFields: ["estimatedPrice"] as const,
-  };
+export const BuyListItemFields: ViewFields<BuyListItemInterface> = {
+  datetimeFields: ["addedAt"] as const,
+  dateFields: ["plannedDate"] as const,
+  timeFields: [] as const,
+  pricesFields: ["estimatedPrice"] as const,
+};
