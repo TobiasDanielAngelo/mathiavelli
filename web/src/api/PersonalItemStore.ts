@@ -5,7 +5,7 @@ import { getStoreItem, MyModel, MyStore } from "./GenericStore";
 const slug = "finance/personal-items/";
 const keyName = "PersonalItem";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   name: prop<string>(""),
   category: prop<number | null>(null),
   location: prop<string>(""),

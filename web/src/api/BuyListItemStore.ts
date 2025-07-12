@@ -8,7 +8,7 @@ export const WISHLIST_STATUS_CHOICES = ["Pending", "Bought", "Canceled"];
 const keyName = "BuyListItem";
 const slug = "finance/buy-list-items/";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   name: prop<string>(""),
   description: prop<string>(""),
   estimatedPrice: prop<number>(0),

@@ -94,7 +94,7 @@ export const IssueCommentCard = observer((props: { item: IssueComment }) => {
       item={item}
       shownFields={shownFields}
       header={["id"]}
-      prices={IssueCommentFields.prices}
+      prices={IssueCommentFields.pricesFields}
       FormComponent={IssueCommentForm}
       deleteItem={issueCommentStore.deleteItem}
       fetchFcn={fetchFcn}
@@ -133,7 +133,7 @@ export const IssueCommentFilter = observer(() => {
     <MyGenericFilter
       view={new IssueComment({}).$view}
       title="IssueComment Filters"
-      dateFields={IssueCommentFields.datetime}
+      dateFields={IssueCommentFields.datetimeFields}
       excludeFields={["id"]}
     />
   );

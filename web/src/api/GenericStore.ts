@@ -23,7 +23,7 @@ import { Store } from "./Store";
 import { LoginInterface } from "./UserStore";
 
 type KeystoneModel<U> = {
-  id: number | null;
+  id: number | string | null;
   $view: Required<U>;
   update: (details: Partial<U>) => void;
 };
@@ -38,14 +38,14 @@ export type NullableProps<T> = {
   [K in keyof T]: T[K] | null;
 };
 
-function hasAllItems(obj: any): obj is { allItems: Map<number, any> } {
+function hasAllItems(obj: any): obj is { allItems: Map<number | string, any> } {
   return obj && typeof obj === "object" && "allItems" in obj;
 }
 
 export function getStoreItem<K extends keyof Store>(
   self: any,
   storeKey: K,
-  id?: number | null
+  id?: number | string | null
 ): StoreItemType<K> | undefined {
   if (!id || id === null) return;
   const targetedStore = getRoot<Store>(self)?.[storeKey];
@@ -92,12 +92,15 @@ export function MyModel<TProps extends ModelProps, TView>(
   >;
 }
 
-export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
+export function MyStore<
+  T extends KeystoneModel<{ id?: number | string | null }>
+>(
   keyName: string,
   ModelClass: {
     new (...args: any[]): T;
   },
-  slug: string
+  slug: string,
+  resetOnFetch?: boolean
 ) {
   @model(`myApp/${keyName}Store`)
   class GenericStore extends Model({
@@ -105,7 +108,7 @@ export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
   }) {
     @computed
     get allItems() {
-      const map = new Map<number, T>();
+      const map = new Map<number | string, T>();
       this.items.forEach((item) => map.set(item.id ?? -1, item));
       return map;
     }
@@ -145,6 +148,8 @@ export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
         });
         return { details: "An error has occurred", ok: false, data: null };
       }
+
+      resetOnFetch && this.resetItems();
 
       result.data.forEach((s: Partial<T>) => {
         if (!s.id) return;
@@ -187,7 +192,7 @@ export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
     @modelFlow
     updateItem = _async(function* (
       this: GenericStore,
-      itemId: number,
+      itemId: number | string,
       details: NullableProps<Partial<T>>
     ) {
       let result;
@@ -210,7 +215,10 @@ export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
     });
 
     @modelFlow
-    deleteItem = _async(function* (this: GenericStore, itemId: number) {
+    deleteItem = _async(function* (
+      this: GenericStore,
+      itemId: number | string
+    ) {
       let result;
       try {
         result = yield* _await(deleteItemRequest(slug, itemId));

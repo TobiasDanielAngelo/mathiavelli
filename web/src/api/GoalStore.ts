@@ -6,7 +6,7 @@ import { MyModel, MyStore } from "./GenericStore";
 const slug = "productivity/goals/";
 const keyName = "Goal";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   description: prop<string>(""),
   parentGoal: prop<number | null>(null),

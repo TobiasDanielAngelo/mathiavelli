@@ -13,7 +13,9 @@ interface MyGenericRecursiveCardProps<T> extends ItemDetailsProps<T> {
     setVisible: (v: boolean) => void;
     fetchFcn: () => void;
   }>;
-  deleteItem: (id: number) => Promise<{ ok: boolean; details?: string }>;
+  deleteItem: (
+    id: number | string
+  ) => Promise<{ ok: boolean; details?: string }>;
   fetchFcn: () => void;
   items: T[];
   itemMap?: KV<any>[];
@@ -22,7 +24,7 @@ interface MyGenericRecursiveCardProps<T> extends ItemDetailsProps<T> {
 }
 
 export const MyGenericRecursiveCard = observer(
-  <T extends object & { id: number }>({
+  <T extends object & { id: number | string }>({
     item,
     header,
     important,

@@ -15,7 +15,7 @@ export const FOLLOWUP_STATUS_CHOICES = [
 const slug = "career/follow-ups/";
 const keyName = "FollowUp";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   job: prop<number | null>(null),
   date: prop<string>(""),
   message: prop<string>(""),

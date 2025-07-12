@@ -5,7 +5,7 @@ import { MyModel, MyStore } from "./GenericStore";
 const slug = "health/body-fats/";
 const keyName = "BodyFat";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   bodyFatPercent: prop<number>(0),
   date: prop<string>(""),
 };

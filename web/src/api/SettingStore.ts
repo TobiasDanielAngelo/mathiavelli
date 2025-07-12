@@ -6,7 +6,7 @@ import { functionBinder, MyModel, MyStore } from "./GenericStore";
 const slug = "settings/";
 const keyName = "Setting";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   key: prop<string>(""),
   value: prop<string>(""),
   description: prop<string>(""),

@@ -12,12 +12,14 @@ interface MyGenericRowProps<T> {
     setVisible: (v: boolean) => void;
     fetchFcn: () => void;
   }>;
-  deleteItem: (id: number) => Promise<{ ok: boolean; details?: string }>;
+  deleteItem: (
+    id: number | string
+  ) => Promise<{ ok: boolean; details?: string }>;
   fetchFcn: () => void;
 }
 
 export const MyGenericRow = observer(
-  <T extends object & { id: number }>({
+  <T extends object & { id: number | string }>({
     item,
     FormComponent,
     deleteItem,

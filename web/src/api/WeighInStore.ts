@@ -5,7 +5,7 @@ import { MyModel, MyStore } from "./GenericStore";
 const slug = "health/weigh-ins/";
 const keyName = "WeighIn";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   weightKg: prop<number>(0),
   date: prop<string>(""),
 };

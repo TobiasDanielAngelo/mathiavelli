@@ -6,7 +6,7 @@ import { useVisible, useWindowWidth } from "../../constants/hooks";
 import { useEffect } from "react";
 
 export const MyGenericCollection = observer(
-  <T extends { id: number /* & object */ }>(props: {
+  <T extends { id: number | string /* & object */ }>(props: {
     PageBar?: React.FC;
     pageDetails?: PaginatedDetails | undefined; // set page details to undefined if you don't want any filters
     items: T[];

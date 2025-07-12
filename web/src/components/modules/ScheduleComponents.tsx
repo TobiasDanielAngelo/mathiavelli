@@ -195,28 +195,25 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
   const { fetchFcn, shownFields, itemMap } = useScheduleView();
   const { scheduleStore, taskStore, habitStore } = useStore();
 
-  const dropdownActions =
-    item.associatedTask === "—" && item.associatedHabit === "—"
-      ? [
-          {
-            onClick: () =>
-              taskStore.addItem({
-                title: item.name,
-                schedule: item.id,
-                importance: 5,
-              }),
-            title: "Add to Tasks",
-          },
-          {
-            onClick: () =>
-              habitStore.addItem({
-                title: item.name,
-                schedule: item.id,
-              }),
-            title: "Add to Habits",
-          },
-        ]
-      : [];
+  const dropdownActions = [
+    {
+      onClick: () =>
+        taskStore.addItem({
+          title: item.name,
+          schedule: item.id,
+          importance: 5,
+        }),
+      title: "Add to Tasks",
+    },
+    {
+      onClick: () =>
+        habitStore.addItem({
+          title: item.name,
+          schedule: item.id,
+        }),
+      title: "Add to Habits",
+    },
+  ];
 
   return (
     <MyGenericCard
@@ -273,7 +270,7 @@ export const ScheduleDashboard = observer(
           })
           .map((s, ind) => ({
             id: ind,
-            title: s.name,
+            title: s.name ?? "",
             dateStart: s.collidingDate.toISOString(),
             dateEnd: s.collidingDate.toISOString(),
             dateCompleted: s.collidingDate.toISOString(),

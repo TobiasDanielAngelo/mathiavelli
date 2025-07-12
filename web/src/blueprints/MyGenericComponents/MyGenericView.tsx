@@ -30,7 +30,7 @@ export type ActionModalDef = {
 };
 
 export const useViewValues = <
-  U extends Object & { id?: number | null },
+  U extends Object & { id?: number | string | null },
   T extends { $view: Record<string, any> }
 >(
   settingStore: SettingStore,

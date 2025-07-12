@@ -14,7 +14,7 @@ export const WORKOUT_CATEGORY_CHOICES = [
 const slug = "health/workouts/";
 const keyName = "Workout";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   name: prop<string>(""),
   category: prop<number>(0),
   durationMinutes: prop<number>(0),

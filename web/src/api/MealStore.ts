@@ -7,7 +7,7 @@ export const MEAL_CATEGORY_CHOICES = ["Breakfast", "Lunch", "Dinner", "Snack"];
 const slug = "health/meals/";
 const keyName = "Meal";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   name: prop<string>(""),
   category: prop<number>(0),
   calories: prop<number>(0),

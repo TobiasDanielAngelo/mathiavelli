@@ -5,15 +5,15 @@ import { getStoreItem, MyModel, MyStore } from "./GenericStore";
 const slug = "finance/transactions/";
 const keyName = "Transaction";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   category: prop<number | null>(null),
   description: prop<string>(""),
   transmitter: prop<number | null>(null),
   receiver: prop<number | null>(null),
   amount: prop<number>(0),
   datetimeTransacted: prop<string>(""),
-  receivableId: prop<number | null>(null),
-  payableId: prop<number | null>(null),
+  receivableId: prop<number | string | null>(null),
+  payableId: prop<number | string | null>(null),
 };
 
 const derivedProps = (item: TransactionInterface) => ({

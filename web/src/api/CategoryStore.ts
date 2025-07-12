@@ -13,7 +13,7 @@ export const CATEGORY_CHOICES = [
 const slug = "finance/categories/";
 const keyName = "Category";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   nature: prop<number>(0),
   logo: prop<string>(""),

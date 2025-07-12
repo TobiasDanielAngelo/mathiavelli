@@ -5,11 +5,11 @@ import { getStoreItem, MyModel, MyStore } from "./GenericStore";
 const slug = "productivity/habits/";
 const keyName = "Habit";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   description: prop<string>(""),
   goal: prop<number | null>(null),
-  schedule: prop<number | null>(null),
+  schedule: prop<number | string | null>(null),
   thresholdPercent: prop<number>(0),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),

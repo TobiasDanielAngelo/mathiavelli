@@ -1,22 +1,12 @@
-import { computed } from "mobx";
-import {
-  Model,
-  _async,
-  _await,
-  model,
-  modelAction,
-  modelFlow,
-  prop,
-} from "mobx-keystone";
-import { fetchItemsRequest } from "../api/_apiHelpers";
-import Swal from "sweetalert2";
+import { prop } from "mobx-keystone";
+import { MyModel, MyStore } from "../api/GenericStore";
 import { GraphType } from "../blueprints/MyGenericComponents/MyGenericView";
 import { PropsToInterface } from "../constants/interfaces";
 
 const slug = "finance/analytics/transactions/";
-
+const keyName = "TransactionAnalytics";
 const props = {
-  id: prop<string>(""),
+  id: prop<string | number>(""),
   graph: prop<GraphType>("pie"),
   category: prop<number | null>(null),
   categoryNature: prop<number | null>(null),
@@ -28,81 +18,9 @@ const props = {
 };
 
 export type TransactionAnalyticsInterface = PropsToInterface<typeof props>;
-
-@model("myApp/TransactionAnalytics")
-export class TransactionAnalytics extends Model(props) {
-  update(details: TransactionAnalyticsInterface) {
-    Object.assign(this, details);
-  }
-}
-
-@model("myApp/TransactionAnalyticsStore")
-export class TransactionAnalyticsStore extends Model({
-  items: prop<TransactionAnalytics[]>(() => []),
-}) {
-  @computed
-  get itemsSignature() {
-    const keys = Object.keys(
-      new TransactionAnalytics({}).$
-    ) as (keyof TransactionAnalyticsInterface)[];
-    return this.items
-      .map((item) => keys.map((key) => String(item[key])).join("|"))
-      .join("::");
-  }
-
-  @computed
-  get allItems() {
-    const map = new Map<number, TransactionAnalytics>();
-    this.items.forEach((item, ind) => map.set(ind, item));
-    return map;
-  }
-
-  @modelFlow
-  fetchAll = _async(function* (
-    this: TransactionAnalyticsStore,
-    params?: string
-  ) {
-    let result;
-
-    try {
-      result = yield* _await(
-        fetchItemsRequest<TransactionAnalytics>(slug, params)
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    this.resetItems();
-
-    result.data.forEach((s) => {
-      if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new TransactionAnalytics(s));
-      } else {
-        this.items.find((t) => t.id === s.id)?.update(s);
-      }
-    });
-
-    return result;
-  });
-
-  @modelAction
-  resetItems = function (this: TransactionAnalyticsStore) {
-    this.items = [];
-  };
-}
+export class TransactionAnalytics extends MyModel(keyName, props) {}
+export class TransactionAnalyticsStore extends MyStore(
+  keyName,
+  TransactionAnalytics,
+  slug
+) {}

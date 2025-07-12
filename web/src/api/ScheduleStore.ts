@@ -10,7 +10,7 @@ import { MyModel, MyStore } from "./GenericStore";
 const slug = "productivity/schedules/";
 const keyName = "Schedule";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   name: prop<string>(""),
   freq: prop<number>(0),
   interval: prop<number>(0),

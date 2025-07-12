@@ -5,7 +5,7 @@ import { functionBinder, MyModel, MyStore } from "./GenericStore";
 const slug = "users/";
 const keyName = "User";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   username: prop<string>(""),
   firstName: prop<string>(""),
   lastName: prop<string>(""),

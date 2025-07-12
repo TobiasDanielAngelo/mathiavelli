@@ -14,12 +14,12 @@ export const FREQUENCY_CHOICES = [
 const slug = "productivity/tasks/";
 const keyName = "Task";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   description: prop<string>(""),
   goal: prop<number | null>(null),
   habit: prop<number | null>(null),
-  schedule: prop<number | null>(null),
+  schedule: prop<number | string | null>(null),
   importance: prop<number>(0),
   dueDate: prop<string>(""),
   dateCompleted: prop<string>(""),

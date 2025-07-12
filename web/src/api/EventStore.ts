@@ -6,7 +6,7 @@ import { getStoreItem, MyModel, MyStore } from "./GenericStore";
 const slug = "productivity/events/";
 const keyName = "Event";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   description: prop<string>(""),
   dateStart: prop<string>(""),

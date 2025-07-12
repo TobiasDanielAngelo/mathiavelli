@@ -14,7 +14,7 @@ export const AUTHENTICATOR_CHOICES = [
 const slug = "personal/credentials/";
 const keyName = "Credential";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   platform: prop<number | null>(null),
   billingAccounts: prop<number[] | null>(null),
   email: prop<string>(""),

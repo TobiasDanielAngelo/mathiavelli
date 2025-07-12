@@ -5,7 +5,7 @@ import { getStoreItem, MyModel, MyStore } from "./GenericStore";
 const slug = "finance/payables/";
 const keyName = "Payable";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   payment: prop<number[] | null>(null),
   lenderName: prop<string>(""),
   datetimeOpened: prop<string>(""),

@@ -5,7 +5,7 @@ import { MyModel, MyStore, getStoreItem } from "./GenericStore";
 const slug = "finance/receivables/";
 const keyName = "Receivable";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   payment: prop<number[] | null>(null),
   borrowerName: prop<string>(""),
   lentAmount: prop<number>(0),

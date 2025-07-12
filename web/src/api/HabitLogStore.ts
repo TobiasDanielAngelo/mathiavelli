@@ -5,7 +5,7 @@ import { getStoreItem, MyModel, MyStore } from "./GenericStore";
 const slug = "productivity/habit-logs/";
 const keyName = "HabitLog";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   habit: prop<number | null>(null),
   dateCreated: prop<string>(""),
 };

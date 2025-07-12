@@ -59,7 +59,7 @@ export async function guidedRequest<T>(
   options: {
     method: "GET" | "POST" | "PATCH" | "DELETE";
     body?: any;
-    itemId?: number;
+    itemId?: number | string;
     params?: string;
   }
 ): Promise<{ details: any; ok: boolean; data: T | null }> {
@@ -150,7 +150,7 @@ export async function postItemRequest<T>(endpoint: string, body?: T) {
 
 export async function updateItemRequest<T>(
   endpoint: string,
-  itemId: number,
+  itemId: number | string,
   body: T
 ) {
   return await guidedRequest<T>(endpoint, {
@@ -160,7 +160,10 @@ export async function updateItemRequest<T>(
   });
 }
 
-export async function deleteItemRequest(endpoint: string, itemId: number) {
+export async function deleteItemRequest(
+  endpoint: string,
+  itemId: number | string
+) {
   return await guidedRequest(endpoint, {
     method: "DELETE",
     itemId: itemId,

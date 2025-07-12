@@ -29,7 +29,9 @@ interface MyGenericCardProps<T> extends ItemDetailsProps<T> {
     setVisible: (v: boolean) => void;
     fetchFcn: () => void;
   }>;
-  deleteItem: (id: number) => Promise<{ ok: boolean; details?: string }>;
+  deleteItem: (
+    id: number | string
+  ) => Promise<{ ok: boolean; details?: string }>;
   fetchFcn: () => void;
   moreActions?: IAction[];
   dropdownActions?: Page[];
@@ -37,7 +39,7 @@ interface MyGenericCardProps<T> extends ItemDetailsProps<T> {
 }
 
 export const MyGenericCard = observer(
-  <T extends object & { id: number; $view: any }>({
+  <T extends object & { id: number | string; $view: any }>({
     item,
     shownFields,
     header,

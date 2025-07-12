@@ -521,11 +521,11 @@ export function sortAndFilterByIds<T>(
 
 export const getDescendantIds = (
   allGoals: GoalInterface[],
-  goalId?: number
-): number[] => {
+  goalId?: number | string
+): (number | string)[] => {
   const directChildren = allGoals
     .filter((g) => g.parentGoal === goalId)
-    .map((s) => s.id) as number[];
+    .map((s) => s.id) as (number | string)[];
   const allDescendants = directChildren.flatMap((c) =>
     getDescendantIds(allGoals, c)
   );

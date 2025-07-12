@@ -5,15 +5,15 @@ import { Field } from "../../constants/interfaces";
 import { MyForm } from "../MyForm";
 
 export interface MyGenericFormProps<T> {
-  item?: T & { id?: number };
+  item?: T & { id?: number | string };
   setVisible?: (t: boolean) => void;
   fetchFcn?: () => void;
   fields: Field[][];
   objectName: string;
   store: {
     addItem: (details: T) => Promise<any>;
-    updateItem: (id: number, item: T) => Promise<any>;
-    deleteItem: (id: number) => Promise<any>;
+    updateItem: (id: number | string, item: T) => Promise<any>;
+    deleteItem: (id: number | string) => Promise<any>;
   };
   dateFields?: (keyof T)[];
   datetimeFields?: (keyof T)[];

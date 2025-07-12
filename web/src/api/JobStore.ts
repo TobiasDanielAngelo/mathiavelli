@@ -35,7 +35,7 @@ export const JOB_TYPE_CHOICES = [
 const slug = "career/jobs/";
 const keyName = "Job";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   company: prop<string>(""),
   location: prop<string>(""),

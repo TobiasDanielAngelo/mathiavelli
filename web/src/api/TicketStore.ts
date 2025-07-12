@@ -9,7 +9,7 @@ export const PRIORITY_CHOICES = ["Low", "Medium", "High"];
 const slug = "issues/tickets/";
 const keyName = "Ticket";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   tags: prop<number[] | null>(null),
   description: prop<string>(""),

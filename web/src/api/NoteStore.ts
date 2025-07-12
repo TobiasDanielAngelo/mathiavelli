@@ -5,7 +5,7 @@ import { MyModel, MyStore } from "./GenericStore";
 const slug = "issues/notes/";
 const keyName = "Note";
 const props = {
-  id: prop<number>(-1),
+  id: prop<number | string>(-1),
   title: prop<string>(""),
   body: prop<string>(""),
   file: prop<File | null>(null),
