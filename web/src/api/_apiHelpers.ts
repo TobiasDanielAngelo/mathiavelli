@@ -49,7 +49,7 @@ export function getCookie(name: string): string {
 }
 
 export const fetchCSRF = async () => {
-  return await guidedRequest("csrf", {
+  return await guidedRequest("csrf/", {
     method: "GET",
   });
 };
@@ -70,7 +70,7 @@ export async function guidedRequest<T>(
     if (value.trim()) filtered.append(key, value);
   }
 
-  let url = `${import.meta.env.VITE_BASE_URL}/${endpoint}/`;
+  let url = `${import.meta.env.VITE_BASE_URL}/${endpoint}`;
   if (options.itemId) url += `${options.itemId}/`;
   if (options.params) url += `?${filtered.toString()}`;
 
@@ -141,7 +141,7 @@ export async function fetchItemsRequest<T>(
   return { details: "", ok: true, data: results, pageDetails };
 }
 
-export async function postItemRequest<T>(endpoint: string, body: T) {
+export async function postItemRequest<T>(endpoint: string, body?: T) {
   return await guidedRequest<T>(endpoint, {
     method: "POST",
     body: body,

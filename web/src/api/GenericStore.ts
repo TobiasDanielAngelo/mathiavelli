@@ -20,6 +20,7 @@ import {
   updateItemRequest,
 } from "./_apiHelpers";
 import { Store } from "./Store";
+import { LoginInterface } from "./UserStore";
 
 type KeystoneModel<U> = {
   id: number | null;
@@ -230,6 +231,34 @@ export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
       return result;
     });
 
+    @modelFlow
+    authBase = _async(function* (
+      this: GenericStore,
+      method: "login" | "reauth" | "logout",
+      credentials?: LoginInterface
+    ) {
+      let result;
+      try {
+        result = yield* _await(
+          postItemRequest(`cookie-${method}`, credentials)
+        );
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Network Error",
+        });
+        error;
+        return { details: "Network Error", ok: false, data: null };
+      }
+      if (!result.ok || !result.data) {
+        Swal.fire({
+          icon: "error",
+          title: "An error has occurred.",
+        });
+      }
+      return { details: "", ok: true, data: null };
+    });
+
     @modelAction
     resetItems = function (this: GenericStore) {
       this.items = [];
@@ -238,3 +267,20 @@ export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
 
   return GenericStore;
 }
+
+export const functionBinder = (item: any) => {
+  for (const key of Object.getOwnPropertyNames(item)) {
+    if (typeof (item as any)[key] === "function") {
+      (item as any)[key] = (item as any)[key].bind(item);
+    }
+  }
+
+  const proto = Object.getPrototypeOf(item);
+  for (const key of Object.getOwnPropertyNames(proto)) {
+    if (key === "constructor") continue;
+    const desc = Object.getOwnPropertyDescriptor(proto, key);
+    if (desc?.value && typeof desc.value === "function") {
+      (item as any)[key] = desc.value.bind(item);
+    }
+  }
+};

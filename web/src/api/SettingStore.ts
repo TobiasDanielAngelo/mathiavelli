@@ -1,9 +1,9 @@
-import { modelAction, prop } from "mobx-keystone";
+import { modelAction, modelFlow, prop } from "mobx-keystone";
 import { SettingIdMap } from "../components/modules/SettingComponents";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { MyModel, MyStore } from "./GenericStore";
+import { functionBinder, MyModel, MyStore } from "./GenericStore";
 
-const slug = "settings";
+const slug = "settings/";
 const keyName = "Setting";
 const props = {
   id: prop<number>(-1),
@@ -17,9 +17,9 @@ export class Setting extends MyModel(keyName, props) {}
 export class SettingStore extends MyStore(keyName, Setting, slug) {
   constructor(args: any) {
     super(args);
-    this.toggleTheme = this.toggleTheme.bind(this);
-    this.theme = this.theme.bind(this);
+    functionBinder(this);
   }
+
   @modelAction
   theme = function (this: SettingStore) {
     const savedTheme = localStorage.getItem("theme");
@@ -31,8 +31,8 @@ export class SettingStore extends MyStore(keyName, Setting, slug) {
       this.allItems.get(SettingIdMap.Theme)?.value ?? savedTheme ?? defaultTheme
     );
   };
-  @modelAction
-  toggleTheme = function (this: SettingStore) {
+  @modelFlow
+  toggleTheme = async function (this: SettingStore) {
     const currentTheme = this.allItems.get(SettingIdMap.Theme)?.value;
     if (currentTheme) {
       const newTheme = currentTheme === "light" ? "dark" : "light";

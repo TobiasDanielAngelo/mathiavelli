@@ -6,7 +6,7 @@ export const PRIORITY_CHOICES = ["Low", "Medium", "High"];
 export const WISHLIST_STATUS_CHOICES = ["Pending", "Bought", "Canceled"];
 
 const keyName = "BuyListItem";
-const slug = "finance/buy-list-items";
+const slug = "finance/buy-list-items/";
 const props = {
   id: prop<number>(-1),
   name: prop<string>(""),

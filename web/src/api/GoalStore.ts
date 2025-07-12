@@ -3,7 +3,7 @@ import moment from "moment";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
 import { MyModel, MyStore } from "./GenericStore";
 
-const slug = "productivity/goals";
+const slug = "productivity/goals/";
 const keyName = "Goal";
 const props = {
   id: prop<number>(-1),

@@ -11,7 +11,7 @@ export const AUTHENTICATOR_CHOICES = [
   "Other",
 ];
 
-const slug = "personal/credentials";
+const slug = "personal/credentials/";
 const keyName = "Credential";
 const props = {
   id: prop<number>(-1),

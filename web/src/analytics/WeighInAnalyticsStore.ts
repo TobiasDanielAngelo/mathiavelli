@@ -13,7 +13,7 @@ import Swal from "sweetalert2";
 import { GraphType } from "../blueprints/MyGenericComponents/MyGenericView";
 import { PropsToInterface } from "../constants/interfaces";
 
-const slug = "health/analytics/weigh-ins";
+const slug = "health/analytics/weigh-ins/";
 
 const props = {
   id: prop<string>(""),

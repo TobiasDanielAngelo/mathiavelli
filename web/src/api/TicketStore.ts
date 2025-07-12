@@ -6,7 +6,7 @@ import { Store } from "./Store";
 export const STATUS_CHOICES = ["Open", "In Progress", "Closed"];
 export const PRIORITY_CHOICES = ["Low", "Medium", "High"];
 
-const slug = "issues/tickets";
+const slug = "issues/tickets/";
 const keyName = "Ticket";
 const props = {
   id: prop<number>(-1),

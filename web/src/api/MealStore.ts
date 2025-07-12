@@ -4,7 +4,7 @@ import { MyModel, MyStore } from "./GenericStore";
 
 export const MEAL_CATEGORY_CHOICES = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
-const slug = "health/meals";
+const slug = "health/meals/";
 const keyName = "Meal";
 const props = {
   id: prop<number>(-1),

@@ -11,7 +11,7 @@ export const FREQUENCY_CHOICES = [
   "Yearly",
 ];
 
-const slug = "productivity/tasks";
+const slug = "productivity/tasks/";
 const keyName = "Task";
 const props = {
   id: prop<number>(-1),

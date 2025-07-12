@@ -32,7 +32,7 @@ export const JOB_TYPE_CHOICES = [
   "Temporary",
 ];
 
-const slug = "career/jobs";
+const slug = "career/jobs/";
 const keyName = "Job";
 const props = {
   id: prop<number>(-1),

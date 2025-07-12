@@ -10,7 +10,7 @@ export const CATEGORY_CHOICES = [
   "Receivable",
 ];
 
-const slug = "finance/categories";
+const slug = "finance/categories/";
 const keyName = "Category";
 const props = {
   id: prop<number>(-1),

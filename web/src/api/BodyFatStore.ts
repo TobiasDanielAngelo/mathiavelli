@@ -2,7 +2,7 @@ import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
 import { MyModel, MyStore } from "./GenericStore";
 
-const slug = "health/body-fats";
+const slug = "health/body-fats/";
 const keyName = "BodyFat";
 const props = {
   id: prop<number>(-1),

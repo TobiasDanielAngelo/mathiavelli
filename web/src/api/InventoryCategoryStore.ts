@@ -2,7 +2,7 @@ import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
 import { MyModel, MyStore } from "./GenericStore";
 
-const slug = "finance/inventory-categories";
+const slug = "finance/inventory-categories/";
 const keyName = "InventoryCategory";
 const props = {
   id: prop<number>(-1),

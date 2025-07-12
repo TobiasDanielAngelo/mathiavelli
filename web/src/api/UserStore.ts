@@ -1,17 +1,9 @@
-import { computed } from "mobx";
-import { Model, _async, _await, model, modelFlow, prop } from "mobx-keystone";
-import {
-  deleteItemRequest,
-  fetchItemsRequest,
-  getCookie,
-  postItemRequest,
-  updateItemRequest,
-} from "./_apiHelpers";
-import Swal from "sweetalert2";
+import { modelAction, prop } from "mobx-keystone";
 import { PropsToInterface } from "../constants/interfaces";
+import { functionBinder, MyModel, MyStore } from "./GenericStore";
 
-const slug = "users";
-
+const slug = "users/";
+const keyName = "User";
 const props = {
   id: prop<number>(-1),
   username: prop<string>(""),
@@ -21,328 +13,41 @@ const props = {
   isSuperuser: prop<boolean>(true),
 };
 
-export type UserInterface = PropsToInterface<typeof props>;
+const derivedProps = (item: UserInterface) => ({
+  fullName: `${item.lastName}${item.firstName || item.lastName ? "," : ""} ${
+    item.firstName
+  }`,
+});
 
+export type UserInterface = PropsToInterface<typeof props>;
 export interface SignupInterface extends UserInterface {
   password?: string;
   password2?: string;
 }
+export type LoginInterface = {
+  username: string;
+  password: string;
+};
 
-@model("myApp/User")
-export class User extends Model(props) {
-  update(details: UserInterface) {
-    Object.assign(this, details);
+export class User extends MyModel(keyName, props, derivedProps) {}
+export class UserStore extends MyStore(keyName, User, slug) {
+  constructor(args: any) {
+    super(args);
+    functionBinder(this);
   }
 
-  get fullName() {
-    return `${this.lastName}${this.firstName || this.lastName ? "," : ""} ${
-      this.firstName
-    }`;
-  }
-}
+  @modelAction
+  loginUser = function (this: UserStore, credentials: LoginInterface) {
+    return this.authBase("login", credentials);
+  };
 
-@model("myApp/UserStore")
-export class UserStore extends Model({
-  items: prop<User[]>(() => []),
-  currentLogger: prop<User>(() => new User({})),
-}) {
-  @computed
-  get itemsSignature() {
-    const keys = Object.keys(new User({}).$) as (keyof UserInterface)[];
-    return this.items
-      .map((item) => keys.map((key) => String(item[key])).join("|"))
-      .join("::");
-  }
+  @modelAction
+  logoutUser = function (this: UserStore) {
+    return this.authBase("logout");
+  };
 
-  @computed
-  get allItems() {
-    const map = new Map<number, User>();
-    this.items.forEach((item) => map.set(item.id, item));
-    return map;
-  }
-
-  @modelFlow
-  fetchAll = _async(function* (this: UserStore, params?: string) {
-    let result;
-
-    try {
-      result = yield* _await(fetchItemsRequest<User>(slug, params));
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    result.data.forEach((s) => {
-      if (!this.items.map((s) => s.id).includes(s.id)) {
-        this.items.push(new User(s));
-      } else {
-        this.items.find((t) => t.id === s.id)?.update(s);
-      }
-    });
-
-    return result;
-  });
-
-  @modelFlow
-  addItem = _async(function* (this: UserStore, details: UserInterface) {
-    let result;
-
-    try {
-      result = yield* _await(postItemRequest<UserInterface>(slug, details));
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    const item = new User(result.data);
-    this.items.push(item);
-
-    return { details: "", ok: true, data: item };
-  });
-
-  @modelFlow
-  updateItem = _async(function* (
-    this: UserStore,
-    itemId: number,
-    details: UserInterface
-  ) {
-    let result;
-
-    try {
-      result = yield* _await(
-        updateItemRequest<UserInterface>(slug, itemId, details)
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok || !result.data) {
-      Swal.fire({
-        icon: "error",
-        title: "An error has occurred.",
-      });
-
-      if (!result.ok || !result.data) {
-        return { details: "An error has occurred", ok: false, data: null };
-      }
-    }
-
-    this.allItems.get(result.data.id ?? -1)?.update(result.data);
-
-    return { details: "", ok: true, data: result.data };
-  });
-
-  @modelFlow
-  deleteItem = _async(function* (this: UserStore, itemId: number) {
-    let result;
-
-    try {
-      result = yield* _await(deleteItemRequest(slug, itemId));
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!result.ok) {
-      return result;
-    }
-
-    const indexOfItem = this.items.findIndex((s) => s.id === itemId);
-    if (indexOfItem !== -1) {
-      this.items.splice(indexOfItem, 1);
-    }
-
-    return result;
-  });
-
-  @modelFlow
-  loginUser = _async(function* (
-    this: UserStore,
-    credentials: {
-      username: string;
-      password: string;
-    }
-  ) {
-    let response: Response;
-
-    try {
-      response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/cookie-login`, {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: {
-            "Content-type": "application/json",
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-          credentials: "include",
-        })
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!response.ok) {
-      let msg: any = yield* _await(response.json());
-
-      if (msg.nonFieldErrors || msg.detail) {
-        return {
-          details: msg,
-          ok: false,
-          data: null,
-        };
-      }
-      return { details: msg, ok: false, data: null };
-    }
-
-    let json: User;
-    try {
-      const resp = yield* _await(response.json());
-      json = resp.user;
-    } catch (error) {
-      console.error("Parsing Error", error);
-      return { details: "Parsing Error", ok: false, data: null };
-    }
-
-    this.currentLogger = new User(json);
-
-    return { details: "", ok: true, data: "" };
-  });
-
-  @modelFlow
-  logoutUser = _async(function* (this: UserStore) {
-    let response: Response;
-
-    try {
-      response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/cookie-logout`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-type": "application/json",
-            "ngrok-skip-browser-warning": "any",
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-        })
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!response.ok) {
-      let msg = yield* _await(response.json()) as any;
-      if (msg.nonFieldErrors || msg.detail) {
-        return {
-          details: msg,
-          ok: false,
-          data: null,
-        };
-      }
-      return { details: msg, ok: false, data: null };
-    }
-
-    this.currentLogger = new User({});
-
-    return { details: "", ok: true, data: null };
-  });
-
-  @modelFlow
-  reauthUser = _async(function* (this: UserStore) {
-    let response: Response;
-
-    try {
-      response = yield* _await(
-        fetch(`${import.meta.env.VITE_BASE_URL}/cookie-reauth`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-type": "application/json",
-            "ngrok-skip-browser-warning": "any",
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-        })
-      );
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Network Error",
-      });
-      error;
-      return { details: "Network Error", ok: false, data: null };
-    }
-
-    if (!response.ok) {
-      let msg = yield* _await(response.json()) as any;
-
-      if (msg.nonFieldErrors || msg.detail) {
-        return {
-          details: msg,
-          ok: false,
-          data: null,
-        };
-      }
-      return { details: msg, ok: false, data: null };
-    }
-
-    let json: User;
-    try {
-      const resp = yield* _await(response.json());
-      json = resp.user;
-    } catch (error) {
-      console.error("Parsing Error", error);
-      return { details: "Parsing Error", ok: false, data: null };
-    }
-
-    this.currentLogger = new User(json);
-
-    return { details: "", ok: true, data: "" };
-  });
+  @modelAction
+  reauthUser = function (this: UserStore) {
+    return this.authBase("reauth");
+  };
 }

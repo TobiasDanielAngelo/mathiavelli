@@ -12,7 +12,7 @@ export const FOLLOWUP_STATUS_CHOICES = [
   "Got a Response",
 ];
 
-const slug = "career/follow-ups";
+const slug = "career/follow-ups/";
 const keyName = "FollowUp";
 const props = {
   id: prop<number>(-1),

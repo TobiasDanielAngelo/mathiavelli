@@ -7,7 +7,7 @@ import { PropsToInterface, ViewFields } from "../constants/interfaces";
 import { formatValue } from "../constants/JSXHelpers";
 import { MyModel, MyStore } from "./GenericStore";
 
-const slug = "productivity/schedules";
+const slug = "productivity/schedules/";
 const keyName = "Schedule";
 const props = {
   id: prop<number>(-1),
