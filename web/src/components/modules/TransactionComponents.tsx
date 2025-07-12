@@ -113,7 +113,7 @@ export const TransactionForm = ({
 
 export const TransactionCard = observer((props: { item: Transaction }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useTransactionView();
+  const { fetchFcn, shownFields, itemMap } = useTransactionView();
   const { transactionStore } = useStore();
 
   return (
@@ -126,6 +126,7 @@ export const TransactionCard = observer((props: { item: Transaction }) => {
       FormComponent={TransactionForm}
       deleteItem={transactionStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

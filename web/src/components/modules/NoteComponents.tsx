@@ -71,7 +71,7 @@ export const NoteForm = ({
 
 export const NoteCard = observer((props: { item: Note }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useNoteView();
+  const { fetchFcn, shownFields, itemMap } = useNoteView();
   const { noteStore } = useStore();
 
   return (
@@ -84,6 +84,7 @@ export const NoteCard = observer((props: { item: Note }) => {
       FormComponent={NoteForm}
       deleteItem={noteStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

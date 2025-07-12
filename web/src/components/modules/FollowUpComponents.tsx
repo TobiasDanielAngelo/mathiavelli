@@ -78,7 +78,7 @@ export const FollowUpForm = ({
 
 export const FollowUpCard = observer((props: { item: FollowUp }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useFollowUpView();
+  const { fetchFcn, shownFields, itemMap } = useFollowUpView();
   const { followUpStore } = useStore();
 
   return (
@@ -91,6 +91,7 @@ export const FollowUpCard = observer((props: { item: FollowUp }) => {
       FormComponent={FollowUpForm}
       deleteItem={followUpStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

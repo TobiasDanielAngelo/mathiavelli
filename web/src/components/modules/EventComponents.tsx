@@ -135,7 +135,7 @@ export const EventForm = ({
 
 export const EventCard = observer((props: { item: Event }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useEventView();
+  const { fetchFcn, shownFields, itemMap } = useEventView();
   const { eventStore } = useStore();
 
   const moreActions = [
@@ -168,6 +168,7 @@ export const EventCard = observer((props: { item: Event }) => {
       deleteItem={eventStore.deleteItem}
       fetchFcn={fetchFcn}
       moreActions={moreActions}
+      itemMap={itemMap}
     />
   );
 });

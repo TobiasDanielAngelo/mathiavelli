@@ -120,7 +120,7 @@ export const CredentialForm = ({
 
 export const CredentialCard = observer((props: { item: Credential }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useCredentialView();
+  const { fetchFcn, shownFields, itemMap } = useCredentialView();
   const { credentialStore } = useStore();
 
   return (
@@ -133,6 +133,7 @@ export const CredentialCard = observer((props: { item: Credential }) => {
       FormComponent={CredentialForm}
       deleteItem={credentialStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

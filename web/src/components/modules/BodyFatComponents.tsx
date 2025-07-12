@@ -67,7 +67,7 @@ export const BodyFatForm = ({
 
 export const BodyFatCard = observer((props: { item: BodyFat }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useBodyFatView();
+  const { fetchFcn, shownFields, itemMap } = useBodyFatView();
   const { bodyFatStore } = useStore();
 
   return (
@@ -80,6 +80,7 @@ export const BodyFatCard = observer((props: { item: BodyFat }) => {
       FormComponent={BodyFatForm}
       deleteItem={bodyFatStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

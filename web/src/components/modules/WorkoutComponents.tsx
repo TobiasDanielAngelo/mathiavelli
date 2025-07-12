@@ -79,7 +79,7 @@ export const WorkoutForm = ({
 
 export const WorkoutCard = observer((props: { item: Workout }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useWorkoutView();
+  const { fetchFcn, shownFields, itemMap } = useWorkoutView();
   const { workoutStore } = useStore();
 
   return (
@@ -92,6 +92,7 @@ export const WorkoutCard = observer((props: { item: Workout }) => {
       FormComponent={WorkoutForm}
       deleteItem={workoutStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

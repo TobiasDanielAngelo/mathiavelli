@@ -4,7 +4,8 @@ import moment from "moment";
 import { Options, RRule, Weekday } from "rrule";
 import { GoalInterface } from "../api/GoalStore";
 import { Schedule, ScheduleInterface } from "../api/ScheduleStore";
-import { Option } from "./interfaces";
+import { DjangoField, djangoToJsType, JsType, Option } from "./interfaces";
+import { prop } from "mobx-keystone";
 
 export const posRamp = (x: number) => (x > 0 ? x : 0);
 
@@ -929,4 +930,62 @@ export function toRomanWithExponents(num: number): string {
   if (num > 0) chunks.push(toRoman(num));
 
   return chunks.join(" ");
+}
+// Unused yet
+export const jsTypeDefaults: Record<JsType, () => any> = {
+  number: () => prop<number>(-1),
+  "number[]": () => prop<number[]>(() => []),
+  "number | null": () => prop<number | null>(null),
+  "number[] | null": () => prop<number[] | null>(null),
+  string: () => prop<string>(""),
+  "string[]": () => prop<string[]>(() => []),
+  boolean: () => prop<boolean>(false),
+  "string | null": () => prop<string | null>(null),
+  "File | null": () => prop<File | null>(null),
+  "string[] | null": () => prop<string[] | null>(null),
+};
+
+// Unused yet
+export function fieldsToProps<
+  F extends { [K in DjangoField]?: readonly string[] }
+>(fields: F) {
+  type FieldKeys<F> = F[keyof F] extends readonly (infer E)[]
+    ? E extends string
+      ? E
+      : never
+    : never;
+  type Keys<F> = FieldKeys<F> | "id";
+
+  const props = {} as Record<Keys<F>, any>;
+
+  props["id"] = prop<number>(-1);
+
+  for (const [djangoField, names] of Object.entries(fields) as [
+    DjangoField,
+    readonly string[]
+  ][]) {
+    const jsType = djangoToJsType[djangoField];
+    const getDefaultProp = jsTypeDefaults[jsType];
+    if (!getDefaultProp)
+      throw new Error(`Unknown JS type for ${djangoField}: ${jsType}`);
+
+    for (const name of names) {
+      props[name as Keys<F>] = getDefaultProp();
+    }
+  }
+
+  return props;
+}
+
+export function ensureUniqueFields(fields: Record<DjangoField, string[]>) {
+  const seen = new Set<string>();
+
+  for (const names of Object.values(fields)) {
+    for (const name of names) {
+      if (seen.has(name)) {
+        throw new Error(`Duplicate field detected: "${name}"`);
+      }
+      seen.add(name);
+    }
+  }
 }

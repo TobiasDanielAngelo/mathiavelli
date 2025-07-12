@@ -81,7 +81,7 @@ export const SettingForm = ({
 
 export const SettingCard = observer((props: { item: Setting }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useSettingView();
+  const { fetchFcn, shownFields, itemMap } = useSettingView();
   const { settingStore } = useStore();
 
   return (
@@ -94,6 +94,7 @@ export const SettingCard = observer((props: { item: Setting }) => {
       FormComponent={SettingForm}
       deleteItem={settingStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

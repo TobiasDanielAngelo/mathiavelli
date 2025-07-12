@@ -91,7 +91,7 @@ export const HabitForm = ({
 
 export const HabitCard = observer((props: { item: Habit }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useHabitView();
+  const { fetchFcn, shownFields, itemMap } = useHabitView();
   const { habitStore } = useStore();
 
   return (
@@ -104,6 +104,7 @@ export const HabitCard = observer((props: { item: Habit }) => {
       FormComponent={HabitForm}
       deleteItem={habitStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

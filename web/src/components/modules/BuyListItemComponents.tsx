@@ -91,7 +91,7 @@ export const BuyListItemForm = ({
 
 export const BuyListItemCard = observer((props: { item: BuyListItem }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useBuyListItemView();
+  const { fetchFcn, shownFields, itemMap } = useBuyListItemView();
   const { buyListItemStore } = useStore();
 
   return (
@@ -104,6 +104,7 @@ export const BuyListItemCard = observer((props: { item: BuyListItem }) => {
       FormComponent={BuyListItemForm}
       deleteItem={buyListItemStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

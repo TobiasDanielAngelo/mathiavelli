@@ -74,7 +74,7 @@ export const PlatformForm = ({
 
 export const PlatformCard = observer((props: { item: Platform }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = usePlatformView();
+  const { fetchFcn, shownFields, itemMap } = usePlatformView();
   const { platformStore } = useStore();
 
   return (
@@ -87,6 +87,7 @@ export const PlatformCard = observer((props: { item: Platform }) => {
       FormComponent={PlatformForm}
       deleteItem={platformStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

@@ -86,7 +86,7 @@ export const JournalForm = ({
 
 export const JournalCard = observer((props: { item: Journal }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useJournalView();
+  const { fetchFcn, shownFields, itemMap } = useJournalView();
   const { journalStore } = useStore();
 
   return (
@@ -99,6 +99,7 @@ export const JournalCard = observer((props: { item: Journal }) => {
       FormComponent={JournalForm}
       deleteItem={journalStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

@@ -97,7 +97,7 @@ export const TicketForm = ({
 
 export const TicketCard = observer((props: { item: Ticket }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useTicketView();
+  const { fetchFcn, shownFields, itemMap } = useTicketView();
   const { ticketStore } = useStore();
 
   return (
@@ -110,6 +110,7 @@ export const TicketCard = observer((props: { item: Ticket }) => {
       FormComponent={TicketForm}
       deleteItem={ticketStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

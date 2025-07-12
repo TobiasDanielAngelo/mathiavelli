@@ -100,7 +100,7 @@ export const PayableForm = ({
 
 export const PayableCard = observer((props: { item: Payable }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = usePayableView();
+  const { fetchFcn, shownFields, itemMap } = usePayableView();
   const { payableStore } = useStore();
   const { isVisible1, setVisible1 } = useVisible();
 
@@ -133,6 +133,7 @@ export const PayableCard = observer((props: { item: Payable }) => {
         deleteItem={payableStore.deleteItem}
         fetchFcn={fetchFcn}
         moreActions={moreActions}
+        itemMap={itemMap}
       />
     </>
   );

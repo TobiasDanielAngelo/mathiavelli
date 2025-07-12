@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { ItemDetails } from "../../blueprints/ItemDetails";
+import { ItemDetails, KV } from "../../blueprints/ItemDetails";
 import { useVisible } from "../../constants/hooks";
 import { ItemDetailsProps } from "../ItemDetails";
 import { MyConfirmModal } from "../MyConfirmModal";
@@ -16,6 +16,7 @@ interface MyGenericRecursiveCardProps<T> extends ItemDetailsProps<T> {
   deleteItem: (id: number) => Promise<{ ok: boolean; details?: string }>;
   fetchFcn: () => void;
   items: T[];
+  itemMap?: KV<any>[];
   parentKey: keyof T;
   border?: boolean;
 }
@@ -33,6 +34,7 @@ export const MyGenericRecursiveCard = observer(
     items,
     parentKey,
     border,
+    itemMap = [],
   }: MyGenericRecursiveCardProps<T>) => {
     const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
@@ -98,6 +100,7 @@ export const MyGenericRecursiveCard = observer(
                   header={header}
                   important={important}
                   prices={prices}
+                  itemMap={itemMap}
                 />
               </div>
             </div>

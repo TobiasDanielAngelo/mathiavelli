@@ -75,7 +75,7 @@ export const HabitLogForm = ({
 
 export const HabitLogCard = observer((props: { item: HabitLog }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useHabitLogView();
+  const { fetchFcn, shownFields, itemMap } = useHabitLogView();
   const { habitLogStore } = useStore();
 
   return (
@@ -88,6 +88,7 @@ export const HabitLogCard = observer((props: { item: HabitLog }) => {
       FormComponent={HabitLogForm}
       deleteItem={habitLogStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

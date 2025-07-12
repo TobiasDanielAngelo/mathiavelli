@@ -131,7 +131,7 @@ export const GoalDashboard = observer(() => {
 
 export const GoalCard = observer((props: { item: Goal }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useGoalView();
+  const { fetchFcn, shownFields, itemMap } = useGoalView();
   const { goalStore } = useStore();
 
   return (
@@ -146,6 +146,7 @@ export const GoalCard = observer((props: { item: Goal }) => {
       fetchFcn={fetchFcn}
       items={goalStore.items}
       parentKey={"parentGoal"}
+      itemMap={itemMap}
       border
     />
   );

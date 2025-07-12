@@ -77,7 +77,7 @@ export const TagForm = ({
 
 export const TagCard = observer((props: { item: Tag }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useTagView();
+  const { fetchFcn, shownFields, itemMap } = useTagView();
   const { tagStore } = useStore();
 
   return (
@@ -90,6 +90,7 @@ export const TagCard = observer((props: { item: Tag }) => {
       FormComponent={TagForm}
       deleteItem={tagStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

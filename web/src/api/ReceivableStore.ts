@@ -1,10 +1,9 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { GenerateModel, GenerateStore, getStoreItem } from "./GenericStore";
+import { MyModel, MyStore, getStoreItem } from "./GenericStore";
 
 const slug = "finance/receivables";
 const keyName = "Receivable";
-
 const props = {
   id: prop<number>(-1),
   payment: prop<number[] | null>(null),
@@ -25,8 +24,8 @@ const derivedProps = (item: ReceivableInterface) => ({
 });
 
 export type ReceivableInterface = PropsToInterface<typeof props>;
-export class Receivable extends GenerateModel(props, derivedProps, keyName) {}
-export class ReceivableStore extends GenerateStore(Receivable, slug, keyName) {}
+export class Receivable extends MyModel(keyName, props, derivedProps) {}
+export class ReceivableStore extends MyStore(keyName, Receivable, slug) {}
 export const ReceivableFields: ViewFields<ReceivableInterface> = {
   datetimeFields: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
   dateFields: [] as const,

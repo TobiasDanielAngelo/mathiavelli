@@ -92,6 +92,7 @@ class UserSerializer(serializers.ModelSerializer):
 class CustomSerializer(serializers.ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
+        return fields
 
         for field_name, field in list(fields.items()):
 

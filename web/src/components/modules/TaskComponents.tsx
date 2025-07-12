@@ -125,7 +125,7 @@ export const TaskForm = ({
 
 export const TaskCard = observer((props: { item: Task }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useTaskView();
+  const { fetchFcn, shownFields, itemMap } = useTaskView();
   const { taskStore } = useStore();
 
   return (
@@ -138,6 +138,7 @@ export const TaskCard = observer((props: { item: Task }) => {
       FormComponent={TaskForm}
       deleteItem={taskStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

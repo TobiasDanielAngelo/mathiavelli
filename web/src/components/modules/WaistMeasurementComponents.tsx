@@ -70,7 +70,7 @@ export const WaistMeasurementForm = ({
 export const WaistMeasurementCard = observer(
   (props: { item: WaistMeasurement }) => {
     const { item } = props;
-    const { fetchFcn, shownFields } = useWaistMeasurementView();
+    const { fetchFcn, shownFields, itemMap } = useWaistMeasurementView();
     const { waistMeasurementStore } = useStore();
 
     return (
@@ -83,6 +83,7 @@ export const WaistMeasurementCard = observer(
         FormComponent={WaistMeasurementForm}
         deleteItem={waistMeasurementStore.deleteItem}
         fetchFcn={fetchFcn}
+        itemMap={itemMap}
       />
     );
   }

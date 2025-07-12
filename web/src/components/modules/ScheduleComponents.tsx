@@ -192,7 +192,7 @@ export const ScheduleForm = ({
 
 export const ScheduleCard = observer((props: { item: Schedule }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useScheduleView();
+  const { fetchFcn, shownFields, itemMap } = useScheduleView();
   const { scheduleStore, taskStore, habitStore } = useStore();
 
   const dropdownActions =
@@ -229,6 +229,7 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
       deleteItem={scheduleStore.deleteItem}
       fetchFcn={fetchFcn}
       dropdownActions={dropdownActions}
+      itemMap={itemMap}
     />
   );
 });

@@ -64,7 +64,7 @@ export const IssueTagForm = ({
 
 export const IssueTagCard = observer((props: { item: IssueTag }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useIssueTagView();
+  const { fetchFcn, shownFields, itemMap } = useIssueTagView();
   const { issueTagStore } = useStore();
 
   return (
@@ -77,6 +77,7 @@ export const IssueTagCard = observer((props: { item: IssueTag }) => {
       FormComponent={IssueTagForm}
       deleteItem={issueTagStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

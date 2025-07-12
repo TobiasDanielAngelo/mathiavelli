@@ -112,7 +112,7 @@ export const JobForm = ({
 
 export const JobCard = observer((props: { item: Job }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useJobView();
+  const { fetchFcn, shownFields, itemMap } = useJobView();
   const { jobStore } = useStore();
 
   return (
@@ -125,6 +125,7 @@ export const JobCard = observer((props: { item: Job }) => {
       FormComponent={JobForm}
       deleteItem={jobStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

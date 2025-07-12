@@ -66,7 +66,7 @@ export const InventoryCategoryForm = ({
 export const InventoryCategoryCard = observer(
   (props: { item: InventoryCategory }) => {
     const { item } = props;
-    const { fetchFcn, shownFields } = useInventoryCategoryView();
+    const { fetchFcn, shownFields, itemMap } = useInventoryCategoryView();
     const { inventoryCategoryStore } = useStore();
 
     return (
@@ -79,6 +79,7 @@ export const InventoryCategoryCard = observer(
         FormComponent={InventoryCategoryForm}
         deleteItem={inventoryCategoryStore.deleteItem}
         fetchFcn={fetchFcn}
+        itemMap={itemMap}
       />
     );
   }

@@ -68,7 +68,7 @@ export const WeighInForm = ({
 
 export const WeighInCard = observer((props: { item: WeighIn }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useWeighInView();
+  const { fetchFcn, shownFields, itemMap } = useWeighInView();
   const { weighInStore } = useStore();
 
   return (
@@ -80,6 +80,7 @@ export const WeighInCard = observer((props: { item: WeighIn }) => {
       FormComponent={WeighInForm}
       deleteItem={weighInStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

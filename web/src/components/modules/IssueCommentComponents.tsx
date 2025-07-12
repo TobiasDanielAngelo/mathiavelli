@@ -86,7 +86,7 @@ export const IssueCommentForm = ({
 
 export const IssueCommentCard = observer((props: { item: IssueComment }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useIssueCommentView();
+  const { fetchFcn, shownFields, itemMap } = useIssueCommentView();
   const { issueCommentStore } = useStore();
 
   return (
@@ -98,6 +98,7 @@ export const IssueCommentCard = observer((props: { item: IssueComment }) => {
       FormComponent={IssueCommentForm}
       deleteItem={issueCommentStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

@@ -92,7 +92,7 @@ export const CategoryForm = ({
 
 export const CategoryCard = observer((props: { item: Category }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useCategoryView();
+  const { fetchFcn, shownFields, itemMap } = useCategoryView();
   const { categoryStore } = useStore();
 
   return (
@@ -105,6 +105,7 @@ export const CategoryCard = observer((props: { item: Category }) => {
       FormComponent={CategoryForm}
       deleteItem={categoryStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

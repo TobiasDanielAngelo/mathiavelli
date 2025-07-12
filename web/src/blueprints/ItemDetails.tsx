@@ -17,6 +17,7 @@ export interface ItemDetailsProps<T> {
   prices?: (keyof T)[];
   showMore?: boolean;
   setShowMore?: StateSetter<boolean>;
+  itemMap?: KV<any>[];
 }
 
 const sectionStyles: Record<string, string> = {
@@ -33,6 +34,7 @@ export const ItemDetails = observer(
     important = [],
     prices = [],
     showMore,
+    itemMap = [],
   }: ItemDetailsProps<T>) => {
     const itemView = item.$view ?? item;
     const allItemKeys = Object.keys(itemView).filter(
@@ -54,11 +56,12 @@ export const ItemDetails = observer(
 
     const renderRow = (key: keyof T, title: string) => {
       const value = item[key];
+      const kv = itemMap?.find((s) => s.key === key);
       const keyTitle = key === "id" ? "ID" : toTitleCase(key as string);
       const body =
         key === "id"
           ? toRomanWithExponents(value)
-          : formatValue(value, String(key), prices as string[]);
+          : formatValue(value, String(key), prices as string[], kv);
 
       return body === "—" ? (
         <div key={String(key)}></div>

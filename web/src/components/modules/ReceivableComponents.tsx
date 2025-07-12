@@ -102,7 +102,7 @@ export const ReceivableForm = ({
 
 export const ReceivableCard = observer((props: { item: Receivable }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useReceivableView();
+  const { fetchFcn, shownFields, itemMap } = useReceivableView();
   const { receivableStore } = useStore();
   const { isVisible1, setVisible1 } = useVisible();
 
@@ -134,6 +134,7 @@ export const ReceivableCard = observer((props: { item: Receivable }) => {
         deleteItem={receivableStore.deleteItem}
         fetchFcn={fetchFcn}
         moreActions={moreActions}
+        itemMap={itemMap}
       />
     </>
   );

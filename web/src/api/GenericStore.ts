@@ -54,10 +54,10 @@ export function getStoreItem<K extends keyof Store>(
   }
 }
 
-export function GenerateModel<TProps extends ModelProps, TView>(
+export function MyModel<TProps extends ModelProps, TView>(
+  keyName: string,
   props: TProps,
-  derivedProps: (self: any) => TView = () => ({} as TView),
-  keyName: string
+  derivedProps: (self: any) => TView = () => ({} as TView)
 ) {
   type GenericInterface = PropsToInterface<typeof props>;
 
@@ -89,12 +89,12 @@ export function GenerateModel<TProps extends ModelProps, TView>(
   >;
 }
 
-export function GenerateStore<T extends KeystoneModel<{ id?: number | null }>>(
+export function MyStore<T extends KeystoneModel<{ id?: number | null }>>(
+  keyName: string,
   ModelClass: {
     new (...args: any[]): T;
   },
-  slug: string,
-  keyName: string
+  slug: string
 ) {
   @model(`myApp/${keyName}Store`)
   class GenericStore extends Model({

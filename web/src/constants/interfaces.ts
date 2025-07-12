@@ -129,3 +129,91 @@ export type ViewFields<T> = Record<
   `${"datetime" | "date" | "time" | "prices"}Fields`,
   (keyof T)[]
 >;
+
+// Unused yet
+export type DjangoField =
+  | "ID"
+  | "AmountField"
+  | "DecimalField"
+  | "LongCharField"
+  | "MediumCharField"
+  | "ShortCharField"
+  | "ColorField"
+  | "AutoCreatedAtField"
+  | "AutoUpdatedAtField"
+  | "DefaultNowField"
+  | "DefaultTodayField"
+  | "OptionalDateTimeField"
+  | "OptionalDateField"
+  | "ChoiceIntegerField"
+  | "DefaultBooleanField"
+  | "OptionalLimitedTimeField"
+  | "ForeignKey"
+  | "CascadeRequiredForeignKey"
+  | "CascadeOptionalForeignKey"
+  | "SetNullOptionalForeignKey"
+  | "ManyToManyField"
+  | "OptionalManyToManyField"
+  | "OneToOneField"
+  | "OptionalOneToOneField"
+  | "OptionalSetNullOneToOneField"
+  | "OptionalEmailField"
+  | "OptionalURLField"
+  | "LimitedDecimalField"
+  | "OptionalLimitedDecimalField"
+  | "StringArrayField"
+  | "NumberArrayField"
+  | "ChoicesStringArrayField"
+  | "ChoicesNumberArrayField"
+  | "FileField";
+
+// Unused yet
+export type JsType =
+  | "number"
+  | "number[]"
+  | "number | null"
+  | "number[] | null"
+  | "string"
+  | "string[]"
+  | "boolean"
+  | "string | null"
+  | "string[] | null"
+  | "File | null";
+
+// Unused yet
+export const djangoToJsType: Record<DjangoField, JsType> = {
+  ID: "number",
+  AmountField: "number",
+  DecimalField: "number",
+  LongCharField: "string",
+  MediumCharField: "string",
+  ShortCharField: "string",
+  ColorField: "string",
+  AutoCreatedAtField: "string",
+  AutoUpdatedAtField: "string",
+  DefaultNowField: "string",
+  DefaultTodayField: "string",
+  OptionalDateTimeField: "string | null",
+  OptionalDateField: "string | null",
+  ChoiceIntegerField: "number",
+  DefaultBooleanField: "boolean",
+  OptionalLimitedTimeField: "string | null",
+  ForeignKey: "number",
+  CascadeRequiredForeignKey: "number",
+  CascadeOptionalForeignKey: "number | null",
+  SetNullOptionalForeignKey: "number",
+  ManyToManyField: "number[]",
+  OptionalManyToManyField: "number[] | null",
+  OneToOneField: "number",
+  OptionalOneToOneField: "number | null",
+  OptionalSetNullOneToOneField: "number | null",
+  OptionalEmailField: "string",
+  OptionalURLField: "string",
+  LimitedDecimalField: "number",
+  OptionalLimitedDecimalField: "number",
+  StringArrayField: "string[]",
+  NumberArrayField: "number[]",
+  ChoicesStringArrayField: "string[]",
+  ChoicesNumberArrayField: "number[]",
+  FileField: "File | null",
+};

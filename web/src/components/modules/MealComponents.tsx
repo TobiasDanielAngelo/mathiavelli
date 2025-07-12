@@ -78,7 +78,7 @@ export const MealForm = ({
 
 export const MealCard = observer((props: { item: Meal }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useMealView();
+  const { fetchFcn, shownFields, itemMap } = useMealView();
   const { mealStore } = useStore();
 
   return (
@@ -91,6 +91,7 @@ export const MealCard = observer((props: { item: Meal }) => {
       FormComponent={MealForm}
       deleteItem={mealStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

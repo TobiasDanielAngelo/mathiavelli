@@ -73,7 +73,7 @@ export const AccountForm = ({
 
 export const AccountCard = observer((props: { item: Account }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = useAccountView();
+  const { fetchFcn, shownFields, itemMap } = useAccountView();
   const { accountStore } = useStore();
 
   return (
@@ -86,6 +86,7 @@ export const AccountCard = observer((props: { item: Account }) => {
       FormComponent={AccountForm}
       deleteItem={accountStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

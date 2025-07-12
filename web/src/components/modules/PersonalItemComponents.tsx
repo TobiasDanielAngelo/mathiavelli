@@ -83,7 +83,7 @@ export const PersonalItemForm = ({
 
 export const PersonalItemCard = observer((props: { item: PersonalItem }) => {
   const { item } = props;
-  const { fetchFcn, shownFields } = usePersonalItemView();
+  const { fetchFcn, shownFields, itemMap } = usePersonalItemView();
   const { personalItemStore } = useStore();
 
   return (
@@ -96,6 +96,7 @@ export const PersonalItemCard = observer((props: { item: PersonalItem }) => {
       FormComponent={PersonalItemForm}
       deleteItem={personalItemStore.deleteItem}
       fetchFcn={fetchFcn}
+      itemMap={itemMap}
     />
   );
 });

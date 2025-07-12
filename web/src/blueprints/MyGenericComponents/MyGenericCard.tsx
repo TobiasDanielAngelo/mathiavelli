@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useVisible } from "../../constants/hooks";
 import { Page } from "../../constants/interfaces";
-import { ItemDetails, ItemDetailsProps } from "../ItemDetails";
+import { ItemDetails, ItemDetailsProps, KV } from "../ItemDetails";
 import { MyConfirmModal } from "../MyConfirmModal";
 import { MyDropdownMenu } from "../MyDropdownMenu";
 import { IconName, MyIcon } from "../MyIcon";
@@ -33,6 +33,7 @@ interface MyGenericCardProps<T> extends ItemDetailsProps<T> {
   fetchFcn: () => void;
   moreActions?: IAction[];
   dropdownActions?: Page[];
+  itemMap?: KV<any>[];
 }
 
 export const MyGenericCard = observer(
@@ -47,6 +48,7 @@ export const MyGenericCard = observer(
     fetchFcn,
     moreActions,
     dropdownActions,
+    itemMap,
   }: MyGenericCardProps<T>) => {
     const {
       isVisible1,
@@ -103,6 +105,7 @@ export const MyGenericCard = observer(
               prices={prices}
               showMore={showMore}
               setShowMore={setShowMore}
+              itemMap={itemMap}
             />
 
             <div className="flex justify-between mt-2 flex-row-reverse">
