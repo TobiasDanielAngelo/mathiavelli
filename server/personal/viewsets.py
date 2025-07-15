@@ -15,3 +15,13 @@ class PlatformViewSet(CustomModelViewSet):
 class CredentialViewSet(CustomModelViewSet):
     queryset = Credential.objects.all()
     serializer_class = CredentialSerializer
+
+
+class DreamViewSet(CustomModelViewSet):
+    queryset = Dream.objects.all()
+    serializer_class = DreamSerializer
+
+
+class DocumentViewSet(CustomModelViewSet):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer

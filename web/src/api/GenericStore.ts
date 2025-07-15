@@ -146,7 +146,7 @@ export function MyStore<
           icon: "error",
           title: "An error has occurred.",
         });
-        return { details: "An error has occurred", ok: false, data: null };
+        return { details: result.details, ok: false, data: null };
       }
 
       resetOnFetch && this.resetItems();
@@ -179,8 +179,8 @@ export function MyStore<
       }
 
       if (!result.ok || !result.data) {
-        Swal.fire({ icon: "error", title: "An error has occurred." });
-        return { details: "An error has occurred", ok: false, data: null };
+        // Swal.fire({ icon: "error", title: "An error has occurred." });
+        return { details: result.details, ok: false, data: null };
       }
 
       const item = new ModelClass(result.data);
@@ -204,8 +204,8 @@ export function MyStore<
       }
 
       if (!result.ok || !result.data) {
-        Swal.fire({ icon: "error", title: "An error has occurred." });
-        return { details: "An error has occurred", ok: false, data: null };
+        // Swal.fire({ icon: "error", title: "An error has occurred." });
+        return { details: result.details, ok: false, data: null };
       }
 
       this.items

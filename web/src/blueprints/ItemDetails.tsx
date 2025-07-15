@@ -37,9 +37,10 @@ export const ItemDetails = observer(
     itemMap = [],
   }: ItemDetailsProps<T>) => {
     const itemView = item.$view ?? item;
-    const allItemKeys = Object.keys(itemView).filter(
-      (s) => !s.includes("$")
-    ) as (keyof T)[];
+
+    const allItemKeys = [
+      ...new Set(Object.keys(itemView).filter((s) => !s.includes("$"))),
+    ] as (keyof T)[];
 
     const sections = [
       { title: "Header", keys: header },
@@ -52,7 +53,7 @@ export const ItemDetails = observer(
       },
     ];
 
-    const hiddenKeys = allItemKeys.filter((s) => !shownFields.includes(s));
+    // const hiddenKeys = allItemKeys.filter((s) => !shownFields.includes(s));
 
     const renderRow = (key: keyof T, title: string) => {
       const value = item[key];
@@ -82,9 +83,9 @@ export const ItemDetails = observer(
             {keys
               .filter((key) => shownFields.includes(key) || showMore)
               .map((key) => renderRow(key, title))}
-            {title === "Body" &&
+            {/* {title === "Body" &&
               showMore &&
-              hiddenKeys.map((key) => renderRow(key, title))}
+              hiddenKeys.map((key) => renderRow(key, title))} */}
           </div>
         ))}
       </>

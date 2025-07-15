@@ -7,6 +7,7 @@ import career from "/images/career.png";
 import categories from "/images/categories.png";
 import credentials from "/images/credentials.png";
 import dashboard from "/images/dashboard.png";
+import dreams from "/images/dreams.png";
 import events from "/images/events.png";
 import finance from "/images/finance.png";
 import followUps from "/images/follow-ups.png";
@@ -26,6 +27,7 @@ import payables from "/images/payables.png";
 import personal from "/images/personal.png";
 import platforms from "/images/platforms.png";
 import productivity from "/images/productivity.png";
+import properties from "/images/properties.png";
 import receivables from "/images/receivables.png";
 import schedules from "/images/schedules.png";
 import settings from "/images/settings.png";
@@ -55,6 +57,7 @@ const IMAGES: Record<string, string> = {
   habits,
   health,
   dashboard,
+  dreams,
   inventoryTypes,
   jobs,
   journals,
@@ -67,6 +70,7 @@ const IMAGES: Record<string, string> = {
   inventory,
   personal,
   platforms,
+  properties,
   productivity,
   receivables,
   schedules,

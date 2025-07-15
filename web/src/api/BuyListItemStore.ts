@@ -5,8 +5,8 @@ import { MyModel, MyStore } from "./GenericStore";
 export const PRIORITY_CHOICES = ["Low", "Medium", "High"];
 export const WISHLIST_STATUS_CHOICES = ["Pending", "Bought", "Canceled"];
 
-const keyName = "BuyListItem";
 const slug = "finance/buy-list-items/";
+const keyName = "BuyListItem";
 const props = {
   id: prop<number | string>(-1),
   name: prop<string>(""),

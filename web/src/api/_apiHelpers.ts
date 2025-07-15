@@ -61,7 +61,9 @@ export async function guidedRequest<T>(
     body?: any;
     itemId?: number | string;
     params?: string;
-  }
+  },
+  customURL?: string,
+  hasNoCredentials?: boolean
 ): Promise<{ details: any; ok: boolean; data: T | null }> {
   const input = new URLSearchParams(options.params);
   const filtered = new URLSearchParams();
@@ -70,7 +72,9 @@ export async function guidedRequest<T>(
     if (value.trim()) filtered.append(key, value);
   }
 
-  let url = `${import.meta.env.VITE_BASE_URL}/${endpoint}`;
+  let url = customURL
+    ? `${customURL}/${endpoint}`
+    : `${import.meta.env.VITE_BASE_URL}/${endpoint}`;
   if (options.itemId) url += `${options.itemId}/`;
   if (options.params) url += `?${filtered.toString()}`;
 
@@ -88,7 +92,7 @@ export async function guidedRequest<T>(
 
   const response = await fetch(url, {
     method: options.method,
-    credentials: "include",
+    credentials: hasNoCredentials ? undefined : "include",
     body: preparedBody
       ? isFormData
         ? preparedBody

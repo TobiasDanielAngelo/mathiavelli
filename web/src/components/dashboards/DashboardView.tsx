@@ -172,7 +172,6 @@ export const DashboardView = observer(() => {
         </div>
         <FormComponent />
       </MyModal>
-      <EventDisplay calendarProps={calendarProps} />
       <MyGenericCollection
         items={eventStore.items.filter(
           (s) => !s.isArchived && new TwoDates(s.dateStart, date).isEqualDate
@@ -180,6 +179,7 @@ export const DashboardView = observer(() => {
         CardComponent={EventCard}
         title="Events"
       />
+      <EventDisplay calendarProps={calendarProps} />
       <TaskDashboard />
       <TransactionDashboard graph="pie" itemMap={itemMap} />
       <TransactionDashboard graph="line" itemMap={itemMap} />

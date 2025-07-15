@@ -195,25 +195,28 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
   const { fetchFcn, shownFields, itemMap } = useScheduleView();
   const { scheduleStore, taskStore, habitStore } = useStore();
 
-  const dropdownActions = [
-    {
-      onClick: () =>
-        taskStore.addItem({
-          title: item.name,
-          schedule: item.id,
-          importance: 5,
-        }),
-      title: "Add to Tasks",
-    },
-    {
-      onClick: () =>
-        habitStore.addItem({
-          title: item.name,
-          schedule: item.id,
-        }),
-      title: "Add to Habits",
-    },
-  ];
+  const dropdownActions =
+    !item.associatedHabit && !item.associatedTask
+      ? [
+          {
+            onClick: () =>
+              taskStore.addItem({
+                title: item.name,
+                schedule: item.id,
+                importance: 5,
+              }),
+            title: "Add to Tasks",
+          },
+          {
+            onClick: () =>
+              habitStore.addItem({
+                title: item.name,
+                schedule: item.id,
+              }),
+            title: "Add to Habits",
+          },
+        ]
+      : [];
 
   return (
     <MyGenericCard
@@ -249,8 +252,11 @@ export const ScheduleDashboard = observer(
           .map((s) => s.$view)
           .flatMap((s) =>
             generateCollidingDates(s, {
-              startDate: moment(date).startOf("week").toDate(),
-              endDate: moment(date).add(7, "days").endOf("week").toDate(),
+              startDate: moment(date)
+                .subtract(1, "days")
+                .startOf("day")
+                .toDate(),
+              endDate: moment(date).add(1, "days").endOf("day").toDate(),
             }).map((date) => ({
               ...s,
               collidingDate: date,

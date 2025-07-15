@@ -123,6 +123,7 @@ export const MyGenericRecursiveCard = observer(
                 fetchFcn={fetchFcn}
                 items={items}
                 parentKey={parentKey}
+                itemMap={itemMap}
               />
             ))}
           </div>

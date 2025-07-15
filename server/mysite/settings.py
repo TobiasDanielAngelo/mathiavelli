@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "personal",
     "productivity",
     "issues",
+    "travel",
 ]
 
 MIDDLEWARE = [

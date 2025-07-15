@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate, hashers, password_validation
+from django.db.models.manager import BaseManager
 from django.contrib.auth.models import User
 from .models import *
 
@@ -89,6 +90,32 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CustomSerializer(serializers.ModelSerializer):
     pass
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     obj = (
+    #         self.instance[0]
+    #         if isinstance(self.instance, list) and self.instance
+    #         else self.instance
+    #     )
+    #     if obj:
+    #         for attr_name in dir(obj):
+    #             attr = getattr(obj, attr_name, None)
+    #             if isinstance(attr, BaseManager):
+    #                 self.fields[attr_name] = serializers.SerializerMethodField()
+
+    # def get_field(self, obj, attr_name):
+    #     related_qs = getattr(obj, attr_name).all()
+    #     return [item.pk for item in related_qs]
+
+    # def __getattr__(self, name):
+    #     if name.startswith("get_"):
+    #         attr_name = name[4:]
+
+    #         def method(obj):
+    #             return self.get_field(obj, attr_name)
+
+    #         return method
+    #     raise AttributeError(f"{type(self).__name__} object has no attribute {name}")
 
 
 class SettingSerializer(CustomSerializer):

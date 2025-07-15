@@ -150,8 +150,8 @@ export const useTrendChart = <T extends Record<string, any>>(
   ).filter((key) => key !== xKey);
 
   useEffect(() => {
-    setShownFields([...allTraceKeys]);
-  }, [allTraceKeys.length]);
+    setShownFields(noTotal ? [...allTraceKeys] : [totalTitle]);
+  }, [allTraceKeys.length, noTotal, totalTitle]);
 
   return { allTraceKeys, transformedData, shownFields, setShownFields };
 };

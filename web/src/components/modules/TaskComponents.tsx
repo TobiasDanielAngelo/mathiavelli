@@ -105,7 +105,7 @@ export const TaskForm = ({
           },
         ],
       ] satisfies Field[][],
-    [goalStore.items.length, scheduleStore.items.length, item?.id]
+    [goalStore.items.length, scheduleStore.items.length]
   );
 
   return (
@@ -256,8 +256,8 @@ export const TaskView = observer(() => {
         },
         {
           key: "schedule",
-          values: scheduleStore.items,
-          label: "name",
+          values: scheduleStore.items.map((s) => s.$view),
+          label: "definition",
         },
         {
           key: "habit",

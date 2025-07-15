@@ -203,8 +203,8 @@ export const useCalendarProps = () => {
       ? moment(date).format("YYYY")
       : "month";
 
-  const start = moment(date).startOf("week");
-  const end = moment(date).endOf("week");
+  const start = moment(date).startOf("day");
+  const end = moment(date).endOf("day");
 
   return { date, setDate, view, setView, range, start, end };
 };

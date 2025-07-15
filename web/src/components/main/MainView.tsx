@@ -10,6 +10,8 @@ import { BodyFatView } from "../modules/BodyFatComponents";
 import { BuyListItemView } from "../modules/BuyListItemComponents";
 import { CategoryView } from "../modules/CategoryComponents";
 import { CredentialView } from "../modules/CredentialComponents";
+import { DocumentView } from "../modules/DocumentComponents";
+import { DreamView } from "../modules/DreamComponents";
 import { EventView } from "../modules/EventComponents";
 import { FinanceView } from "../modules/FinanceComponents";
 import { FollowUpView } from "../modules/FollowUpComponents";
@@ -19,6 +21,7 @@ import { HabitLogView } from "../modules/HabitLogComponents";
 import { InventoryCategoryView } from "../modules/InventoryCategoryComponents";
 import { IssueCommentView } from "../modules/IssueCommentComponents";
 import { IssueTagView } from "../modules/IssueTagComponents";
+import { ItemToBringView } from "../modules/ItemToBringComponents";
 import { JobView } from "../modules/JobComponents";
 import { JournalView } from "../modules/JournalComponents";
 import { MealView } from "../modules/MealComponents";
@@ -27,16 +30,19 @@ import { PayableView } from "../modules/PayableComponents";
 import { PersonalItemView } from "../modules/PersonalItemComponents";
 import { PlatformView } from "../modules/PlatformComponents";
 import { ReceivableView } from "../modules/ReceivableComponents";
+import { RequirementView } from "../modules/RequirementComponents";
 import { ScheduleView } from "../modules/ScheduleComponents";
 import { SettingView } from "../modules/SettingComponents";
 import { TagView } from "../modules/TagComponents";
 import { TaskView } from "../modules/TaskComponents";
 import { TicketView } from "../modules/TicketComponents";
 import { TransactionView } from "../modules/TransactionComponents";
+import { TravelPlanView } from "../modules/TravelPlanComponents";
 import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { WeighInView } from "../modules/WeighInComponents";
 import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
+import { TestingView } from "../dashboards/TestingView";
 
 export const MainView = observer(() => {
   const {
@@ -67,7 +73,7 @@ export const MainView = observer(() => {
       tagStore.fetchAll("page=all"),
       inventoryCategoryStore.fetchAll("page=all"),
       goalStore.fetchAll("page=all&is_archived=0"),
-      jobStore.fetchAll("page=all&status__lte=3"),
+      jobStore.fetchAll("page=all&status__lte=5"),
       taskStore.fetchAll("page=all&is_archived=0"),
       scheduleStore.fetchAll("page=all"),
       settingStore.fetchAll("page=all"),
@@ -97,6 +103,7 @@ export const MainView = observer(() => {
         <Route path="" element={<DashboardView />} />
         <Route path="dashboard" element={<DashboardView />} />
         <Route path="journals" element={<JournalView />} />
+        <Route path="dreams" element={<DreamView />} />
         <Route path="transactions" element={<TransactionView />} />
         <Route path="categories" element={<CategoryView />} />
         <Route path="accounts" element={<AccountView />} />
@@ -128,6 +135,11 @@ export const MainView = observer(() => {
         <Route path="issue-tags" element={<IssueTagView />} />
         <Route path="tickets" element={<TicketView />} />
         <Route path="notes" element={<NoteView />} />
+        <Route path="travel-plans" element={<TravelPlanView />} />
+        <Route path="bring-items" element={<ItemToBringView />} />
+        <Route path="travel-requirements" element={<RequirementView />} />
+        <Route path="test" element={<TestingView />} />
+        <Route path="documents" element={<DocumentView />} />
       </Routes>
     </div>
   );

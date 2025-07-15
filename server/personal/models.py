@@ -9,6 +9,11 @@ class Journal(CustomModel):
     datetime_created = fields.DefaultNowField()
 
 
+class Dream(CustomModel):
+    entry = fields.LongCharField()
+    date_created = fields.DefaultTodayField()
+
+
 class Platform(CustomModel):
     name = fields.ShortCharField()
 
@@ -49,3 +54,22 @@ class Credential(CustomModel):
     def __str__(self):
         main_id = self.username or self.email or "unknown"
         return f"{self.platform.name} - {main_id}"
+
+
+class Document(CustomModel):
+    DOCUMENT_TYPE_CHOICES = [
+        (0, "ID"),
+        (1, "Certificate"),
+        (2, "Contract"),
+        (3, "Bill"),
+        (4, "Other"),
+    ]
+    title = fields.ShortCharField(display=True)
+    description = fields.MediumCharField()
+    document_type = fields.ChoiceIntegerField(DOCUMENT_TYPE_CHOICES, 4)
+    file = fields.FileField("documents/")
+    issued_date = fields.OptionalDateField()
+    expiry_date = fields.OptionalDateField()
+    is_active = fields.DefaultBooleanField(True)
+    created_at = fields.AutoCreatedAtField()
+    updated_at = fields.AutoUpdatedAtField()

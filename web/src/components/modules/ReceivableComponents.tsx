@@ -104,11 +104,16 @@ export const ReceivableCard = observer((props: { item: Receivable }) => {
   const { item } = props;
   const { fetchFcn, shownFields, itemMap } = useReceivableView();
   const { receivableStore } = useStore();
-  const { isVisible1, setVisible1 } = useVisible();
+  const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
 
-  const moreActions = [
-    { onClick: () => setVisible1(true), icon: "Payment" },
-  ] satisfies IAction[];
+  const moreActions = (
+    item.chargeTransaction
+      ? [{ onClick: () => setVisible1(true), icon: "Payment" }]
+      : [
+          { onClick: () => setVisible1(true), icon: "Payment" },
+          { onClick: () => setVisible2(true), icon: "ElectricBolt" },
+        ]
+  ) satisfies IAction[];
   return (
     <>
       <MyModal isVisible={isVisible1} setVisible={setVisible1}>
@@ -122,6 +127,20 @@ export const ReceivableCard = observer((props: { item: Receivable }) => {
           }}
           fetchFcn={fetchFcn}
           setVisible={setVisible1}
+        />
+      </MyModal>
+      <MyModal isVisible={isVisible2} setVisible={setVisible2}>
+        <TransactionForm
+          item={{
+            receivableId: item.id,
+            description: `Charge TRX for RCV${item.id}`,
+            amount: item.lentAmount,
+            receiver: AccountIdMap.Operations,
+            category: CategoryIdMap["Lend Money"],
+            datetimeTransacted: item.datetimeOpened,
+          }}
+          fetchFcn={fetchFcn}
+          setVisible={setVisible2}
         />
       </MyModal>
       <MyGenericCard
@@ -232,7 +251,12 @@ export const ReceivableView = observer(() => {
       .map((s) => s.payment)
       .flat(1)
       .filter((s) => typeof s === "number");
-    transactionStore.fetchAll(`id__in=${payments.join(",")}`);
+    const chargeTRX = resp.data
+      .map((s) => s.chargeTransaction)
+      .flat(1)
+      .filter((s) => typeof s === "number");
+    const transactions = [...payments, ...chargeTRX];
+    transactionStore.fetchAll(`id__in=${transactions.join(",")}`);
   };
 
   const itemMap = useMemo(
@@ -240,6 +264,11 @@ export const ReceivableView = observer(() => {
       [
         {
           key: "payment",
+          values: transactionStore.items,
+          label: "description",
+        },
+        {
+          key: "chargeTransaction",
           values: transactionStore.items,
           label: "description",
         },

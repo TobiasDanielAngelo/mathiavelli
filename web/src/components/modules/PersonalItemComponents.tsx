@@ -59,7 +59,7 @@ export const PersonalItemForm = ({
         [{ name: "location", label: "Location", type: "text" }],
         [{ name: "quantity", label: "Quantity", type: "text" }],
         [{ name: "acquiredDate", label: "Acquired Date", type: "date" }],
-        [{ name: "worth", label: "Worth", type: "text" }],
+        [{ name: "worth", label: "Worth (Total)", type: "text" }],
         [{ name: "notes", label: "Notes", type: "textarea" }],
         [{ name: "isImportant", label: "Is Important", type: "check" }],
       ] satisfies Field[][],
@@ -174,7 +174,8 @@ export const PersonalItemTable = observer(() => {
 });
 
 export const PersonalItemView = observer(() => {
-  const { personalItemStore, settingStore } = useStore();
+  const { personalItemStore, settingStore, inventoryCategoryStore } =
+    useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<PersonalItemInterface, PersonalItem>(
     settingStore,
@@ -190,7 +191,17 @@ export const PersonalItemView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
+  const itemMap = useMemo(
+    () =>
+      [
+        {
+          key: "category",
+          values: inventoryCategoryStore.items,
+          label: "name",
+        },
+      ] satisfies KV<any>[],
+    [inventoryCategoryStore.items.length]
+  );
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 

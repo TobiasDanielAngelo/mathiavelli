@@ -29,6 +29,9 @@ const props = {
   weekStart: prop<number>(0),
   startTime: prop<string>(""),
   endTime: prop<string>(""),
+
+  associatedTask: prop<number | string | null>(null),
+  associatedHabit: prop<number | string | null>(null),
 };
 
 const derivedProps = (item: ScheduleInterface) => ({
@@ -43,8 +46,6 @@ const derivedProps = (item: ScheduleInterface) => ({
     item.count === 0 || item.count === null ? true : false
   ),
   definition: generateScheduleDefinition(item) ?? "",
-  // associatedTask: getStoreItem(item, "taskStore", item.id)?.id ?? "—",
-  // associatedHabit: getStoreItem(item, "habitStore", item.id)?.id ?? "—",
 });
 
 export const FREQ_CHOICES = [

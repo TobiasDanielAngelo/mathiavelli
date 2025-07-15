@@ -33,6 +33,7 @@ const title = "Categories";
 export const CategoryIdMap = {
   "Receivable Payment": 1000001,
   "Payable Payment": 1000002,
+  "Lend Money": 1000003,
 } as const;
 
 export const CategoryForm = ({

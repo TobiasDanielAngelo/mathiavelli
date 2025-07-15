@@ -1,6 +1,7 @@
 from .models import *
 from django.utils import timezone
 from core.serializers import CustomSerializer
+from rest_framework import serializers
 
 
 class EventSerializer(CustomSerializer):
@@ -72,10 +73,20 @@ class TaskSerializer(CustomSerializer):
 
 
 class ScheduleSerializer(CustomSerializer):
+    associated_task = serializers.SerializerMethodField()
+    associated_habit = serializers.SerializerMethodField()
 
     class Meta:
         model = Schedule
         fields = "__all__"
+
+    def get_associated_task(self, obj):
+        task = obj.task_schedule.first()
+        return task.pk if task else None
+
+    def get_associated_habit(self, obj):
+        habit = obj.habit_schedule.first()
+        return habit.pk if habit else None
 
 
 class HabitSerializer(CustomSerializer):

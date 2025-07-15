@@ -179,7 +179,7 @@ export const HabitTable = observer(() => {
 });
 
 export const HabitView = observer(() => {
-  const { habitStore, settingStore, scheduleStore } = useStore();
+  const { habitStore, settingStore, scheduleStore, goalStore } = useStore();
   const { isVisible, setVisible, setVisible4 } = useVisible();
   const values = useViewValues<HabitInterface, Habit>(
     settingStore,
@@ -203,11 +203,16 @@ export const HabitView = observer(() => {
       [
         {
           key: "schedule",
-          values: scheduleStore.items,
+          values: scheduleStore.items.map((s) => s.$view),
           label: "definition",
         },
+        {
+          key: "goal",
+          values: goalStore.items,
+          label: "title",
+        },
       ] satisfies KV<any>[],
-    [scheduleStore.items.length]
+    [scheduleStore.items.length, goalStore.items.length]
   );
 
   const actionModalDefs = [

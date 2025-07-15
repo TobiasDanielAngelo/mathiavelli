@@ -182,22 +182,15 @@ export const EventDashboard = observer(
     range: string;
   }) => {
     const { eventStore } = useStore();
-    let pageIds: number[] | undefined = undefined;
-
-    try {
-      const { pageDetails } = useEventView();
-      pageIds = pageDetails?.ids;
-    } catch {
-      console.log("No Event View Props Returned");
-    }
+    const { pageDetails } = useEventView();
 
     return (
       <MyCalendar
         {...props}
-        // noIcon
+        noIcon
         events={sortAndFilterByIds(
           eventStore.items,
-          pageIds ?? eventStore.items.map((s) => s.id),
+          pageDetails?.ids ?? eventStore.items.map((s) => s.id),
           (s) => s.id
         ).filter((s) => !s.isArchived)}
       />
@@ -308,6 +301,7 @@ export const EventView = observer(() => {
   const { params, setPageDetails, setParams } = values;
 
   const fetchFcn = async () => {
+    if (!params.size) return;
     const resp = await eventStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
       return;

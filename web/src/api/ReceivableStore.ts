@@ -7,6 +7,7 @@ const keyName = "Receivable";
 const props = {
   id: prop<number | string>(-1),
   payment: prop<number[] | null>(null),
+  chargeTransaction: prop<number | null>(null),
   borrowerName: prop<string>(""),
   lentAmount: prop<number>(0),
   description: prop<string>(""),

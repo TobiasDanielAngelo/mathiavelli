@@ -201,7 +201,22 @@ export const TicketView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
+  const itemMap = useMemo(
+    () =>
+      [
+        {
+          key: "status",
+          label: "",
+          values: STATUS_CHOICES,
+        },
+        {
+          key: "priority",
+          label: "",
+          values: PRIORITY_CHOICES,
+        },
+      ] satisfies KV<any>[],
+    []
+  );
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 

@@ -24,11 +24,12 @@ export const allViewPaths = [
       "receivables",
       "payables",
       "categories",
-      "wishlist",
-      "inventory",
-      "inventory-types",
     ],
     mainLink: "finance",
+  },
+  {
+    title: "Properties",
+    items: ["wishlist", "inventory", "inventory-types"],
   },
   {
     title: "Productivity",
@@ -36,7 +37,11 @@ export const allViewPaths = [
   },
   {
     title: "Personal",
-    items: ["journals", "credentials", "platforms"],
+    items: ["journals", "credentials", "platforms", "dreams", "documents"],
+  },
+  {
+    title: "Travel",
+    items: ["travel-plans", "bring-items", "travel-requirements"],
   },
   {
     title: "Career",
@@ -48,7 +53,14 @@ export const allViewPaths = [
   },
   {
     title: "Support",
-    items: ["notes", "tickets", "issue-comments", "issue-tags", "settings"],
+    items: [
+      "notes",
+      "tickets",
+      "issue-comments",
+      "issue-tags",
+      "settings",
+      "test",
+    ],
   },
 ] as ViewPath[];
 

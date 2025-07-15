@@ -33,11 +33,17 @@ import { WeighInStore } from "./WeighInStore";
 import { WorkoutStore } from "./WorkoutStore";
 import { NoteStore } from "./NoteStore";
 import { WeighInAnalyticsStore } from "../analytics/WeighInAnalyticsStore";
+import { DreamStore } from "./DreamStore";
+import { DocumentStore } from "./DocumentStore";
+import { TravelPlanStore } from "./TravelPlanStore";
+import { ItemToBringStore } from "./ItemToBringStore";
+import { RequirementStore } from "./RequirementStore";
 
 @model("myApp/Store")
 export class Store extends Model({
   userStore: prop<UserStore>(),
   journalStore: prop<JournalStore>(),
+  dreamStore: prop<DreamStore>(),
   accountStore: prop<AccountStore>(),
   categoryStore: prop<CategoryStore>(),
   transactionStore: prop<TransactionStore>(),
@@ -69,12 +75,17 @@ export class Store extends Model({
   issueTagStore: prop<IssueTagStore>(),
   issueCommentStore: prop<IssueCommentStore>(),
   noteStore: prop<NoteStore>(),
+  documentStore: prop<DocumentStore>(),
+  itemToBringStore: prop<ItemToBringStore>(),
+  travelPlanStore: prop<TravelPlanStore>(),
+  requirementStore: prop<RequirementStore>(),
 }) {}
 
 export const createStore = () =>
   new Store({
     userStore: new UserStore({}),
     journalStore: new JournalStore({}),
+    dreamStore: new DreamStore({}),
     accountStore: new AccountStore({}),
     categoryStore: new CategoryStore({}),
     transactionStore: new TransactionStore({}),
@@ -106,6 +117,10 @@ export const createStore = () =>
     issueCommentStore: new IssueCommentStore({}),
     ticketStore: new TicketStore({}),
     noteStore: new NoteStore({}),
+    documentStore: new DocumentStore({}),
+    itemToBringStore: new ItemToBringStore({}),
+    travelPlanStore: new TravelPlanStore({}),
+    requirementStore: new RequirementStore({}),
   });
 
 export const StoreContext = createContext<Store | null>(null);

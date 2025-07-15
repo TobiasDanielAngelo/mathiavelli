@@ -43,6 +43,7 @@ import DisplaySettings from "@mui/icons-material/DisplaySettings";
 import DynamicForm from "@mui/icons-material/DynamicForm";
 import WarningAmber from "@mui/icons-material/WarningAmber";
 import Warning from "@mui/icons-material/Warning";
+import ElectricBolt from "@mui/icons-material/ElectricBolt";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 
 // 1. Map icons to names
@@ -53,6 +54,7 @@ const iconMap = {
   AddCard,
   Check,
   Close,
+  ElectricBolt,
   CloudUpload,
   WarningAmber,
   Event,

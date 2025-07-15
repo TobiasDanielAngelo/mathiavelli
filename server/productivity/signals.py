@@ -182,7 +182,7 @@ def sync_habitlog_from_event(sender, instance, **kwargs):
     habit = task.habit
     log_date = instance.date_start
 
-    if instance.date_completed:
+    if instance.date_completed and not instance.excuse:
         # Ensure timezone-aware datetime
         if isinstance(log_date, datetime) and log_date.tzinfo is None:
             log_date = make_aware(log_date)

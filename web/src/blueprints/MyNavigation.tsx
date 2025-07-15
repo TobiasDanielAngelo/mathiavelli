@@ -94,7 +94,7 @@ const NavLink = ({ page }: { page: Page }) => {
   return isTouch ? (
     <></>
   ) : (
-    <div className="relative group px-2 py-1 cursor-pointer">
+    <div className="relative group cursor-pointer">
       {page.link ? (
         <Link
           to={page.link}
@@ -192,7 +192,7 @@ export const MyNavBar = observer(
           <div className="md:w-auto" id="navbar-default">
             <ul className="font-medium flex items-center justify-center md:p-0 mt-4 border border-teal-100 rounded-lg flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 dark:border-gray-700">
               {paths?.map((s, ind) => (
-                <div key={ind} className="hidden lg:block">
+                <div key={ind} className="hidden xl:block">
                   <NavLink page={s} />
                 </div>
               ))}

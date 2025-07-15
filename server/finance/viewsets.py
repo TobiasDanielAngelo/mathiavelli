@@ -19,14 +19,21 @@ class TransactionViewSet(CustomModelViewSet):
     def perform_create(self, serializer):
         receivable_id = self.request.data.get("receivable_id")
         payable_id = self.request.data.get("payable_id")
+        transmitter = self.request.data.get("transmitter")
+        receiver = self.request.data.get("receiver")
 
         transaction = serializer.save()
 
         if receivable_id:
             try:
                 receivable = Receivable.objects.get(pk=receivable_id)
-                receivable.payment.add(transaction)
+                if transmitter == 1000003:  # If Operation (or + to balance)
+                    receivable.payment.add(transaction)
+                elif receiver == 1000003:  # If Operation (or - to balance)
+                    receivable.charge_transaction = transaction
+                print(receivable.charge_transaction)
                 receivable.check_and_close()
+                receivable.save()
             except Receivable.DoesNotExist:
                 raise serializers.ValidationError("Receivable not found")
 

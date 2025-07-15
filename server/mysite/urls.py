@@ -30,6 +30,7 @@ urlpatterns = [
     path("career/", include("career.urls")),
     path("personal/", include("personal.urls")),
     path("issues/", include("issues.urls")),
+    path("travel/", include("travel.urls")),
 ]
 
 if settings.DEBUG:

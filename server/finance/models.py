@@ -50,6 +50,7 @@ class Transaction(CustomModel):
 
 
 class Receivable(CustomModel):
+    charge_transaction = fields.SetNullOptionalForeignKey(Transaction)
     payment = fields.OptionalManyToManyField(Transaction)
     borrower_name = fields.ShortCharField(display=True)
     lent_amount = fields.AmountField()

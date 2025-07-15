@@ -14,7 +14,19 @@ class PlatformSerializer(CustomSerializer):
         fields = "__all__"
 
 
+class DreamSerializer(CustomSerializer):
+    class Meta:
+        model = Dream
+        fields = "__all__"
+
+
 class CredentialSerializer(CustomSerializer):
     class Meta:
         model = Credential
+        fields = "__all__"
+
+
+class DocumentSerializer(CustomSerializer):
+    class Meta:
+        model = Document
         fields = "__all__"
