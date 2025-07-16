@@ -3,7 +3,7 @@ import {
   SpeechRecognition,
   SpeechRecognitionEvent,
 } from "./MySpeechRecognition";
-import { guidedRequest } from "../api/_apiHelpers";
+import { guidedRequest } from "../api";
 
 type Message = {
   text: string;

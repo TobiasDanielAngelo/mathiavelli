@@ -99,7 +99,7 @@ class DefaultTodayField(models.DateField):
     """
 
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault("default", timezone.now)
+        kwargs.setdefault("default", timezone.localdate)
         kwargs.setdefault("null", True)
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
