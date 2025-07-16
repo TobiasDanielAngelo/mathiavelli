@@ -18,8 +18,14 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(os.path.join(BASE_DIR, ".env"))
+# Always load shared
+load_dotenv(os.path.join(BASE_DIR, ".env"), override=True)
 
+# Then load environment-specific
+if os.environ.get("RUNNING_IN_DOCKER") == "1":
+    load_dotenv(os.path.join(BASE_DIR, ".env.docker"), override=True)
+else:
+    load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -31,7 +37,6 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -188,7 +193,7 @@ REST_KNOX = {
 }
 
 CSRF_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SECURE = True  # requires HTTPS
+CSRF_COOKIE_SECURE = True
 
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True

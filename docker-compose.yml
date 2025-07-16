@@ -5,29 +5,14 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - DB_NAME=${DATABASE_NAME}
-      - DB_USER=${DATABASE_USER}
-      - DB_PASS=${DATABASE_PASS}
-      - DB_HOST=${DATABASE_HOST}
-      - DB_PORT=${DATABASE_PORT}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
-      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
-      - COOKIE_SECURE_BOOL=${COOKIE_SECURE_BOOL}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
-      - DEBUG=${DEBUG}
 
     volumes:
       - ./server:/app
-      - ./static:/app/static
 
   frontend:
     build: ./web
     ports:
       - "3000:80"
-    environment:
-      - VITE_BASE_URL=${VITE_BASE_URL}
     volumes:
       - ./web:/app
       

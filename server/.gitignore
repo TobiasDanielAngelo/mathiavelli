@@ -30,5 +30,7 @@ Thumbs.db
 
 # Others
 .env
+.env.docker
+.env.local
 *.bak
 *.swp

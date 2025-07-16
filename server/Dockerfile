@@ -20,6 +20,8 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --no-root
 
+ARG RUNNING_IN_DOCKER=1
+ENV RUNNING_IN_DOCKER=${RUNNING_IN_DOCKER}
 
 # Copy the rest of your Django app
 COPY . .
