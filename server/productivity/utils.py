@@ -169,7 +169,10 @@ def generate_missing_events(params=None):
         if task.schedule:
             datetimes = get_datetimes(task.schedule, start, end)
         else:
-            datetimes = [task.date_start.isoformat()]
+            if task.date_start:
+                datetimes = [task.date_start.isoformat()]
+            else:
+                datetimes = []
         updated = (
             Event.objects.filter(task=task, date_start__gte=start, date_start__lte=end)
             .exclude(date_start__in=datetimes)
