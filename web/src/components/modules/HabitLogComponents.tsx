@@ -186,7 +186,13 @@ export const HabitLogView = observer(() => {
     }
   };
 
-  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
+  const itemMap = useMemo(
+    () =>
+      [
+        { key: "habit", values: habitStore.items, label: "title" },
+      ] satisfies KV<any>[],
+    [habitStore.items.length]
+  );
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
