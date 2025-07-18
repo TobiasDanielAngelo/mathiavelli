@@ -1,4 +1,5 @@
 import { prop } from "mobx-keystone";
+import { IconName } from "../blueprints/MyIcon";
 
 export type PropsToInterface<P> = {
   [K in keyof P]?: P[K] extends ReturnType<typeof prop<infer T>> ? T : never;
@@ -11,6 +12,34 @@ export type InterfaceToProps<T> = {
 export interface Option {
   id: number | string;
   name: string;
+}
+
+export const graphTypes = ["pie", "line", "bar", "area"] as const;
+
+export type GraphType = (typeof graphTypes)[number];
+
+export type ActionModalDef = {
+  icon: IconName;
+  label: string;
+  name: string;
+  modal: React.ReactNode;
+};
+
+export interface KV<U extends Record<string, any>> {
+  key: string;
+  values: U[];
+  label: keyof U;
+}
+
+export interface ItemDetailsProps<T> {
+  item: T;
+  shownFields?: (keyof T)[];
+  header?: (keyof T)[];
+  important?: (keyof T)[];
+  prices?: (keyof T)[];
+  showMore?: boolean;
+  setShowMore?: StateSetter<boolean>;
+  itemMap?: KV<any>[];
 }
 
 export type Page = {

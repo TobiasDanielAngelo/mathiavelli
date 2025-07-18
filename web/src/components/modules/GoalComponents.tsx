@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { Goal, GoalFields, GoalInterface } from "../../api/GoalStore";
 import { useStore } from "../../api/Store";
-import { KV } from "../../blueprints/ItemDetails";
+import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
@@ -11,7 +11,6 @@ import { MyGenericRecursiveCard } from "../../blueprints/MyGenericComponents/MyG
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
-  ActionModalDef,
   MyGenericView,
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";

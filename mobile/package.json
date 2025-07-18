@@ -1,0 +1,32 @@
+{
+  "name": "mobile",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "expo": "~53.0.17",
+    "expo-status-bar": "~2.2.3",
+    "lz-string": "^1.5.0",
+    "mobx": "^6.13.7",
+    "mobx-keystone": "^1.11.4",
+    "mobx-react-lite": "^4.1.0",
+    "moment": "^2.30.1",
+    "react": "19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-native": "0.79.5",
+    "react-router-native": "^6.30.0",
+    "rrule": "^2.8.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/react": "~19.0.10",
+    "typescript": "~5.8.3"
+  },
+  "private": true
+}

@@ -6,7 +6,7 @@ import {
   TransactionFields,
   TransactionInterface,
 } from "../../api/TransactionStore";
-import { KV } from "../../blueprints/ItemDetails";
+import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
@@ -17,7 +17,6 @@ import { createGenericViewContext } from "../../blueprints/MyGenericComponents/M
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
-  ActionModalDef,
   MyGenericView,
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";

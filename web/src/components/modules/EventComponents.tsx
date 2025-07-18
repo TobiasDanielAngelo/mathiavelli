@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo } from "react";
 import { Event, EventFields, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
-import { KV } from "../../blueprints/ItemDetails";
+import { KV, ActionModalDef } from "../../constants/interfaces";
 import { CalendarView, MyCalendar } from "../../blueprints/MyCalendar";
 import {
   IAction,
@@ -18,7 +18,6 @@ import {
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
-  ActionModalDef,
   MyGenericView,
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";

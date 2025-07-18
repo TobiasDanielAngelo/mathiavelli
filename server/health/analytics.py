@@ -17,8 +17,8 @@ class WeighInAnalyticsViewSet(viewsets.ViewSet):
 
     def list(self, request):
         queryset = WeighIn.objects.all()
-        queryset = annotate_period(queryset, "date", *("year", "month", "day"))
-        period_list = generate_period_list(queryset, "date", *("year", "month", "day"))
+        queryset = annotate_period(queryset, "date", *("year", "week"))
+        period_list = generate_period_list(queryset, "date", *("year", "week"))
         weight_map = {
             str(item["period"]): float(item["ave_weight"])
             for item in queryset.values("period").annotate(ave_weight=Avg("weight_kg"))

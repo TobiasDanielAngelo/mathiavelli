@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
-import { KV } from "../../blueprints/ItemDetails";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyIcon } from "../../blueprints/MyIcon";
 import { MyModal } from "../../blueprints/MyModal";
@@ -45,6 +44,7 @@ import { TransactionForm } from "../modules/TransactionComponents";
 import { WaistMeasurementForm } from "../modules/WaistMeasurementComponents";
 import { WeighInForm } from "../modules/WeighInComponents";
 import { WorkoutForm } from "../modules/WorkoutComponents";
+import { KV, ActionModalDef } from "../../constants/interfaces";
 
 const AllForms = {
   JournalForm,

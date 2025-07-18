@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
-import { KV } from "../../blueprints/ItemDetails";
+import { KV } from "../../constants/interfaces";
 import { TransactionDashboard } from "../modules/TransactionComponents";
 
 export const FinanceView = observer(() => {

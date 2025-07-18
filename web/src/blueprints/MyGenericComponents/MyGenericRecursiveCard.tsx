@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { ItemDetails, KV } from "../../blueprints/ItemDetails";
+import { ItemDetails } from "../../blueprints/ItemDetails";
 import { useVisible } from "../../constants/hooks";
-import { ItemDetailsProps } from "../ItemDetails";
 import { MyConfirmModal } from "../MyConfirmModal";
 import { MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
+import { ItemDetailsProps, KV } from "../../constants/interfaces";
 
 interface MyGenericRecursiveCardProps<T> extends ItemDetailsProps<T> {
   FormComponent: React.ComponentType<{

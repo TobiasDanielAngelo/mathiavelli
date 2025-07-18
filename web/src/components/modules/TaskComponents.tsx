@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import { Task, TaskFields, TaskInterface } from "../../api/TaskStore";
-import { KV } from "../../blueprints/ItemDetails";
+import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -12,7 +12,6 @@ import { createGenericViewContext } from "../../blueprints/MyGenericComponents/M
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
-  ActionModalDef,
   MyGenericView,
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";

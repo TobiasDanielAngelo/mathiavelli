@@ -6,7 +6,7 @@ import {
   PayableInterface,
 } from "../../api/PayableStore";
 import { useStore } from "../../api/Store";
-import { KV } from "../../blueprints/ItemDetails";
+import { KV, ActionModalDef } from "../../constants/interfaces";
 import {
   IAction,
   MyGenericCard,
@@ -18,7 +18,6 @@ import { createGenericViewContext } from "../../blueprints/MyGenericComponents/M
 import { MyGenericRow } from "../../blueprints/MyGenericComponents/MyGenericRow";
 import { MyGenericTable } from "../../blueprints/MyGenericComponents/MyGenericTable";
 import {
-  ActionModalDef,
   MyGenericView,
   useViewValues,
 } from "../../blueprints/MyGenericComponents/MyGenericView";

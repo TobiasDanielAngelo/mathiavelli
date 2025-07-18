@@ -6,9 +6,8 @@ import {
   toRomanWithExponents,
   toTitleCase,
 } from "../../constants/helpers";
-import { StateSetter } from "../../constants/interfaces";
+import { KV, StateSetter } from "../../constants/interfaces";
 import { formatValue } from "../../constants/JSXHelpers";
-import { KV } from "../ItemDetails";
 import { MyTable } from "../MyTable";
 
 type MyGenericTableProps<T extends object> = {

@@ -4,11 +4,13 @@ import { SetURLSearchParams, useSearchParams } from "react-router-dom";
 import { toTitleCase } from "../../constants/helpers";
 import { useKeyPress, useSettings, VisibleMap } from "../../constants/hooks";
 import {
+  ActionModalDef,
+  GraphType,
   KeyboardCodes,
+  KV,
   PaginatedDetails,
   StateSetter,
 } from "../../constants/interfaces";
-import { KV } from "../ItemDetails";
 import { IconName, MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
 import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
@@ -17,17 +19,6 @@ import { MySpeedDial } from "../MySpeedDial";
 import { GenericViewProps } from "./MyGenericProps";
 import { SettingStore } from "../../api/SettingStore";
 import { useStore } from "../../api/Store";
-
-export const graphTypes = ["pie", "line", "bar", "area"] as const;
-
-export type GraphType = (typeof graphTypes)[number];
-
-export type ActionModalDef = {
-  icon: IconName;
-  label: string;
-  name: string;
-  modal: React.ReactNode;
-};
 
 export const useViewValues = <
   U extends Object & { id?: number | string | null },

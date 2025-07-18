@@ -1,24 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { toRomanWithExponents, toTitleCase } from "../constants/helpers";
-import { StateSetter } from "../constants/interfaces";
+import { ItemDetailsProps } from "../constants/interfaces";
 import { formatValue } from "../constants/JSXHelpers";
-
-export interface KV<U extends Record<string, any>> {
-  key: string;
-  values: U[];
-  label: keyof U;
-}
-
-export interface ItemDetailsProps<T> {
-  item: T;
-  shownFields?: (keyof T)[];
-  header?: (keyof T)[];
-  important?: (keyof T)[];
-  prices?: (keyof T)[];
-  showMore?: boolean;
-  setShowMore?: StateSetter<boolean>;
-  itemMap?: KV<any>[];
-}
 
 const sectionStyles: Record<string, string> = {
   Header: "text-sm flex flex-row",

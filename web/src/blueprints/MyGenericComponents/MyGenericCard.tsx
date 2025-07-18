@@ -1,8 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useVisible } from "../../constants/hooks";
-import { Page } from "../../constants/interfaces";
-import { ItemDetails, ItemDetailsProps, KV } from "../ItemDetails";
+import { ItemDetailsProps, KV, Page } from "../../constants/interfaces";
+import { ItemDetails } from "../ItemDetails";
 import { MyConfirmModal } from "../MyConfirmModal";
 import { MyDropdownMenu } from "../MyDropdownMenu";
 import { IconName, MyIcon } from "../MyIcon";

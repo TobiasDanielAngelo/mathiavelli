@@ -1,8 +1,8 @@
 import moment from "moment";
-import { KV } from "../blueprints/ItemDetails";
 import { GuidedDiv } from "../blueprints/MyGuidedDiv";
 import { isDatetimeValue, isDateValue, toMoney } from "./helpers";
 import ReactMarkdown from "react-markdown";
+import { KV } from "./interfaces";
 
 export function isValidJSON(str: string): boolean {
   try {

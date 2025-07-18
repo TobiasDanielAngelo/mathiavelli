@@ -1,8 +1,11 @@
 import { createContext, useContext } from "react";
 import { SetURLSearchParams } from "react-router-dom";
-import { PaginatedDetails, StateSetter } from "../../constants/interfaces";
-import { KV } from "../ItemDetails";
-import { GraphType } from "./MyGenericView";
+import {
+  GraphType,
+  KV,
+  PaginatedDetails,
+  StateSetter,
+} from "../../constants/interfaces";
 
 export interface GenericViewProps<T> {
   shownFields: (keyof T)[];
