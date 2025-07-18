@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { MyImage } from "../../blueprints/MyImages";
 import { titleToCamel, toTitleCase } from "../../constants/helpers";
-import { allViewPaths, ViewPath } from "../main/NavigationBar";
+import { allViewPaths, ViewPath } from "../main/";
 
 // ModuleCard Component
 const ModuleCard = ({ title, path }: { title: string; path: ViewPath }) => {

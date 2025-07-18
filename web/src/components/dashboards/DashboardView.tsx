@@ -44,7 +44,7 @@ import { TransactionForm } from "../modules/TransactionComponents";
 import { WaistMeasurementForm } from "../modules/WaistMeasurementComponents";
 import { WeighInForm } from "../modules/WeighInComponents";
 import { WorkoutForm } from "../modules/WorkoutComponents";
-import { KV, ActionModalDef } from "../../constants/interfaces";
+import { KV } from "../../constants/interfaces";
 
 const AllForms = {
   JournalForm,

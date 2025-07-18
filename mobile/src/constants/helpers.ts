@@ -1,4 +1,4 @@
-// import { format, isValid, parse } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 import LZString from "lz-string";
 import { prop } from "mobx-keystone";
 import moment from "moment";
@@ -215,7 +215,7 @@ export const sortByKey = <T>(
  */
 export const toOptions = <T>(items: T[], keyName?: keyof T): Option[] => {
   return items.map((item, index) => {
-    if (typeof item === "string") {
+    if (typeof item === "string" || typeof item === "number") {
       return { id: index, name: item };
     } else {
       const obj = item as Record<string, any>;
@@ -581,37 +581,35 @@ export const toUTCForRRule = (date: Date | string | null): Date | null =>
         .toDate();
 
 function normalizeDate(dateStr: string | null | Date | undefined): string {
-  // if (typeof dateStr !== "string") {
-  //   return format(dateStr as Date, "yyyy-MM-dd");
-  // }
-  // const formats = ["MMM d, yyyy", "yyyy-MM-dd"];
-  // for (const fmt of formats) {
-  //   const parsed = parse(dateStr, fmt, new Date());
-  //   if (isValid(parsed)) return format(parsed, "yyyy-MM-dd");
-  // }
-  // try {
-  //   return dateStr;
-  // } catch (_) {
-  //   return "";
-  // }
-  return "";
+  if (typeof dateStr !== "string") {
+    return format(dateStr as Date, "yyyy-MM-dd");
+  }
+  const formats = ["MMM d, yyyy", "yyyy-MM-dd"];
+  for (const fmt of formats) {
+    const parsed = parse(dateStr, fmt, new Date());
+    if (isValid(parsed)) return format(parsed, "yyyy-MM-dd");
+  }
+  try {
+    return dateStr;
+  } catch (_) {
+    return "";
+  }
 }
 
 function normalizeTime(timeStr: string | null | Date | undefined): string {
-  // if (typeof timeStr !== "string") {
-  //   return format(timeStr as Date, "HH:mm:ss");
-  // }
-  // const formats = ["h:mm a", "HH:mm:ss"];
-  // for (const fmt of formats) {
-  //   const parsed = parse(timeStr, fmt, new Date());
-  //   if (isValid(parsed)) return format(parsed, "HH:mm:ss");
-  // }
-  // try {
-  //   return format(timeStr, "HH:mm:ss");
-  // } catch (_) {
-  //   return "";
-  // }
-  return "";
+  if (typeof timeStr !== "string") {
+    return format(timeStr as Date, "HH:mm:ss");
+  }
+  const formats = ["h:mm a", "HH:mm:ss"];
+  for (const fmt of formats) {
+    const parsed = parse(timeStr, fmt, new Date());
+    if (isValid(parsed)) return format(parsed, "HH:mm:ss");
+  }
+  try {
+    return format(timeStr, "HH:mm:ss");
+  } catch (_) {
+    return "";
+  }
 }
 
 export function isValidRRuleOptions(options: Partial<Options>): boolean {
@@ -621,13 +619,11 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
 
   // FREQ is required
   if (typeof options.freq !== "number" || !allowedFreq.includes(options.freq)) {
-    console.warn("Freq issue");
     return false;
   }
 
   // DTSTART must be a valid Date
   if (!(options.dtstart instanceof Date) || isNaN(options.dtstart.getTime())) {
-    console.warn("DTstart issue");
     return false;
   }
 
@@ -636,7 +632,6 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
     options.interval &&
     (!Number.isInteger(options.interval) || options.interval <= 0)
   ) {
-    console.warn("Interval issue");
     return false;
   }
 
@@ -645,7 +640,6 @@ export function isValidRRuleOptions(options: Partial<Options>): boolean {
     options.count &&
     (!Number.isInteger(options.count) || options.count <= 0)
   ) {
-    console.warn("Count issue");
     return false;
   }
 

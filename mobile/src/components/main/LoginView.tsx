@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { winHeight, winWidth } from "../../constants/constants";
 
 export const LoginView = observer(() => {
   const { userStore } = useStore();
@@ -31,10 +32,6 @@ export const LoginView = observer(() => {
     }
     navigate("/main");
   };
-
-  // useEffect(() => {
-  //   // fetchCSRF();
-  // }, []);
 
   return (
     <View style={styles.main}>
@@ -61,6 +58,9 @@ export const LoginView = observer(() => {
           <Text style={styles.loginText}>Login</Text>
         </View>
       </TouchableOpacity>
+      <Text>
+        {winWidth}, {winHeight}
+      </Text>
     </View>
   );
 });

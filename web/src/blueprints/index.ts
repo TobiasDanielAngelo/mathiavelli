@@ -10,3 +10,4 @@ export { MyTextArea } from "./MyTextArea";
 export { MyColorPicker } from "./MyColorPicker";
 export { MyMultiDropdownSelector } from "./MyMultiDropdownSelector";
 export { MyGenericTable } from "./MyGenericComponents/MyGenericTable";
+export { MyFileUploader } from "./MyFileUploader";

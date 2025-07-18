@@ -1,20 +1,9 @@
-import { Button, StyleSheet, Text, View } from "react-native";
-import { NativeRouter, Route, Routes, useNavigate } from "react-router-native";
+import { StyleSheet } from "react-native";
+import { NativeRouter, Route, Routes } from "react-router-native";
+import { createStore, StoreContext } from "./src/api/Store";
 import { LoginView } from "./src/components/main/LoginView";
-import { createStore, StoreContext, useStore } from "./src/api/Store";
-
-const Main = () => {
-  const navigate = useNavigate();
-  return (
-    <View>
-      <Text>Main</Text>
-      <Button
-        title="Press to Login"
-        onPress={() => navigate("/login")}
-      ></Button>
-    </View>
-  );
-};
+import { MainView } from "./src/components/main/MainView";
+import { TestingView } from "./src/components/main/TestingView";
 
 export default function App() {
   const store = createStore();
@@ -22,8 +11,9 @@ export default function App() {
     <StoreContext.Provider value={store}>
       <NativeRouter>
         <Routes>
-          <Route path="/*" element={<Main />} />
+          <Route path="/*" element={<MainView />} />
           <Route path="/login" element={<LoginView />} />
+          <Route path="/testing" element={<TestingView />} />
         </Routes>
       </NativeRouter>
     </StoreContext.Provider>

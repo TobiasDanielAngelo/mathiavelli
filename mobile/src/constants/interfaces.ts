@@ -47,7 +47,7 @@ export type Page = {
   title: string;
   link?: string;
   selected?: boolean;
-  onClick?: () => void;
+  onPress?: () => void;
   hidden?: boolean;
   children?: Page[];
 };
@@ -63,9 +63,9 @@ export type Field = {
 };
 
 export type MySpeedDialProps = {
-  icon: any;
+  icon: string;
   name: string;
-  onClick?: () => void;
+  onPress?: () => void;
   hidden?: boolean;
 };
 

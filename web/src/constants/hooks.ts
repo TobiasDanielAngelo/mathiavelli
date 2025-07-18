@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { SettingStore } from "../api/SettingStore";
 import { handleKeyDown } from "./helpers";
-import { KeyboardCodes, StateSetter } from "./interfaces";
+import { CalendarView, KeyboardCodes, StateSetter } from "./interfaces";
 import moment from "moment";
-import { CalendarView } from "../blueprints/MyCalendar";
 
 export const useKeyPress = (keys: KeyboardCodes[], callbackFcn: () => void) => {
   useEffect(() => {

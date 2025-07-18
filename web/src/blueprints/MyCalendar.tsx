@@ -3,7 +3,7 @@ import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
 import { getStoreSignature, sortByKey } from "../constants/helpers";
 import { useVisible, useWindowWidth } from "../constants/hooks";
-import { StateSetter } from "../constants/interfaces";
+import { CalendarView, StateSetter } from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
 import { MyModal } from "./MyModal";
 import { MyTable } from "./MyTable";
@@ -79,8 +79,6 @@ const EventItem = (props: {
     </>
   );
 };
-
-export type CalendarView = "week" | "month" | "year" | "decade";
 
 export const MyCalendar = observer(
   (props: {

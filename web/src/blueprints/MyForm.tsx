@@ -15,8 +15,9 @@ import {
   MyMultiDropdownSelector,
   MyMultiSelector,
   MyTextArea,
+  MyFileUploader,
 } from "./";
-import { MyFileUploader } from "./MyFileUploader";
+import {} from "./MyFileUploader";
 import { MyIcon } from "./MyIcon";
 
 const getMsg = (msg: any, name: string) =>

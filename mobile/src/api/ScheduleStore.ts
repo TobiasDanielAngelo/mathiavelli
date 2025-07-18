@@ -40,7 +40,7 @@ const derivedProps = (item: ScheduleInterface) => ({
     WEEKDAY_CHOICES.find((_, ind) => ind === item.weekStart) ?? "—",
   collidingDates: formatValue(
     generateCollidingDates(item),
-    "",
+    "colliding",
     [],
     undefined,
     item.count === 0 || item.count === null ? true : false

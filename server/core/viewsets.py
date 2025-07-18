@@ -13,8 +13,18 @@ from lzstring import LZString
 class CustomAuthentication(TokenAuthentication):
     def authenticate(self, request):
         token = request.COOKIES.get("knox_token")
+
+        # Fallback: check header or body (for mobile)
+        if not token:
+            token = request.headers.get("Authorization")
+            if token and token.startswith("Token "):
+                token = token.split("Token ")[1]
+            elif "token" in request.data:
+                token = request.data.get("token")
+
         if token:
             return self.authenticate_credentials(token.encode("utf-8"))
+
         return None
 
 

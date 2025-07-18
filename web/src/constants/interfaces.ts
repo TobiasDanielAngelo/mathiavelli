@@ -5,6 +5,8 @@ export type PropsToInterface<P> = {
   [K in keyof P]?: P[K] extends ReturnType<typeof prop<infer T>> ? T : never;
 };
 
+export type CalendarView = "week" | "month" | "year" | "decade";
+
 export type InterfaceToProps<T> = {
   [K in keyof T]: ReturnType<typeof prop<T[K]>>;
 };

@@ -2,8 +2,8 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo } from "react";
 import { Event, EventFields, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
-import { CalendarView, MyCalendar } from "../../blueprints/MyCalendar";
+import { KV, ActionModalDef, CalendarView } from "../../constants/interfaces";
+import { MyCalendar } from "../../blueprints/MyCalendar";
 import {
   IAction,
   MyGenericCard,

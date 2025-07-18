@@ -1,3 +1,8 @@
+import { Dimensions } from "react-native";
+
+export const { width: winWidth, height: winHeight } = Dimensions.get("window");
+export const isWideScreen = winWidth >= 600;
+
 export const DAYS_OF_WEEK_CHOICES = [
   "Sun",
   "Mon",

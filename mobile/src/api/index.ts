@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PaginatedResponse } from "../constants/interfaces";
 
 export function autoFormData(body: Record<string, any>) {
@@ -37,17 +38,6 @@ export function autoFormData(body: Record<string, any>) {
   return formData;
 }
 
-export function getCookie(name: string): string {
-  const cookies = document.cookie ? document.cookie.split(";") : [];
-  for (let cookie of cookies) {
-    cookie = cookie.trim();
-    if (cookie.startsWith(name + "=")) {
-      return decodeURIComponent(cookie.substring(name.length + 1));
-    }
-  }
-  return "";
-}
-
 export const fetchCSRF = async () => {
   return await guidedRequest("csrf/", {
     method: "GET",
@@ -74,16 +64,19 @@ export async function guidedRequest<T>(
 
   let url = customURL
     ? `${customURL}/${endpoint}`
-    : `${"http://192.168.1.14"}/${endpoint}`;
+    : `${"http://192.168.1.14:8000"}/${endpoint}`;
   if (options.itemId) url += `${options.itemId}/`;
   if (options.params) url += `?${filtered.toString()}`;
 
   const preparedBody = options.body ? autoFormData(options.body) : undefined;
   const isFormData = preparedBody instanceof FormData;
 
+  const token = await AsyncStorage.getItem("token");
+
   const headers: Record<string, string> = {
     "ngrok-skip-browser-warning": "any",
-    // "X-CSRFToken": getCookie("csrftoken"),
+    "X-From-Mobile": "true",
+    Authorization: `Token ${token}`,
   };
 
   if (!isFormData) {

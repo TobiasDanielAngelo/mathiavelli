@@ -4,20 +4,8 @@ import { handleKeyDown } from "./helpers";
 import { KeyboardCodes, StateSetter } from "./interfaces";
 import moment from "moment";
 import { CalendarView } from "./interfaces";
-
-export const useWindowWidth = () => {
-  const [width, setWidth] = useState<number>(0);
-
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return width;
-};
+import { Dimensions } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function useSettings<T>(
   settingStore: SettingStore,
@@ -49,7 +37,7 @@ export function useSettings<T>(
     settingId
       ? settingStore.updateItem(settingId, { value: JSON.stringify(state) })
       : settingStore.addItem({ key, value: JSON.stringify(state) });
-    localStorage.setItem(key, JSON.stringify(state));
+    AsyncStorage.setItem(key, JSON.stringify(state));
   }, [state]);
 
   return [state, setState] as const;

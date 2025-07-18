@@ -9,8 +9,8 @@ import {
   WEEKDAY_CHOICES,
 } from "../../api/ScheduleStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
-import { CalendarView, MyCalendar } from "../../blueprints/MyCalendar";
+import { KV, ActionModalDef, CalendarView } from "../../constants/interfaces";
+import { MyCalendar } from "../../blueprints/MyCalendar";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";

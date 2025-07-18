@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useStore } from "../../api/Store";
 import { DashboardView } from "../dashboards/DashboardView";
-import { HealthView } from "../dashboards/HealthView";
+import { HealthView } from "../modules/HealthComponents";
 import { ModularView } from "../dashboards/ModularView";
 import { AccountView } from "../modules/AccountComponents";
 import { BodyFatView } from "../modules/BodyFatComponents";
