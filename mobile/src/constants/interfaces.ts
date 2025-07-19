@@ -69,6 +69,14 @@ export type MySpeedDialProps = {
   hidden?: boolean;
 };
 
+export type CalendarEvent = {
+  id: string | number;
+  title: string;
+  dateStart: string;
+  dateEnd?: string;
+  dateCompleted?: string;
+};
+
 export type PaginatedResponse<T> = {
   count: number;
   next: string | null;

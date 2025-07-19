@@ -36,6 +36,8 @@ import {
   StateSetter,
 } from "../../constants/interfaces";
 import { formatValue } from "../../constants/JSXHelpers";
+import { Text } from "react-native";
+import { MyCalendar } from "../../blueprints/MyCalendar";
 
 export const { Context: ScheduleViewContext, useGenericView: useScheduleView } =
   createGenericViewContext<ScheduleInterface>();
@@ -201,7 +203,7 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
     !item.associatedHabit && !item.associatedTask
       ? [
           {
-            onClick: () =>
+            onPress: () =>
               taskStore.addItem({
                 title: item.name,
                 schedule: item.id,
@@ -210,7 +212,7 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
             title: "Add to Tasks",
           },
           {
-            onClick: () =>
+            onPress: () =>
               habitStore.addItem({
                 title: item.name,
                 schedule: item.id,
@@ -264,18 +266,8 @@ export const ScheduleDashboard = observer(
               collidingDate: date,
             }))
           )
-          .filter((s) => {
-            const m = moment(s.collidingDate);
-            if (view === "week")
-              return m.isBetween(
-                moment(range).startOf("week"),
-                moment(range).endOf("week"),
-                null,
-                "[]"
-              );
-            if (view === "month") return m.format("YYYY-MM") === range;
-            return false;
-          })
+          .filter((s) => s.collidingDate.getDate() === date.getDate())
+          .sort((a, b) => a.collidingDate.getTime() - b.collidingDate.getTime())
           .map((s, ind) => ({
             id: ind,
             title: s.name ?? "",
@@ -283,7 +275,7 @@ export const ScheduleDashboard = observer(
             dateEnd: s.collidingDate.toISOString(),
             dateCompleted: s.collidingDate.toISOString(),
           }));
-    return <></>;
+    return <MyCalendar {...props} events={items} />;
   }
 );
 

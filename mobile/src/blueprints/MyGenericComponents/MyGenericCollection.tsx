@@ -1,18 +1,41 @@
 import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { sortAndFilterByIds } from "../../constants/helpers";
+import { useVisible } from "../../constants/hooks";
 import { PaginatedDetails } from "../../constants/interfaces";
 import { MyIcon } from "../MyIcon";
-import { useVisible } from "../../constants/hooks";
-import { useEffect } from "react";
-import { winWidth } from "../../constants/constants";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Platform,
-  Text,
-  FlatList,
-} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const TopBar = () => (
+  <View style={styles2.topBar}>
+    <Text style={styles2.barText}>TopBar</Text>
+  </View>
+);
+
+const styles2 = StyleSheet.create({
+  topBar: {
+    height: 50,
+    backgroundColor: "#4A90E2",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  bottomBar: {
+    height: 60,
+    backgroundColor: "#50E3C2",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  barText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  item: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+  },
+});
 
 export const MyGenericCollection = observer(
   <T extends { id: number | string /* & object */ }>(props: {
@@ -32,12 +55,7 @@ export const MyGenericCollection = observer(
     }, []);
 
     return (
-      <View
-        style={[
-          styles.container,
-          // isVisible1 && { minHeight: "85%", maxHeight: "85%" },
-        ]}
-      >
+      <View style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={[styles.headerText]}>{title.toUpperCase()}</Text>
           <MyIcon
@@ -45,7 +63,6 @@ export const MyGenericCollection = observer(
             onPress={() => setVisible1((t) => !t)}
           />
         </View>
-
         {isVisible1 && (
           <>
             {PageBar ? <PageBar /> : <></>}
@@ -73,20 +90,15 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     borderRadius: 12,
   },
-
-  content: {
-    flexGrow: 1,
-  },
-  list: {
-    paddingTop: 10,
-  },
+  content: {},
+  list: {},
   header: {
     flexDirection: "row",
     borderBottomWidth: 2,
-    borderBottomColor: "teal",
+    // borderBottomColor: "teal",
     padding: 8,
     borderRadius: 6,
-    backgroundColor: "#ccfbf1", // bg-teal-100
+    // backgroundColor: "#ccfbf1", // bg-teal-100
     top: 0,
     zIndex: 0,
     width: "100%",

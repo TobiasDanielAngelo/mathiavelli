@@ -2,7 +2,16 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useStore } from "../../api/Store";
 import { Route, Routes, useNavigate } from "react-router-native";
-import { Button, Text, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  ImageBackground,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AccountView } from "../modules/AccountComponents";
 import { HealthView } from "../modules/HealthComponents";
@@ -45,9 +54,20 @@ import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
 import { MySpeedDial } from "../../blueprints/MySpeedDial";
 import { MyButton } from "../../blueprints";
+import { LinearGradient } from "expo-linear-gradient";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { MenuBar } from "../../blueprints/MenuBar";
+import { Menu } from "../../blueprints/MenuCard";
+import { useVisible } from "../../constants/hooks";
+import { TestingView } from "./TestingView";
 
 export const MainView = observer(() => {
   const navigate = useNavigate();
+  const insets = useSafeAreaInsets();
+  const { isVisible1, setVisible1 } = useVisible();
 
   const {
     accountStore,
@@ -84,55 +104,86 @@ export const MainView = observer(() => {
     }
   };
 
+  const menuItems = [
+    { name: "bars", label: "Menu", onPress: () => navigate("/menu") },
+    { name: "door-open", label: "Drawer", onPress: () => setVisible1(true) },
+    { name: "star", label: "Testing", onPress: () => navigate("/testing") },
+    { name: "star", label: "Events", onPress: () => navigate("/events") },
+  ] satisfies Menu[];
+
   useEffect(() => {
     fetchAll();
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "lightcyan" }}>
-      <MyButton label="Press to Login" onPress={() => navigate("/menu")} />
-      <Routes>
-        <Route path="menu" element={<ModularView />} />
-        <Route path="" element={<ModularView />} />
-        {/* <Route path="dashboard" element={<DashboardView />} /> */}
-        <Route path="journals" element={<JournalView />} />
-        <Route path="dreams" element={<DreamView />} />
-        <Route path="transactions" element={<TransactionView />} />
-        <Route path="categories" element={<CategoryView />} />
-        <Route path="accounts" element={<AccountView />} />
-        <Route path="events" element={<EventView />} />
-        <Route path="tags" element={<TagView />} />
-        <Route path="goals" element={<GoalView />} />
-        <Route path="receivables" element={<ReceivableView />} />
-        <Route path="payables" element={<PayableView />} />
-        <Route path="health" element={<HealthView />} />
-        <Route path="tasks" element={<TaskView />} />
-        <Route path="wishlist" element={<BuyListItemView />} />
-        <Route path="credentials" element={<CredentialView />} />
-        <Route path="platforms" element={<PlatformView />} />
-        <Route path="jobs" element={<JobView />} />
-        <Route path="follow-ups" element={<FollowUpView />} />
-        <Route path="body-fats" element={<BodyFatView />} />
-        <Route path="waist-measure" element={<WaistMeasurementView />} />
-        <Route path="meals" element={<MealView />} />
-        <Route path="weigh-ins" element={<WeighInView />} />
-        <Route path="workouts" element={<WorkoutView />} />
-        <Route path="inventory-types" element={<InventoryCategoryView />} />
-        <Route path="inventory" element={<PersonalItemView />} />
-        <Route path="finance" element={<FinanceView />} />
-        <Route path="habits" element={<HabitView />} />
-        <Route path="logs" element={<HabitLogView />} />
-        <Route path="schedules" element={<ScheduleView />} />
-        <Route path="settings" element={<SettingView />} />
-        <Route path="issue-comments" element={<IssueCommentView />} />
-        <Route path="issue-tags" element={<IssueTagView />} />
-        <Route path="tickets" element={<TicketView />} />
-        <Route path="notes" element={<NoteView />} />
-        <Route path="travel-plans" element={<TravelPlanView />} />
-        <Route path="bring-items" element={<ItemToBringView />} />
-        <Route path="travel-requirements" element={<RequirementView />} />
-        <Route path="documents" element={<DocumentView />} />
-      </Routes>
-    </View>
+    <LinearGradient
+      colors={["cyan", "lightcyan", "cyan"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }} // horizontal
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
+      <ImageBackground
+        source={require("../../../assets/faintgreen.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <Routes>
+          <Route path="menu" element={<ModularView />} />
+          <Route path="" element={<ModularView />} />
+          <Route path="journals" element={<JournalView />} />
+          <Route path="dreams" element={<DreamView />} />
+          <Route path="transactions" element={<TransactionView />} />
+          <Route path="categories" element={<CategoryView />} />
+          <Route path="accounts" element={<AccountView />} />
+          <Route path="events" element={<EventView />} />
+          <Route path="tags" element={<TagView />} />
+          <Route path="goals" element={<GoalView />} />
+          <Route path="receivables" element={<ReceivableView />} />
+          <Route path="payables" element={<PayableView />} />
+          <Route path="health" element={<HealthView />} />
+          <Route path="tasks" element={<TaskView />} />
+          <Route path="wishlist" element={<BuyListItemView />} />
+          <Route path="credentials" element={<CredentialView />} />
+          <Route path="platforms" element={<PlatformView />} />
+          <Route path="jobs" element={<JobView />} />
+          <Route path="follow-ups" element={<FollowUpView />} />
+          <Route path="body-fats" element={<BodyFatView />} />
+          <Route path="waist-measure" element={<WaistMeasurementView />} />
+          <Route path="meals" element={<MealView />} />
+          <Route path="weigh-ins" element={<WeighInView />} />
+          <Route path="workouts" element={<WorkoutView />} />
+          <Route path="inventory-types" element={<InventoryCategoryView />} />
+          <Route path="inventory" element={<PersonalItemView />} />
+          <Route path="finance" element={<FinanceView />} />
+          <Route path="habits" element={<HabitView />} />
+          <Route path="logs" element={<HabitLogView />} />
+          <Route path="schedules" element={<ScheduleView />} />
+          <Route path="settings" element={<SettingView />} />
+          <Route path="issue-comments" element={<IssueCommentView />} />
+          <Route path="issue-tags" element={<IssueTagView />} />
+          <Route path="tickets" element={<TicketView />} />
+          <Route path="notes" element={<NoteView />} />
+          <Route path="travel-plans" element={<TravelPlanView />} />
+          <Route path="bring-items" element={<ItemToBringView />} />
+          <Route path="travel-requirements" element={<RequirementView />} />
+          <Route path="documents" element={<DocumentView />} />
+          <Route path="/testing" element={<TestingView />} />
+        </Routes>
+      </ImageBackground>
+      <NavBar drawerOpen={isVisible1} setDrawerOpen={setVisible1} />
+      <MenuBar items={menuItems} />
+    </LinearGradient>
   );
+});
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
 });

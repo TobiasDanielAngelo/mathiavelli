@@ -53,13 +53,13 @@ export const MyGenericRow = observer(
         <MyConfirmModal
           isVisible={isVisible2}
           setVisible={setVisible2}
-          onClickCheck={onDelete}
+          onPressCheck={onDelete}
           actionName="Delete"
           msg={msg}
         />
         <HView>
           <MyIcon icon="edit" onPress={() => setVisible1(true)} />
-          <MyIcon icon="close" onPress={() => setVisible2(true)} />
+          <MyIcon icon="times" onPress={() => setVisible2(true)} />
         </HView>
       </View>
     );

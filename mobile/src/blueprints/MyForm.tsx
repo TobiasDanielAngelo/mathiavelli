@@ -43,7 +43,7 @@ const renderField = (
       return (
         <View key={key}>
           <Text>{t.label}</Text>
-          {t.function?.(details)}
+          <Text style={{ textAlign: "center" }}>{t.function?.(details)}</Text>
         </View>
       );
     case "password":
@@ -111,7 +111,11 @@ const renderField = (
         />
       );
     default:
-      return <View key={key}>{t.label}</View>;
+      return (
+        <Text key={key} style={{ textAlign: "center" }}>
+          {t.label}
+        </Text>
+      );
   }
 };
 
@@ -121,8 +125,8 @@ type FormProps = {
   objectName?: string;
   details: any;
   setDetails: (t: any) => void;
-  onClickSubmit: () => void;
-  onClickSubmitAdd: () => void;
+  onPressSubmit: () => void;
+  onPressSubmitAdd: () => void;
   hasDelete?: boolean;
   onDelete?: () => Promise<void>;
   msg?: Object;
@@ -142,8 +146,8 @@ export const MyForm = observer(
     objectName,
     details,
     setDetails,
-    onClickSubmit,
-    onClickSubmitAdd,
+    onPressSubmit,
+    onPressSubmitAdd,
     hasDelete,
     onDelete,
     msg,
@@ -154,10 +158,10 @@ export const MyForm = observer(
     const onChangeValue = (val: any, name: string) =>
       setDetails({ ...details, [name]: val });
 
-    const onClickDelete = () => {
+    const onPressDelete = () => {
       setVisible1?.(true);
     };
-    const onClickConfirm = async () => {
+    const onPressConfirm = async () => {
       await onDelete?.();
     };
 
@@ -166,7 +170,7 @@ export const MyForm = observer(
         <MyConfirmModal
           isVisible={isVisible1}
           setVisible={setVisible1}
-          onClickCheck={onClickConfirm}
+          onPressCheck={onPressConfirm}
           objectName={objectName}
           actionName="Delete"
         />
@@ -186,18 +190,18 @@ export const MyForm = observer(
         <Text>{getMsg(msg, "detail")}</Text>
         <View>
           <MyButton
-            onPress={onClickSubmit}
+            onPress={onPressSubmit}
             isLoading={isLoading}
             label="Save"
           />
           {!hasDelete ? (
             <MyButton
-              onPress={onClickSubmitAdd}
+              onPress={onPressSubmitAdd}
               isLoading={isLoading}
               label="Save and Add"
             />
           ) : (
-            <MyIcon icon="trash" onPress={onClickDelete} />
+            <MyIcon icon="trash" onPress={onPressDelete} />
           )}
         </View>
       </View>

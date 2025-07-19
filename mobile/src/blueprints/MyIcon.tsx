@@ -10,11 +10,13 @@ export type IconName = keyof typeof iconMap;
 // 3. Props with generic icon component + standard icon props
 interface MyIconProps {
   icon: string;
+  color?: string;
   label?: string;
   hidden?: boolean;
   disabled?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
+  size?: number;
 }
 
 export const MyIcon: React.FC<MyIconProps> = ({
@@ -24,6 +26,8 @@ export const MyIcon: React.FC<MyIconProps> = ({
   disabled,
   onPress,
   onLongPress,
+  color,
+  size,
 }) => {
   return (
     !hidden && (
@@ -32,8 +36,17 @@ export const MyIcon: React.FC<MyIconProps> = ({
         onPress={!disabled ? onPress : undefined}
         onLongPress={!disabled ? onLongPress : undefined}
       >
-        <Icon name={icon} type="font-awesome" />
-        {label && <Text style={styles.text}>{label}</Text>}
+        <Icon
+          name={icon}
+          color={color ?? undefined}
+          type="font-awesome-5"
+          size={size}
+        />
+        {label && (
+          <Text style={[styles.text, { color: color ?? undefined }]}>
+            {label}
+          </Text>
+        )}
       </TouchableOpacity>
     )
   );

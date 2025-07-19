@@ -135,10 +135,10 @@ export const MyGenericTable = observer(
     }, []);
 
     return (
-      <ScrollView>
+      <View style={{ flex: 1 }}>
         <PageBar />
         <MyTable matrix={matrix} hidden={!shownFields.length} />
-      </ScrollView>
+      </View>
     );
   }
 );

@@ -30,6 +30,7 @@ import {
   useVisible,
 } from "../../constants/hooks";
 import { Field, StateSetter } from "../../constants/interfaces";
+import { MyCalendar } from "../../blueprints/MyCalendar";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -138,15 +139,15 @@ export const EventCard = observer((props: { item: Event }) => {
 
   const moreActions = [
     {
-      onClick: () =>
+      onPress: () =>
         eventStore.updateItem(item.id, {
           dateCompleted: item.dateCompleted ? null : new Date().toISOString(),
         }),
       icon: (item.dateCompleted
         ? item.excuse === ""
-          ? "CheckBox"
-          : "Warning"
-        : "CheckBoxOutlineBlank") as IconName,
+          ? "check-square"
+          : "exclamation"
+        : "square") as IconName,
       color: item.dateCompleted ? "success" : "inherit",
     },
   ] satisfies IAction[];
@@ -182,7 +183,7 @@ export const EventDashboard = observer(
     const { eventStore } = useStore();
     const { pageDetails } = useEventView();
 
-    return <></>;
+    return <MyCalendar {...props} />;
   }
 );
 
@@ -289,7 +290,6 @@ export const EventView = observer(() => {
   const { params, setPageDetails, setParams } = values;
 
   const fetchFcn = async () => {
-    if (!params.size) return;
     const resp = await eventStore.fetchAll(params.toString());
     if (!resp.ok || !resp.data) {
       return;

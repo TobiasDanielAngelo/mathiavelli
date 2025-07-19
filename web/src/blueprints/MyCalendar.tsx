@@ -3,18 +3,14 @@ import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
 import { getStoreSignature, sortByKey } from "../constants/helpers";
 import { useVisible, useWindowWidth } from "../constants/hooks";
-import { CalendarView, StateSetter } from "../constants/interfaces";
+import {
+  CalendarEvent,
+  CalendarView,
+  StateSetter,
+} from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
 import { MyModal } from "./MyModal";
 import { MyTable } from "./MyTable";
-
-export type CalendarEvent = {
-  id: string | number;
-  title: string;
-  dateStart: string;
-  dateEnd?: string;
-  dateCompleted?: string;
-};
 
 const HourItem = (props: {
   hour: number;

@@ -30,11 +30,10 @@ const ModuleCard = ({
   };
   return (
     <View>
-      <Text
-        style={{ color: pathLink ? "blue" : "black" }}
-        onPress={gotoNavigate}
-      >
-        Go to {title}: ({pathLink}){" "}
+      <Text style={{ color: pathLink ? "blue" : "black" }}>
+        <Text onPress={gotoNavigate}>
+          Go to {title}: ({pathLink}){" "}
+        </Text>
         {onPress && (
           <Text
             onPress={onPress}
@@ -42,7 +41,9 @@ const ModuleCard = ({
               color: path.items.length ? "blue" : "black",
             }}
           >
-            {path.mainLink !== "back" ? "More..." : "Back"}
+            {path.mainLink !== "back"
+              ? `More... (${path.items.length})`
+              : "Back"}
           </Text>
         )}
       </Text>
@@ -59,6 +60,7 @@ export const ModularView = observer(() => {
   return (
     <View>
       <View>
+        <Text>X {module}</Text>
         {!currentPaths ? (
           allViewPaths.map((path, index) => (
             <ModuleCard

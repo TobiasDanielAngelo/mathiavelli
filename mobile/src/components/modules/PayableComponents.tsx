@@ -104,7 +104,7 @@ export const PayableCard = observer((props: { item: Payable }) => {
   const { isVisible1, setVisible1 } = useVisible();
 
   const moreActions = [
-    { onClick: () => setVisible1(true), icon: "Payment" },
+    { onPress: () => setVisible1(true), icon: "Payment" },
   ] satisfies IAction[];
 
   return (

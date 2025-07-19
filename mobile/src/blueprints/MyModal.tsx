@@ -1,5 +1,11 @@
 import { PropsWithChildren } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { Overlay } from "react-native-elements";
 import { winHeight, winWidth } from "../constants/constants";
 import { StateSetter } from "../constants/interfaces";
@@ -16,6 +22,7 @@ export const MyModal = (
     disableClose?: boolean;
   }>
 ) => {
+  const { width, height } = useWindowDimensions();
   const {
     isVisible,
     setVisible,
@@ -28,11 +35,17 @@ export const MyModal = (
 
   return (
     <Overlay isVisible={isVisible}>
-      <ScrollView style={styles.main}>
+      <ScrollView
+        style={{
+          width: width * 0.8,
+          maxWidth: 500,
+          maxHeight: height * 0.7,
+        }}
+      >
         <HView>
           <Text style={styles.text}>{title}</Text>
           <Text style={styles.text}>{subTitle}</Text>
-          <MyIcon icon="close" onPress={() => setVisible(false)} />
+          <MyIcon icon="times" onPress={() => setVisible(false)} />
         </HView>
         <View style={styles.children}>{children}</View>
         <View style={styles.bar}>
@@ -44,15 +57,12 @@ export const MyModal = (
 };
 
 const styles = StyleSheet.create({
-  main: {
-    width: winWidth * 0.85,
-  },
   text: {},
   bar: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
   },
   children: {
-    padding: winHeight * 0.03,
+    // padding: winHeight * 0.03,
   },
 });

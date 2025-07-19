@@ -1,6 +1,10 @@
 import React from "react";
 import { PaginatedDetails } from "../constants/interfaces";
-import { Text, View } from "react-native";
+import { Dimensions, Pressable, Text, View } from "react-native";
+import { isWideScreen } from "../constants/constants";
+import { StyleSheet } from "react-native";
+import { MyIcon } from "./MyIcon";
+import { LinearGradient } from "expo-linear-gradient";
 
 export type MyPageBarProps = {
   pageDetails?: PaginatedDetails;
@@ -44,42 +48,105 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
   };
 
   return (
-    <View>
-      {totalPages <= 1 ? (
-        <></>
-      ) : (
-        <Text>{`Page ${currentPage} of ${totalPages} (${count} items)`}</Text>
-      )}
-      <Text>{title.toUpperCase()}</Text>
+    <View
+      style={[
+        styles.main,
+        {
+          flexDirection:
+            Dimensions.get("window").width > 600 ? "row" : "column",
+        },
+      ]}
+    >
       <View>
+        <Text>{`Page ${currentPage} of ${totalPages} (${count} items)`}</Text>
+        <Text style={styles.title}>{title.toUpperCase()}</Text>
+      </View>
+      <View style={styles.pageNav}>
         {currentPage === 1 ? (
           <></>
         ) : (
-          <View>
-            <Text onPress={onPressPrev}>Prev</Text>
+          <View style={[styles.navButton, styles.navLeft]}>
+            <Text style={styles.text} onPress={onPressPrev}>
+              {`\u276e`}
+            </Text>
           </View>
         )}
         {totalPages <= 1 ? (
           <></>
         ) : (
           getPageNumbers().map((item, index) => (
-            <View key={index}>
-              {typeof item === "number" ? (
-                <Text onPress={() => onPressPage(item)}>{item}</Text>
-              ) : (
-                <Text>{item}</Text>
-              )}
-            </View>
+            <Pressable
+              key={index}
+              style={[
+                styles.navButton,
+                item === currentPage ? styles.selected : {},
+              ]}
+              onPress={
+                typeof item === "number" ? () => onPressPage(item) : undefined
+              }
+            >
+              <Text
+                style={[
+                  styles.text,
+                  item === currentPage ? styles.selected : {},
+                ]}
+              >
+                {item}
+              </Text>
+            </Pressable>
           ))
         )}
-        <View>
-          {currentPage >= totalPages ? (
-            <></>
-          ) : (
-            <Text onPress={onPressNext}>Next</Text>
-          )}
-        </View>
+        {currentPage < totalPages && (
+          <View style={[styles.navButton, styles.navRight]}>
+            <Text style={styles.text} onPress={onPressNext}>
+              {`\u276f`}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  main: {
+    // flex: 1,
+    paddingTop: 10,
+    alignItems: "center",
+    flexDirection: isWideScreen ? "row" : "column",
+    // flexWrap: "wrap",
+    justifyContent: "space-between",
+    margin: 4,
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  pageNav: {
+    flexDirection: "row",
+    gap: 2,
+  },
+  navButton: {
+    padding: 1,
+    paddingHorizontal: 7,
+    backgroundColor: "lightcyan",
+    minWidth: 20,
+    textAlign: "center",
+    alignItems: "center",
+  },
+  navLeft: {
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+  },
+  navRight: {
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+  },
+  selected: {
+    backgroundColor: "teal",
+    color: "white",
+  },
+  text: {
+    fontSize: 15,
+  },
+});

@@ -21,6 +21,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
 import { Field } from "../../constants/interfaces";
+import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 
 export const { Context: WeighInViewContext, useGenericView: useWeighInView } =
   createGenericViewContext<WeighInInterface>();
@@ -86,7 +87,16 @@ export const WeighInCard = observer((props: { item: WeighIn }) => {
 export const WeighInDashboard = observer(() => {
   const { weighInAnalyticsStore } = useStore();
 
-  return <></>;
+  return (
+    <MyLineChart
+      data={weighInAnalyticsStore.items}
+      xKey="period"
+      yKey="aveWeight"
+      // formatter={(value: number, name: string) => [`${value} kg`, name]}
+      // noTotal
+      // title="Weigh In (kg)"
+    />
+  );
 });
 
 export const WeighInCollection = observer(() => {

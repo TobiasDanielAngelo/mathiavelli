@@ -24,6 +24,7 @@ import { useVisible } from "../../constants/hooks";
 import { Field } from "../../constants/interfaces";
 import { AccountForm } from "./AccountComponents";
 import { CATEGORY_CHOICES } from "../../api/CategoryStore";
+import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 
 export const {
   Context: TransactionViewContext,
@@ -133,7 +134,22 @@ export const TransactionDashboard = observer(
     const { transactionAnalyticsStore } = useStore();
     const { itemMap, graph } = props;
 
-    return <>{graph === "pie" ? <></> : <></>}</>;
+    return (
+      <MyLineChart
+        data={transactionAnalyticsStore.items.filter((s) => s.graph === "line")}
+        traceKey="account"
+        xKey="period"
+        yKey="total"
+        formatter={(value: number, name: string) => [
+          toMoneyShortened(value),
+          name,
+        ]}
+        itemMap={itemMap}
+        excludedFromTotal={["Operations", "Initial"]}
+        selectionLabel="Accounts"
+        title="Transactions"
+      />
+    );
   }
 );
 

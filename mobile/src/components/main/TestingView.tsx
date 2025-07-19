@@ -1,13 +1,8 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
-import { MyTable } from "../../blueprints/MyTable";
+import React from "react";
+import { Text } from "react-native";
+import { MyCalendar } from "../../blueprints/MyCalendar";
 
 export const TestingView = observer(() => {
-  const [x, setX] = useState(new Date().toISOString());
-
-  return (
-    <>
-      <MyTable matrix={[]} />
-    </>
-  );
+  return <></>;
 });

@@ -93,7 +93,7 @@ export function MyGenericForm<T>({
   const [msg, setMsg] = useState<Object>();
   const [isLoading, setLoading] = useState(false);
 
-  const onClickCreate = async () => {
+  const onPressCreate = async () => {
     setLoading(true);
     const resp = await store.addItem(transformTo(details));
     setLoading(false);
@@ -102,7 +102,7 @@ export function MyGenericForm<T>({
     setVisible?.(false);
   };
 
-  const onClickCreateAdd = async () => {
+  const onPressCreateAdd = async () => {
     setLoading(true);
     const resp = await store.addItem(transformTo(details));
     setLoading(false);
@@ -111,7 +111,7 @@ export function MyGenericForm<T>({
     setDetails(transformFrom({} as T));
   };
 
-  const onClickEdit = async () => {
+  const onPressEdit = async () => {
     if (!item?.id) return;
     setLoading(true);
     const resp = await store.updateItem(item.id, transformTo(details));
@@ -121,7 +121,7 @@ export function MyGenericForm<T>({
     setVisible?.(false);
   };
 
-  const onClickDelete = async () => {
+  const onPressDelete = async () => {
     if (!item?.id) return;
     setLoading(true);
     const resp = await store.deleteItem(item.id);
@@ -138,10 +138,10 @@ export function MyGenericForm<T>({
         title={title}
         details={details}
         setDetails={setDetails}
-        onClickSubmit={item?.id ? onClickEdit : onClickCreate}
-        onClickSubmitAdd={onClickCreateAdd}
+        onPressSubmit={item?.id ? onPressEdit : onPressCreate}
+        onPressSubmitAdd={onPressCreateAdd}
         hasDelete={!!item?.id}
-        onDelete={onClickDelete}
+        onDelete={onPressDelete}
         msg={msg}
         isLoading={isLoading}
       />

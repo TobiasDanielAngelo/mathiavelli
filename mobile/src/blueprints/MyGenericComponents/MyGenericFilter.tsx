@@ -152,7 +152,7 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
     setDetails({ ...details, [name]: val });
   };
 
-  const onClickFilter = () => {
+  const onPressFilter = () => {
     if (
       !Object.entries(details).filter(([_, v]) => v != null && v !== "").length
     ) {
@@ -166,7 +166,7 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
     setParams("q=" + generateShortParam(filtered));
   };
 
-  const onClickReset = () => {
+  const onPressReset = () => {
     setDetails(getInitialDetails(fields));
     setParams("");
   };
@@ -190,8 +190,7 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
       ))}
 
       <View>
-        <MyButton onPress={onClickFilter} label="Filter Results" />
-        <MyIcon icon="RestartAlt" onPress={onClickReset} />
+        <MyButton onPress={onPressFilter} label="Filter Results" />
       </View>
     </ScrollView>
   );

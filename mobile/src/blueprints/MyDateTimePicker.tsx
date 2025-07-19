@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { winWidth } from "../constants/constants";
 import { MyIcon } from "./MyIcon";
+import { isValidDate } from "rrule/dist/esm/dateutil";
 
 export const MyDateTimePicker = (props: {
   hidden?: boolean;
@@ -37,10 +38,12 @@ export const MyDateTimePicker = (props: {
     setShowTimePicker(false);
   }, []);
 
-  const datePart = moment(value === "" ? new Date() : value).format(
-    "MMM D, YYYY"
-  );
-  const timePart = moment(value === "" ? new Date() : value).format("hh:mm A");
+  const datePart =
+    value !== "" && value
+      ? moment(value, "MMM D, YYYY").format("MMM D, YYYY")
+      : "N/D";
+  const timePart =
+    value !== "" && value ? moment(value).format("hh:mm A") : "N/T";
   const calendarLabel = isDateOnly
     ? datePart
     : isTimeOnly
@@ -59,24 +62,6 @@ export const MyDateTimePicker = (props: {
           label={calendarLabel}
         />
 
-        {/* <View style={styles.bar}>
-          <Text
-            style={styles.text}
-            onPress={() =>
-              isTimeOnly ? setShowTimePicker(true) : setShowDatePicker(true)
-            }
-          >
-            {calendarLabel}
-          </Text>
-          <MyIcon
-            icon="edit"
-            onPress={() =>
-              isTimeOnly
-                ? setShowTimePicker(true)
-                : setShowDatePicker((t) => !t)
-            }
-          />
-        </View> */}
         {showDatePicker && (
           <DateTimePicker
             mode="date"

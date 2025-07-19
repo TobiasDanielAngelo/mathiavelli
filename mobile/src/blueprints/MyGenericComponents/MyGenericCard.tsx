@@ -10,7 +10,7 @@ import { MyModal } from "../MyModal";
 import { View, StyleSheet } from "react-native";
 
 export interface IAction {
-  onClick: () => void;
+  onPress: () => void;
   icon: string;
   color?:
     | "inherit"
@@ -112,7 +112,7 @@ export const MyGenericCard = observer(
 
             <View style={styles.actionsRow}>
               <View style={styles.relative}>
-                <MyIcon icon="gear" onPress={() => setVisible3((t) => !t)} />
+                <MyIcon icon="cog" onPress={() => setVisible3((t) => !t)} />
                 <MyDropdownMenu
                   setOpen={setVisible3}
                   open={isVisible3}

@@ -1,83 +1,66 @@
-import React from "react";
 import {
-  View,
-  StyleSheet,
   useWindowDimensions,
   ScrollView,
+  View,
   DimensionValue,
+  FlatList,
 } from "react-native";
-import { winHeight } from "../constants/constants";
 
-interface SideBySideViewProps {
-  SideA?: React.ReactNode;
-  SideB?: React.ReactNode;
-  ratio?: number;
+type Props = {
+  SideA: React.ReactNode;
+  SideB: React.ReactNode;
+  ratio?: number; // SideA weight (e.g. 2 for 2:1)
   reversed?: boolean;
-}
+};
 
 export const SideBySideView = ({
   SideA,
   SideB,
   ratio = 1,
   reversed = false,
-}: SideBySideViewProps) => {
-  const { width } = useWindowDimensions();
-  const isLarge = width >= 900;
+}: Props) => {
+  const { width, height } = useWindowDimensions();
+  const isPortrait = height >= width || (height < width && height < 600);
   const total = ratio + 1;
+
   const widthA = `${(ratio / total) * 100}%` as DimensionValue;
   const widthB = `${(1 / total) * 100}%` as DimensionValue;
 
-  const containerStyle = {
-    flexDirection: (isLarge ? (reversed ? "row-reverse" : "row") : "column") as
-      | "row-reverse"
-      | "row"
-      | "column"
-      | "column-reverse",
-  };
+  const orderedItems =
+    reversed && isPortrait
+      ? [
+          { key: "B", content: SideB },
+          { key: "A", content: SideA },
+        ]
+      : [
+          { key: "A", content: SideA },
+          { key: "B", content: SideB },
+        ];
 
+  if (isPortrait) {
+    return (
+      <FlatList
+        data={orderedItems}
+        keyExtractor={(item) => item.key}
+        renderItem={({ item }) => (
+          <View style={{ paddingVertical: 8 }}>{item.content}</View>
+        )}
+      />
+    );
+  }
+
+  // Landscape: side-by-side with width control
   return (
-    <View style={styles.outer}>
-      <View style={[styles.inner, containerStyle]}>
-        {SideA && (
-          <View
-            style={[
-              styles.panel,
-              {
-                width: isLarge ? widthA : "100%",
-              },
-            ]}
-            // contentContainerStyle={styles.scrollContent}
-          >
-            {SideA}
-          </View>
-        )}
-
-        {SideB && (
-          <View
-            style={[
-              styles.panel,
-              styles.sideB,
-              {
-                width: isLarge ? widthB : "100%",
-              },
-            ]}
-          >
-            {SideB}
-          </View>
-        )}
-      </View>
+    <View
+      style={{
+        flexDirection: "row",
+        flex: 1,
+        paddingTop: 10,
+        paddingHorizontal: 10,
+      }}
+    >
+      <View style={{ width: widthA }}>{SideA}</View>
+      <View style={{ width: widthB }}>{SideB}</View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  outer: {
-    flex: 1,
-  },
-  inner: {
-    flex: 1,
-  },
-  panel: {},
-  sideB: {},
-  scrollContent: {},
-});

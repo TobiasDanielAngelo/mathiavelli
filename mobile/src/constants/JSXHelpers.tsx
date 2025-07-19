@@ -32,7 +32,7 @@ export const formatValue = (
         ? `\nup to ${moment(value[value.length - 1]).format(formatStr)}`
         : "";
 
-    return list + suffix + finalDate;
+    return list + "\n" + suffix + finalDate;
   };
 
   const fileExtensionRegex = /\.(jpg|jpeg|png|gif|pdf|docx?|xlsx?|txt)$/i;

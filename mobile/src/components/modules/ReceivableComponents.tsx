@@ -107,10 +107,10 @@ export const ReceivableCard = observer((props: { item: Receivable }) => {
 
   const moreActions = (
     item.chargeTransaction
-      ? [{ onClick: () => setVisible1(true), icon: "Payment" }]
+      ? [{ onPress: () => setVisible1(true), icon: "Payment" }]
       : [
-          { onClick: () => setVisible1(true), icon: "Payment" },
-          { onClick: () => setVisible2(true), icon: "ElectricBolt" },
+          { onPress: () => setVisible1(true), icon: "Payment" },
+          { onPress: () => setVisible2(true), icon: "ElectricBolt" },
         ]
   ) satisfies IAction[];
   return (

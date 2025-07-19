@@ -14,7 +14,7 @@ export const MyDropdownMenu = (props: {
   actions?: Page[];
   margin?: number;
 }) => {
-  const { open, actions, margin } = props;
+  const { open, setOpen, actions, margin } = props;
   if (!open) return null;
 
   return (
@@ -31,13 +31,19 @@ export const MyDropdownMenu = (props: {
         data={actions}
         keyExtractor={(_, i) => i.toString()}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <Pressable onPress={item.onPress}>
-            <Text style={styles.item} onPress={item.onPress}>
-              {item.title}
-            </Text>
-          </Pressable>
-        )}
+        renderItem={({ item }) => {
+          const onPress = () => {
+            item.onPress?.();
+            setOpen?.(false);
+          };
+          return (
+            <Pressable onPress={onPress}>
+              <Text style={styles.item} onPress={onPress}>
+                {item.title}
+              </Text>
+            </Pressable>
+          );
+        }}
       />
     </View>
   );

@@ -1,6 +1,14 @@
 import { prop } from "mobx-keystone";
 import { IconName } from "../blueprints/MyIcon";
 
+export type CalendarEvent = {
+  id: string | number;
+  title: string;
+  dateStart: string;
+  dateEnd?: string;
+  dateCompleted?: string;
+};
+
 export type PropsToInterface<P> = {
   [K in keyof P]?: P[K] extends ReturnType<typeof prop<infer T>> ? T : never;
 };

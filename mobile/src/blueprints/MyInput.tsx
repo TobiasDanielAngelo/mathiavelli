@@ -78,6 +78,7 @@ export const MyInput = (props: MyInputProps) => {
               {
                 backgroundColor: editable && !disabled ? "white" : "#ddd",
                 textAlign: centered ? "center" : numeric ? "right" : "left",
+                borderRadius: 5,
               },
             ]}
             editable={editable && !disabled}
