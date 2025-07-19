@@ -245,6 +245,17 @@ export const useTrendChart = <T extends Record<string, any>>(
   return { allTraceKeys: legend, transformedData, shownFields, setShownFields };
 };
 
+interface PieChartValues {
+  trace: string;
+  data: {
+    name: string;
+    population: number;
+    color: string;
+    legendFontColor: string;
+    legendFontSize: number;
+  }[];
+}
+
 export const useCircleChart = <T extends Record<string, any>>(
   data: T[],
   nameKey: keyof T,
@@ -271,7 +282,7 @@ export const useCircleChart = <T extends Record<string, any>>(
   const kv = itemMap?.find((s) => s.key === nameKey);
   const resolvedData = cleanedData
     .filter((s) => s[traceKey] === selectedField)
-    .map((s) => ({
+    .map((s, ind) => ({
       [nameKey]:
         kv?.label === ""
           ? kv.values.find((_, i) => i === s[nameKey])
@@ -280,6 +291,9 @@ export const useCircleChart = <T extends Record<string, any>>(
             s[nameKey],
       [dataKey]: s[dataKey],
       [traceKey]: s[traceKey],
+      color: COLORS[ind % COLORS.length],
+      legendFontColor: "red",
+      legendFontSize: 13,
     }));
 
   useEffect(() => {

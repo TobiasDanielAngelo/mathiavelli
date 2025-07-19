@@ -25,6 +25,7 @@ import { Field } from "../../constants/interfaces";
 import { AccountForm } from "./AccountComponents";
 import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
+import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
 
 export const {
   Context: TransactionViewContext,
@@ -135,20 +136,41 @@ export const TransactionDashboard = observer(
     const { itemMap, graph } = props;
 
     return (
-      <MyLineChart
-        data={transactionAnalyticsStore.items.filter((s) => s.graph === "line")}
-        traceKey="account"
-        xKey="period"
-        yKey="total"
-        formatter={(value: number, name: string) => [
-          toMoneyShortened(value),
-          name,
-        ]}
-        itemMap={itemMap}
-        excludedFromTotal={["Operations", "Initial"]}
-        selectionLabel="Accounts"
-        title="Transactions"
-      />
+      <>
+        {graph === "pie" ? (
+          <MyPieChart
+            data={transactionAnalyticsStore.items.filter(
+              (s) => s.graph === "pie"
+            )}
+            nameKey="category"
+            dataKey="total"
+            traceKey="categoryNature"
+            itemMap={itemMap}
+            formatter={(value: number, name: string) => [
+              toMoneyShortened(value),
+              name,
+            ]}
+            title="Transactions"
+          />
+        ) : (
+          <MyLineChart
+            data={transactionAnalyticsStore.items.filter(
+              (s) => s.graph === "line"
+            )}
+            traceKey="account"
+            xKey="period"
+            yKey="total"
+            formatter={(value: number, name: string) => [
+              toMoneyShortened(value),
+              name,
+            ]}
+            itemMap={itemMap}
+            excludedFromTotal={["Operations", "Initial"]}
+            selectionLabel="Accounts"
+            title="Transactions"
+          />
+        )}
+      </>
     );
   }
 );

@@ -1,27 +1,14 @@
+import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import { LineChartData } from "react-native-chart-kit/dist/line-chart/LineChart";
-import { winWidth } from "../../constants/constants";
-import { Text } from "react-native";
 import {
   COLORS,
   filterChartDataByFields,
   MyTrendChartProps,
   useTrendChart,
 } from ".";
-import { observer } from "mobx-react-lite";
 import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
-
-const defaultDatePrice = {
-  label: "",
-  price: -1,
-};
 
 export const MyLineChart = observer(
   <T extends Record<string, any>>({
@@ -38,7 +25,6 @@ export const MyLineChart = observer(
     noTotal,
     title = "",
   }: MyTrendChartProps<T>) => {
-    const [dataPoint, setDataPoint] = useState(defaultDatePrice);
     const { width, height } = useWindowDimensions();
     const isPortrait = height >= width || (height < width && height < 600);
     const ratio = 0.7;
@@ -57,7 +43,7 @@ export const MyLineChart = observer(
 
     const filteredData = filterChartDataByFields(transformedData, shownFields);
 
-    return !filteredData.datasets.map((s) => s.data).length ? (
+    return !filteredData.datasets.length ? (
       <></>
     ) : (
       <View>
