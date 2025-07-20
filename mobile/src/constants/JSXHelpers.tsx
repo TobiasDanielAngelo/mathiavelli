@@ -3,6 +3,23 @@ import { View } from "react-native";
 import { isDatetimeValue, isDateValue, prettifyJSON, toMoney } from "./helpers";
 import { KV } from "./interfaces";
 
+function paragraphWrapper(t: string, maxLen = 80): string {
+  const words = t.split(" ");
+  let line = "";
+  const lines: string[] = [];
+
+  for (const word of words) {
+    if ((line + word).length > maxLen) {
+      lines.push(line.trim());
+      line = "";
+    }
+    line += word + " ";
+  }
+
+  if (line) lines.push(line.trim());
+  return lines.join("\n");
+}
+
 export const formatValue = (
   value: any,
   key: string,
@@ -79,5 +96,7 @@ export const formatValue = (
     }
   }
 
-  return value && value !== "—" ? prettifyJSON(String(value)) || "—" : "—";
+  return value && value !== "—"
+    ? prettifyJSON(paragraphWrapper(String(value))) || "—"
+    : "—";
 };

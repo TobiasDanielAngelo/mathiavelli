@@ -65,11 +65,11 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
         {currentPage === 1 ? (
           <></>
         ) : (
-          <View style={[styles.navButton, styles.navLeft]}>
+          <Pressable style={[styles.navButton, styles.navLeft]}>
             <Text style={styles.text} onPress={onPressPrev}>
               {`\u276e`}
             </Text>
-          </View>
+          </Pressable>
         )}
         {totalPages <= 1 ? (
           <></>
@@ -97,11 +97,11 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
           ))
         )}
         {currentPage < totalPages && (
-          <View style={[styles.navButton, styles.navRight]}>
+          <Pressable style={[styles.navButton, styles.navRight]}>
             <Text style={styles.text} onPress={onPressNext}>
               {`\u276f`}
             </Text>
-          </View>
+          </Pressable>
         )}
       </View>
     </View>
@@ -111,7 +111,7 @@ export const MyPageBar: React.FC<MyPageBarProps> = ({
 const styles = StyleSheet.create({
   main: {
     // flex: 1,
-    paddingTop: 10,
+    padding: 10,
     alignItems: "center",
     flexDirection: isWideScreen ? "row" : "column",
     // flexWrap: "wrap",

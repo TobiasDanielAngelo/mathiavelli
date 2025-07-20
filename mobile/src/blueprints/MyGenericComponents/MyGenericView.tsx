@@ -132,7 +132,7 @@ export const MyGenericView = observer(
 
     const defaultActionModalDefs = [
       {
-        icon: "NoteAdd",
+        icon: "wpforms",
         label: "NEW",
         name: `Add ${title}`,
         modal: (
@@ -143,7 +143,7 @@ export const MyGenericView = observer(
         ),
       },
       {
-        icon: "ViewList",
+        icon: "tasks",
         label: "FIELDS",
         name: "Show Fields",
         modal: (
@@ -161,7 +161,7 @@ export const MyGenericView = observer(
         ),
       },
       {
-        icon: "FilterListAlt",
+        icon: "filter",
         label: "FILTERS",
         name: "Filters",
         modal: <FilterComponent />,
@@ -171,10 +171,10 @@ export const MyGenericView = observer(
     const graphIconMap: Record<GraphType, { icon: string; label: string }> =
       availableGraphs.reduce((acc, type) => {
         const iconMap: Record<GraphType, { icon: string; label: string }> = {
-          pie: { icon: "PieChart", label: "PIE" },
-          line: { icon: "Timeline", label: "LINE" },
-          bar: { icon: "BarChart", label: "BAR" },
-          area: { icon: "InsertChart", label: "AREA" },
+          pie: { icon: "chart-pie", label: "PIE" },
+          line: { icon: "chart-line", label: "LINE" },
+          bar: { icon: "chart-bar", label: "BAR" },
+          area: { icon: "chart-area", label: "AREA" },
         };
         acc[type] = iconMap[type];
         return acc;
@@ -242,12 +242,14 @@ export const MyGenericView = observer(
     const views = useMemo(
       () => [
         {
-          icon: view === "card" ? "Padding" : "TableChart",
+          icon: view === "card" ? "id-card" : "table",
           name: "Toggle View",
           onPress: toggleView,
         },
         {
-          icon: "Help",
+          icon: {
+            ...(graphIconMap[graph] ?? { icon: "question", label: "N/A" }),
+          }.icon,
           name: "Toggle Graphs",
           onPress: toggleGraph,
         },

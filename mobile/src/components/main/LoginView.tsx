@@ -30,7 +30,7 @@ export const LoginView = observer(() => {
       setMsg(response.details);
       return;
     }
-    navigate("/main");
+    navigate("/");
   };
 
   return (
@@ -58,9 +58,6 @@ export const LoginView = observer(() => {
           <Text style={styles.loginText}>Login</Text>
         </View>
       </TouchableOpacity>
-      <Text>
-        {winWidth}, {winHeight}
-      </Text>
     </View>
   );
 });

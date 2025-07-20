@@ -18,6 +18,8 @@ import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { Field } from "../../constants/interfaces";
+import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
+import moment from "moment";
 
 export const { Context: TaskViewContext, useGenericView: useTaskView } =
   createGenericViewContext<TaskInterface>();
@@ -146,13 +148,18 @@ export const TaskDashboard = observer(() => {
   const tasks = taskStore.items
     .filter((s) => !s.dateCompleted && !s.isArchived && s.dueDate)
     .map((s) => ({
-      id: s.id,
-      name: s.title,
-      importance: 10 * s.importance,
-      dueDate: new Date(s.dueDate),
+      ...s.$,
+      due: moment(s.dueDate, "YYYY-MM-DD").unix(),
     }));
 
-  return <></>;
+  return (
+    <MyEisenhowerChart
+      items={tasks}
+      xKey={"due"}
+      yKey={"importance"}
+      label={["title", "dueDate"]}
+    />
+  );
 });
 
 export const TaskCollection = observer(() => {

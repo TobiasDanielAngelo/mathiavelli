@@ -1,9 +1,8 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
-import { Text } from "react-native";
-import { MyCalendar } from "../../blueprints/MyCalendar";
-import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
+import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
+import { MyImage } from "../../blueprints/MyImages";
 
 export const TestingView = observer(() => {
-  return <></>;
+  return <MyImage />;
 });

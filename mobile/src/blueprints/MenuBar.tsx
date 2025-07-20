@@ -1,5 +1,4 @@
 import { StyleSheet, View } from "react-native";
-import { winWidth } from "../constants/constants";
 import { Menu, MenuCard } from "./MenuCard";
 
 export const MenuBar = (props: { items: Menu[]; hidden?: boolean }) => {

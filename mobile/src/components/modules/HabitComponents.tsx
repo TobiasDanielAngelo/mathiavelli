@@ -216,7 +216,7 @@ export const HabitView = observer(() => {
 
   const actionModalDefs = [
     {
-      icon: "NoteAdd",
+      icon: "plus-square",
       label: "SCHED",
       name: "Add a Schedule",
       modal: <ScheduleForm setVisible={setVisible4} />,

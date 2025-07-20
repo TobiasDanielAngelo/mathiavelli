@@ -5,6 +5,7 @@ import { useStore } from "../../api/Store";
 import { KV } from "../../constants/interfaces";
 import { TransactionDashboard } from "../modules/TransactionComponents";
 import { View } from "react-native";
+import { SideBySideView } from "../../blueprints/SideBySideView";
 
 export const FinanceView = observer(() => {
   const { transactionStore, categoryStore, accountStore } = useStore();
@@ -45,9 +46,10 @@ export const FinanceView = observer(() => {
   );
 
   return (
-    <View>
-      <TransactionDashboard graph="pie" itemMap={itemMap} />
-      <TransactionDashboard graph="line" itemMap={itemMap} />
-    </View>
+    <SideBySideView
+      SideA={<TransactionDashboard graph="pie" itemMap={itemMap} />}
+      SideB={<TransactionDashboard graph="line" itemMap={itemMap} />}
+      ratio={0.7}
+    />
   );
 });

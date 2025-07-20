@@ -1,18 +1,17 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router-native";
-import { toTitleCase } from "../../constants/helpers";
+import { ImageNameType, MyImage } from "../../blueprints/MyImages";
+import { titleToCamel, toTitleCase } from "../../constants/helpers";
 import { allViewPaths, ViewPath } from "../main/";
-import { MyIcon } from "../../blueprints/MyIcon";
+import { LinearGradient } from "expo-linear-gradient";
 
 // ModuleCard Component
 const ModuleCard = ({
-  title,
   path,
   onPress,
 }: {
-  title: string;
   path: ViewPath;
   onPress?: () => void;
 }) => {
@@ -29,24 +28,40 @@ const ModuleCard = ({
     path.mainLink === "back" ? onPress?.() : navigate(pathLink);
   };
   return (
-    <View>
-      <Text style={{ color: pathLink ? "blue" : "black" }}>
-        <Text onPress={gotoNavigate}>
-          Go to {title}: ({pathLink}){" "}
+    <View style={styles.module}>
+      <MyImage
+        image={titleToCamel(path.title) as ImageNameType}
+        onPress={onPress ?? gotoNavigate}
+      />
+      <View>
+        <Text
+          numberOfLines={2}
+          adjustsFontSizeToFit
+          style={{
+            fontSize: 18,
+            marginHorizontal: 5,
+            flexShrink: 1,
+            fontWeight: "bold",
+            color: pathLink !== "" || path.title === "Back" ? "green" : "black",
+          }}
+          onPress={gotoNavigate}
+        >
+          {path.title}
         </Text>
-        {onPress && (
-          <Text
-            onPress={onPress}
-            style={{
-              color: path.items.length ? "blue" : "black",
-            }}
-          >
-            {path.mainLink !== "back"
-              ? `More... (${path.items.length})`
-              : "Back"}
-          </Text>
-        )}
-      </Text>
+        <Text
+          style={{
+            fontSize: 20,
+            flexShrink: 1,
+            fontWeight: "bold",
+            marginLeft: 10,
+            color: path.items.length ? "green" : "black",
+            display: path.items.length ? "flex" : "none",
+          }}
+          onPress={onPress}
+        >
+          ...
+        </Text>
+      </View>
     </View>
   );
 };
@@ -58,35 +73,69 @@ export const ModularView = observer(() => {
   const currentPaths = allViewPaths.find((s) => s.title === module);
 
   return (
-    <View>
-      <View>
-        <Text>X {module}</Text>
+    <View style={styles.main}>
+      <ScrollView contentContainerStyle={styles.container}>
         {!currentPaths ? (
           allViewPaths.map((path, index) => (
             <ModuleCard
-              title={path.title}
               path={path}
               onPress={() => setModule(path.title)}
               key={index}
             />
           ))
         ) : (
-          <View>
+          <>
             {currentPaths.items.map((item, index) => (
               <ModuleCard
                 key={index}
-                title={toTitleCase(item)}
                 path={{ title: toTitleCase(item), items: [], mainLink: item }}
               />
             ))}
             <ModuleCard
-              title="Back"
               path={{ title: "Back", items: [], mainLink: "back" }}
               onPress={() => setModule("")}
             />
-          </View>
+          </>
         )}
-      </View>
+      </ScrollView>
+      <LinearGradient
+        colors={["transparent", "cyan", "teal"]} // change white to your bg color
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 20,
+        }}
+      />
     </View>
   );
+});
+
+const styles = StyleSheet.create({
+  module: {
+    borderRadius: 50,
+    borderWidth: 4,
+    width: 200,
+    margin: 20,
+    padding: 10,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    borderColor: "teal",
+  },
+  main: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+    margin: "auto",
+  },
+  container: {
+    paddingVertical: 50,
+    paddingHorizontal: 80,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
 });

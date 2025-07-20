@@ -3,14 +3,16 @@ import React, { PropsWithChildren, useRef } from "react";
 import {
   Animated,
   Dimensions,
+  ImageBackground,
   PanResponder,
   Pressable,
   StyleSheet,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.5;
+const DRAWER_WIDTH = 250;
 
 type MyDrawerProps = PropsWithChildren<{
   icon?: React.ReactNode;
@@ -73,8 +75,15 @@ export default function MyDrawer({
         style={[styles.drawer, { transform: [{ translateX }] }]}
         {...panResponder.panHandlers}
       >
-        {children}
+        <ImageBackground
+          source={require("../../assets/faintgreen.jpg")}
+          style={styles.background}
+          resizeMode="cover"
+        >
+          <SafeAreaView>{children}</SafeAreaView>
+        </ImageBackground>
       </Animated.View>
+
       <View style={styles.content}>{icon}</View>
     </View>
   );
@@ -96,5 +105,8 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     zIndex: 1,
+  },
+  background: {
+    flex: 1,
   },
 });

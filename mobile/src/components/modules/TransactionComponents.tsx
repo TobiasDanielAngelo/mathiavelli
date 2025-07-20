@@ -305,7 +305,7 @@ export const TransactionView = observer(() => {
 
   const actionModalDefs = [
     {
-      icon: "NoteAdd",
+      icon: "plus-square",
       label: "ACCT",
       name: "Add an Account",
       modal: <AccountForm setVisible={setVisible4} />,

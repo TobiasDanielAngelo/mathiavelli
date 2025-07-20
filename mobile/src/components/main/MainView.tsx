@@ -107,8 +107,7 @@ export const MainView = observer(() => {
   const menuItems = [
     { name: "bars", label: "Menu", onPress: () => navigate("/menu") },
     { name: "door-open", label: "Drawer", onPress: () => setVisible1(true) },
-    { name: "star", label: "Testing", onPress: () => navigate("/testing") },
-    { name: "star", label: "Events", onPress: () => navigate("/events") },
+    // { name: "star", label: "Testing", onPress: () => navigate("/testing") },
   ] satisfies Menu[];
 
   useEffect(() => {

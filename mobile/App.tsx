@@ -4,7 +4,6 @@ import { NativeRouter, Route, Routes } from "react-router-native";
 import { createStore, StoreContext } from "./src/api/Store";
 import { LoginView } from "./src/components/main/LoginView";
 import { MainView } from "./src/components/main/MainView";
-("expo-linear-gradient");
 
 export default function App() {
   const store = createStore();

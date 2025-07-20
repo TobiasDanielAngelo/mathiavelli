@@ -67,7 +67,7 @@ export const MyPieChart = observer(
   }: MyCircleChartProps<T>) => {
     const { width, height } = useWindowDimensions();
     const isPortrait = height >= width || (height < width && height < 600);
-    const ratio = 0.7;
+    const ratio = 0.5;
     const chartWidth = isPortrait ? 0.93 * width : (1 / (ratio + 1.1)) * width;
 
     const { selectedField, setSelectedField, resolvedData } = useCircleChart(
@@ -102,7 +102,8 @@ export const MyPieChart = observer(
           height={0.5 * height}
           accessor={dataKey as string}
           backgroundColor="transparent"
-          paddingLeft={""}
+          paddingLeft={isPortrait ? "150" : "0"}
+          hasLegend={false}
           chartConfig={{
             backgroundGradientFrom: "transparent",
             backgroundGradientTo: "white",
@@ -118,7 +119,12 @@ export const MyPieChart = observer(
             },
           }}
         />
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+          }}
+        >
           {resolvedData.map((s, ind, arr) => (
             <View
               key={ind}

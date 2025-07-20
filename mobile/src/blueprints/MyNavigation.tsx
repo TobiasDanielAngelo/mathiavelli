@@ -1,12 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Button, Text, View } from "react-native";
+import { Button, FlatList, Text, View } from "react-native";
 import { useNavigate } from "react-router-native";
 import { useStore } from "../api/Store";
 import { useIsUnhoverable } from "../constants/hooks";
 import { Page, StateSetter } from "../constants/interfaces";
 import MyDrawer from "./MyDrawer";
 import { MyIcon } from "./MyIcon";
+import { ImageNameType, MyImage } from "./MyImages";
+import { titleToCamel, toTitleCase } from "../constants/helpers";
 
 const drawerWidth = 240;
 
@@ -17,25 +19,55 @@ export const ResponsiveDrawer = observer(
     paths?: Page[];
     onPress: () => void;
   }) => {
-    const { open, setOpen, onPress, paths } = props;
+    const { open, setOpen, paths } = props;
     const navigate = useNavigate();
-    const { userStore } = useStore();
     return (
-      <MyDrawer
-        isOpen={open}
-        onClose={() => setOpen?.(false)}
-        // icon={<MyIcon label="Bars" icon="bars" onPress={onPress} />}
-      >
-        <Button title="Close Drawer" onPress={() => setOpen(false)} />
+      <MyDrawer isOpen={open} onClose={() => setOpen?.(false)}>
+        <FlatList
+          data={paths}
+          keyExtractor={(_, i) => i.toString()}
+          renderItem={({ item: s }) => {
+            const onPress = () => {
+              if (s.onPress) {
+                s.onPress();
+              } else {
+                navigate(s.link ?? "#");
+              }
+              setOpen?.(false);
+            };
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 10,
+                }}
+              >
+                <MyImage
+                  image={titleToCamel(s.title) as ImageNameType}
+                  onPress={onPress}
+                />
+                <Text
+                  numberOfLines={2}
+                  adjustsFontSizeToFit
+                  style={{
+                    fontSize: 18,
+                    marginHorizontal: 5,
+                    flexShrink: 1,
+                    fontWeight: "bold",
+                  }}
+                  onPress={onPress}
+                >
+                  {toTitleCase(s.title)}
+                </Text>
+              </View>
+            );
+          }}
+        />
       </MyDrawer>
     );
   }
 );
-
-const NavLink = ({ page }: { page: Page }) => {
-  const isTouch = useIsUnhoverable();
-  return isTouch ? <></> : <View></View>;
-};
 
 export const MyNavBar = observer(
   (props: {
@@ -47,10 +79,11 @@ export const MyNavBar = observer(
   }) => {
     const { title, profileUrl, paths, drawerOpen, setDrawerOpen } = props;
 
-    const { settingStore } = useStore();
+    const { userStore } = useStore();
     const navigate = useNavigate();
 
     const onPressLogout = async () => {
+      userStore.logoutUser();
       navigate("/login");
     };
 
@@ -76,7 +109,14 @@ export const MyNavBar = observer(
       <ResponsiveDrawer
         open={drawerOpen}
         setOpen={setDrawerOpen}
-        paths={leafPages}
+        paths={[
+          ...(leafPages ?? []),
+          {
+            title: "Logout",
+            link: "",
+            onPress: onPressLogout,
+          },
+        ]}
         onPress={onPress}
       />
     );

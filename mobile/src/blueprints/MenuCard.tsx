@@ -25,7 +25,7 @@ export const MenuCard = (props: Menu) => {
         label={label}
         onPress={onPress}
         color="white"
-        size={12}
+        size={15}
       />
     </TouchableOpacity>
   );

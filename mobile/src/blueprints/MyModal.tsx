@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native";
 import { Overlay } from "react-native-elements";
-import { winHeight, winWidth } from "../constants/constants";
 import { StateSetter } from "../constants/interfaces";
 import { HView } from "./HView";
 import { MyIcon } from "./MyIcon";
@@ -35,23 +34,26 @@ export const MyModal = (
 
   return (
     <Overlay isVisible={isVisible}>
-      <ScrollView
+      <View
         style={{
-          width: width * 0.8,
-          maxWidth: 500,
+          minWidth: 100,
+          width: width * 0.5,
+          maxWidth: 400,
           maxHeight: height * 0.7,
         }}
       >
-        <HView>
-          <Text style={styles.text}>{title}</Text>
-          <Text style={styles.text}>{subTitle}</Text>
-          <MyIcon icon="times" onPress={() => setVisible(false)} />
-        </HView>
-        <View style={styles.children}>{children}</View>
-        <View style={styles.bar}>
-          <MyIcon icon="check" onPress={() => setVisible(false)} />
-        </View>
-      </ScrollView>
+        <ScrollView>
+          <HView>
+            <Text style={styles.text}>{title}</Text>
+            <Text style={styles.text}>{subTitle}</Text>
+            <MyIcon icon="times" onPress={() => setVisible(false)} />
+          </HView>
+          <View style={styles.children}>{children}</View>
+          <View style={styles.bar}>
+            <MyIcon icon="check" onPress={() => setVisible(false)} />
+          </View>
+        </ScrollView>
+      </View>
     </Overlay>
   );
 };
@@ -63,6 +65,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   children: {
+    flex: 1,
     // padding: winHeight * 0.03,
   },
 });
