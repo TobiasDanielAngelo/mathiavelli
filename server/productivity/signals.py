@@ -1,6 +1,6 @@
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
-from .models import Task, Event, Schedule, Habit, Goal, HabitLog
+from .models import Task, Event, Schedule, Habit, Goal, HabitLog, RedeemPoint
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now, get_current_timezone
 from dateutil.parser import parse
@@ -196,3 +196,10 @@ def sync_habitlog_from_event(sender, instance, **kwargs):
             habit=habit,
             date_created=log_date,
         ).delete()
+
+
+@receiver(post_save, sender=HabitLog)
+def create_redeem_point(sender, instance, created, **kwargs):
+    if created:
+        points = instance.habit.points
+        RedeemPoint.objects.create(log=instance, amount=points)

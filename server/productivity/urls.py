@@ -1,5 +1,6 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+from .views import AvailablePointsAPIView
 from rest_framework.viewsets import ViewSetMixin
 import re
 import inflect
@@ -25,4 +26,5 @@ for attr_name in dir(vs_module):
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("available-points/", AvailablePointsAPIView.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

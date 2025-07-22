@@ -99,3 +99,9 @@ class HabitLogSerializer(CustomSerializer):
     class Meta:
         model = HabitLog
         fields = "__all__"
+
+
+class RedeemPointSerializer(CustomSerializer):
+    class Meta:
+        model = RedeemPoint
+        fields = "__all__"

@@ -43,6 +43,7 @@ export const HabitForm = ({
       [
         [{ name: "title", label: "Title", type: "text" }],
         [{ name: "description", label: "Description", type: "text" }],
+        [{ name: "points", label: "Points (1 to 3)", type: "text" }],
         [
           {
             name: "goal",

@@ -16,6 +16,7 @@ const props = {
   dateCompleted: prop<string>(""),
   isArchived: prop<boolean>(false),
   dateCreated: prop<string>(""),
+  points: prop<number>(0),
 };
 
 const derivedProps = (item: HabitInterface) => ({

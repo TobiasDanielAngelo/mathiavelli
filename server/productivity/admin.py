@@ -27,3 +27,7 @@ class EventAdmin(CustomAdmin):
 
 class HabitLogAdmin(CustomAdmin):
     pass
+
+
+class RedeemPointAdmin(CustomAdmin):
+    pass

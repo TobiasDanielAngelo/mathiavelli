@@ -99,6 +99,7 @@ class Habit(Productivity):
     goal = fields.CascadeOptionalForeignKey(Goal)
     schedule = fields.CascadeOptionalForeignKey(Schedule)
     threshold_percent = fields.LimitedDecimalField(0, 100, 80)
+    points = fields.LimitedDecimalField(1, 3, 1)
 
 
 class Task(Productivity):
@@ -151,3 +152,9 @@ class Event(Productivity):
 class HabitLog(CustomModel):
     habit = fields.CascadeRequiredForeignKey(Habit)
     date_created = fields.DefaultNowField()
+
+
+# For a game
+class RedeemPoint(CustomModel):
+    log = fields.CascadeOptionalForeignKey(HabitLog)
+    amount = fields.DecimalField()
