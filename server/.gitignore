@@ -33,5 +33,6 @@ Thumbs.db
 .env.local
 .env.prod
 .env.staging
+.env.lan
 *.bak
 *.swp
