@@ -94,12 +94,8 @@ class CookieLoginView(KnoxLoginView):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        # _, token = AuthToken.objects.create(user)
         login(request, user)
         response = super().post(request, format=None)
-        # authenticated_user = authenticate(
-        #     request, username=user.username, password=request.data["password"]
-        # )
         if user:
             response = super().post(request, format=None)
             token = response.data.get("token")
@@ -118,10 +114,10 @@ class CookieLoginView(KnoxLoginView):
             cookie_response.set_cookie(
                 key="knox_token",
                 value=token,
-                httponly=True,
-                secure=os.environ.get("COOKIE_SECURE_BOOL"),
-                samesite="None",
-                expires=60 * 60 * 24 * 7,
+                httponly=settings.KNOX_COOKIE_HTTPONLY,
+                secure=settings.KNOX_COOKIE_SECURE,
+                samesite=settings.KNOX_COOKIE_SAMESITE,
+                expires=settings.KNOX_COOKIE_EXPIRE_DAYS,
             )
             return cookie_response
         else:
@@ -138,17 +134,13 @@ class CookieReauthView(APIView):
     authentication_classes = (CustomAuthentication,)
 
     def post(self, request):
-        # Delete old tokens (optional cleanup)
+        is_mobile = request.headers.get("X-From-Mobile") == "true"
         AuthToken.objects.filter(user=request.user).delete()
-
-        # Create new token
         instance, token = AuthToken.objects.create(request.user)
-
-        user = request.user  # already fully loaded user
-
+        user = request.user
         response = JsonResponse(
             {
-                "key": "",
+                "key": token if is_mobile else "",
                 "user": {
                     "id": user.id,
                     "username": user.username,
@@ -161,12 +153,10 @@ class CookieReauthView(APIView):
         response.set_cookie(
             key="knox_token",
             value=token,
-            httponly=True,
-            secure=os.environ.get(
-                "COOKIE_SECURE_BOOL"
-            ),  # set False for local http, True in prod HTTPS
-            samesite="None",  # Lax works better across ports on localhost
-            expires=60 * 60 * 24 * 7,
+            httponly=settings.KNOX_COOKIE_HTTPONLY,
+            secure=settings.KNOX_COOKIE_SECURE,
+            samesite=settings.KNOX_COOKIE_SAMESITE,
+            expires=settings.KNOX_COOKIE_EXPIRE_DAYS,
         )
         return response
 

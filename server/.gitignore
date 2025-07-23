@@ -31,5 +31,7 @@ Thumbs.db
 .env
 .env.docker
 .env.local
+.env.prod
+.env.staging
 *.bak
 *.swp

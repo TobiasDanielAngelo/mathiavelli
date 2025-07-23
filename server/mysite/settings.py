@@ -12,32 +12,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+from .utils import GET_BOOL, GET_ENV_LIST, LOAD_ENV, GET_ENV
+from datetime import timedelta
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+LOAD_ENV(BASE_DIR)
 
-# Always load shared
-load_dotenv(os.path.join(BASE_DIR, ".env"), override=True)
-
-# Then load environment-specific
-if os.environ.get("RUNNING_IN_DOCKER") == "1":
-    load_dotenv(os.path.join(BASE_DIR, ".env.docker"), override=True)
-else:
-    load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG") == "True"
-
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
-# Application definition
+SECRET_KEY = GET_ENV("SECRET_KEY")
+DEBUG = GET_BOOL("DEBUG", "True")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -58,7 +40,6 @@ INSTALLED_APPS = [
     "issues",
     "travel",
 ]
-
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -71,8 +52,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "djangorestframework_camel_case.middleware.CamelCaseMiddleWare",
 ]
-
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 ROOT_URLCONF = "mysite.urls"
 
@@ -93,24 +72,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "mysite.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get("DB_NAME"),
         "USER": os.environ.get("DB_USER"),
         "PASSWORD": os.environ.get("DB_PASS"),
-        "HOST": os.getenv("DB_HOST"),
+        "HOST": os.environ.get("DB_HOST"),
         "PORT": os.environ.get("DB_PORT"),
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -127,35 +98,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "Asia/Manila"
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = "static/"
-
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-MEDIA_URL = "/uploads/"
-
-MEDIA_ROOT = BASE_DIR / "uploads"
-
-# MEDIA_URL = "/images/"
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+MEDIA_URL = "/uploads/"
+MEDIA_ROOT = BASE_DIR / "uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -173,11 +125,23 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     "COERCE_DECIMAL_TO_STRING": False,
 }
+REST_KNOX = {
+    "TOKEN_TTL": timedelta(days=int(GET_ENV("COOKIE_EXPIRE_DAYS", "7"))),
+}
 
-CORS_ALLOW_CREDENTIALS = True
+ALLOWED_HOSTS = GET_ENV_LIST("ALLOWED_HOSTS")
+ALLOWED_ORIGINS = GET_ENV_LIST("ALLOWED_ORIGINS")
 
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+COOKIE_SECURE = GET_BOOL("COOKIE_SECURE", "True")
+COOKIE_SAMESITE = GET_ENV("COOKIE_SAMESITE", "Lax")
+COOKIE_HTTPONLY = GET_BOOL("COOKIE_HTTPONLY", "True")
+COOKIE_EXPIRE_DAYS = 60 * 60 * 24 * int(GET_ENV("COOKIE_EXPIRE_DAYS", "7"))
 
+SESSION_COOKIE_SECURE = COOKIE_SECURE
+SESSION_COOKIE_SAMESITE = COOKIE_SAMESITE
+
+CORS_ALLOWED_ORIGINS = ALLOWED_ORIGINS
+CORS_ALLOW_CREDENTIALS = GET_BOOL("CORS_ALLOW_CREDENTIALS", "True")
 CORS_ALLOW_HEADERS = [
     "accept",
     "authorization",
@@ -188,12 +152,12 @@ CORS_ALLOW_HEADERS = [
     "ngrok-skip-browser-warning",
 ]
 
-REST_KNOX = {
-    "TOKEN_TTL": None,
-}
 
-CSRF_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = COOKIE_SECURE
+CSRF_COOKIE_SAMESITE = COOKIE_SAMESITE
+CSRF_TRUSTED_ORIGINS = ALLOWED_ORIGINS
 
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = True
+KNOX_COOKIE_HTTPONLY = True
+KNOX_COOKIE_SECURE = COOKIE_SECURE
+KNOX_COOKIE_SAMESITE = COOKIE_SAMESITE
+KNOX_COOKIE_EXPIRE_DAYS = COOKIE_EXPIRE_DAYS
