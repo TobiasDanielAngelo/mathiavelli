@@ -1,6 +1,10 @@
 from core.admin import CustomAdmin
 
 
+class AccountAdmin(CustomAdmin):
+    pass
+
+
 class CategoryAdmin(CustomAdmin):
     pass
 

@@ -127,7 +127,7 @@ export const WorkoutFilter = observer(() => {
         ...WorkoutFields.dateFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["categoryName"]}
       optionFields={[]}
     />
   );

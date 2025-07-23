@@ -143,7 +143,7 @@ export const TravelPlanFilter = observer(() => {
         ...TravelPlanFields.dateFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["itemsToBringName", "purposeName", "statusName"]}
       optionFields={[]}
     />
   );

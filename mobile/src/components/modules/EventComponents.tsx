@@ -229,7 +229,7 @@ export const EventFilter = observer(() => {
       title="Event Filters"
       dateFields={[...EventFields.dateFields, ...EventFields.datetimeFields]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["tagsName", "taskTitle"]}
       optionFields={[]}
     />
   );

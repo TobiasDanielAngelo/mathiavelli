@@ -141,7 +141,7 @@ export const HabitFilter = observer(() => {
       title="Habit Filters"
       dateFields={[...HabitFields.datetimeFields, ...HabitFields.dateFields]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["goalName"]}
       optionFields={[]}
     />
   );

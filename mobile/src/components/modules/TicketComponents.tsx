@@ -146,7 +146,12 @@ export const TicketFilter = observer(() => {
       title="Ticket Filters"
       dateFields={[...TicketFields.datetimeFields, ...TicketFields.dateFields]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={[
+        "assignedToName",
+        "priorityName",
+        "statusName",
+        "tagsName",
+      ]}
       optionFields={[]}
     />
   );

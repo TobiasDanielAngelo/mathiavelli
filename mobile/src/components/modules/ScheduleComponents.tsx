@@ -328,7 +328,7 @@ export const ScheduleFilter = observer(() => {
         ...ScheduleFields.dateFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["freqName", "weekStartName"]}
       optionFields={[]}
     />
   );

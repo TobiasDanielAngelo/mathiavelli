@@ -206,7 +206,7 @@ export const TransactionFilter = observer(() => {
         ...TransactionFields.dateFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["transmitterName", "receiverName", "categoryTitle"]}
       optionFields={[]}
     />
   );

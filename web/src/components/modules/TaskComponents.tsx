@@ -188,7 +188,7 @@ export const TaskFilter = observer(() => {
       title="Task Filters"
       dateFields={[...TaskFields.datetimeFields, ...TaskFields.dateFields]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["goalTitle", "habitTitle", "scheduleDefinition"]}
       optionFields={[]}
     />
   );

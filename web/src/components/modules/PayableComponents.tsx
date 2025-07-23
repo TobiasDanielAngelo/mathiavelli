@@ -173,7 +173,7 @@ export const PayableFilter = observer(() => {
         ...PayableFields.datetimeFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["paymentDescription"]}
       optionFields={[]}
     />
   );

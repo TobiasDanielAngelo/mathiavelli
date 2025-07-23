@@ -131,7 +131,7 @@ export const RequirementFilter = observer(() => {
         ...RequirementFields.dateFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["planName"]}
       optionFields={[]}
     />
   );

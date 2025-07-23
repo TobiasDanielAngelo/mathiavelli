@@ -161,7 +161,12 @@ export const JobFilter = observer(() => {
       title="Job Filters"
       dateFields={[...JobFields.dateFields, ...JobFields.datetimeFields]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={[
+        "jobTypeName",
+        "sourceName",
+        "statusName",
+        "workSetupName",
+      ]}
       optionFields={[]}
     />
   );

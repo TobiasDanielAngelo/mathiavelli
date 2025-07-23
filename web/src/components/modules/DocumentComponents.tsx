@@ -133,7 +133,7 @@ export const DocumentFilter = observer(() => {
         ...DocumentFields.dateFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["documentTypeName"]}
       optionFields={[]}
     />
   );

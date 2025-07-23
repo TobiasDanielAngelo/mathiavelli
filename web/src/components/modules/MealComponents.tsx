@@ -123,7 +123,7 @@ export const MealFilter = observer(() => {
       title="Meal Filters"
       dateFields={[...MealFields.datetimeFields, ...MealFields.dateFields]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["categoryName"]}
       optionFields={[]}
     />
   );

@@ -168,7 +168,11 @@ export const CredentialFilter = observer(() => {
         ...CredentialFields.datetimeFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={[
+        "authenticatorAppName",
+        "billingAccountsName",
+        "platformName",
+      ]}
       optionFields={[]}
     />
   );

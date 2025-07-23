@@ -193,7 +193,7 @@ export const ReceivableFilter = observer(() => {
         ...ReceivableFields.datetimeFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["paymentDescription"]}
       optionFields={[]}
     />
   );

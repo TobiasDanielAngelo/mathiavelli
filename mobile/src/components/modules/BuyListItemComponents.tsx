@@ -139,7 +139,7 @@ export const BuyListItemFilter = observer(() => {
         ...BuyListItemFields.datetimeFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["priorityName", "statusName"]}
       optionFields={[]}
     />
   );

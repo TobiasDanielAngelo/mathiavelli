@@ -138,7 +138,7 @@ export const ItemToBringFilter = observer(() => {
         ...ItemToBringFields.dateFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["documentName", "inventoryItemName"]}
       optionFields={[]}
     />
   );

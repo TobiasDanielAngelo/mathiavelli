@@ -126,7 +126,7 @@ export const FollowUpFilter = observer(() => {
         ...FollowUpFields.datetimeFields,
       ]}
       excludeFields={["id"]}
-      relatedFields={[]}
+      relatedFields={["jobTitle", "statusName"]}
       optionFields={[]}
     />
   );
