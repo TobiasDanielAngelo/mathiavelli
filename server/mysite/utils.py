@@ -18,6 +18,8 @@ def LOAD_ENV(BASE_DIR):
             f"{GET_ENV('ALLOWED_ORIGINS','')},"
             f"http://{local_ip}:3000,http://{local_ip}:5173"
         )
+    elif env_type == "rpi":
+        load_dotenv(os.path.join(BASE_DIR, ".env.rpi"), override=True)
     elif env_type == "production":
         load_dotenv(os.path.join(BASE_DIR, ".env.prod"), override=True)
     else:

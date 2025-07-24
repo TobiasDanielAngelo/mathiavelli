@@ -34,5 +34,6 @@ Thumbs.db
 .env.prod
 .env.staging
 .env.lan
+.env.rpi
 *.bak
 *.swp
