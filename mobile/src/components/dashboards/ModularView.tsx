@@ -7,6 +7,10 @@ import { titleToCamel, toTitleCase } from "../../constants/helpers";
 import { allViewPaths, ViewPath } from "../main/";
 import { LinearGradient } from "expo-linear-gradient";
 
+const MAX_SIZE = 18;
+const MIN_SIZE = 10;
+const MIN_LENGTH = 10;
+const NEG_SLOPE = 0.5;
 // ModuleCard Component
 const ModuleCard = ({
   path,
@@ -38,7 +42,13 @@ const ModuleCard = ({
           numberOfLines={2}
           adjustsFontSizeToFit
           style={{
-            fontSize: 18,
+            fontSize:
+              path.title.length <= MIN_LENGTH
+                ? MAX_SIZE
+                : Math.max(
+                    MIN_SIZE,
+                    MAX_SIZE - (path.title.length - MIN_LENGTH) * NEG_SLOPE
+                  ),
             marginHorizontal: 5,
             flexShrink: 1,
             fontWeight: "bold",
@@ -46,7 +56,7 @@ const ModuleCard = ({
           }}
           onPress={gotoNavigate}
         >
-          {path.title}
+          {path.title.replace(" ", "\n")}
         </Text>
         <Text
           style={{
@@ -132,7 +142,7 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   container: {
-    paddingVertical: 50,
+    paddingVertical: 30,
     paddingHorizontal: 80,
     flexDirection: "row",
     flexWrap: "wrap",

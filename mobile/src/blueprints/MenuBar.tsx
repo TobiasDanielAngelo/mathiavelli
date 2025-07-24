@@ -17,7 +17,7 @@ export const MenuBar = (props: { items: Menu[]; hidden?: boolean }) => {
 const styles = StyleSheet.create({
   main: {
     minHeight: 20,
-    maxHeight: "10%",
+    maxHeight: "15%",
     backgroundColor: "gainsboro",
     flexDirection: "row",
     justifyContent: "flex-end",
