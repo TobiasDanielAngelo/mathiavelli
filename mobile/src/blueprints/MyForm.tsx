@@ -68,6 +68,7 @@ const renderField = (
         <MyMultiDropdownSelector
           key={key}
           {...commonProps}
+          value={details[t.name] ?? []}
           options={t.options}
         />
       );
@@ -186,9 +187,11 @@ export const MyForm = observer(
             )}
           </View>
         ))}
-        <Text>{getMsg(msg, "nonFieldErrors")}</Text>
-        <Text>{getMsg(msg, "detail")}</Text>
-        <View>
+        <Text style={{ color: "darkred" }}>
+          {getMsg(msg, "nonFieldErrors")}
+        </Text>
+        <Text style={{ color: "red" }}>{getMsg(msg, "detail")}</Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <MyButton
             onPress={onPressSubmit}
             isLoading={isLoading}

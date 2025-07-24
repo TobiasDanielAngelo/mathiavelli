@@ -122,7 +122,7 @@ export const MyGenericCard = observer(
               </View>
 
               {moreActions?.map((s, ind) => (
-                <MyIcon key={ind} icon={s.icon} />
+                <MyIcon key={ind} icon={s.icon} onPress={s.onPress} />
               ))}
 
               <MyIcon

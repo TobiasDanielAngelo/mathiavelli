@@ -7,7 +7,6 @@ import {
   PRIORITY_CHOICES,
   WISHLIST_STATUS_CHOICES,
 } from "../../api/BuyListItemStore";
-import { STATUS_CHOICES } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
 import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
@@ -198,7 +197,7 @@ export const BuyListItemView = observer(() => {
       [
         {
           key: "status",
-          values: STATUS_CHOICES,
+          values: WISHLIST_STATUS_CHOICES,
           label: "",
         },
         {

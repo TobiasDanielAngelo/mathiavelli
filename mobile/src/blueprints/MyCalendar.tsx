@@ -12,8 +12,9 @@ export const MyCalendar = observer(
     date: Date;
     setDate: StateSetter<Date>;
     events?: CalendarEvent[];
+    noModal?: boolean;
   }) => {
-    const { date, setDate, events } = props;
+    const { date, setDate, events, noModal } = props;
     const { isVisible1, setVisible1 } = useVisible();
 
     const selected = moment(date).format("YYYY-MM-DD");
@@ -34,7 +35,7 @@ export const MyCalendar = observer(
         <Calendar
           onDayPress={(day) => {
             setDate(moment(day.dateString, "YYYY-MM-DD").toDate());
-            setVisible1(true);
+            !noModal && setVisible1(true);
           }}
           markedDates={{
             [selected]: {

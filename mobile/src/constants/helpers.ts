@@ -684,20 +684,28 @@ export function buildRRule(schedule: ScheduleInterface): RRule | null {
     ? null
     : `${normalizeDate(endDate)}T${normalizeTime(endTime)}`;
 
+  function safeMap<T, R>(
+    input: T[] | null | undefined,
+    callback: (value: T, index: number) => R
+  ): R[] {
+    return [];
+  }
+
   const ruleOptions = {
     freq: schedule.freq ?? RRule.DAILY,
     interval: Number(schedule.interval) || 1,
-    byweekday: schedule.byWeekDay
-      ?.map((d) => WEEKDAY_MAP[d])
-      .filter(Boolean) as Weekday[],
-    bymonth: schedule.byMonth?.map(Number) ?? undefined,
-    bymonthday: schedule.byMonthDay?.map(Number) ?? undefined,
-    byyearday: schedule.byYearDay?.map(Number) ?? undefined,
-    byweekno: schedule.byWeekNo?.map(Number) ?? undefined,
-    byhour: schedule.byHour?.map(Number) ?? undefined,
-    byminute: schedule.byMinute?.map(Number) ?? undefined,
-    bysecond: schedule.bySecond?.map(Number) ?? undefined,
-    bysetpos: schedule.bySetPosition?.map(Number) ?? undefined,
+    byweekday: safeMap(
+      schedule.byWeekDay,
+      (d: string) => WEEKDAY_MAP[d]
+    ).filter(Boolean) as Weekday[],
+    bymonth: safeMap(schedule.byMonth, Number),
+    bymonthday: safeMap(schedule.byMonthDay, Number),
+    byyearday: safeMap(schedule.byYearDay, Number),
+    byweekno: safeMap(schedule.byWeekNo, Number),
+    byhour: safeMap(schedule.byHour, Number),
+    byminute: safeMap(schedule.byMinute, Number),
+    bysecond: safeMap(schedule.byMinute, Number),
+    bysetpos: safeMap(schedule.bySetPosition, Number),
     count: Number(schedule.count) === 0 ? undefined : Number(schedule.count),
     dtstart: toUTCForRRule(start),
     until: toUTCForRRule(end),

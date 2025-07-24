@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
-import { CheckBox } from "react-native-elements";
-import { winWidth } from "../constants/constants";
+import { StyleSheet, View } from "react-native";
+import { MyIcon } from "./MyIcon";
 
 export const MyCheckBox = (props: {
   hidden?: boolean;
@@ -14,13 +13,10 @@ export const MyCheckBox = (props: {
   return (
     !hidden && (
       <View style={styles.main}>
-        <Text>{label}</Text>
-        <CheckBox
-          checked={value}
-          style={styles.checkbox}
+        <MyIcon
+          icon={value ? "check" : "square"}
           onPress={() => onChangeValue?.(!value)}
-          containerStyle={[styles.container]}
-          checkedColor="teal"
+          label={label}
         />
       </View>
     )
@@ -33,11 +29,6 @@ const styles = StyleSheet.create({
   main: {
     justifyContent: "center",
     alignItems: "center",
-  },
-  container: {
-    margin: 0,
-    padding: 0,
-    justifyContent: "center",
-    flexDirection: "column",
+    padding: 5,
   },
 });

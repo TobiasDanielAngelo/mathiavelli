@@ -36,7 +36,7 @@ export const MyModal = (
     <Overlay isVisible={isVisible}>
       <View
         style={{
-          minWidth: 100,
+          minWidth: 200,
           width: width * 0.5,
           maxWidth: 400,
           maxHeight: height * 0.7,
@@ -49,9 +49,6 @@ export const MyModal = (
             <MyIcon icon="times" onPress={() => setVisible(false)} />
           </HView>
           <View style={styles.children}>{children}</View>
-          <View style={styles.bar}>
-            <MyIcon icon="check" onPress={() => setVisible(false)} />
-          </View>
         </ScrollView>
       </View>
     </Overlay>

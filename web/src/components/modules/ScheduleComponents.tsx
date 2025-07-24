@@ -198,20 +198,24 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
     !item.associatedHabit && !item.associatedTask
       ? [
           {
-            onClick: () =>
+            onPress: () => {
               taskStore.addItem({
                 title: item.name,
                 schedule: item.id,
                 importance: 5,
-              }),
+              });
+              scheduleStore.fetchAll(`id__in=${item.id}`);
+            },
             title: "Add to Tasks",
           },
           {
-            onClick: () =>
+            onPress: () => {
               habitStore.addItem({
                 title: item.name,
                 schedule: item.id,
-              }),
+              });
+              scheduleStore.fetchAll(`id__in=${item.id}`);
+            },
             title: "Add to Habits",
           },
         ]

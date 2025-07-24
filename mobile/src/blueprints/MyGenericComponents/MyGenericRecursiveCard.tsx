@@ -6,7 +6,7 @@ import { MyConfirmModal } from "../MyConfirmModal";
 import { MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
 import { ItemDetailsProps, KV, Page } from "../../constants/interfaces";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { MyDropdownMenu } from "../MyDropdownMenu";
 
 interface MyGenericRecursiveCardProps<T> extends ItemDetailsProps<T> {
@@ -70,7 +70,7 @@ export const MyGenericRecursiveCard = observer(
     ] satisfies Page[];
 
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, { borderWidth: border ? 1 : 0 }]}>
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
           <FormComponent
             item={item}
@@ -87,6 +87,22 @@ export const MyGenericRecursiveCard = observer(
         />
 
         <View style={styles.wrapper}>
+          <View style={styles.actionsRow}>
+            <View style={styles.relative}>
+              <MyIcon icon="cog" onPress={() => setVisible3((t) => !t)} />
+              <MyDropdownMenu
+                setOpen={setVisible3}
+                open={isVisible3}
+                actions={actions}
+                margin={0}
+              />
+              <MyIcon
+                icon={showMore ? "angle-up" : "angle-down"}
+                onPress={() => setShowMore((t) => !t)}
+              />
+            </View>
+          </View>
+
           <View style={styles.flex1}>
             <ItemDetails<T>
               item={item.$view}
@@ -98,42 +114,24 @@ export const MyGenericRecursiveCard = observer(
               setShowMore={setShowMore}
               itemMap={itemMap}
             />
-
-            <View style={styles.actionsRow}>
-              <View style={styles.relative}>
-                <MyIcon icon="cog" onPress={() => setVisible3((t) => !t)} />
-                <MyDropdownMenu
-                  setOpen={setVisible3}
-                  open={isVisible3}
-                  actions={actions}
-                  margin={9}
+            {showMore &&
+              subItems.length > 0 &&
+              subItems.map((s) => (
+                <MyGenericRecursiveCard
+                  key={s.id}
+                  item={s}
+                  header={header}
+                  important={important}
+                  prices={prices}
+                  shownFields={shownFields}
+                  FormComponent={FormComponent}
+                  deleteItem={deleteItem}
+                  fetchFcn={fetchFcn}
+                  items={items}
+                  parentKey={parentKey}
+                  itemMap={itemMap}
                 />
-              </View>
-
-              {showChildren &&
-                subItems.length > 0 &&
-                subItems.map((s) => (
-                  <MyGenericRecursiveCard
-                    key={s.id}
-                    item={s}
-                    header={header}
-                    important={important}
-                    prices={prices}
-                    shownFields={shownFields}
-                    FormComponent={FormComponent}
-                    deleteItem={deleteItem}
-                    fetchFcn={fetchFcn}
-                    items={items}
-                    parentKey={parentKey}
-                    itemMap={itemMap}
-                  />
-                ))}
-
-              <MyIcon
-                icon={showMore ? "angle-up" : "angle-down"}
-                onPress={() => setShowMore((t) => !t)}
-              />
-            </View>
+              ))}
           </View>
         </View>
       </View>
@@ -146,7 +144,6 @@ const styles = StyleSheet.create({
     margin: 12, // m-3
     padding: 8, // pt-3
     borderRadius: 8, // rounded-lg
-    borderWidth: 1, // border
     borderColor: "teal", // border-teal-300
     // For dark mode, override this dynamically
   },
@@ -160,10 +157,11 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
-    marginTop: 8, // mt-2 → 8px
-    alignItems: "center",
+    marginTop: 8,
   },
   relative: {
+    flexDirection: "column",
+    gap: 10,
     position: "relative",
   },
 });

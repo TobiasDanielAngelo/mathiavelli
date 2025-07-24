@@ -29,7 +29,9 @@ export const MyConfirmModal = (props: {
       title="Confirm Action"
       disableClose
     >
-      <View>
+      <View
+        style={{ height: 200, justifyContent: "center", alignItems: "center" }}
+      >
         <Text>
           {objectName
             ? `${actionName ?? "Confirm"} this ${objectName}?`
@@ -47,10 +49,9 @@ export const MyConfirmModal = (props: {
           ? `${msg["detail" as keyof Object]}`
           : ""}
       </View>
-
-      <Pressable onPress={onPressCheck}>
-        <MyIcon icon="" />
-      </Pressable>
+      <View style={{ flex: 1, alignItems: "flex-end" }}>
+        <MyIcon icon="check" onPress={onPressCheck} />
+      </View>
     </MyModal>
   );
 };

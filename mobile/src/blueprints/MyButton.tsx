@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     backgroundColor: "teal",
     borderRadius: 30,
+    paddingHorizontal: 10,
   },
-  text: { textAlign: "center", color: "white", fontSize: 25 },
+  text: { textAlign: "center", color: "white", fontSize: 20 },
 });

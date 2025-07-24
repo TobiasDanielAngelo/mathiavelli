@@ -43,9 +43,7 @@ export const MyLineChart = observer(
 
     const filteredData = filterChartDataByFields(transformedData, shownFields);
 
-    return !filteredData.datasets.length ? (
-      <></>
-    ) : (
+    return (
       <View>
         <MyMultiDropdownSelector
           value={shownFields}
@@ -54,61 +52,67 @@ export const MyLineChart = observer(
           label={selectionLabel ?? "Items"}
           isAll
         />
-        <LineChart
-          onDataPointClick={({ value, dataset, getColor, index }) => {
-            // do something like show tooltip or alert
-            console.log(`Clicked value: ${value} at index ${index}`);
-          }}
-          data={filteredData}
-          width={chartWidth} // from react-native
-          height={height * 0.45}
-          yAxisLabel={yPrefix}
-          yAxisSuffix={ySuffix}
-          yAxisInterval={1} // optional, defaults to 1
-          chartConfig={{
-            backgroundGradientFrom: "teal",
-            backgroundGradientTo: "teal",
-            decimalPlaces: 2, // optional, defaults to 2dp
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-            propsForDots: {
-              r: "6",
-              strokeWidth: "2",
-            },
-          }}
-          verticalLabelRotation={-45}
-          xLabelsOffset={20}
-          style={{
-            marginVertical: 8,
-            borderRadius: 16,
-            padding: 20,
-          }}
-        />
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {filteredData.legend?.map((label, index) => (
-            <View
-              key={index}
-              style={{
-                alignItems: "center",
-                marginHorizontal: 8,
-                marginBottom: 8,
+        {!filteredData.datasets.length ? (
+          <></>
+        ) : (
+          <>
+            <LineChart
+              onDataPointClick={({ value, dataset, getColor, index }) => {
+                // do something like show tooltip or alert
+                console.log(`Clicked value: ${value} at index ${index}`);
               }}
-            >
-              <View
-                style={{
-                  width: 12,
-                  height: 12,
-                  backgroundColor: COLORS[index % COLORS.length],
-                  borderRadius: 6,
-                }}
-              />
-              <Text style={{ fontSize: 12, marginTop: 4 }}>{label}</Text>
+              data={filteredData}
+              width={chartWidth} // from react-native
+              height={height * 0.45}
+              yAxisLabel={yPrefix}
+              yAxisSuffix={ySuffix}
+              yAxisInterval={1} // optional, defaults to 1
+              chartConfig={{
+                backgroundGradientFrom: "teal",
+                backgroundGradientTo: "teal",
+                decimalPlaces: 2, // optional, defaults to 2dp
+                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+                propsForDots: {
+                  r: "6",
+                  strokeWidth: "2",
+                },
+              }}
+              verticalLabelRotation={-45}
+              xLabelsOffset={20}
+              style={{
+                marginVertical: 8,
+                borderRadius: 16,
+                padding: 20,
+              }}
+            />
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              {filteredData.legend?.map((label, index) => (
+                <View
+                  key={index}
+                  style={{
+                    alignItems: "center",
+                    marginHorizontal: 8,
+                    marginBottom: 8,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 12,
+                      height: 12,
+                      backgroundColor: COLORS[index % COLORS.length],
+                      borderRadius: 6,
+                    }}
+                  />
+                  <Text style={{ fontSize: 12, marginTop: 4 }}>{label}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+          </>
+        )}
       </View>
     );
   }

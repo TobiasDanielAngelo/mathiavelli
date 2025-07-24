@@ -69,10 +69,10 @@ export const MyInput = (props: MyInputProps) => {
     !hidden && (
       <View style={[styles.main, { flex: flex ? flex : 0 }]}>
         <View style={styles.textInput}>
-          <Text>{label}</Text>
+          {label && <Text>{label}</Text>}
           <TextInput
             onChangeText={onChangeCorrect}
-            value={value}
+            value={String(value)}
             style={[
               styles.input,
               {
@@ -89,7 +89,7 @@ export const MyInput = (props: MyInputProps) => {
             secureTextEntry={isPassword}
             multiline={multiline}
           />
-          {msg && <Text>{msg}</Text>}
+          {msg && <Text style={{ color: "darkred" }}>{msg}</Text>}
         </View>
         {checkpoint && (
           <MyIcon

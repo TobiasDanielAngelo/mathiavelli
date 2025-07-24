@@ -1,59 +1,122 @@
-import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import DropDownPicker, {
-  ItemType,
-  ValueType,
-} from "react-native-dropdown-picker";
-import { winWidth } from "../constants/constants";
-import { Option } from "../constants/interfaces";
+import { useState, useRef, useEffect } from "react";
+import type { Option } from "../constants/interfaces";
+import { Pressable, Text, View } from "react-native";
+import { MyCheckBox } from "./MyCheckbox";
+import { MyIcon } from "./MyIcon";
+import { MyInput } from "./MyInput";
 
 export const MyDropdownSelector = (props: {
-  options?: Option[];
-  value?: number;
-  onChangeValue: (t: number) => void;
-  msg?: string;
   label?: string;
-  flex?: boolean;
-  disabled?: boolean;
-  hidden?: boolean;
+  value: number | string | undefined;
+  onChangeValue: (t: number | string | undefined) => void;
+  options?: Option[];
+  msg?: string;
+  noSearch?: boolean;
+  flex?: number;
 }) => {
-  const { options, value, onChangeValue, label, flex, hidden, disabled } =
-    props;
+  const {
+    label,
+    options = [],
+    onChangeValue,
+    value,
+    msg,
+    noSearch,
+    flex,
+  } = props;
 
-  const [open, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+
+  const [isOption, setIsOption] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const filteredOptions = options?.filter((opt) =>
+    String(opt.name).toLowerCase().includes(search.toLowerCase())
+  );
+
+  const toggleValue = (t: number | string) => {
+    onChangeValue(t === value ? undefined : t);
+  };
 
   return (
-    !hidden && (
-      <View style={[styles.main, { flex: flex ? 1 : 0 }]}>
-        {label && <Text>{label}</Text>}
-        <DropDownPicker
-          items={
-            options?.map((t) => ({
-              label: t.name,
-              value: t.id,
-            })) ?? []
-          }
-          multiple={false}
-          setValue={(t: any) => onChangeValue(t())}
-          value={value ?? -1}
-          open={open}
-          setOpen={setOpen}
-          // textStyle={{
-          //   fontSize: (1 / 20) * winWidth,
-          // }}
-          searchable={true}
-          searchPlaceholder="Search..."
-          listMode="MODAL"
-          disabled={disabled}
-          placeholder={label}
-        />
-      </View>
-    )
+    <View style={{ position: "relative", paddingHorizontal: 2 }}>
+      {label && (
+        <Text style={{ fontSize: 15, color: "blue", marginBottom: 5 }}>
+          {label}
+        </Text>
+      )}
+
+      {isOption ? (
+        <View style={{ flexDirection: "row", gap: 10, flex: flex }}>
+          <Pressable
+            style={{
+              borderWidth: 1,
+              borderColor: "gray",
+              borderRadius: 5,
+              justifyContent: "space-between",
+              paddingHorizontal: 10,
+              alignItems: "center",
+              flexDirection: "row",
+              flex: 1,
+            }}
+            onPress={() => setOpen(!isOpen)}
+          >
+            <Text ellipsizeMode="tail">
+              {options.find((s) => s.id === value)
+                ? options.find((s) => s.id === value)?.name
+                : "No item selected."}
+            </Text>
+            <MyIcon
+              icon={isOpen ? "angle-up" : "angle-down"}
+              onPress={() => setOpen(!isOpen)}
+            />
+          </Pressable>
+          {!noSearch && (
+            <MyIcon icon={"searchengin"} onPress={() => setIsOption(false)} />
+          )}
+        </View>
+      ) : (
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flex: 1 }}>
+            <MyInput
+              value={search}
+              onChangeValue={setSearch}
+              placeholder="Search"
+            />
+          </View>
+          {!noSearch && (
+            <MyIcon icon={"searchengin"} onPress={() => setIsOption(true)} />
+          )}
+        </View>
+      )}
+
+      {(isOpen || search) && (
+        <View
+          style={{
+            marginTop: 5,
+            padding: 5,
+            borderWidth: 1,
+            borderRadius: 5,
+            borderColor: "gray",
+          }}
+        >
+          {filteredOptions.map((opt) => (
+            <View
+              style={{
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+              key={opt.id}
+            >
+              <MyCheckBox
+                value={value === opt.id}
+                onChangeValue={() => toggleValue(opt.id)}
+              />
+              <Text>{opt.name}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+      <Text style={{ color: "darkred" }}>{msg}</Text>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  main: {
-    margin: 3,
-  },
-});

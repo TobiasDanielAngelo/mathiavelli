@@ -43,7 +43,9 @@ export const MyIcon: React.FC<MyIconProps> = ({
           size={size}
         />
         {label && (
-          <Text style={[styles.text, { color: color ?? undefined }]}>
+          <Text
+            style={[styles.text, { color: color ?? undefined, fontSize: size }]}
+          >
             {label}
           </Text>
         )}

@@ -1,82 +1,125 @@
-import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
-import { winWidth } from "../constants/constants";
-import { Option, StateSetter } from "../constants/interfaces";
+import { useState, useRef, useEffect } from "react";
+import type { Option } from "../constants/interfaces";
+import { Pressable, Text, View } from "react-native";
+import { MyCheckBox } from "./MyCheckbox";
+import { MyIcon } from "./MyIcon";
 
 export const MyMultiDropdownSelector = (props: {
   label?: string;
   value: (number | string)[];
-  onChangeValue: StateSetter<(number | string)[]>;
+  onChangeValue: (t: (number | string)[]) => void;
   options?: Option[];
   msg?: string;
   relative?: boolean;
   open?: boolean;
   maxSelections?: number;
   isAll?: boolean;
-  flex?: boolean;
-  disabled?: boolean;
-  hidden?: boolean;
 }) => {
-  const { options, value, onChangeValue, label, flex, hidden, disabled } =
-    props;
+  const {
+    label,
+    options = [],
+    onChangeValue,
+    value = [],
+    msg,
+    relative,
+    open,
+    maxSelections,
+    isAll,
+  } = props;
+  const [isOpen, setOpen] = useState(open ?? false);
+  const [selectAll, setSelectAll] = useState(isAll);
 
-  const [open, setOpen] = useState(false);
+  const onToggle = (id: number | string) => {
+    if (value.includes(id)) {
+      onChangeValue(value.filter((v) => v !== id));
+    } else {
+      if (!maxSelections || value.length < maxSelections) {
+        onChangeValue([...value, id]);
+      }
+    }
+  };
+
+  useEffect(() => {
+    onChangeValue(selectAll ? options.map((s) => s.id) : []);
+  }, [selectAll, options.length]);
+
+  useEffect(() => {
+    onChangeValue(
+      selectAll ? options.map((s) => s.id) : value === null ? [] : value
+    );
+  }, []);
 
   return (
-    !hidden && (
-      <View style={[styles.main, { flex: flex ? 1 : 0 }]}>
-        <Text>{label}</Text>
-        <DropDownPicker
-          items={
-            options?.map((t) => ({
-              label: t.name,
-              value: t.id,
-            })) ?? []
-          }
-          multiple={true}
-          setValue={onChangeValue}
-          value={value}
-          open={open}
-          setOpen={setOpen}
-          // textStyle={{
-          //   fontSize: (1 / 20) * winWidth,
-          // }}
-          searchable={true}
-          searchPlaceholder="Search..."
-          listMode="MODAL"
-          disabled={disabled}
-          placeholder={label}
+    <View style={{ position: "relative", paddingHorizontal: 2 }}>
+      {label && (
+        <Text style={{ fontSize: 15, color: "blue", marginBottom: 5 }}>
+          {label}
+        </Text>
+      )}
+
+      <Pressable
+        style={{
+          borderWidth: 1,
+          borderRadius: 5,
+          paddingHorizontal: 10,
+          borderColor: "gray",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexDirection: "row",
+        }}
+        onPress={() => setOpen(!isOpen)}
+      >
+        <Text>
+          {!value || value.length === 0
+            ? `Select ${label ?? "items"}`
+            : value.slice(0, 3).join(", ") + (value.length > 3 ? "..." : "")}
+        </Text>
+        <MyIcon
+          icon={isOpen ? "angle-up" : "angle-down"}
+          onPress={() => setOpen(!isOpen)}
         />
-        {/* <MyQuickList
-          values={values}
-          items={items}
-          setValues={setValues}
-          hidden={values.length === 0}
-          editable
-        /> */}
-      </View>
-    )
+      </Pressable>
+
+      {isOpen && (
+        <View
+          style={{
+            marginTop: 5,
+            padding: 5,
+            borderWidth: 1,
+            borderRadius: 5,
+            borderColor: "gray",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <MyCheckBox
+              value={selectAll}
+              onChangeValue={() => setSelectAll((t) => !t)}
+            />
+            <Text>Select All</Text>
+          </View>
+          {options.map((opt) => (
+            <View
+              style={{
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+              key={opt.id}
+            >
+              <MyCheckBox
+                value={value.includes(opt.id)}
+                onChangeValue={() => onToggle(opt.id)}
+              />
+              <Text>{opt.name}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+      <Text style={{ color: "darkred" }}>{msg}</Text>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  main: {
-    margin: 3,
-  },
-  list: {
-    margin: 5,
-    padding: 5,
-    flexDirection: "row",
-    backgroundColor: "lightblue",
-    flexWrap: "wrap",
-    borderRadius: 20,
-  },
-  item: {
-    backgroundColor: "lightcyan",
-    borderRadius: 20,
-    padding: 5,
-    margin: 5,
-  },
-  text: { fontSize: 0.04 * winWidth },
-});

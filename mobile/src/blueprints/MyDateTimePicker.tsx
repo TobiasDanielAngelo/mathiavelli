@@ -1,13 +1,18 @@
-import DateTimePicker, {
-  DateTimePickerAndroid,
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
 import moment from "moment";
-import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { winWidth } from "../constants/constants";
+import { useVisible } from "../constants/hooks";
+import { DatePicker } from "./DatePicker";
+import { DateTimePicker } from "./DateTimePicker";
 import { MyIcon } from "./MyIcon";
-import { isValidDate } from "rrule/dist/esm/dateutil";
+import { TimePicker } from "./TimePicker";
+
+const toString = (dt: Date, isDateOnly?: boolean, isTimeOnly?: boolean) => {
+  return isDateOnly
+    ? moment(dt).format("MMM D, YYYY")
+    : isTimeOnly
+    ? moment(dt).format("h:mm A")
+    : moment(dt).format("MMM D YYYY h:mm A");
+};
 
 export const MyDateTimePicker = (props: {
   hidden?: boolean;
@@ -20,61 +25,78 @@ export const MyDateTimePicker = (props: {
   msg?: string;
 }) => {
   const { hidden, onChangeValue, value, isDateOnly, isTimeOnly, label } = props;
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
+  const { isVisible1, setVisible1 } = useVisible();
 
-  const onChangeDate = useCallback((event: DateTimePickerEvent, date: Date) => {
-    if (event.type == "set") {
-      onChangeValue(date.toISOString());
-    }
-    setShowDatePicker(false);
-    !isDateOnly && setShowTimePicker(true);
-  }, []);
-
-  const onChangeTime = useCallback((event: DateTimePickerEvent, date: Date) => {
-    if (event.type == "set") {
-      onChangeValue(date.toISOString());
-    }
-    setShowTimePicker(false);
-  }, []);
-
-  const datePart =
+  const valueMoment =
     value !== "" && value
-      ? moment(value, "MMM D, YYYY").format("MMM D, YYYY")
-      : "N/D";
-  const timePart =
-    value !== "" && value ? moment(value).format("hh:mm A") : "N/T";
+      ? isDateOnly
+        ? moment(value, "MMM D, YYYY")
+        : isTimeOnly
+        ? moment(value, "h:mm A")
+        : moment(value, "MMM D YYYY h:mm A")
+      : undefined;
+
+  const dateString = valueMoment ? valueMoment.format("MMM D, YYYY") : "N/D";
+  const timeString = valueMoment ? valueMoment.format("h:mm A") : "N/T";
+
   const calendarLabel = isDateOnly
-    ? datePart
+    ? dateString
     : isTimeOnly
-    ? timePart
-    : `${datePart} ${timePart}`;
+    ? timeString
+    : `${dateString} ${timeString}`;
 
   return (
     !hidden && (
       <View style={styles.main}>
-        <Text>{label}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <MyIcon icon="times" size={10} onPress={() => onChangeValue("")} />
+            <Text style={{ paddingLeft: 5 }}>{label}</Text>
+          </View>
+          <View>
+            <MyIcon
+              icon="calendar"
+              size={10}
+              onPress={() =>
+                onChangeValue(toString(new Date(), isDateOnly, isTimeOnly))
+              }
+              label="Now"
+            />
+          </View>
+        </View>
+
         <MyIcon
           icon="calendar"
-          onPress={() =>
-            isTimeOnly ? setShowTimePicker(true) : setShowDatePicker(true)
-          }
+          onPress={() => setVisible1(true)}
           label={calendarLabel}
         />
-
-        {showDatePicker && (
-          <DateTimePicker
-            mode="date"
-            display="calendar"
-            value={moment(value).toDate()}
-            onChange={(e, date) => onChangeDate(e, date ?? new Date())}
+        {isDateOnly ? (
+          <DatePicker
+            date={value}
+            setDate={onChangeValue}
+            open={isVisible1}
+            setOpen={setVisible1}
           />
-        )}
-        {showTimePicker && (
+        ) : isTimeOnly ? (
+          <TimePicker
+            time={value}
+            setTime={onChangeValue}
+            open={isVisible1}
+            setOpen={setVisible1}
+          />
+        ) : (
           <DateTimePicker
-            mode="time"
-            value={moment(value).toDate()}
-            onChange={(e, date) => onChangeTime(e, date ?? new Date())}
+            dateTime={value}
+            setDateTime={onChangeValue}
+            open={isVisible1}
+            setOpen={setVisible1}
           />
         )}
       </View>

@@ -30,7 +30,7 @@ export const {
   useGenericView: useTravelPlanView,
 } = createGenericViewContext<TravelPlanInterface>();
 
-const title = "TravelPlans";
+const title = "Travel Plans";
 
 export const TravelPlanIdMap = {} as const;
 
@@ -137,7 +137,7 @@ export const TravelPlanFilter = observer(() => {
   return (
     <MyGenericFilter
       view={new TravelPlan({}).$view}
-      title="TravelPlan Filters"
+      title="Travel Plan Filters"
       dateFields={[
         ...TravelPlanFields.datetimeFields,
         ...TravelPlanFields.dateFields,

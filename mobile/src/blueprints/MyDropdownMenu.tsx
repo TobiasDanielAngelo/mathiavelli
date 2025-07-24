@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 25,
     zIndex: 10,
-    maxHeight: "400%",
+    // maxHeight: "400%",
     overflow: "scroll",
     backgroundColor: "#fff",
     borderRadius: 8,
