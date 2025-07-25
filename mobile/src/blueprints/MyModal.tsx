@@ -39,45 +39,23 @@ export const MyModal = (
   }, [isVisible]);
 
   return (
-    <Animated.View
+    <Overlay
+      isVisible={isVisible}
       style={{
+        transform: [{ translateX: -500 }],
         position: "absolute",
-        opacity: opacity,
-        width: width - insets.right,
-        height: height,
-        top: 0,
-        backgroundColor: "rgba(100,100,100,0.1)",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 100,
-        display: isVisible ? "flex" : "none",
-        padding: 10,
       }}
+      statusBarTranslucent
+      navigationBarTranslucent
+      onBackdropPress={() => setVisible(false)}
+      supportedOrientations={["portrait", "landscape"]}
     >
-      <Pressable
-        style={{
-          flex: 1,
-          position: "absolute",
-          backgroundColor: "rgba(100,100,100,0.5)",
-          width: width,
-          height: height,
-        }}
-        onPress={() => setVisible(false)}
-      ></Pressable>
       <View
         style={{
-          position: "absolute",
-          minHeight: "40%",
-          marginHorizontal: "auto",
-          marginBottom: 30,
-          padding: 15,
           justifyContent: "space-between",
           backgroundColor: "white",
           borderRadius: 10,
-          minWidth: 300,
-          width: width * 0.5,
-          maxWidth: 400,
-          maxHeight: height * 0.7,
+          width: 300,
         }}
       >
         <ScrollView keyboardShouldPersistTaps="always">
@@ -89,7 +67,7 @@ export const MyModal = (
           <View style={styles.children}>{children}</View>
         </ScrollView>
       </View>
-    </Animated.View>
+    </Overlay>
   );
 };
 
@@ -101,6 +79,9 @@ const styles = StyleSheet.create({
   },
   children: {
     flex: 1,
+    margin: "auto",
+    justifyContent: "center",
+    alignItems: "center",
     // padding: winHeight * 0.03,
   },
 });

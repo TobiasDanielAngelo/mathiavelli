@@ -57,10 +57,10 @@ export const MyGenericRow = observer(
           actionName="Delete"
           msg={msg}
         />
-        <HView>
+        <View style={{ flexDirection: "row", gap: 5, paddingHorizontal: 10 }}>
           <MyIcon icon="edit" onPress={() => setVisible1(true)} />
           <MyIcon icon="times" onPress={() => setVisible2(true)} />
-        </HView>
+        </View>
       </View>
     );
   }

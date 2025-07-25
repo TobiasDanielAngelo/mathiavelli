@@ -175,7 +175,15 @@ export const MyForm = observer(
           objectName={objectName}
           actionName="Delete"
         />
-        <Text>{title}</Text>
+        <Text
+          style={{
+            width: 300,
+            borderBottomWidth: 1,
+            borderBottomColor: "#dddddd",
+          }}
+        >
+          {title}
+        </Text>
         {fields.map((row, rowIdx) => (
           <View key={rowIdx}>
             {row.map((t, colIdx) =>
@@ -191,7 +199,12 @@ export const MyForm = observer(
           {getMsg(msg, "nonFieldErrors")}
         </Text>
         <Text style={{ color: "red" }}>{getMsg(msg, "detail")}</Text>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View
+          style={{
+            flexDirection: "row-reverse",
+            justifyContent: "space-between",
+          }}
+        >
           <MyButton
             onPress={onPressSubmit}
             isLoading={isLoading}

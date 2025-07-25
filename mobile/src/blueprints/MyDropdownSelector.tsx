@@ -1,14 +1,14 @@
-import { useState, useRef, useEffect } from "react";
-import type { Option } from "../constants/interfaces";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import type { Option, StateSetter } from "../constants/interfaces";
 import { MyCheckBox } from "./MyCheckbox";
 import { MyIcon } from "./MyIcon";
 import { MyInput } from "./MyInput";
 
 export const MyDropdownSelector = (props: {
   label?: string;
-  value: number | string | undefined;
-  onChangeValue: (t: number | string | undefined) => void;
+  value: number;
+  onChangeValue: (t: number) => void;
   options?: Option[];
   msg?: string;
   noSearch?: boolean;
@@ -33,8 +33,8 @@ export const MyDropdownSelector = (props: {
     String(opt.name).toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggleValue = (t: number | string) => {
-    onChangeValue(t === value ? undefined : t);
+  const toggleValue = (t: number) => {
+    onChangeValue(t === value ? -1 : t);
   };
 
   return (
@@ -109,7 +109,7 @@ export const MyDropdownSelector = (props: {
             >
               <MyCheckBox
                 value={value === opt.id}
-                onChangeValue={() => toggleValue(opt.id)}
+                onChangeValue={() => toggleValue(opt.id as number)}
               />
               <Text>{opt.name}</Text>
             </View>

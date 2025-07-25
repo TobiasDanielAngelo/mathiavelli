@@ -1,19 +1,10 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
-import { LineChart, PieChart } from "react-native-chart-kit";
-import {
-  COLORS,
-  filterChartDataByFields,
-  MyCircleChartProps,
-  MyTrendChartProps,
-  useCircleChart,
-  useTrendChart,
-} from ".";
-import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
-import { MyDropdownSelector } from "../MyDropdownSelector";
+import { PieChart } from "react-native-chart-kit";
+import { COLORS, MyCircleChartProps, useCircleChart } from ".";
 import { formatValue } from "../../constants/JSXHelpers";
 import { mySum } from "../../constants/helpers";
+import { MyDropdownSelector } from "../MyDropdownSelector";
 
 const data = [
   {
@@ -66,7 +57,7 @@ export const MyPieChart = observer(
     title = "",
   }: MyCircleChartProps<T>) => {
     const { width, height } = useWindowDimensions();
-    const isPortrait = height >= width || (height < width && height < 600);
+    const isPortrait = height >= width;
     const ratio = 0.5;
     const chartWidth = isPortrait ? 0.93 * width : (1 / (ratio + 1.1)) * width;
 
@@ -79,30 +70,32 @@ export const MyPieChart = observer(
     );
 
     return (
-      <View>
-        <MyDropdownSelector
-          value={selectedField}
-          onChangeValue={setSelectedField}
-          options={Array.from(
-            new Set(data.map((s) => s[traceKey as string]))
-          ).map((s) => ({
-            id: s,
-            name: formatValue(
-              s,
-              traceKey as string,
-              [],
-              itemMap?.find((s) => s.key === traceKey)
-            ),
-          }))}
-          label={selectionLabel ?? "Traces"}
-        />
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <View style={{ width: width }}>
+          <MyDropdownSelector
+            value={selectedField}
+            onChangeValue={setSelectedField}
+            options={Array.from(
+              new Set(data.map((s) => s[traceKey as string]))
+            ).map((s) => ({
+              id: s,
+              name: formatValue(
+                s,
+                traceKey as string,
+                [],
+                itemMap?.find((s) => s.key === traceKey)
+              ),
+            }))}
+            label={selectionLabel ?? "Traces"}
+          />
+        </View>
         <PieChart
           data={resolvedData}
-          width={width}
+          width={0.5 * height}
           height={0.5 * height}
           accessor={dataKey as string}
           backgroundColor="transparent"
-          paddingLeft={isPortrait ? "150" : "0"}
+          paddingLeft={isPortrait ? "90" : `50`}
           hasLegend={false}
           chartConfig={{
             backgroundGradientFrom: "transparent",
@@ -125,36 +118,38 @@ export const MyPieChart = observer(
             flexWrap: "wrap",
           }}
         >
-          {resolvedData.map((s, ind, arr) => (
-            <View
-              key={ind}
-              style={{
-                alignItems: "center",
-                marginHorizontal: 8,
-                marginBottom: 8,
-              }}
-            >
+          {resolvedData
+            .sort((a, b) => b[dataKey as string] - a[dataKey as string])
+            .map((s, ind, arr) => (
               <View
+                key={ind}
                 style={{
-                  width: 12,
-                  height: 12,
-                  backgroundColor: COLORS[ind % COLORS.length],
-                  borderRadius: 6,
+                  alignItems: "center",
+                  marginHorizontal: 8,
+                  marginBottom: 8,
                 }}
-              />
-              <Text style={{ fontSize: 12, marginTop: 4 }}>
-                {s[nameKey as string]}
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 4 }}>
-                {Math.round(
-                  (s[dataKey as string] /
-                    mySum(arr.map((t) => t[dataKey as string]))) *
-                    1000
-                ) / 10}
-                %
-              </Text>
-            </View>
-          ))}
+              >
+                <View
+                  style={{
+                    width: 12,
+                    height: 12,
+                    backgroundColor: COLORS[ind % COLORS.length],
+                    borderRadius: 6,
+                  }}
+                />
+                <Text style={{ fontSize: 12, marginTop: 4 }}>
+                  {s[nameKey as string]}
+                </Text>
+                <Text style={{ fontSize: 12, marginTop: 4 }}>
+                  {Math.round(
+                    (s[dataKey as string] /
+                      mySum(arr.map((t) => t[dataKey as string]))) *
+                      1000
+                  ) / 10}
+                  %
+                </Text>
+              </View>
+            ))}
         </View>
       </View>
     );
