@@ -21,13 +21,13 @@ export const DateTimePicker = ({
   setOpen,
 }: DatePickerProps) => {
   const [hour, setHour] = useState(
-    moment(dateTime, "MMM D YYYY h:mm A").format("hh")
+    moment(dateTime ?? new Date(), "MMM D YYYY h:mm A").format("hh")
   );
   const [minute, setMinute] = useState(
-    moment(dateTime, "MMM D YYYY h:mm A").format("mm")
+    moment(dateTime ?? new Date(), "MMM D YYYY h:mm A").format("mm")
   );
   const [isAM, setIsAM] = useState(
-    moment(dateTime, "MMM D YYYY h:mm A").format("A") === "AM"
+    moment(dateTime ?? new Date(), "MMM D YYYY h:mm A").format("A") === "AM"
   );
   const [value, setValue] = useState(moment(dateTime, "MMM D, YYYY").toDate());
 

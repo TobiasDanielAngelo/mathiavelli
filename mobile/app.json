@@ -1,27 +1,27 @@
 {
   "expo": {
-    "name": "Mobile",
-    "slug": "Mobile",
+    "name": "Mathiavelli",
+    "slug": "mathiavelli",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/mathiavelli.jpg",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#cbf5dd"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/mathiavelli.jpg",
+        "backgroundColor": "#cbf5dd"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Mobile"
+      "package": "com.dan6842.mathiavelli"
     },
     "web": {
       "favicon": "./assets/favicon.png"

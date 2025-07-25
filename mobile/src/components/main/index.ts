@@ -53,7 +53,7 @@ export const allViewPaths = [
       "issue-comments",
       "issue-tags",
       "settings",
-      "test",
+      "testing",
     ],
   },
 ] as ViewPath[];

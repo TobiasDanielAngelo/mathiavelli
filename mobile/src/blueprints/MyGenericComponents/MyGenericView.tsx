@@ -16,7 +16,7 @@ import { GenericViewProps } from "./MyGenericProps";
 import { SettingStore } from "../../api/SettingStore";
 import { useStore } from "../../api/Store";
 import { SetURLSearchParams, useSearchParams } from "react-router-native";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { MySpeedDial } from "../MySpeedDial";
 import { MyMultiDropdownSelector } from "../MyMultiDropdownSelector";
 import { MyPageBar } from "../MyPageBar";
@@ -122,7 +122,8 @@ export const MyGenericView = observer(
       setGraph,
       title,
     } = props;
-
+    const { width, height } = useWindowDimensions();
+    const isPortrait = height >= width;
     const { settingStore } = useStore();
     const setVisibleForIndex = (index: number) => {
       return (value: boolean) => {
@@ -292,8 +293,14 @@ export const MyGenericView = observer(
       <Context.Provider value={value}>
         {view === "card" ? <CollectionComponent /> : <TableComponent />}
         {Modals}
-        <MySpeedDial actions={actions} />
-        <MySpeedDial actions={views} leftSide />
+        {isPortrait ? (
+          <MySpeedDial actions={[...actions, ...views]} />
+        ) : (
+          <>
+            <MySpeedDial actions={actions} />
+            <MySpeedDial actions={views} leftSide />
+          </>
+        )}
       </Context.Provider>
     );
   }

@@ -183,7 +183,16 @@ export const EventDashboard = observer(
     const { eventStore } = useStore();
     const { pageDetails } = useEventView();
 
-    return <MyCalendar {...props} />;
+    return (
+      <MyCalendar
+        {...props}
+        events={sortAndFilterByIds(
+          eventStore.items,
+          pageDetails?.ids ?? eventStore.items.map((s) => s.id),
+          (s) => s.id
+        ).filter((s) => !s.isArchived)}
+      />
+    );
   }
 );
 
@@ -217,6 +226,7 @@ export const EventCollection = observer(() => {
         }
         SideB={<EventDashboard {...values} />}
         ratio={0.7}
+        reversed
       />
     </>
   );

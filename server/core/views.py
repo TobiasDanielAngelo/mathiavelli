@@ -90,6 +90,8 @@ class CookieLoginView(KnoxLoginView):
         return response.Response(content)
 
     def post(self, request, format=None):
+        print("Cookie?", request.COOKIES)
+        print("Header X-From-Mobile?", request.headers.get("X-From-Mobile"))
         is_mobile = request.headers.get("X-From-Mobile") == "true"
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -99,7 +101,6 @@ class CookieLoginView(KnoxLoginView):
         if user:
             response = super().post(request, format=None)
             token = response.data.get("token")
-            expiry = response.data.get("expiry")
             cookie_response = JsonResponse(
                 {
                     "key": token if is_mobile else "",

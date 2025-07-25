@@ -50,9 +50,9 @@ export const MyGenericCollection = observer(
     const { PageBar, items, pageDetails, CardComponent, title } = props;
     const { isVisible1, setVisible1 } = useVisible();
 
-    useEffect(() => {
-      setVisible1(true);
-    }, []);
+    // useEffect(() => {
+    //   setVisible1(true);
+    // }, []);
 
     return (
       <View style={{ flex: 1 }}>
@@ -77,6 +77,10 @@ export const MyGenericCollection = observer(
               )}
               keyExtractor={(item) => `${item.id}`}
               style={styles.list}
+              initialNumToRender={5}
+              maxToRenderPerBatch={10}
+              windowSize={10}
+              removeClippedSubviews={true}
             />
           </>
         )}

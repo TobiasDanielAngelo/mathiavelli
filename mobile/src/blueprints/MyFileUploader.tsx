@@ -11,59 +11,95 @@ import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import { MyIcon } from "./MyIcon"; // Assuming you have this component
 
+const imageExtensions = /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i;
+
+const extensionToIcon: Record<string, string> = {
+  doc: "file-word",
+  docx: "file-word",
+  xls: "file-excel",
+  xlsx: "file-excel",
+  csv: "file-csv",
+  pdf: "file-pdf",
+  mp4: "file-video",
+  mov: "file-video",
+  avi: "file-video",
+  mp3: "file-audio",
+  wav: "file-audio",
+  js: "file-code",
+  ts: "file-code",
+  html: "file-code",
+  css: "file-code",
+  py: "file-code",
+  java: "file-code",
+  cpp: "file-code",
+};
+
+const getIcon = (filename: string) => {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  if (!ext) return "file";
+
+  if (imageExtensions.test(filename)) return "file-image";
+  return extensionToIcon[ext] || "file";
+};
+
 export const MyFileUploader = (props: {
-  value?: string;
-  onChangeValue?: (t: string) => void;
+  value?: string | ImagePicker.ImagePickerAsset;
+  onChangeValue?: (t: string | ImagePicker.ImagePickerAsset) => void;
 }) => {
   const { value, onChangeValue } = props;
 
-  const imageExtensions = /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i;
-
-  const [image, setImage] = useState<string | null>(
-    value && imageExtensions.test(value) ? value : null
-  );
+  const [image, setImage] = useState<
+    string | ImagePicker.ImagePickerAsset | null
+  >(typeof value === "string" && imageExtensions.test(value) ? value : null);
   const [nonImageFile, setNonImageFile] = useState<string | null>(
-    value && !imageExtensions.test(value) ? value : null
+    typeof value === "string" && !imageExtensions.test(value) ? value : null
   );
 
   const handleImagePicker = async () => {
+    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
+      mediaTypes: ["images", "videos"],
       quality: 1,
     });
 
-    if (!result.canceled) {
-      //   setImage(result);
-      setNonImageFile(null);
-      //   onChangeValue?.(result.uri);
+    if (!result.canceled && result.assets.length) {
+      setImage(result.assets[0]);
+      onChangeValue?.(result.assets[0]);
     }
   };
 
   const handleFilePicker = async () => {
-    let result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
+    try {
+      const result = await DocumentPicker.getDocumentAsync();
 
-    if (!result.canceled) {
-      //   setNonImageFile(result.uri);
-      setImage(null);
-      //   onChangeValue?.(result.uri);
+      if (result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+        setNonImageFile(file.uri); // or file.uri if you just need the URI
+      }
+    } catch (err) {
+      console.error("Document pick failed:", err);
     }
   };
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() =>
-          image ? null : nonImageFile ? handleFilePicker() : handleImagePicker()
-        }
-      >
+      <TouchableOpacity style={styles.uploadButton}>
         {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
+          <Image
+            source={{ uri: typeof image === "string" ? image : image.uri }}
+            style={styles.image}
+          />
         ) : nonImageFile ? (
           <View style={styles.filePlaceholder}>
-            <MyIcon icon="FilePresent" />
+            <MyIcon
+              icon={getIcon(nonImageFile)}
+              onPress={() =>
+                image
+                  ? null
+                  : nonImageFile
+                  ? handleImagePicker()
+                  : handleImagePicker()
+              }
+            />
             <Text style={styles.text}>
               <Text style={{ fontWeight: "bold" }}>Uploaded File</Text>
               {"\n"}
@@ -77,7 +113,7 @@ export const MyFileUploader = (props: {
           </View>
         ) : (
           <View style={styles.placeholder}>
-            <MyIcon icon="CloudUpload" />
+            <MyIcon icon={getIcon(image ?? "")} />
             <Text style={styles.text}>Click to upload</Text>
           </View>
         )}

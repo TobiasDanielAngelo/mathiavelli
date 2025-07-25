@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PaginatedResponse } from "../constants/interfaces";
+import * as ImagePicker from "expo-image-picker";
 
 const hostURL = "http://192.168.254.164:8000";
 
@@ -8,14 +9,13 @@ export function autoFormData(body: Record<string, any>) {
   const fileExtensionRegex = /\.(jpg|jpeg|png|gif|pdf|docx?|xlsx?|txt)$/i;
 
   for (const value of Object.values(body)) {
-    if (value instanceof File || value instanceof Blob) {
+    if (typeof value === "object" && value?.uri && value?.type) {
       needsFormData = true;
       break;
     }
   }
 
   if (!needsFormData) {
-    // strip keys with file-like strings even in JSON
     const filtered: Record<string, any> = {};
     for (const key in body) {
       if (
@@ -27,14 +27,14 @@ export function autoFormData(body: Record<string, any>) {
     return filtered;
   }
 
-  // Build FormData, skip existing file links
   const formData = new FormData();
   for (const key in body) {
     const value = body[key];
-    if (typeof value === "string" && fileExtensionRegex.test(value)) {
-      continue;
+    if (typeof value === "string" && key !== "file") {
+      formData.append(key, value);
+    } else {
+      // formData.append(key, value);
     }
-    formData.append(key, value);
   }
 
   return formData;
@@ -81,6 +81,14 @@ export async function guidedRequest<T>(
 
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
+  } else {
+    headers["Content-Type"] = "multipart/form-data";
+  }
+
+  if (preparedBody && "_parts" in preparedBody) {
+    for (let [key, value] of preparedBody["_parts"]) {
+      console.log(`${key}:`, value);
+    }
   }
 
   const response = await fetch(url, {
@@ -137,11 +145,20 @@ export async function fetchItemsRequest<T>(
   return { details: "", ok: true, data: results, pageDetails };
 }
 
-export async function postItemRequest<T>(endpoint: string, body?: T) {
-  return await guidedRequest<T>(endpoint, {
-    method: "POST",
-    body: body,
-  });
+export async function postItemRequest<T>(
+  endpoint: string,
+  body?: T,
+  hasNoCredentials?: boolean
+) {
+  return await guidedRequest<T>(
+    endpoint,
+    {
+      method: "POST",
+      body: body,
+    },
+    undefined,
+    hasNoCredentials
+  );
 }
 
 export async function updateItemRequest<T>(
