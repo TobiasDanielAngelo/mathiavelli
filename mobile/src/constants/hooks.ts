@@ -1,44 +1,60 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { SettingStore } from "../api/SettingStore";
-import { handleKeyDown } from "./helpers";
-import { KeyboardCodes, StateSetter } from "./interfaces";
-import moment from "moment";
-import { CalendarView } from "./interfaces";
-import { Dimensions } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CalendarView, StateSetter } from "./interfaces";
 
 export function useSettings<T>(
   settingStore: SettingStore,
   defaultValue: T,
   key: string
 ) {
-  const setting = settingStore.items.find((s) => s.key === key);
-  const [state, setState] = useState<T>(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      return stored
-        ? (JSON.parse(stored) as T)
-        : (JSON.parse(setting?.value ?? JSON.stringify(defaultValue)) as T) ??
-            defaultValue;
-    } catch {
-      return (
-        (JSON.parse(setting?.value ?? JSON.stringify(defaultValue)) as T) ??
-        defaultValue
-      );
-    }
-  });
+  const [state, setState] = useState<T>(defaultValue);
 
   useEffect(() => {
-    if (settingStore.items.length === 0) {
-      return;
+    const load = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(key);
+        if (stored) {
+          setState(JSON.parse(stored));
+          return;
+        }
+
+        const setting = settingStore.items.find((s) => s.key === key);
+        if (setting?.value) {
+          setState(JSON.parse(setting.value));
+        } else {
+          setState(defaultValue);
+        }
+      } catch {
+        setState(defaultValue);
+      }
+    };
+
+    load();
+  }, [key, settingStore]);
+
+  useEffect(() => {
+    const save = async () => {
+      try {
+        const json = JSON.stringify(state);
+        const setting = settingStore.items.find((s) => s.key === key);
+        const settingId = setting?.id;
+
+        settingId
+          ? settingStore.updateItem(settingId, { value: json })
+          : settingStore.addItem({ key, value: json });
+
+        await AsyncStorage.setItem(key, json);
+      } catch {
+        // handle error if needed
+      }
+    };
+
+    if (settingStore.items.length > 0) {
+      save();
     }
-    const setting = settingStore.items.find((s) => s.key === key);
-    const settingId = setting?.id;
-    settingId
-      ? settingStore.updateItem(settingId, { value: JSON.stringify(state) })
-      : settingStore.addItem({ key, value: JSON.stringify(state) });
-    AsyncStorage.setItem(key, JSON.stringify(state));
-  }, [state]);
+  }, [state, key, settingStore]);
 
   return [state, setState] as const;
 }

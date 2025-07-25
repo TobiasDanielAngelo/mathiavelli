@@ -178,7 +178,7 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
   }, [params.size]);
 
   return (
-    <ScrollView>
+    <View style={{ height: "10%" }}>
       {fields.map((row, i) => (
         <View key={i}>
           {row.map((field) =>
@@ -192,7 +192,7 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
       <View>
         <MyButton onPress={onPressFilter} label="Filter Results" />
       </View>
-    </ScrollView>
+    </View>
   );
 });
 

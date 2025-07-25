@@ -49,7 +49,7 @@ export const MyConfirmModal = (props: {
           ? `${msg["detail" as keyof Object]}`
           : ""}
       </View>
-      <View style={{ flex: 1, alignItems: "flex-end" }}>
+      <View style={{ alignItems: "flex-end" }}>
         <MyIcon icon="check" onPress={onPressCheck} />
       </View>
     </MyModal>

@@ -12,7 +12,10 @@ import { Overlay } from "react-native-elements";
 import { StateSetter } from "../constants/interfaces";
 import { HView } from "./HView";
 import { MyIcon } from "./MyIcon";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export const MyModal = (
   props: PropsWithChildren<{
@@ -25,9 +28,6 @@ export const MyModal = (
   }>
 ) => {
   const { isVisible, setVisible, children, title, subTitle } = props;
-  const { width, height } = useWindowDimensions();
-
-  const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -41,32 +41,19 @@ export const MyModal = (
   return (
     <Overlay
       isVisible={isVisible}
-      style={{
-        transform: [{ translateX: -500 }],
-        position: "absolute",
-      }}
       statusBarTranslucent
       navigationBarTranslucent
       onBackdropPress={() => setVisible(false)}
       supportedOrientations={["portrait", "landscape"]}
     >
-      <View
-        style={{
-          justifyContent: "space-between",
-          backgroundColor: "white",
-          borderRadius: 10,
-          width: 300,
-        }}
-      >
-        <ScrollView keyboardShouldPersistTaps="always">
-          <HView>
-            <Text style={styles.text}>{title}</Text>
-            <Text style={styles.text}>{subTitle}</Text>
-            <MyIcon icon="times" onPress={() => setVisible(false)} />
-          </HView>
-          <View style={styles.children}>{children}</View>
-        </ScrollView>
-      </View>
+      <SafeAreaView style={styles.safeAreaContainer}>
+        <HView>
+          <Text style={styles.text}>{title}</Text>
+          <Text style={styles.text}>{subTitle}</Text>
+          <MyIcon icon="times" onPress={() => setVisible(false)} />
+        </HView>
+        <View style={styles.children}>{children}</View>
+      </SafeAreaView>
     </Overlay>
   );
 };
@@ -78,10 +65,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   children: {
-    flex: 1,
-    margin: "auto",
-    justifyContent: "center",
-    alignItems: "center",
-    // padding: winHeight * 0.03,
+    marginBottom: 50,
+  },
+  safeAreaContainer: {
+    paddingVertical: 10,
   },
 });

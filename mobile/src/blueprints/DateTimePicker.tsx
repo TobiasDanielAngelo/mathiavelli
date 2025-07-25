@@ -91,7 +91,12 @@ export const DateTimePicker = ({
           />
         </Pressable>
       </View>
-      <View style={{ flex: 1, alignItems: "flex-end" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "flex-end",
+        }}
+      >
         <MyIcon icon="check" onPress={onPressCheck} />
       </View>
     </MyModal>
