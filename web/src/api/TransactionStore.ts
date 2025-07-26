@@ -1,6 +1,6 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 const slug = "finance/transactions/";
 const keyName = "Transaction";
@@ -16,16 +16,8 @@ const props = {
   payableId: prop<number | string | null>(null),
 };
 
-const derivedProps = (item: TransactionInterface) => ({
-  categoryTitle:
-    getStoreItem(item, "categoryStore", item.category)?.title || "—",
-  transmitterName:
-    getStoreItem(item, "accountStore", item.transmitter)?.name || "—",
-  receiverName: getStoreItem(item, "accountStore", item.receiver)?.name || "—",
-});
-
 export type TransactionInterface = PropsToInterface<typeof props>;
-export class Transaction extends MyModel(keyName, props, derivedProps) {}
+export class Transaction extends MyModel(keyName, props) {}
 export class TransactionStore extends MyStore(keyName, Transaction, slug) {}
 export const TransactionFields: ViewFields<TransactionInterface> = {
   datetimeFields: ["datetimeTransacted"] as const,

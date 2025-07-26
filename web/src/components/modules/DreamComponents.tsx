@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import { Dream, DreamFields, DreamInterface } from "../../api/DreamStore";
+import { Dream, DreamInterface } from "../../api/DreamStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -16,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: DreamViewContext, useGenericView: useDreamView } =
   createGenericViewContext<DreamInterface>();
@@ -65,16 +64,16 @@ export const DreamForm = ({
       objectName="dream"
       fields={fields}
       store={dreamStore}
-      datetimeFields={DreamFields.datetimeFields}
-      dateFields={DreamFields.dateFields}
-      timeFields={DreamFields.timeFields}
+      datetimeFields={dreamStore.datetimeFields}
+      dateFields={dreamStore.dateFields}
+      timeFields={dreamStore.timeFields}
     />
   );
 };
 
 export const DreamCard = observer((props: { item: Dream }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useDreamView();
+  const { fetchFcn, shownFields, itemMap, related } = useDreamView();
   const { dreamStore } = useStore();
 
   return (
@@ -82,11 +81,12 @@ export const DreamCard = observer((props: { item: Dream }) => {
       item={item}
       shownFields={shownFields}
       header={["id", "dateCreated"]}
-      prices={DreamFields.pricesFields}
+      prices={dreamStore.priceFields}
       FormComponent={DreamForm}
       deleteItem={dreamStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -117,14 +117,14 @@ export const DreamCollection = observer(() => {
 });
 
 export const DreamFilter = observer(() => {
+  const { dreamStore } = useStore();
   return (
     <MyGenericFilter
       view={new Dream({}).$view}
       title="Dream Filters"
-      dateFields={[...DreamFields.dateFields, ...DreamFields.datetimeFields]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...dreamStore.dateFields, ...dreamStore.datetimeFields]}
+      relatedFields={dreamStore.relatedFields}
+      optionFields={dreamStore.optionFields}
     />
   );
 });
@@ -154,7 +154,7 @@ export const DreamTable = observer(() => {
       items={dreamStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <DreamRow item={item} />}
-      priceFields={DreamFields.pricesFields}
+      priceFields={dreamStore.priceFields}
       {...values}
     />
   );
@@ -190,6 +190,7 @@ export const DreamView = observer(() => {
       FilterComponent={DreamFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={DreamTable}
+      related={dreamStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

@@ -1,12 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
+import { Related } from "../../api";
 import { useStore } from "../../api/Store";
-import {
-  WeighIn,
-  WeighInFields,
-  WeighInInterface,
-} from "../../api/WeighInStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
+import { WeighIn, WeighInInterface } from "../../api/WeighInStore";
 import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -21,7 +17,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: WeighInViewContext, useGenericView: useWeighInView } =
   createGenericViewContext<WeighInInterface>();
@@ -58,16 +54,16 @@ export const WeighInForm = ({
       objectName="weighIn"
       fields={fields}
       store={weighInStore}
-      datetimeFields={WeighInFields.datetimeFields}
-      dateFields={WeighInFields.dateFields}
-      timeFields={WeighInFields.timeFields}
+      datetimeFields={weighInStore.datetimeFields}
+      dateFields={weighInStore.dateFields}
+      timeFields={weighInStore.timeFields}
     />
   );
 };
 
 export const WeighInCard = observer((props: { item: WeighIn }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useWeighInView();
+  const { fetchFcn, shownFields, itemMap, related } = useWeighInView();
   const { weighInStore } = useStore();
 
   return (
@@ -75,16 +71,18 @@ export const WeighInCard = observer((props: { item: WeighIn }) => {
       item={item}
       shownFields={shownFields}
       header={["id", "date"]}
-      prices={WeighInFields.pricesFields}
+      prices={weighInStore.priceFields}
       FormComponent={WeighInForm}
       deleteItem={weighInStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
 
-export const WeighInDashboard = observer(() => {
+export const WeighInDashboard = observer((props: { related: Related[] }) => {
+  const { related } = props;
   const { weighInAnalyticsStore } = useStore();
 
   return (
@@ -95,13 +93,14 @@ export const WeighInDashboard = observer(() => {
       formatter={(value: number, name: string) => [`${value} kg`, name]}
       noTotal
       title="Weigh In (kg)"
+      related={related}
     />
   );
 });
 
 export const WeighInCollection = observer(() => {
   const { weighInStore } = useStore();
-  const { pageDetails, PageBar } = useWeighInView();
+  const { pageDetails, PageBar, related } = useWeighInView();
 
   return (
     <SideBySideView
@@ -114,24 +113,21 @@ export const WeighInCollection = observer(() => {
           items={weighInStore.items}
         />
       }
-      SideB={<WeighInDashboard />}
+      SideB={<WeighInDashboard related={related} />}
       ratio={0.7}
     />
   );
 });
 
 export const WeighInFilter = observer(() => {
+  const { weighInStore } = useStore();
   return (
     <MyGenericFilter
       view={new WeighIn({}).$view}
       title="WeighIn Filters"
-      dateFields={[
-        ...WeighInFields.datetimeFields,
-        ...WeighInFields.dateFields,
-      ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...weighInStore.datetimeFields, ...weighInStore.dateFields]}
+      relatedFields={weighInStore.relatedFields}
+      optionFields={weighInStore.optionFields}
     />
   );
 });
@@ -161,7 +157,7 @@ export const WeighInTable = observer(() => {
       items={weighInStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <WeighInRow item={item} />}
-      priceFields={WeighInFields.pricesFields}
+      priceFields={weighInStore.priceFields}
       {...values}
     />
   );
@@ -198,6 +194,7 @@ export const WeighInView = observer(() => {
       FilterComponent={WeighInFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={WeighInTable}
+      related={weighInStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

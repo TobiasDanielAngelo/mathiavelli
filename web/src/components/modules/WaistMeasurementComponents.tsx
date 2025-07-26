@@ -3,10 +3,8 @@ import { useMemo } from "react";
 import { useStore } from "../../api/Store";
 import {
   WaistMeasurement,
-  WaistMeasurementFields,
   WaistMeasurementInterface,
 } from "../../api/WaistMeasurementStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +18,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: WaistMeasurementViewContext,
@@ -59,9 +57,9 @@ export const WaistMeasurementForm = ({
       objectName="waistMeasurement"
       fields={fields}
       store={waistMeasurementStore}
-      datetimeFields={WaistMeasurementFields.datetimeFields}
-      dateFields={WaistMeasurementFields.dateFields}
-      timeFields={WaistMeasurementFields.timeFields}
+      datetimeFields={waistMeasurementStore.datetimeFields}
+      dateFields={waistMeasurementStore.dateFields}
+      timeFields={waistMeasurementStore.timeFields}
     />
   );
 };
@@ -69,7 +67,8 @@ export const WaistMeasurementForm = ({
 export const WaistMeasurementCard = observer(
   (props: { item: WaistMeasurement }) => {
     const { item } = props;
-    const { fetchFcn, shownFields, itemMap } = useWaistMeasurementView();
+    const { fetchFcn, shownFields, itemMap, related } =
+      useWaistMeasurementView();
     const { waistMeasurementStore } = useStore();
 
     return (
@@ -78,11 +77,12 @@ export const WaistMeasurementCard = observer(
         shownFields={shownFields}
         header={["id"]}
         important={["waistCm"]}
-        prices={WaistMeasurementFields.pricesFields}
+        prices={waistMeasurementStore.priceFields}
         FormComponent={WaistMeasurementForm}
         deleteItem={waistMeasurementStore.deleteItem}
         fetchFcn={fetchFcn}
         itemMap={itemMap}
+        related={related}
       />
     );
   }
@@ -110,17 +110,17 @@ export const WaistMeasurementCollection = observer(() => {
 });
 
 export const WaistMeasurementFilter = observer(() => {
+  const { waistMeasurementStore } = useStore();
   return (
     <MyGenericFilter
       view={new WaistMeasurement({}).$view}
       title="WaistMeasurement Filters"
       dateFields={[
-        ...WaistMeasurementFields.datetimeFields,
-        ...WaistMeasurementFields.dateFields,
+        ...waistMeasurementStore.datetimeFields,
+        ...waistMeasurementStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      relatedFields={waistMeasurementStore.relatedFields}
+      optionFields={waistMeasurementStore.optionFields}
     />
   );
 });
@@ -152,7 +152,7 @@ export const WaistMeasurementTable = observer(() => {
       items={waistMeasurementStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <WaistMeasurementRow item={item} />}
-      priceFields={WaistMeasurementFields.pricesFields}
+      priceFields={waistMeasurementStore.priceFields}
       {...values}
     />
   );
@@ -188,6 +188,7 @@ export const WaistMeasurementView = observer(() => {
       FilterComponent={WaistMeasurementFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={WaistMeasurementTable}
+      related={waistMeasurementStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

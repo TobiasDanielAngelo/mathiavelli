@@ -2,11 +2,9 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import {
   PersonalItem,
-  PersonalItemFields,
   PersonalItemInterface,
 } from "../../api/PersonalItemStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -21,7 +19,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: PersonalItemViewContext,
@@ -73,16 +71,16 @@ export const PersonalItemForm = ({
       objectName="personalItem"
       fields={fields}
       store={personalItemStore}
-      datetimeFields={PersonalItemFields.datetimeFields}
-      dateFields={PersonalItemFields.dateFields}
-      timeFields={PersonalItemFields.timeFields}
+      datetimeFields={personalItemStore.datetimeFields}
+      dateFields={personalItemStore.dateFields}
+      timeFields={personalItemStore.timeFields}
     />
   );
 };
 
 export const PersonalItemCard = observer((props: { item: PersonalItem }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = usePersonalItemView();
+  const { fetchFcn, shownFields, itemMap, related } = usePersonalItemView();
   const { personalItemStore } = useStore();
 
   return (
@@ -91,11 +89,12 @@ export const PersonalItemCard = observer((props: { item: PersonalItem }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={PersonalItemFields.pricesFields}
+      prices={personalItemStore.priceFields}
       FormComponent={PersonalItemForm}
       deleteItem={personalItemStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -126,17 +125,17 @@ export const PersonalItemCollection = observer(() => {
 });
 
 export const PersonalItemFilter = observer(() => {
+  const { personalItemStore } = useStore();
   return (
     <MyGenericFilter
       view={new PersonalItem({}).$}
       title="PersonalItem Filters"
       dateFields={[
-        ...PersonalItemFields.datetimeFields,
-        ...PersonalItemFields.dateFields,
+        ...personalItemStore.datetimeFields,
+        ...personalItemStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      relatedFields={personalItemStore.relatedFields}
+      optionFields={personalItemStore.optionFields}
     />
   );
 });
@@ -166,15 +165,14 @@ export const PersonalItemTable = observer(() => {
       items={personalItemStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <PersonalItemRow item={item} />}
-      priceFields={PersonalItemFields.pricesFields}
+      priceFields={personalItemStore.priceFields}
       {...values}
     />
   );
 });
 
 export const PersonalItemView = observer(() => {
-  const { personalItemStore, settingStore, inventoryCategoryStore } =
-    useStore();
+  const { personalItemStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<PersonalItemInterface, PersonalItem>(
     settingStore,
@@ -190,17 +188,7 @@ export const PersonalItemView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "category",
-          values: inventoryCategoryStore.items,
-          label: "name",
-        },
-      ] satisfies KV<any>[],
-    [inventoryCategoryStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -213,6 +201,7 @@ export const PersonalItemView = observer(() => {
       FilterComponent={PersonalItemFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={PersonalItemTable}
+      related={personalItemStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

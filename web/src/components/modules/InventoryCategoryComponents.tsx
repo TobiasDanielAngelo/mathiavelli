@@ -2,11 +2,9 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import {
   InventoryCategory,
-  InventoryCategoryFields,
   InventoryCategoryInterface,
 } from "../../api/InventoryCategoryStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +18,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: InventoryCategoryViewContext,
@@ -55,9 +53,9 @@ export const InventoryCategoryForm = ({
       objectName="inventoryCategory"
       fields={fields}
       store={inventoryCategoryStore}
-      datetimeFields={InventoryCategoryFields.datetimeFields}
-      dateFields={InventoryCategoryFields.dateFields}
-      timeFields={InventoryCategoryFields.timeFields}
+      datetimeFields={inventoryCategoryStore.datetimeFields}
+      dateFields={inventoryCategoryStore.dateFields}
+      timeFields={inventoryCategoryStore.timeFields}
     />
   );
 };
@@ -65,7 +63,8 @@ export const InventoryCategoryForm = ({
 export const InventoryCategoryCard = observer(
   (props: { item: InventoryCategory }) => {
     const { item } = props;
-    const { fetchFcn, shownFields, itemMap } = useInventoryCategoryView();
+    const { fetchFcn, shownFields, itemMap, related } =
+      useInventoryCategoryView();
     const { inventoryCategoryStore } = useStore();
 
     return (
@@ -74,11 +73,12 @@ export const InventoryCategoryCard = observer(
         shownFields={shownFields}
         header={["id"]}
         important={["name"]}
-        prices={InventoryCategoryFields.pricesFields}
+        prices={inventoryCategoryStore.priceFields}
         FormComponent={InventoryCategoryForm}
         deleteItem={inventoryCategoryStore.deleteItem}
         fetchFcn={fetchFcn}
         itemMap={itemMap}
+        related={related}
       />
     );
   }
@@ -110,17 +110,17 @@ export const InventoryCategoryCollection = observer(() => {
 });
 
 export const InventoryCategoryFilter = observer(() => {
+  const { inventoryCategoryStore } = useStore();
   return (
     <MyGenericFilter
-      view={new InventoryCategory({}).$}
+      view={new InventoryCategory({}).$view}
       title="Inventory Category Filters"
       dateFields={[
-        ...InventoryCategoryFields.datetimeFields,
-        ...InventoryCategoryFields.dateFields,
+        ...inventoryCategoryStore.datetimeFields,
+        ...inventoryCategoryStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      relatedFields={inventoryCategoryStore.relatedFields}
+      optionFields={inventoryCategoryStore.optionFields}
     />
   );
 });
@@ -152,7 +152,7 @@ export const InventoryCategoryTable = observer(() => {
       items={inventoryCategoryStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <InventoryCategoryRow item={item} />}
-      priceFields={InventoryCategoryFields.pricesFields}
+      priceFields={inventoryCategoryStore.priceFields}
       {...values}
     />
   );
@@ -188,6 +188,7 @@ export const InventoryCategoryView = observer(() => {
       FilterComponent={InventoryCategoryFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={InventoryCategoryTable}
+      related={inventoryCategoryStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

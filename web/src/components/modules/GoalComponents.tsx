@@ -1,8 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import { Goal, GoalFields, GoalInterface } from "../../api/GoalStore";
+import { Goal, GoalInterface } from "../../api/GoalStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
+import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
 import { MyGenericForm } from "../../blueprints/MyGenericComponents/MyGenericForm";
@@ -17,8 +17,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { getDescendantIds, toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
-import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: GoalViewContext, useGenericView: useGoalView } =
   createGenericViewContext<GoalInterface>();
@@ -103,9 +102,9 @@ export const GoalForm = ({
       objectName="goal"
       fields={fields}
       store={goalStore}
-      datetimeFields={GoalFields.datetimeFields}
-      dateFields={GoalFields.dateFields}
-      timeFields={GoalFields.timeFields}
+      datetimeFields={goalStore.datetimeFields}
+      dateFields={goalStore.dateFields}
+      timeFields={goalStore.timeFields}
     />
   );
 };
@@ -130,7 +129,7 @@ export const GoalDashboard = observer(() => {
 
 export const GoalCard = observer((props: { item: Goal }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useGoalView();
+  const { fetchFcn, shownFields, itemMap, related } = useGoalView();
   const { goalStore } = useStore();
 
   return (
@@ -139,13 +138,14 @@ export const GoalCard = observer((props: { item: Goal }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["title"]}
-      prices={GoalFields.pricesFields}
+      prices={goalStore.priceFields}
       FormComponent={GoalForm}
       deleteItem={goalStore.deleteItem}
       fetchFcn={fetchFcn}
       items={goalStore.items}
       parentKey={"parentGoal"}
       itemMap={itemMap}
+      related={related}
       border
     />
   );
@@ -173,14 +173,14 @@ export const GoalCollection = observer(() => {
 });
 
 export const GoalFilter = observer(() => {
+  const { goalStore } = useStore();
   return (
     <MyGenericFilter
       view={new Goal({}).$view}
       title="Goal Filters"
-      dateFields={[...GoalFields.dateFields, ...GoalFields.datetimeFields]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...goalStore.dateFields, ...goalStore.datetimeFields]}
+      relatedFields={goalStore.relatedFields}
+      optionFields={goalStore.optionFields}
     />
   );
 });
@@ -210,7 +210,7 @@ export const GoalTable = observer(() => {
       items={goalStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <GoalRow item={item} />}
-      priceFields={GoalFields.pricesFields}
+      priceFields={goalStore.priceFields}
       {...values}
     />
   );
@@ -233,17 +233,7 @@ export const GoalView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "parentGoal",
-          values: goalStore.items,
-          label: "title",
-        },
-      ] satisfies KV<any>[],
-    [goalStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -256,6 +246,7 @@ export const GoalView = observer(() => {
       FilterComponent={GoalFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={GoalTable}
+      related={goalStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

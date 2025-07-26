@@ -1,12 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
+import { Related } from "../../api";
+import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
-import {
-  Transaction,
-  TransactionFields,
-  TransactionInterface,
-} from "../../api/TransactionStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
+import { Transaction, TransactionInterface } from "../../api/TransactionStore";
 import { MyLineChart } from "../../blueprints/MyCharts/MyLineChart";
 import { MyPieChart } from "../../blueprints/MyCharts/MyPieChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
@@ -23,9 +20,8 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toMoneyShortened, toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 import { AccountForm } from "./AccountComponents";
-import { CATEGORY_CHOICES } from "../../api/CategoryStore";
 
 export const {
   Context: TransactionViewContext,
@@ -103,16 +99,16 @@ export const TransactionForm = ({
       objectName="transaction"
       fields={fields}
       store={transactionStore}
-      datetimeFields={TransactionFields.datetimeFields}
-      dateFields={TransactionFields.dateFields}
-      timeFields={TransactionFields.timeFields}
+      datetimeFields={transactionStore.datetimeFields}
+      dateFields={transactionStore.dateFields}
+      timeFields={transactionStore.timeFields}
     />
   );
 };
 
 export const TransactionCard = observer((props: { item: Transaction }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useTransactionView();
+  const { fetchFcn, shownFields, itemMap, related } = useTransactionView();
   const { transactionStore } = useStore();
 
   return (
@@ -121,19 +117,20 @@ export const TransactionCard = observer((props: { item: Transaction }) => {
       shownFields={shownFields}
       header={["id", "datetimeTransacted"]}
       important={["amount"]}
-      prices={TransactionFields.pricesFields}
+      prices={transactionStore.priceFields}
       FormComponent={TransactionForm}
       deleteItem={transactionStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
 
 export const TransactionDashboard = observer(
-  (props: { itemMap?: KV<any>[]; graph?: string }) => {
+  (props: { related: Related[]; itemMap?: KV<any>[]; graph?: string }) => {
     const { transactionAnalyticsStore } = useStore();
-    const { itemMap, graph } = props;
+    const { related, itemMap, graph } = props;
 
     return (
       <>
@@ -146,6 +143,7 @@ export const TransactionDashboard = observer(
             dataKey="total"
             traceKey="categoryNature"
             itemMap={itemMap}
+            related={related}
             formatter={(value: number, name: string) => [
               toMoneyShortened(value),
               name,
@@ -164,6 +162,7 @@ export const TransactionDashboard = observer(
               toMoneyShortened(value),
               name,
             ]}
+            related={related}
             itemMap={itemMap}
             excludedFromTotal={["Operations", "Initial"]}
             selectionLabel="Accounts"
@@ -177,7 +176,8 @@ export const TransactionDashboard = observer(
 
 export const TransactionCollection = observer(() => {
   const { transactionStore } = useStore();
-  const { pageDetails, PageBar, itemMap, graph } = useTransactionView();
+  const { pageDetails, PageBar, itemMap, graph, related } =
+    useTransactionView();
 
   return (
     <SideBySideView
@@ -190,24 +190,30 @@ export const TransactionCollection = observer(() => {
           items={transactionStore.items}
         />
       }
-      SideB={<TransactionDashboard itemMap={itemMap} graph={graph} />}
+      SideB={
+        <TransactionDashboard
+          itemMap={itemMap}
+          graph={graph}
+          related={related}
+        />
+      }
       ratio={0.7}
     />
   );
 });
 
 export const TransactionFilter = observer(() => {
+  const { transactionStore } = useStore();
   return (
     <MyGenericFilter
       view={new Transaction({}).$view}
       title="Transaction Filters"
       dateFields={[
-        ...TransactionFields.datetimeFields,
-        ...TransactionFields.dateFields,
+        ...transactionStore.datetimeFields,
+        ...transactionStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["transmitterName", "receiverName", "categoryTitle"]}
-      optionFields={[]}
+      relatedFields={transactionStore.relatedFields}
+      optionFields={transactionStore.optionFields}
     />
   );
 });
@@ -237,7 +243,7 @@ export const TransactionTable = observer(() => {
       items={transactionStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <TransactionRow item={item} />}
-      priceFields={TransactionFields.pricesFields}
+      priceFields={transactionStore.priceFields}
       {...values}
     />
   );
@@ -246,10 +252,9 @@ export const TransactionTable = observer(() => {
 export const TransactionView = observer(() => {
   const {
     transactionStore,
-    accountStore,
-    categoryStore,
     transactionAnalyticsStore,
     settingStore,
+    accountStore,
   } = useStore();
   const { setVisible4, isVisible, setVisible } = useVisible();
   const values = useViewValues<TransactionInterface, Transaction>(
@@ -271,24 +276,9 @@ export const TransactionView = observer(() => {
     () =>
       [
         {
-          key: "transmitter",
-          values: accountStore.items,
-          label: "name",
-        },
-        {
-          key: "receiver",
-          values: accountStore.items,
-          label: "name",
-        },
-        {
           key: "account",
           values: accountStore.items,
           label: "name",
-        },
-        {
-          key: "category",
-          values: categoryStore.items,
-          label: "title",
         },
         {
           key: "categoryNature",
@@ -296,11 +286,7 @@ export const TransactionView = observer(() => {
           label: "",
         },
       ] satisfies KV<any>[],
-    [
-      transactionStore.items.length,
-      categoryStore.items.length,
-      accountStore.items.length,
-    ]
+    [accountStore.items.length]
   );
 
   const actionModalDefs = [
@@ -321,6 +307,7 @@ export const TransactionView = observer(() => {
       FilterComponent={TransactionFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={TransactionTable}
+      related={transactionStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

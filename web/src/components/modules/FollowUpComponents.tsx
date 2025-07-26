@@ -1,13 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  FollowUp,
-  FOLLOWUP_STATUS_CHOICES,
-  FollowUpFields,
-  FollowUpInterface,
-} from "../../api/FollowUpStore";
+import { FollowUp, FollowUpInterface } from "../../api/FollowUpStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -22,7 +16,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: FollowUpViewContext, useGenericView: useFollowUpView } =
   createGenericViewContext<FollowUpInterface>();
@@ -68,16 +62,16 @@ export const FollowUpForm = ({
       objectName="follow-up"
       fields={fields}
       store={followUpStore}
-      datetimeFields={FollowUpFields.datetimeFields}
-      dateFields={FollowUpFields.dateFields}
-      timeFields={FollowUpFields.timeFields}
+      datetimeFields={followUpStore.datetimeFields}
+      dateFields={followUpStore.dateFields}
+      timeFields={followUpStore.timeFields}
     />
   );
 };
 
 export const FollowUpCard = observer((props: { item: FollowUp }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useFollowUpView();
+  const { fetchFcn, shownFields, itemMap, related } = useFollowUpView();
   const { followUpStore } = useStore();
 
   return (
@@ -86,11 +80,12 @@ export const FollowUpCard = observer((props: { item: FollowUp }) => {
       shownFields={shownFields}
       header={["id", "date"]}
       important={["job"]}
-      prices={FollowUpFields.pricesFields}
+      prices={followUpStore.priceFields}
       FormComponent={FollowUpForm}
       deleteItem={followUpStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -117,17 +112,17 @@ export const FollowUpCollection = observer(() => {
 });
 
 export const FollowUpFilter = observer(() => {
+  const { followUpStore } = useStore();
   return (
     <MyGenericFilter
       view={new FollowUp({}).$view}
       title="FollowUp Filters"
       dateFields={[
-        ...FollowUpFields.dateFields,
-        ...FollowUpFields.datetimeFields,
+        ...followUpStore.dateFields,
+        ...followUpStore.datetimeFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["jobTitle", "statusName"]}
-      optionFields={[]}
+      relatedFields={followUpStore.relatedFields}
+      optionFields={followUpStore.optionFields}
     />
   );
 });
@@ -157,14 +152,14 @@ export const FollowUpTable = observer(() => {
       items={followUpStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <FollowUpRow item={item} />}
-      priceFields={FollowUpFields.pricesFields}
+      priceFields={followUpStore.priceFields}
       {...values}
     />
   );
 });
 
 export const FollowUpView = observer(() => {
-  const { followUpStore, jobStore, settingStore } = useStore();
+  const { followUpStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<FollowUpInterface, FollowUp>(
     settingStore,
@@ -180,22 +175,7 @@ export const FollowUpView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "job",
-          values: jobStore.items,
-          label: "company",
-        },
-        {
-          key: "status",
-          values: FOLLOWUP_STATUS_CHOICES,
-          label: "",
-        },
-      ] satisfies KV<any>[],
-    [jobStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -208,6 +188,7 @@ export const FollowUpView = observer(() => {
       FilterComponent={FollowUpFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={FollowUpTable}
+      related={followUpStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

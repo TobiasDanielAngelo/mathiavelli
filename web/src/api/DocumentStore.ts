@@ -25,13 +25,8 @@ const props = {
   updatedAt: prop<string>(""),
 };
 
-const derivedProps = (item: DocumentInterface) => ({
-  documentTypeName:
-    DOCUMENT_TYPE_CHOICES.find((_, ind) => ind === item.documentType) ?? "—",
-});
-
 export type DocumentInterface = PropsToInterface<typeof props>;
-export class Document extends MyModel(keyName, props, derivedProps) {}
+export class Document extends MyModel(keyName, props) {}
 export class DocumentStore extends MyStore(keyName, Document, slug) {}
 
 export const DocumentFields: ViewFields<DocumentInterface> = {

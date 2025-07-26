@@ -1,6 +1,6 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 const slug = "productivity/habit-logs/";
 const keyName = "HabitLog";
@@ -10,12 +10,8 @@ const props = {
   dateCreated: prop<string>(""),
 };
 
-const derivedProps = (item: HabitLogInterface) => ({
-  habitName: getStoreItem(item, "habitStore", item.habit)?.title || "—",
-});
-
 export type HabitLogInterface = PropsToInterface<typeof props>;
-export class HabitLog extends MyModel(keyName, props, derivedProps) {}
+export class HabitLog extends MyModel(keyName, props) {}
 export class HabitLogStore extends MyStore(keyName, HabitLog, slug) {}
 export const HabitLogFields: ViewFields<HabitLogInterface> = {
   datetimeFields: ["dateCreated"] as const,

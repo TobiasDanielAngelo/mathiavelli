@@ -1,7 +1,7 @@
 import { prop } from "mobx-keystone";
 import moment from "moment";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 export const FREQUENCY_CHOICES = [
   "None",
@@ -30,10 +30,6 @@ const props = {
 };
 
 const derivedProps = (item: TaskInterface) => ({
-  goalTitle: getStoreItem(item, "goalStore", item.goal)?.title || "—",
-  habitTitle: getStoreItem(item, "habitStore", item.habit)?.title || "—",
-  scheduleDefinition:
-    getStoreItem(item, "scheduleStore", item.schedule)?.name || "—",
   dateDuration: `${item.dateStart ? moment(item.dateStart).format("lll") : ""}${
     item.dateEnd ? " – " + moment(item.dateEnd).format("lll") : ""
   }`,

@@ -3,11 +3,9 @@ import { useMemo } from "react";
 import {
   Document,
   DOCUMENT_TYPE_CHOICES,
-  DocumentFields,
   DocumentInterface,
 } from "../../api/DocumentStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -22,7 +20,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: DocumentViewContext, useGenericView: useDocumentView } =
   createGenericViewContext<DocumentInterface>();
@@ -71,16 +69,16 @@ export const DocumentForm = ({
       objectName="document"
       fields={fields}
       store={documentStore}
-      datetimeFields={DocumentFields.datetimeFields}
-      dateFields={DocumentFields.dateFields}
-      timeFields={DocumentFields.timeFields}
+      datetimeFields={documentStore.datetimeFields}
+      dateFields={documentStore.dateFields}
+      timeFields={documentStore.timeFields}
     />
   );
 };
 
 export const DocumentCard = observer((props: { item: Document }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useDocumentView();
+  const { fetchFcn, shownFields, itemMap, related } = useDocumentView();
   const { documentStore } = useStore();
 
   return (
@@ -89,11 +87,12 @@ export const DocumentCard = observer((props: { item: Document }) => {
       shownFields={shownFields}
       header={["id"]}
       important={[]}
-      prices={DocumentFields.pricesFields}
+      prices={documentStore.priceFields}
       FormComponent={DocumentForm}
       deleteItem={documentStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -124,17 +123,17 @@ export const DocumentCollection = observer(() => {
 });
 
 export const DocumentFilter = observer(() => {
+  const { documentStore } = useStore();
   return (
     <MyGenericFilter
       view={new Document({}).$view}
       title="Document Filters"
       dateFields={[
-        ...DocumentFields.datetimeFields,
-        ...DocumentFields.dateFields,
+        ...documentStore.datetimeFields,
+        ...documentStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["documentTypeName"]}
-      optionFields={[]}
+      relatedFields={documentStore.relatedFields}
+      optionFields={documentStore.optionFields}
     />
   );
 });
@@ -164,7 +163,7 @@ export const DocumentTable = observer(() => {
       items={documentStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <DocumentRow item={item} />}
-      priceFields={DocumentFields.pricesFields}
+      priceFields={documentStore.priceFields}
       {...values}
     />
   );
@@ -187,13 +186,7 @@ export const DocumentView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        { key: "documentType", values: DOCUMENT_TYPE_CHOICES, label: "" },
-      ] satisfies KV<any>[],
-    []
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -206,6 +199,7 @@ export const DocumentView = observer(() => {
       FilterComponent={DocumentFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={DocumentTable}
+      related={documentStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

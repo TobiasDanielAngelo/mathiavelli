@@ -1,21 +1,10 @@
 import { PropsWithChildren, useEffect, useRef } from "react";
-import {
-  Animated,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Animated, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Overlay } from "react-native-elements";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { StateSetter } from "../constants/interfaces";
 import { HView } from "./HView";
 import { MyIcon } from "./MyIcon";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
 
 export const MyModal = (
   props: PropsWithChildren<{
@@ -52,7 +41,9 @@ export const MyModal = (
           <Text style={styles.text}>{subTitle}</Text>
           <MyIcon icon="times" onPress={() => setVisible(false)} />
         </HView>
-        <View style={styles.children}>{children}</View>
+        <ScrollView keyboardShouldPersistTaps="handled">
+          <View style={styles.children}>{children}</View>
+        </ScrollView>
       </SafeAreaView>
     </Overlay>
   );
@@ -64,10 +55,9 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     justifyContent: "space-between",
   },
-  children: {
-    marginBottom: 50,
-  },
+  children: {},
   safeAreaContainer: {
     paddingVertical: 10,
+    width: 300,
   },
 });

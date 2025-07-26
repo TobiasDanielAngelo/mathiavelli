@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  Platform,
-  PlatformFields,
-  PlatformInterface,
-} from "../../api/PlatformStore";
+import { Platform, PlatformInterface } from "../../api/PlatformStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: PlatformViewContext, useGenericView: usePlatformView } =
   createGenericViewContext<PlatformInterface>();
@@ -64,16 +59,16 @@ export const PlatformForm = ({
       objectName="platform"
       fields={fields}
       store={platformStore}
-      datetimeFields={PlatformFields.datetimeFields}
-      dateFields={PlatformFields.dateFields}
-      timeFields={PlatformFields.timeFields}
+      datetimeFields={platformStore.datetimeFields}
+      dateFields={platformStore.dateFields}
+      timeFields={platformStore.timeFields}
     />
   );
 };
 
 export const PlatformCard = observer((props: { item: Platform }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = usePlatformView();
+  const { fetchFcn, shownFields, itemMap, related } = usePlatformView();
   const { platformStore } = useStore();
 
   return (
@@ -82,11 +77,12 @@ export const PlatformCard = observer((props: { item: Platform }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={PlatformFields.pricesFields}
+      prices={platformStore.priceFields}
       FormComponent={PlatformForm}
       deleteItem={platformStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -117,17 +113,17 @@ export const PlatformCollection = observer(() => {
 });
 
 export const PlatformFilter = observer(() => {
+  const { platformStore } = useStore();
   return (
     <MyGenericFilter
       view={new Platform({}).$view}
       title="Platform Filters"
       dateFields={[
-        ...PlatformFields.dateFields,
-        ...PlatformFields.datetimeFields,
+        ...platformStore.dateFields,
+        ...platformStore.datetimeFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      relatedFields={platformStore.relatedFields}
+      optionFields={platformStore.optionFields}
     />
   );
 });
@@ -157,7 +153,7 @@ export const PlatformTable = observer(() => {
       items={platformStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <PlatformRow item={item} />}
-      priceFields={PlatformFields.pricesFields}
+      priceFields={platformStore.priceFields}
       {...values}
     />
   );
@@ -193,6 +189,7 @@ export const PlatformView = observer(() => {
       FilterComponent={PlatformFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={PlatformTable}
+      related={platformStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

@@ -1,7 +1,7 @@
 import { prop } from "mobx-keystone";
 import moment from "moment";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 const slug = "productivity/events/";
 const keyName = "Event";
@@ -21,10 +21,6 @@ const props = {
 };
 
 const derivedProps = (item: EventInterface) => ({
-  tagsName: item.tags?.map(
-    (s) => getStoreItem(item, "tagStore", s)?.name ?? "—"
-  ),
-  taskTitle: getStoreItem(item, "taskStore", item.task)?.title ?? "—",
   dateDuration: `${moment(item.dateStart).format("lll")}${
     item.dateEnd ? " – " + moment(item.dateEnd).format("lll") : "—"
   }`,

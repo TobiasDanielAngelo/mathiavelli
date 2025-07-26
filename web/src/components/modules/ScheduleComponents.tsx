@@ -4,12 +4,10 @@ import { useMemo, useState } from "react";
 import {
   FREQ_CHOICES,
   Schedule,
-  ScheduleFields,
   ScheduleInterface,
   WEEKDAY_CHOICES,
 } from "../../api/ScheduleStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef, CalendarView } from "../../constants/interfaces";
 import { MyCalendar } from "../../blueprints/MyCalendar";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -31,7 +29,13 @@ import {
   toOptions,
 } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field, StateSetter } from "../../constants/interfaces";
+import {
+  ActionModalDef,
+  CalendarView,
+  Field,
+  KV,
+  StateSetter,
+} from "../../constants/interfaces";
 import { formatValue } from "../../constants/JSXHelpers";
 
 export const { Context: ScheduleViewContext, useGenericView: useScheduleView } =
@@ -182,16 +186,16 @@ export const ScheduleForm = ({
       objectName="schedule"
       fields={fields}
       store={scheduleStore}
-      datetimeFields={ScheduleFields.datetimeFields}
-      dateFields={ScheduleFields.dateFields}
-      timeFields={ScheduleFields.timeFields}
+      datetimeFields={scheduleStore.datetimeFields}
+      dateFields={scheduleStore.dateFields}
+      timeFields={scheduleStore.timeFields}
     />
   );
 };
 
 export const ScheduleCard = observer((props: { item: Schedule }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useScheduleView();
+  const { fetchFcn, shownFields, itemMap, related } = useScheduleView();
   const { scheduleStore, taskStore, habitStore } = useStore();
 
   const dropdownActions =
@@ -227,12 +231,13 @@ export const ScheduleCard = observer((props: { item: Schedule }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={ScheduleFields.pricesFields}
+      prices={scheduleStore.priceFields}
       FormComponent={ScheduleForm}
       deleteItem={scheduleStore.deleteItem}
       fetchFcn={fetchFcn}
       dropdownActions={dropdownActions}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -332,17 +337,17 @@ export const ScheduleCollection = observer(() => {
 });
 
 export const ScheduleFilter = observer(() => {
+  const { scheduleStore } = useStore();
   return (
     <MyGenericFilter
       view={new Schedule({}).$view}
       title="Schedule Filters"
       dateFields={[
-        ...ScheduleFields.datetimeFields,
-        ...ScheduleFields.dateFields,
+        ...scheduleStore.datetimeFields,
+        ...scheduleStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["freqName", "weekStartName"]}
-      optionFields={[]}
+      relatedFields={scheduleStore.relatedFields}
+      optionFields={scheduleStore.optionFields}
     />
   );
 });
@@ -372,14 +377,14 @@ export const ScheduleTable = observer(() => {
       items={scheduleStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <ScheduleRow item={item} />}
-      priceFields={ScheduleFields.pricesFields}
+      priceFields={scheduleStore.priceFields}
       {...values}
     />
   );
 });
 
 export const ScheduleView = observer(() => {
-  const { scheduleStore, settingStore, taskStore, habitStore } = useStore();
+  const { scheduleStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<ScheduleInterface, Schedule>(
     settingStore,
@@ -392,9 +397,6 @@ export const ScheduleView = observer(() => {
     if (!resp.ok || !resp.data) {
       return;
     }
-    const schedIds = resp.data.map((s) => s.id);
-    taskStore.fetchAll(`schedule__in=${schedIds.join(",")}`);
-    habitStore.fetchAll(`schedule__in=${schedIds.join(",")}`);
     setPageDetails(resp.pageDetails);
   };
 
@@ -411,6 +413,7 @@ export const ScheduleView = observer(() => {
       FilterComponent={ScheduleFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={ScheduleTable}
+      related={scheduleStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

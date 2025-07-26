@@ -9,14 +9,16 @@ import {
 import { KV, StateSetter } from "../../constants/interfaces";
 import { formatValue } from "../../constants/JSXHelpers";
 import { MyTable } from "../MyTable";
+import { Related } from "../../api";
 
 type MyGenericTableProps<T extends object> = {
   items: T[];
   itemMap?: KV<any>[];
+  related?: Related[];
   shownFields: (keyof T & string)[];
   sortFields: string[];
   setSortFields: StateSetter<string[]>;
-  priceFields?: (keyof T & string)[];
+  priceFields?: string[];
   pageIds: number[];
   setParams: (updater: (params: URLSearchParams) => URLSearchParams) => void;
   params: URLSearchParams;
@@ -28,6 +30,7 @@ export const MyGenericTable = observer(
   <T extends Record<string, any>>({
     items,
     itemMap,
+    related,
     shownFields,
     sortFields,
     setSortFields,
@@ -105,10 +108,12 @@ export const MyGenericTable = observer(
           ...shownFields
             .filter((s) => Object.keys(items[0].$view).includes(s))
             .map((key) => {
-              const kv = itemMap?.find((s) => s.key === key);
+              const relatedName = related?.find(
+                (s) => s.field === key && s.id === item[key]
+              )?.name;
               return key === "id"
                 ? toRomanWithExponents(item[key])
-                : formatValue(item[key], key, priceFields, kv);
+                : formatValue(relatedName ?? item[key], key, priceFields);
             }),
           renderActions(item),
         ]);

@@ -1,9 +1,8 @@
 import {
-  useWindowDimensions,
-  ScrollView,
-  View,
   DimensionValue,
   FlatList,
+  useWindowDimensions,
+  View,
 } from "react-native";
 
 type Props = {

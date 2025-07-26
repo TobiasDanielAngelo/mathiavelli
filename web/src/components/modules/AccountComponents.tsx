@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  Account,
-  AccountFields,
-  AccountInterface,
-} from "../../api/AccountStore";
+import { Account, AccountInterface } from "../../api/AccountStore";
 import { useStore } from "../../api/Store";
-import { ActionModalDef, KV } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: AccountViewContext, useGenericView: useAccountView } =
   createGenericViewContext<AccountInterface>();
@@ -63,16 +58,16 @@ export const AccountForm = ({
       objectName="account"
       fields={fields}
       store={accountStore}
-      datetimeFields={AccountFields.datetimeFields}
-      dateFields={AccountFields.dateFields}
-      timeFields={AccountFields.timeFields}
+      datetimeFields={accountStore.datetimeFields}
+      dateFields={accountStore.dateFields}
+      timeFields={accountStore.timeFields}
     />
   );
 };
 
 export const AccountCard = observer((props: { item: Account }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useAccountView();
+  const { fetchFcn, shownFields, itemMap, related } = useAccountView();
   const { accountStore } = useStore();
 
   return (
@@ -81,11 +76,12 @@ export const AccountCard = observer((props: { item: Account }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={AccountFields.pricesFields}
+      prices={accountStore.priceFields}
       FormComponent={AccountForm}
       deleteItem={accountStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -112,17 +108,14 @@ export const AccountCollection = observer(() => {
 });
 
 export const AccountFilter = observer(() => {
+  const { accountStore } = useStore();
   return (
     <MyGenericFilter
       view={new Account({}).$view}
       title="Account Filters"
-      dateFields={[
-        ...AccountFields.datetimeFields,
-        ...AccountFields.dateFields,
-      ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...accountStore.datetimeFields, ...accountStore.dateFields]}
+      relatedFields={accountStore.relatedFields}
+      optionFields={accountStore.optionFields}
     />
   );
 });
@@ -152,7 +145,7 @@ export const AccountTable = observer(() => {
       items={accountStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <AccountRow item={item} />}
-      priceFields={AccountFields.pricesFields}
+      priceFields={accountStore.priceFields}
       {...values}
     />
   );
@@ -188,6 +181,7 @@ export const AccountView = observer(() => {
       Context={AccountViewContext}
       CollectionComponent={AccountCollection}
       TableComponent={AccountTable}
+      related={accountStore.related}
       fetchFcn={fetchFcn}
       actionModalDefs={actionModalDefs}
       isVisible={isVisible}

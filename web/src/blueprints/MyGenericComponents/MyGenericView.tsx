@@ -19,6 +19,7 @@ import { MySpeedDial } from "../MySpeedDial";
 import { GenericViewProps } from "./MyGenericProps";
 import { SettingStore } from "../../api/SettingStore";
 import { useStore } from "../../api/Store";
+import { Related } from "../../api";
 
 export const useViewValues = <
   U extends Object & { id?: number | string | null },
@@ -93,6 +94,7 @@ export const MyGenericView = observer(
     setVisible: (index: number, visible: boolean) => void;
     params: URLSearchParams;
     setParams: SetURLSearchParams;
+    related: Related[];
     itemMap: KV<any>[];
     title: string;
   }) => {
@@ -120,6 +122,7 @@ export const MyGenericView = observer(
       graph,
       setGraph,
       title,
+      related,
     } = props;
 
     const { settingStore } = useStore();
@@ -296,6 +299,7 @@ export const MyGenericView = observer(
       graph,
       sortFields,
       setSortFields,
+      related,
     };
 
     return (

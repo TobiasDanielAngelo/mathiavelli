@@ -39,7 +39,11 @@ export const MyTable = (props: {
   ) : matrix.length < 2 ? (
     <Text style={{ textAlign: "center", paddingTop: 10 }}>No entries.</Text>
   ) : (
-    <ScrollView style={styles.container} horizontal>
+    <ScrollView
+      style={styles.container}
+      horizontal
+      keyboardShouldPersistTaps="handled"
+    >
       <View>
         <View
           style={{
@@ -71,7 +75,15 @@ export const MyTable = (props: {
                 backgroundColor: i % 2 ? undefined : "rgba(255,255,255,0.2)",
               }}
             >
-              <Text style={{ width: colWidths[0] }}>{s[0]}</Text>
+              <Text
+                style={{
+                  width: colWidths[0],
+                  justifyContent: "center",
+                  padding: 10,
+                }}
+              >
+                {s[0]}
+              </Text>
               {s.slice(1).map((t, ind) => (
                 <View
                   key={ind}

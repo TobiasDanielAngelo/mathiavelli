@@ -19,12 +19,8 @@ const props = {
   logo: prop<string>(""),
 };
 
-export const derivedProps = (item: CategoryInterface) => ({
-  natureName: CATEGORY_CHOICES.find((_, ind) => ind === item.nature) ?? "—",
-});
-
 export type CategoryInterface = PropsToInterface<typeof props>;
-export class Category extends MyModel(keyName, props, derivedProps) {}
+export class Category extends MyModel(keyName, props) {}
 export class CategoryStore extends MyStore(keyName, Category, slug) {}
 export const CategoryFields: ViewFields<CategoryInterface> = {
   datetimeFields: [] as const,

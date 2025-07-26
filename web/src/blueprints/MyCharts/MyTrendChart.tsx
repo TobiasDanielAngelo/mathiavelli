@@ -23,6 +23,7 @@ export const MyAreaChart = observer(
     xKey,
     yKey,
     itemMap,
+    related,
     formatter,
     excludedFromTotal,
     selectionLabel,
@@ -35,6 +36,7 @@ export const MyAreaChart = observer(
         xKey,
         yKey,
         itemMap,
+        related,
         excludedFromTotal
       );
 

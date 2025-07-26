@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  IssueTag,
-  IssueTagFields,
-  IssueTagInterface,
-} from "../../api/IssueTagStore";
+import { IssueTag, IssueTagInterface } from "../../api/IssueTagStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: IssueTagViewContext, useGenericView: useIssueTagView } =
   createGenericViewContext<IssueTagInterface>();
@@ -54,16 +49,16 @@ export const IssueTagForm = ({
       objectName="issueTag"
       fields={fields}
       store={issueTagStore}
-      datetimeFields={IssueTagFields.datetimeFields}
-      dateFields={IssueTagFields.dateFields}
-      timeFields={IssueTagFields.timeFields}
+      datetimeFields={issueTagStore.datetimeFields}
+      dateFields={issueTagStore.dateFields}
+      timeFields={issueTagStore.timeFields}
     />
   );
 };
 
 export const IssueTagCard = observer((props: { item: IssueTag }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useIssueTagView();
+  const { fetchFcn, shownFields, itemMap, related } = useIssueTagView();
   const { issueTagStore } = useStore();
 
   return (
@@ -72,11 +67,12 @@ export const IssueTagCard = observer((props: { item: IssueTag }) => {
       shownFields={shownFields}
       header={["id"]}
       important={[]}
-      prices={IssueTagFields.pricesFields}
+      prices={issueTagStore.priceFields}
       FormComponent={IssueTagForm}
       deleteItem={issueTagStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -107,17 +103,17 @@ export const IssueTagCollection = observer(() => {
 });
 
 export const IssueTagFilter = observer(() => {
+  const { issueTagStore } = useStore();
   return (
     <MyGenericFilter
       view={new IssueTag({}).$view}
       title="IssueTag Filters"
       dateFields={[
-        ...IssueTagFields.datetimeFields,
-        ...IssueTagFields.dateFields,
+        ...issueTagStore.datetimeFields,
+        ...issueTagStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      relatedFields={issueTagStore.relatedFields}
+      optionFields={issueTagStore.optionFields}
     />
   );
 });
@@ -147,7 +143,7 @@ export const IssueTagTable = observer(() => {
       items={issueTagStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <IssueTagRow item={item} />}
-      priceFields={IssueTagFields.pricesFields}
+      priceFields={issueTagStore.priceFields}
       {...values}
     />
   );
@@ -183,6 +179,7 @@ export const IssueTagView = observer(() => {
       FilterComponent={IssueTagFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={IssueTagTable}
+      related={issueTagStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

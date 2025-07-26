@@ -43,6 +43,7 @@ export const MyRadarChart = observer(
     xKey,
     yKey,
     itemMap,
+    related,
     formatter,
     excludedFromTotal,
     selectionLabel,
@@ -55,6 +56,7 @@ export const MyRadarChart = observer(
         xKey,
         yKey,
         itemMap,
+        related,
         excludedFromTotal
       );
 

@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { useStore } from "../../api/Store";
-import { Task, TaskFields, TaskInterface } from "../../api/TaskStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
+import { Task, TaskInterface } from "../../api/TaskStore";
 import { MyEisenhowerChart } from "../../blueprints/MyCharts/MyEisenhowerChart";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
@@ -18,7 +17,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: TaskViewContext, useGenericView: useTaskView } =
   createGenericViewContext<TaskInterface>();
@@ -115,16 +114,16 @@ export const TaskForm = ({
       objectName="task"
       fields={fields}
       store={taskStore}
-      datetimeFields={TaskFields.datetimeFields}
-      dateFields={TaskFields.dateFields}
-      timeFields={TaskFields.timeFields}
+      datetimeFields={taskStore.datetimeFields}
+      dateFields={taskStore.dateFields}
+      timeFields={taskStore.timeFields}
     />
   );
 };
 
 export const TaskCard = observer((props: { item: Task }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useTaskView();
+  const { fetchFcn, shownFields, itemMap, related } = useTaskView();
   const { taskStore } = useStore();
 
   return (
@@ -133,11 +132,12 @@ export const TaskCard = observer((props: { item: Task }) => {
       shownFields={shownFields}
       header={["id", "dateCreated"]}
       important={["title"]}
-      prices={TaskFields.pricesFields}
+      prices={taskStore.priceFields}
       FormComponent={TaskForm}
       deleteItem={taskStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -182,14 +182,14 @@ export const TaskCollection = observer(() => {
 });
 
 export const TaskFilter = observer(() => {
+  const { taskStore } = useStore();
   return (
     <MyGenericFilter
       view={new Task({}).$view}
       title="Task Filters"
-      dateFields={[...TaskFields.datetimeFields, ...TaskFields.dateFields]}
-      excludeFields={["id"]}
-      relatedFields={["goalTitle", "habitTitle", "scheduleDefinition"]}
-      optionFields={[]}
+      dateFields={[...taskStore.datetimeFields, ...taskStore.dateFields]}
+      relatedFields={taskStore.relatedFields}
+      optionFields={taskStore.optionFields}
     />
   );
 });
@@ -219,15 +219,14 @@ export const TaskTable = observer(() => {
       items={taskStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <TaskRow item={item} />}
-      priceFields={TaskFields.pricesFields}
+      priceFields={taskStore.priceFields}
       {...values}
     />
   );
 });
 
 export const TaskView = observer(() => {
-  const { taskStore, goalStore, scheduleStore, habitStore, settingStore } =
-    useStore();
+  const { taskStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<TaskInterface, Task>(
     settingStore,
@@ -241,35 +240,9 @@ export const TaskView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
-    const habits = resp.data.map((s) => s.habit).filter(Boolean);
-    habitStore.fetchAll(`id__in=${habits.join(",")}`);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "goal",
-          values: goalStore.items,
-          label: "title",
-        },
-        {
-          key: "schedule",
-          values: scheduleStore.items.map((s) => s.$view),
-          label: "definition",
-        },
-        {
-          key: "habit",
-          values: habitStore.items,
-          label: "title",
-        },
-      ] satisfies KV<any>[],
-    [
-      goalStore.items.length,
-      scheduleStore.items.length,
-      habitStore.items.length,
-    ]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -282,6 +255,7 @@ export const TaskView = observer(() => {
       FilterComponent={TaskFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={TaskTable}
+      related={taskStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

@@ -6,6 +6,7 @@ import { MyConfirmModal } from "../MyConfirmModal";
 import { MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
 import { ItemDetailsProps, KV } from "../../constants/interfaces";
+import { Related } from "../../api";
 
 interface MyGenericRecursiveCardProps<T> extends ItemDetailsProps<T> {
   FormComponent: React.ComponentType<{
@@ -19,6 +20,7 @@ interface MyGenericRecursiveCardProps<T> extends ItemDetailsProps<T> {
   fetchFcn: () => void;
   items: T[];
   itemMap?: KV<any>[];
+  related: Related[];
   parentKey: keyof T;
   border?: boolean;
 }
@@ -37,6 +39,7 @@ export const MyGenericRecursiveCard = observer(
     parentKey,
     border,
     itemMap = [],
+    related = [],
   }: MyGenericRecursiveCardProps<T>) => {
     const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
     const [msg, setMsg] = useState("");
@@ -103,6 +106,7 @@ export const MyGenericRecursiveCard = observer(
                   important={important}
                   prices={prices}
                   itemMap={itemMap}
+                  related={related}
                 />
               </div>
             </div>
@@ -123,6 +127,7 @@ export const MyGenericRecursiveCard = observer(
                 fetchFcn={fetchFcn}
                 items={items}
                 parentKey={parentKey}
+                related={related}
                 itemMap={itemMap}
               />
             ))}

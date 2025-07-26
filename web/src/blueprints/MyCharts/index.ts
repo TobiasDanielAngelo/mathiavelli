@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { camelCaseToWords, getStoreSignature } from "../../constants/helpers";
 import { KV } from "../../constants/interfaces";
+import { Related } from "../../api";
 
 export type MyTrendChartProps<T extends Record<string, any>> = {
   data: T[];
@@ -11,6 +12,7 @@ export type MyTrendChartProps<T extends Record<string, any>> = {
   height?: string | number;
   colors?: string[];
   itemMap?: KV<any>[];
+  related: Related[];
   formatter?: (value: number, name: string) => string[];
   excludedFromTotal?: string[];
   selectionLabel?: string;
@@ -27,6 +29,7 @@ export type MyCircleChartProps<T extends Record<string, any>> = {
   height?: string | number;
   colors?: string[];
   itemMap?: KV<any>[];
+  related: Related[];
   formatter?: (value: number, name: string) => string[];
   selectionLabel?: string;
   title?: string;
@@ -99,6 +102,7 @@ export const useTrendChart = <T extends Record<string, any>>(
   xKey: keyof T,
   yKey: keyof T,
   itemMap?: KV<any>[],
+  related?: Related[],
   excludedFromTotal?: string[],
   noTotal?: boolean
 ) => {
@@ -119,15 +123,21 @@ export const useTrendChart = <T extends Record<string, any>>(
 
   const kv = itemMap?.find((s) => s.key === traceKey);
 
-  const resolvedData = cleanedData.map((s) => ({
-    ...s,
-    [traceKey]:
-      kv?.label === ""
-        ? kv.values.find((_, i) => i === s[traceKey])
-        : kv?.values.find((v) => v.id === s[traceKey])?.[kv.label] ??
-          camelCaseToWords(yKey as string) ??
-          s[traceKey],
-  }));
+  const resolvedData = cleanedData.map((s) => {
+    const relatedName = related?.find(
+      (t) => t.field === traceKey && t.id === s[traceKey]
+    )?.name;
+    return {
+      ...s,
+      [traceKey]:
+        kv?.label === ""
+          ? kv.values.find((_, i) => i === s[traceKey])
+          : kv?.values.find((v) => v.id === s[traceKey])?.[kv.label] ??
+            relatedName ??
+            camelCaseToWords(yKey as string) ??
+            s[traceKey],
+    };
+  });
 
   const totalTitle = `Total${
     excludedFromTotal && excludedFromTotal.length > 0
@@ -161,7 +171,8 @@ export const useCircleChart = <T extends Record<string, any>>(
   nameKey: keyof T,
   dataKey: keyof T,
   traceKey: keyof T,
-  itemMap?: KV<any>[]
+  itemMap?: KV<any>[],
+  related?: Related[]
 ) => {
   const [selectedField, setSelectedField] = useState(-1);
 
@@ -182,16 +193,21 @@ export const useCircleChart = <T extends Record<string, any>>(
   const kv = itemMap?.find((s) => s.key === nameKey);
   const resolvedData = cleanedData
     .filter((s) => s[traceKey] === selectedField)
-    .map((s) => ({
-      [nameKey]:
-        kv?.label === ""
-          ? kv.values.find((_, i) => i === s[nameKey])
-          : kv?.values.find((v) => v.id === s[nameKey])?.[kv.label] ??
-            "—" ??
-            s[nameKey],
-      [dataKey]: s[dataKey],
-      [traceKey]: s[traceKey],
-    }));
+    .map((s) => {
+      const relatedName = related?.find(
+        (t) => t.field === nameKey && t.id === s[nameKey]
+      )?.name;
+      return {
+        [nameKey]:
+          kv?.label === ""
+            ? kv.values.find((_, i) => i === s[nameKey])
+            : kv?.values.find((v) => v.id === s[nameKey])?.[kv.label] ??
+              relatedName ??
+              s[nameKey],
+        [dataKey]: s[dataKey],
+        [traceKey]: s[traceKey],
+      };
+    });
 
   useEffect(() => {
     if (cleanedData.length > 0) {

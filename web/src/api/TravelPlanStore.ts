@@ -34,8 +34,8 @@ const props = {
 const derivedProps = (item: TravelPlanInterface) => {
   const itemsToBring = (s: number | string) => {
     const i = getStoreItem(item, "itemToBringStore", s);
-    if (i?.document) return i.documentName;
-    if (i?.inventoryItem) return i.inventoryItemName;
+    if (i?.document) return i.document;
+    if (i?.inventoryItem) return i.inventoryItem;
   };
   return {
     itemsToBringName: item.itemsToBring?.map((s) => itemsToBring(s) ?? ""),

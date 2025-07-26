@@ -1,8 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PaginatedResponse } from "../constants/interfaces";
-import * as ImagePicker from "expo-image-picker";
 
-const hostURL = "http://192.168.254.164:8000";
+const hostURL = "https://api.mathiavelli.com";
 
 export function autoFormData(body: Record<string, any>) {
   let needsFormData = false;

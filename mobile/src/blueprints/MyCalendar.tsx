@@ -20,7 +20,7 @@ export const MyCalendar = observer(
     const selected = moment(date).format("YYYY-MM-DD");
 
     return (
-      <View style={{ flex: 1 }}>
+      <View>
         <MyModal isVisible={isVisible1} setVisible={setVisible1}>
           <MyTable
             matrix={[

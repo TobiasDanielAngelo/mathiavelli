@@ -5,10 +5,8 @@ import {
   PURPOSE_CHOICES,
   STATUS_CHOICES,
   TravelPlan,
-  TravelPlanFields,
   TravelPlanInterface,
 } from "../../api/TravelPlanStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -23,7 +21,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: TravelPlanViewContext,
@@ -81,16 +79,16 @@ export const TravelPlanForm = ({
       objectName="travelPlan"
       fields={fields}
       store={travelPlanStore}
-      datetimeFields={TravelPlanFields.datetimeFields}
-      dateFields={TravelPlanFields.dateFields}
-      timeFields={TravelPlanFields.timeFields}
+      datetimeFields={travelPlanStore.datetimeFields}
+      dateFields={travelPlanStore.dateFields}
+      timeFields={travelPlanStore.timeFields}
     />
   );
 };
 
 export const TravelPlanCard = observer((props: { item: TravelPlan }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useTravelPlanView();
+  const { fetchFcn, shownFields, itemMap, related } = useTravelPlanView();
   const { travelPlanStore } = useStore();
 
   return (
@@ -99,11 +97,12 @@ export const TravelPlanCard = observer((props: { item: TravelPlan }) => {
       shownFields={shownFields}
       header={["id"]}
       important={[]}
-      prices={TravelPlanFields.pricesFields}
+      prices={travelPlanStore.priceFields}
       FormComponent={TravelPlanForm}
       deleteItem={travelPlanStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -134,17 +133,17 @@ export const TravelPlanCollection = observer(() => {
 });
 
 export const TravelPlanFilter = observer(() => {
+  const { travelPlanStore } = useStore();
   return (
     <MyGenericFilter
       view={new TravelPlan({}).$view}
       title="TravelPlan Filters"
       dateFields={[
-        ...TravelPlanFields.datetimeFields,
-        ...TravelPlanFields.dateFields,
+        ...travelPlanStore.datetimeFields,
+        ...travelPlanStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["itemsToBringName", "purposeName", "statusName"]}
-      optionFields={[]}
+      relatedFields={travelPlanStore.relatedFields}
+      optionFields={travelPlanStore.optionFields}
     />
   );
 });
@@ -174,7 +173,7 @@ export const TravelPlanTable = observer(() => {
       items={travelPlanStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <TravelPlanRow item={item} />}
-      priceFields={TravelPlanFields.pricesFields}
+      priceFields={travelPlanStore.priceFields}
       {...values}
     />
   );
@@ -217,6 +216,7 @@ export const TravelPlanView = observer(() => {
       FilterComponent={TravelPlanFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={TravelPlanTable}
+      related={travelPlanStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

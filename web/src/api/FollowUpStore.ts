@@ -1,6 +1,6 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 export const FOLLOWUP_STATUS_CHOICES = [
   "No Response",
@@ -23,14 +23,8 @@ const props = {
   reply: prop<string>(""),
 };
 
-const derivedProps = (item: FollowUpInterface) => ({
-  jobTitle: getStoreItem(item, "jobStore", item.job)?.title || "—",
-  statusName:
-    FOLLOWUP_STATUS_CHOICES.find((_, ind) => ind === item.status) ?? "—",
-});
-
 export type FollowUpInterface = PropsToInterface<typeof props>;
-export class FollowUp extends MyModel(keyName, props, derivedProps) {}
+export class FollowUp extends MyModel(keyName, props) {}
 export class FollowUpStore extends MyStore(keyName, FollowUp, slug) {}
 export const FollowUpFields: ViewFields<FollowUpInterface> = {
   datetimeFields: [] as const,

@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  Payable,
-  PayableFields,
-  PayableInterface,
-} from "../../api/PayableStore";
+import { Payable, PayableInterface } from "../../api/PayableStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import {
   IAction,
   MyGenericCard,
@@ -25,7 +20,7 @@ import { MyModal } from "../../blueprints/MyModal";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { generateShortId, toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 import { AccountIdMap } from "./AccountComponents";
 import { CategoryIdMap } from "./CategoryComponents";
 import { TransactionForm } from "./TransactionComponents";
@@ -90,16 +85,16 @@ export const PayableForm = ({
       objectName="payable"
       fields={fields}
       store={payableStore}
-      datetimeFields={PayableFields.datetimeFields}
-      dateFields={PayableFields.dateFields}
-      timeFields={PayableFields.timeFields}
+      datetimeFields={payableStore.datetimeFields}
+      dateFields={payableStore.dateFields}
+      timeFields={payableStore.timeFields}
     />
   );
 };
 
 export const PayableCard = observer((props: { item: Payable }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = usePayableView();
+  const { fetchFcn, shownFields, itemMap, related } = usePayableView();
   const { payableStore } = useStore();
   const { isVisible1, setVisible1 } = useVisible();
 
@@ -127,12 +122,13 @@ export const PayableCard = observer((props: { item: Payable }) => {
         shownFields={shownFields}
         header={["id", "datetimeDue"]}
         important={["borrowedAmount"]}
-        prices={PayableFields.pricesFields}
+        prices={payableStore.priceFields}
         FormComponent={PayableForm}
         deleteItem={payableStore.deleteItem}
         fetchFcn={fetchFcn}
         moreActions={moreActions}
         itemMap={itemMap}
+        related={related}
       />
     </>
   );
@@ -164,17 +160,14 @@ export const PayableCollection = observer(() => {
 });
 
 export const PayableFilter = observer(() => {
+  const { payableStore } = useStore();
   return (
     <MyGenericFilter
       view={new Payable({}).$view}
       title="Payable Filters"
-      dateFields={[
-        ...PayableFields.dateFields,
-        ...PayableFields.datetimeFields,
-      ]}
-      excludeFields={["id"]}
-      relatedFields={["paymentDescription"]}
-      optionFields={[]}
+      dateFields={[...payableStore.dateFields, ...payableStore.datetimeFields]}
+      relatedFields={payableStore.relatedFields}
+      optionFields={payableStore.optionFields}
     />
   );
 });
@@ -204,7 +197,7 @@ export const PayableTable = observer(() => {
       items={payableStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <PayableRow item={item} />}
-      priceFields={PayableFields.pricesFields}
+      priceFields={payableStore.priceFields}
       {...values}
     />
   );
@@ -250,6 +243,7 @@ export const PayableView = observer(() => {
       FilterComponent={PayableFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={PayableTable}
+      related={payableStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

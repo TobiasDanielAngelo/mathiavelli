@@ -5,10 +5,8 @@ import {
   PRIORITY_CHOICES,
   STATUS_CHOICES,
   Ticket,
-  TicketFields,
   TicketInterface,
 } from "../../api/TicketStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -23,7 +21,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: TicketViewContext, useGenericView: useTicketView } =
   createGenericViewContext<TicketInterface>();
@@ -87,16 +85,16 @@ export const TicketForm = ({
       objectName="ticket"
       fields={fields}
       store={ticketStore}
-      datetimeFields={TicketFields.datetimeFields}
-      dateFields={TicketFields.dateFields}
-      timeFields={TicketFields.timeFields}
+      datetimeFields={ticketStore.datetimeFields}
+      dateFields={ticketStore.dateFields}
+      timeFields={ticketStore.timeFields}
     />
   );
 };
 
 export const TicketCard = observer((props: { item: Ticket }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useTicketView();
+  const { fetchFcn, shownFields, itemMap, related } = useTicketView();
   const { ticketStore } = useStore();
 
   return (
@@ -105,11 +103,12 @@ export const TicketCard = observer((props: { item: Ticket }) => {
       shownFields={shownFields}
       header={["id"]}
       important={[]}
-      prices={TicketFields.pricesFields}
+      prices={ticketStore.priceFields}
       FormComponent={TicketForm}
       deleteItem={ticketStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -140,19 +139,14 @@ export const TicketCollection = observer(() => {
 });
 
 export const TicketFilter = observer(() => {
+  const { ticketStore } = useStore();
   return (
     <MyGenericFilter
       view={new Ticket({}).$view}
       title="Ticket Filters"
-      dateFields={[...TicketFields.datetimeFields, ...TicketFields.dateFields]}
-      excludeFields={["id"]}
-      relatedFields={[
-        "assignedToName",
-        "priorityName",
-        "statusName",
-        "tagsName",
-      ]}
-      optionFields={[]}
+      dateFields={[...ticketStore.datetimeFields, ...ticketStore.dateFields]}
+      relatedFields={ticketStore.relatedFields}
+      optionFields={ticketStore.optionFields}
     />
   );
 });
@@ -182,7 +176,7 @@ export const TicketTable = observer(() => {
       items={ticketStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <TicketRow item={item} />}
-      priceFields={TicketFields.pricesFields}
+      priceFields={ticketStore.priceFields}
       {...values}
     />
   );
@@ -205,22 +199,7 @@ export const TicketView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "status",
-          label: "",
-          values: STATUS_CHOICES,
-        },
-        {
-          key: "priority",
-          label: "",
-          values: PRIORITY_CHOICES,
-        },
-      ] satisfies KV<any>[],
-    []
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -233,6 +212,7 @@ export const TicketView = observer(() => {
       FilterComponent={TicketFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={TicketTable}
+      related={ticketStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

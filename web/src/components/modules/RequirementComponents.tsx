@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  Requirement,
-  RequirementFields,
-  RequirementInterface,
-} from "../../api/RequirementStore";
+import { Requirement, RequirementInterface } from "../../api/RequirementStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -21,7 +16,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: RequirementViewContext,
@@ -69,16 +64,16 @@ export const RequirementForm = ({
       objectName="requirement"
       fields={fields}
       store={requirementStore}
-      datetimeFields={RequirementFields.datetimeFields}
-      dateFields={RequirementFields.dateFields}
-      timeFields={RequirementFields.timeFields}
+      datetimeFields={requirementStore.datetimeFields}
+      dateFields={requirementStore.dateFields}
+      timeFields={requirementStore.timeFields}
     />
   );
 };
 
 export const RequirementCard = observer((props: { item: Requirement }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useRequirementView();
+  const { fetchFcn, shownFields, itemMap, related } = useRequirementView();
   const { requirementStore } = useStore();
 
   return (
@@ -87,11 +82,12 @@ export const RequirementCard = observer((props: { item: Requirement }) => {
       shownFields={shownFields}
       header={["id"]}
       important={[]}
-      prices={RequirementFields.pricesFields}
+      prices={requirementStore.priceFields}
       FormComponent={RequirementForm}
       deleteItem={requirementStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -122,17 +118,17 @@ export const RequirementCollection = observer(() => {
 });
 
 export const RequirementFilter = observer(() => {
+  const { requirementStore } = useStore();
   return (
     <MyGenericFilter
       view={new Requirement({}).$view}
       title="Requirement Filters"
       dateFields={[
-        ...RequirementFields.datetimeFields,
-        ...RequirementFields.dateFields,
+        ...requirementStore.datetimeFields,
+        ...requirementStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["planName"]}
-      optionFields={[]}
+      relatedFields={requirementStore.relatedFields}
+      optionFields={requirementStore.optionFields}
     />
   );
 });
@@ -162,14 +158,14 @@ export const RequirementTable = observer(() => {
       items={requirementStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <RequirementRow item={item} />}
-      priceFields={RequirementFields.pricesFields}
+      priceFields={requirementStore.priceFields}
       {...values}
     />
   );
 });
 
 export const RequirementView = observer(() => {
-  const { requirementStore, settingStore, travelPlanStore } = useStore();
+  const { requirementStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<RequirementInterface, Requirement>(
     settingStore,
@@ -185,17 +181,7 @@ export const RequirementView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "plan",
-          values: travelPlanStore.items,
-          label: "country",
-        },
-      ] satisfies KV<any>[],
-    [travelPlanStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -208,6 +194,7 @@ export const RequirementView = observer(() => {
       FilterComponent={RequirementFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={RequirementTable}
+      related={requirementStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

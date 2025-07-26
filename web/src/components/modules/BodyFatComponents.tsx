@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  BodyFat,
-  BodyFatFields,
-  BodyFatInterface,
-} from "../../api/BodyFatStore";
+import { BodyFat, BodyFatInterface } from "../../api/BodyFatStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: BodyFatViewContext, useGenericView: useBodyFatView } =
   createGenericViewContext<BodyFatInterface>();
@@ -57,16 +52,16 @@ export const BodyFatForm = ({
       objectName="bodyFat"
       fields={fields}
       store={bodyFatStore}
-      datetimeFields={BodyFatFields.datetimeFields}
-      dateFields={BodyFatFields.dateFields}
-      timeFields={BodyFatFields.timeFields}
+      datetimeFields={bodyFatStore.datetimeFields}
+      dateFields={bodyFatStore.dateFields}
+      timeFields={bodyFatStore.timeFields}
     />
   );
 };
 
 export const BodyFatCard = observer((props: { item: BodyFat }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useBodyFatView();
+  const { fetchFcn, shownFields, itemMap, related } = useBodyFatView();
   const { bodyFatStore } = useStore();
 
   return (
@@ -75,11 +70,12 @@ export const BodyFatCard = observer((props: { item: BodyFat }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["bodyFatPercent"]}
-      prices={BodyFatFields.pricesFields}
+      prices={bodyFatStore.priceFields}
       FormComponent={BodyFatForm}
       deleteItem={bodyFatStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -106,17 +102,15 @@ export const BodyFatCollection = observer(() => {
 });
 
 export const BodyFatFilter = observer(() => {
+  const { bodyFatStore } = useStore();
+
   return (
     <MyGenericFilter
       view={new BodyFat({}).$view}
       title="BodyFat Filters"
-      dateFields={[
-        ...BodyFatFields.datetimeFields,
-        ...BodyFatFields.dateFields,
-      ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...bodyFatStore.datetimeFields, ...bodyFatStore.dateFields]}
+      relatedFields={bodyFatStore.relatedFields}
+      optionFields={bodyFatStore.optionFields}
     />
   );
 });
@@ -146,7 +140,7 @@ export const BodyFatTable = observer(() => {
       items={bodyFatStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <BodyFatRow item={item} />}
-      priceFields={BodyFatFields.pricesFields}
+      priceFields={bodyFatStore.priceFields}
       {...values}
     />
   );
@@ -185,6 +179,7 @@ export const BodyFatView = observer(() => {
       isVisible={isVisible}
       setVisible={setVisible}
       TableComponent={BodyFatTable}
+      related={bodyFatStore.related}
       itemMap={itemMap}
       {...values}
     />

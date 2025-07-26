@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import { Note, NoteFields, NoteInterface } from "../../api/NoteStore";
+import { Note, NoteInterface } from "../../api/NoteStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -16,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: NoteViewContext, useGenericView: useNoteView } =
   createGenericViewContext<NoteInterface>();
@@ -61,16 +60,16 @@ export const NoteForm = ({
       objectName="note"
       fields={fields}
       store={noteStore}
-      datetimeFields={NoteFields.datetimeFields}
-      dateFields={NoteFields.dateFields}
-      timeFields={NoteFields.timeFields}
+      datetimeFields={noteStore.datetimeFields}
+      dateFields={noteStore.dateFields}
+      timeFields={noteStore.timeFields}
     />
   );
 };
 
 export const NoteCard = observer((props: { item: Note }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useNoteView();
+  const { fetchFcn, shownFields, itemMap, related } = useNoteView();
   const { noteStore } = useStore();
 
   return (
@@ -79,11 +78,12 @@ export const NoteCard = observer((props: { item: Note }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["title"]}
-      prices={NoteFields.pricesFields}
+      prices={noteStore.priceFields}
       FormComponent={NoteForm}
       deleteItem={noteStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -114,14 +114,14 @@ export const NoteCollection = observer(() => {
 });
 
 export const NoteFilter = observer(() => {
+  const { noteStore } = useStore();
   return (
     <MyGenericFilter
       view={new Note({}).$view}
       title="Note Filters"
-      dateFields={[...NoteFields.dateFields, ...NoteFields.datetimeFields]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...noteStore.dateFields, ...noteStore.datetimeFields]}
+      relatedFields={noteStore.relatedFields}
+      optionFields={noteStore.optionFields}
     />
   );
 });
@@ -151,7 +151,7 @@ export const NoteTable = observer(() => {
       items={noteStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <NoteRow item={item} />}
-      priceFields={NoteFields.pricesFields}
+      priceFields={noteStore.priceFields}
       {...values}
     />
   );
@@ -187,6 +187,7 @@ export const NoteView = observer(() => {
       FilterComponent={NoteFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={NoteTable}
+      related={noteStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

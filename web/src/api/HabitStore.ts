@@ -1,6 +1,6 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 const slug = "productivity/habits/";
 const keyName = "Habit";
@@ -19,14 +19,8 @@ const props = {
   points: prop<number>(0),
 };
 
-const derivedProps = (item: HabitInterface) => ({
-  goalName: getStoreItem(item, "goalStore", item.goal)?.title || "—",
-  scheduleDefinition:
-    getStoreItem(item, "scheduleStore", item.schedule)?.definition || "—",
-});
-
 export type HabitInterface = PropsToInterface<typeof props>;
-export class Habit extends MyModel(keyName, props, derivedProps) {}
+export class Habit extends MyModel(keyName, props) {}
 export class HabitStore extends MyStore(keyName, Habit, slug) {}
 export const HabitFields: ViewFields<HabitInterface> = {
   datetimeFields: [

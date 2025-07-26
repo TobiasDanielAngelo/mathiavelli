@@ -194,32 +194,28 @@ type Props<T extends Record<string, any>> = {
   view: T;
   title?: string;
   setVisible?: (t: boolean) => void;
-  dateFields?: (keyof T)[];
+  dateFields?: string[];
   excludeFields?: (keyof T)[];
-  relatedFields?: (keyof T)[];
-  optionFields?: (keyof T)[];
+  relatedFields?: string[];
+  optionFields?: string[];
 };
 
 export const MyGenericFilter = <T extends Record<string, any>>({
   view,
   title = "Filters",
   dateFields = [],
-  excludeFields = [],
+  excludeFields = ["id"],
   relatedFields = [],
   optionFields = [],
 }: Props<T>) => {
-  const [shownFields, setShownFields] = useState([
-    ...Object.keys(view),
-    ...optionFields.map((f) => f as string),
-  ]);
+  const [shownFields, setShownFields] = useState([...Object.keys(view)]);
 
   const fields: Field[][] = Object.entries(view).flatMap(([key, value]) => {
     if (excludeFields.includes(key) || !shownFields.includes(key)) return [];
-
     const baseName = camelToSnakeCase(key, relatedFields.includes(key));
     const label = toTitleCase(key);
 
-    if (typeof value === "string") {
+    if (typeof value === "string" || typeof value === "object") {
       if (dateFields.includes(key)) {
         return [
           [

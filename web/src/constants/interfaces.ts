@@ -1,5 +1,6 @@
 import { prop } from "mobx-keystone";
 import { IconName } from "../blueprints/MyIcon";
+import { Related } from "../api";
 
 export type CalendarEvent = {
   id: string | number;
@@ -46,10 +47,11 @@ export interface ItemDetailsProps<T> {
   shownFields?: (keyof T)[];
   header?: (keyof T)[];
   important?: (keyof T)[];
-  prices?: (keyof T)[];
+  prices?: string[];
   showMore?: boolean;
   setShowMore?: StateSetter<boolean>;
   itemMap?: KV<any>[];
+  related: Related[];
 }
 
 export type Page = {

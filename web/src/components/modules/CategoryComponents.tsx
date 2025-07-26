@@ -3,11 +3,9 @@ import { useMemo } from "react";
 import {
   Category,
   CATEGORY_CHOICES,
-  CategoryFields,
   CategoryInterface,
 } from "../../api/CategoryStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -22,7 +20,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: CategoryViewContext, useGenericView: useCategoryView } =
   createGenericViewContext<CategoryInterface>();
@@ -83,16 +81,16 @@ export const CategoryForm = ({
       objectName="category"
       fields={fields}
       store={categoryStore}
-      datetimeFields={CategoryFields.datetimeFields}
-      dateFields={CategoryFields.dateFields}
-      timeFields={CategoryFields.timeFields}
+      datetimeFields={categoryStore.datetimeFields}
+      dateFields={categoryStore.dateFields}
+      timeFields={categoryStore.timeFields}
     />
   );
 };
 
 export const CategoryCard = observer((props: { item: Category }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useCategoryView();
+  const { fetchFcn, shownFields, itemMap, related } = useCategoryView();
   const { categoryStore } = useStore();
 
   return (
@@ -101,11 +99,12 @@ export const CategoryCard = observer((props: { item: Category }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["title"]}
-      prices={CategoryFields.pricesFields}
+      prices={categoryStore.priceFields}
       FormComponent={CategoryForm}
       deleteItem={categoryStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -132,16 +131,17 @@ export const CategoryCollection = observer(() => {
 });
 
 export const CategoryFilter = observer(() => {
+  const { categoryStore } = useStore();
   return (
     <MyGenericFilter
       view={new Category({}).$view}
       title="Category Filters"
       dateFields={[
-        ...CategoryFields.dateFields,
-        ...CategoryFields.datetimeFields,
+        ...categoryStore.dateFields,
+        ...categoryStore.datetimeFields,
       ]}
-      excludeFields={["id", "natureName", "nature"]}
-      optionFields={["nature"]}
+      optionFields={categoryStore.optionFields}
+      relatedFields={categoryStore.relatedFields}
     />
   );
 });
@@ -171,7 +171,7 @@ export const CategoryTable = observer(() => {
       items={categoryStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <CategoryRow item={item} />}
-      priceFields={CategoryFields.pricesFields}
+      priceFields={categoryStore.priceFields}
       {...values}
     />
   );
@@ -194,17 +194,7 @@ export const CategoryView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "nature",
-          values: CATEGORY_CHOICES,
-          label: "",
-        },
-      ] satisfies KV<any>[],
-    []
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -217,6 +207,7 @@ export const CategoryView = observer(() => {
       FilterComponent={CategoryFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={CategoryTable}
+      related={categoryStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

@@ -58,8 +58,8 @@ export const MyGenericRow = observer(
           msg={msg}
         />
         <View style={{ flexDirection: "row", gap: 5, paddingHorizontal: 10 }}>
-          <MyIcon icon="edit" onPress={() => setVisible1(true)} />
-          <MyIcon icon="times" onPress={() => setVisible2(true)} />
+          <MyIcon icon="edit" onPress={() => setVisible1(true)} size={20} />
+          <MyIcon icon="times" onPress={() => setVisible2(true)} size={20} />
         </View>
       </View>
     );

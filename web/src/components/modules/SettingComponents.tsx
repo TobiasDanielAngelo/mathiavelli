@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  Setting,
-  SettingFields,
-  SettingInterface,
-} from "../../api/SettingStore";
+import { Setting, SettingInterface } from "../../api/SettingStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: SettingViewContext, useGenericView: useSettingView } =
   createGenericViewContext<SettingInterface>();
@@ -71,16 +66,16 @@ export const SettingForm = ({
       objectName="setting"
       fields={fields}
       store={settingStore}
-      datetimeFields={SettingFields.datetimeFields}
-      dateFields={SettingFields.dateFields}
-      timeFields={SettingFields.timeFields}
+      datetimeFields={settingStore.datetimeFields}
+      dateFields={settingStore.dateFields}
+      timeFields={settingStore.timeFields}
     />
   );
 };
 
 export const SettingCard = observer((props: { item: Setting }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useSettingView();
+  const { fetchFcn, shownFields, itemMap, related } = useSettingView();
   const { settingStore } = useStore();
 
   return (
@@ -89,11 +84,12 @@ export const SettingCard = observer((props: { item: Setting }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["key"]}
-      prices={SettingFields.pricesFields}
+      prices={settingStore.priceFields}
       FormComponent={SettingForm}
       deleteItem={settingStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -120,17 +116,14 @@ export const SettingCollection = observer(() => {
 });
 
 export const SettingFilter = observer(() => {
+  const { settingStore } = useStore();
   return (
     <MyGenericFilter
       view={new Setting({}).$view}
       title="Setting Filters"
-      dateFields={[
-        ...SettingFields.datetimeFields,
-        ...SettingFields.dateFields,
-      ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...settingStore.datetimeFields, ...settingStore.dateFields]}
+      relatedFields={settingStore.relatedFields}
+      optionFields={settingStore.optionFields}
     />
   );
 });
@@ -160,7 +153,7 @@ export const SettingTable = observer(() => {
       items={settingStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <SettingRow item={item} />}
-      priceFields={SettingFields.pricesFields}
+      priceFields={settingStore.priceFields}
       {...values}
     />
   );
@@ -196,6 +189,7 @@ export const SettingView = observer(() => {
       FilterComponent={SettingFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={SettingTable}
+      related={settingStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

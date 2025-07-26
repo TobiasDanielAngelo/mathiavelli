@@ -6,6 +6,7 @@ import {
   PaginatedDetails,
   StateSetter,
 } from "../../constants/interfaces";
+import { Related } from "../../api";
 
 export interface GenericViewProps<T> {
   shownFields: (keyof T)[];
@@ -19,6 +20,7 @@ export interface GenericViewProps<T> {
   PageBar: React.FC;
   fetchFcn: () => void;
   itemMap: KV<any>[];
+  related: Related[];
   graph?: GraphType;
 }
 
@@ -32,6 +34,7 @@ export const defaultViewValues: GenericViewProps<{}> = {
   setPageDetails: () => {},
   fetchFcn: () => {},
   itemMap: [],
+  related: [],
   graph: "line",
   pageDetails: undefined,
   PageBar: () => <></>,

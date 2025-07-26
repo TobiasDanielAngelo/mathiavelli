@@ -1,7 +1,6 @@
-import { getRoot, prop } from "mobx-keystone";
+import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
-import { Store } from "./Store";
+import { MyModel, MyStore } from "./GenericStore";
 
 export const STATUS_CHOICES = ["Open", "In Progress", "Closed"];
 export const PRIORITY_CHOICES = ["Low", "Medium", "High"];
@@ -20,18 +19,8 @@ const props = {
   assignedTo: prop<number | null>(null),
 };
 
-const derivedProps = (item: TicketInterface) => ({
-  tagsName: item.tags?.map(
-    (s) => getRoot<Store>(item)?.tagStore?.allItems.get(s)?.name ?? ""
-  ),
-  statusName: STATUS_CHOICES.find((_, ind) => ind === item.status) ?? "—",
-  priorityName: PRIORITY_CHOICES.find((_, ind) => ind === item.priority) ?? "—",
-  assignedToName:
-    getStoreItem(item, "userStore", item.assignedTo)?.fullName || "—",
-});
-
 export type TicketInterface = PropsToInterface<typeof props>;
-export class Ticket extends MyModel(keyName, props, derivedProps) {}
+export class Ticket extends MyModel(keyName, props) {}
 export class TicketStore extends MyStore(keyName, Ticket, slug) {}
 export const TicketFields: ViewFields<TicketInterface> = {
   datetimeFields: ["createdAt", "updatedAt"] as const,

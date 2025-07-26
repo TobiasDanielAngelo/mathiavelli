@@ -1,6 +1,6 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 export const AUTHENTICATOR_CHOICES = [
   "None",
@@ -36,18 +36,8 @@ const props = {
   addedAt: prop<string>(""),
 };
 
-const derivedProps = (item: CredentialInterface) => ({
-  platformName: getStoreItem(item, "platformStore", item.platform)?.name || "—",
-  billingAccountsName: item.billingAccounts?.map(
-    (s) => getStoreItem(item, "accountStore", s)?.name ?? ""
-  ),
-  authenticatorAppName:
-    AUTHENTICATOR_CHOICES.find((_, ind) => ind === item.authenticatorApp) ??
-    "—",
-});
-
 export type CredentialInterface = PropsToInterface<typeof props>;
-export class Credential extends MyModel(keyName, props, derivedProps) {}
+export class Credential extends MyModel(keyName, props) {}
 export class CredentialStore extends MyStore(keyName, Credential, slug) {}
 export const CredentialFields: ViewFields<CredentialInterface> = {
   datetimeFields: ["addedAt"] as const,

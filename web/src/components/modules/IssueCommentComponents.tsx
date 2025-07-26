@@ -2,11 +2,9 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import {
   IssueComment,
-  IssueCommentFields,
   IssueCommentInterface,
 } from "../../api/IssueCommentStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -21,7 +19,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: IssueCommentViewContext,
@@ -76,16 +74,16 @@ export const IssueCommentForm = ({
       objectName="issueComment"
       fields={fields}
       store={issueCommentStore}
-      datetimeFields={IssueCommentFields.datetimeFields}
-      dateFields={IssueCommentFields.dateFields}
-      timeFields={IssueCommentFields.timeFields}
+      datetimeFields={issueCommentStore.datetimeFields}
+      dateFields={issueCommentStore.dateFields}
+      timeFields={issueCommentStore.timeFields}
     />
   );
 };
 
 export const IssueCommentCard = observer((props: { item: IssueComment }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useIssueCommentView();
+  const { fetchFcn, shownFields, itemMap, related } = useIssueCommentView();
   const { issueCommentStore } = useStore();
 
   return (
@@ -93,11 +91,12 @@ export const IssueCommentCard = observer((props: { item: IssueComment }) => {
       item={item}
       shownFields={shownFields}
       header={["id"]}
-      prices={IssueCommentFields.pricesFields}
+      prices={issueCommentStore.priceFields}
       FormComponent={IssueCommentForm}
       deleteItem={issueCommentStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -128,12 +127,17 @@ export const IssueCommentCollection = observer(() => {
 });
 
 export const IssueCommentFilter = observer(() => {
+  const { issueCommentStore } = useStore();
   return (
     <MyGenericFilter
       view={new IssueComment({}).$view}
       title="IssueComment Filters"
-      dateFields={IssueCommentFields.datetimeFields}
-      excludeFields={["id"]}
+      dateFields={[
+        ...issueCommentStore.datetimeFields,
+        ...issueCommentStore.dateFields,
+      ]}
+      optionFields={issueCommentStore.optionFields}
+      relatedFields={issueCommentStore.relatedFields}
     />
   );
 });
@@ -163,7 +167,7 @@ export const IssueCommentTable = observer(() => {
       items={issueCommentStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <IssueCommentRow item={item} />}
-      priceFields={IssueCommentFields.pricesFields}
+      priceFields={issueCommentStore.priceFields}
       {...values}
     />
   );
@@ -199,6 +203,7 @@ export const IssueCommentView = observer(() => {
       FilterComponent={IssueCommentFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={IssueCommentTable}
+      related={issueCommentStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

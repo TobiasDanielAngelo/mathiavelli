@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { useStore } from "../../api/Store";
-import { Tag, TagFields, TagInterface } from "../../api/TagStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
+import { Tag, TagInterface } from "../../api/TagStore";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -16,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: TagViewContext, useGenericView: useTagView } =
   createGenericViewContext<TagInterface>();
@@ -67,16 +66,16 @@ export const TagForm = ({
       objectName="tag"
       fields={fields}
       store={tagStore}
-      datetimeFields={TagFields.datetimeFields}
-      dateFields={TagFields.dateFields}
-      timeFields={TagFields.timeFields}
+      datetimeFields={tagStore.datetimeFields}
+      dateFields={tagStore.dateFields}
+      timeFields={tagStore.timeFields}
     />
   );
 };
 
 export const TagCard = observer((props: { item: Tag }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useTagView();
+  const { fetchFcn, shownFields, itemMap, related } = useTagView();
   const { tagStore } = useStore();
 
   return (
@@ -85,11 +84,12 @@ export const TagCard = observer((props: { item: Tag }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={TagFields.pricesFields}
+      prices={tagStore.priceFields}
       FormComponent={TagForm}
       deleteItem={tagStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -116,14 +116,14 @@ export const TagCollection = observer(() => {
 });
 
 export const TagFilter = observer(() => {
+  const { tagStore } = useStore();
   return (
     <MyGenericFilter
       view={new Tag({}).$view}
       title="Tag Filters"
-      dateFields={[...TagFields.datetimeFields, ...TagFields.dateFields]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...tagStore.datetimeFields, ...tagStore.dateFields]}
+      relatedFields={tagStore.relatedFields}
+      optionFields={tagStore.optionFields}
     />
   );
 });
@@ -153,7 +153,7 @@ export const TagTable = observer(() => {
       items={tagStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <TagRow item={item} />}
-      priceFields={TagFields.pricesFields}
+      priceFields={tagStore.priceFields}
       {...values}
     />
   );
@@ -189,6 +189,7 @@ export const TagView = observer(() => {
       FilterComponent={TagFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={TagTable}
+      related={tagStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

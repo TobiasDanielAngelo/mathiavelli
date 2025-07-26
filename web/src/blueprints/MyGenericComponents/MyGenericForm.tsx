@@ -15,9 +15,9 @@ export interface MyGenericFormProps<T> {
     updateItem: (id: number | string, item: T) => Promise<any>;
     deleteItem: (id: number | string) => Promise<any>;
   };
-  dateFields?: (keyof T)[];
-  datetimeFields?: (keyof T)[];
-  timeFields?: (keyof T)[];
+  dateFields?: string[];
+  datetimeFields?: string[];
+  timeFields?: string[];
 }
 
 export function MyGenericForm<T>({
@@ -38,16 +38,23 @@ export function MyGenericForm<T>({
   const transformFrom = (raw: T): T => {
     const copy = { ...raw };
     dateFields.forEach((k) => {
-      if (copy[k])
-        copy[k] = moment(copy[k] as any).format("MMM D, YYYY") as any;
+      if (copy[k as keyof T])
+        copy[k as keyof T] = moment(copy[k as keyof T] as any).format(
+          "MMM D, YYYY"
+        ) as any;
     });
     datetimeFields.forEach((k) => {
-      if (copy[k])
-        copy[k] = moment(copy[k] as any).format("MMM D YYYY h:mm A") as any;
+      if (copy[k as keyof T])
+        copy[k as keyof T] = moment(copy[k as keyof T] as any).format(
+          "MMM D YYYY h:mm A"
+        ) as any;
     });
     timeFields.forEach((k) => {
-      if (copy[k])
-        copy[k] = moment(copy[k] as any, "HH:mm:ss").format("h:mm A") as any;
+      if (copy[k as keyof T])
+        copy[k as keyof T] = moment(
+          copy[k as keyof T] as any,
+          "HH:mm:ss"
+        ).format("h:mm A") as any;
     });
 
     return copy;
@@ -57,29 +64,36 @@ export function MyGenericForm<T>({
     const copy = { ...raw };
 
     dateFields.forEach((k) => {
-      const val = copy[k];
+      const val = copy[k as keyof T];
       if (val === "") {
-        copy[k] = null as any;
+        copy[k as keyof T] = null as any;
       } else if (val) {
-        copy[k] = moment(val as any, "MMM D, YYYY").format("YYYY-MM-DD") as any;
+        copy[k as keyof T] = moment(val as any, "MMM D, YYYY").format(
+          "YYYY-MM-DD"
+        ) as any;
       }
     });
 
     datetimeFields.forEach((k) => {
-      const val = copy[k];
+      const val = copy[k as keyof T];
       if (val === "") {
-        copy[k] = null as any;
+        copy[k as keyof T] = null as any;
       } else if (val) {
-        copy[k] = moment(val as any, "MMM D YYYY h:mm A").toISOString() as any;
+        copy[k as keyof T] = moment(
+          val as any,
+          "MMM D YYYY h:mm A"
+        ).toISOString() as any;
       }
     });
 
     timeFields.forEach((k) => {
-      const val = copy[k];
+      const val = copy[k as keyof T];
       if (val === "") {
-        copy[k] = null as any;
+        copy[k as keyof T] = null as any;
       } else if (val) {
-        copy[k] = moment(val as any, "h:mm A").format("HH:mm:ss") as any;
+        copy[k as keyof T] = moment(val as any, "h:mm A").format(
+          "HH:mm:ss"
+        ) as any;
       }
     });
     return copy;

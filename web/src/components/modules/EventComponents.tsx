@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo } from "react";
-import { Event, EventFields, EventInterface } from "../../api/EventStore";
+import { Event, EventInterface } from "../../api/EventStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef, CalendarView } from "../../constants/interfaces";
 import { MyCalendar } from "../../blueprints/MyCalendar";
 import {
   IAction,
@@ -30,7 +29,13 @@ import {
   useCalendarProps,
   useVisible,
 } from "../../constants/hooks";
-import { Field, StateSetter } from "../../constants/interfaces";
+import {
+  ActionModalDef,
+  CalendarView,
+  Field,
+  KV,
+  StateSetter,
+} from "../../constants/interfaces";
 
 export const { Context: EventViewContext, useGenericView: useEventView } =
   createGenericViewContext<EventInterface>();
@@ -125,16 +130,16 @@ export const EventForm = ({
       objectName="event"
       fields={fields}
       store={eventStore}
-      datetimeFields={EventFields.datetimeFields}
-      dateFields={EventFields.dateFields}
-      timeFields={EventFields.timeFields}
+      datetimeFields={eventStore.datetimeFields}
+      dateFields={eventStore.dateFields}
+      timeFields={eventStore.timeFields}
     />
   );
 };
 
 export const EventCard = observer((props: { item: Event }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useEventView();
+  const { fetchFcn, shownFields, itemMap, related } = useEventView();
   const { eventStore } = useStore();
 
   const moreActions = [
@@ -162,12 +167,13 @@ export const EventCard = observer((props: { item: Event }) => {
       }
       header={["id"]}
       important={["title"]}
-      prices={EventFields.pricesFields}
+      prices={eventStore.priceFields}
       FormComponent={EventForm}
       deleteItem={eventStore.deleteItem}
       fetchFcn={fetchFcn}
       moreActions={moreActions}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -233,14 +239,14 @@ export const EventCollection = observer(() => {
 });
 
 export const EventFilter = observer(() => {
+  const { eventStore } = useStore();
   return (
     <MyGenericFilter
       view={new Event({}).$view}
       title="Event Filters"
-      dateFields={[...EventFields.dateFields, ...EventFields.datetimeFields]}
-      excludeFields={["id"]}
-      relatedFields={["tagsName", "taskTitle"]}
-      optionFields={[]}
+      dateFields={[...eventStore.dateFields, ...eventStore.datetimeFields]}
+      relatedFields={eventStore.relatedFields}
+      optionFields={eventStore.optionFields}
     />
   );
 });
@@ -270,7 +276,7 @@ export const EventTable = observer(() => {
       items={eventStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <EventRow item={item} />}
-      priceFields={EventFields.pricesFields}
+      priceFields={eventStore.priceFields}
       {...values}
     />
   );
@@ -288,7 +294,7 @@ export const { Context: MoreEventContext, useGeneric: useMoreEventView } =
   createGenericContext<Props>();
 
 export const EventView = observer(() => {
-  const { eventStore, tagStore, taskStore, settingStore } = useStore();
+  const { eventStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<EventInterface, Event>(
     settingStore,
@@ -318,22 +324,7 @@ export const EventView = observer(() => {
     setParams(newParams);
   }, [start.toISOString()]);
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "tags",
-          values: tagStore.items,
-          label: "name",
-        },
-        {
-          key: "task",
-          values: taskStore.items,
-          label: "title",
-        },
-      ] satisfies KV<any>[],
-    [tagStore.items.length, taskStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -347,6 +338,7 @@ export const EventView = observer(() => {
         FilterComponent={EventFilter}
         actionModalDefs={actionModalDefs}
         TableComponent={EventTable}
+        related={eventStore.related}
         fetchFcn={fetchFcn}
         isVisible={isVisible}
         setVisible={setVisible}

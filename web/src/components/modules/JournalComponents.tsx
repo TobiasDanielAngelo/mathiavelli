@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  Journal,
-  JournalFields,
-  JournalInterface,
-} from "../../api/JournalStore";
+import { Journal, JournalInterface } from "../../api/JournalStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -20,7 +15,7 @@ import {
 } from "../../blueprints/MyGenericComponents/MyGenericView";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: JournalViewContext, useGenericView: useJournalView } =
   createGenericViewContext<JournalInterface>();
@@ -76,16 +71,16 @@ export const JournalForm = ({
       objectName="journal"
       fields={fields}
       store={journalStore}
-      datetimeFields={JournalFields.datetimeFields}
-      dateFields={JournalFields.dateFields}
-      timeFields={JournalFields.timeFields}
+      datetimeFields={journalStore.datetimeFields}
+      dateFields={journalStore.dateFields}
+      timeFields={journalStore.timeFields}
     />
   );
 };
 
 export const JournalCard = observer((props: { item: Journal }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useJournalView();
+  const { fetchFcn, shownFields, itemMap, related } = useJournalView();
   const { journalStore } = useStore();
 
   return (
@@ -94,11 +89,12 @@ export const JournalCard = observer((props: { item: Journal }) => {
       shownFields={shownFields}
       header={["id", "datetimeCreated"]}
       important={["title"]}
-      prices={JournalFields.pricesFields}
+      prices={journalStore.priceFields}
       FormComponent={JournalForm}
       deleteItem={journalStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -129,17 +125,14 @@ export const JournalCollection = observer(() => {
 });
 
 export const JournalFilter = observer(() => {
+  const { journalStore } = useStore();
   return (
     <MyGenericFilter
       view={new Journal({}).$view}
       title="Journal Filters"
-      dateFields={[
-        ...JournalFields.dateFields,
-        ...JournalFields.datetimeFields,
-      ]}
-      excludeFields={["id"]}
-      relatedFields={[]}
-      optionFields={[]}
+      dateFields={[...journalStore.dateFields, ...journalStore.datetimeFields]}
+      relatedFields={journalStore.relatedFields}
+      optionFields={journalStore.optionFields}
     />
   );
 });
@@ -169,7 +162,7 @@ export const JournalTable = observer(() => {
       items={journalStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <JournalRow item={item} />}
-      priceFields={JournalFields.pricesFields}
+      priceFields={journalStore.priceFields}
       {...values}
     />
   );
@@ -205,6 +198,7 @@ export const JournalView = observer(() => {
       FilterComponent={JournalFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={JournalTable}
+      related={journalStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

@@ -1,6 +1,6 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 const slug = "finance/payables/";
 const keyName = "Payable";
@@ -17,14 +17,8 @@ const props = {
   paymentTotal: prop<number>(0),
 };
 
-const derivedProps = (item: PayableInterface) => ({
-  paymentDescription: item.payment?.map(
-    (s) => getStoreItem(item, "transactionStore", s)?.description ?? "-"
-  ),
-});
-
 export type PayableInterface = PropsToInterface<typeof props>;
-export class Payable extends MyModel(keyName, props, derivedProps) {}
+export class Payable extends MyModel(keyName, props) {}
 export class PayableStore extends MyStore(keyName, Payable, slug) {}
 export const PayableFields: ViewFields<PayableInterface> = {
   datetimeFields: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,

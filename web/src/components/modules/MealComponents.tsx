@@ -3,11 +3,9 @@ import { useMemo } from "react";
 import {
   Meal,
   MEAL_CATEGORY_CHOICES,
-  MealFields,
   MealInterface,
 } from "../../api/MealStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -22,7 +20,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: MealViewContext, useGenericView: useMealView } =
   createGenericViewContext<MealInterface>();
@@ -68,16 +66,16 @@ export const MealForm = ({
       objectName="meal"
       fields={fields}
       store={mealStore}
-      datetimeFields={MealFields.datetimeFields}
-      dateFields={MealFields.dateFields}
-      timeFields={MealFields.timeFields}
+      datetimeFields={mealStore.datetimeFields}
+      dateFields={mealStore.dateFields}
+      timeFields={mealStore.timeFields}
     />
   );
 };
 
 export const MealCard = observer((props: { item: Meal }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useMealView();
+  const { fetchFcn, shownFields, itemMap, related } = useMealView();
   const { mealStore } = useStore();
 
   return (
@@ -86,11 +84,12 @@ export const MealCard = observer((props: { item: Meal }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={MealFields.pricesFields}
+      prices={mealStore.priceFields}
       FormComponent={MealForm}
       deleteItem={mealStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -117,14 +116,14 @@ export const MealCollection = observer(() => {
 });
 
 export const MealFilter = observer(() => {
+  const { mealStore } = useStore();
   return (
     <MyGenericFilter
       view={new Meal({}).$view}
       title="Meal Filters"
-      dateFields={[...MealFields.datetimeFields, ...MealFields.dateFields]}
-      excludeFields={["id"]}
-      relatedFields={["categoryName"]}
-      optionFields={[]}
+      dateFields={[...mealStore.datetimeFields, ...mealStore.dateFields]}
+      relatedFields={mealStore.relatedFields}
+      optionFields={mealStore.optionFields}
     />
   );
 });
@@ -154,7 +153,7 @@ export const MealTable = observer(() => {
       items={mealStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <MealRow item={item} />}
-      priceFields={MealFields.pricesFields}
+      priceFields={mealStore.priceFields}
       {...values}
     />
   );
@@ -190,6 +189,7 @@ export const MealView = observer(() => {
       FilterComponent={MealFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={MealTable}
+      related={mealStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

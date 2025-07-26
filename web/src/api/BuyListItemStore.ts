@@ -18,14 +18,8 @@ const props = {
   status: prop<number>(0),
 };
 
-const derivedProps = (item: BuyListItemInterface) => ({
-  priorityName: PRIORITY_CHOICES.find((_, ind) => ind === item.priority) ?? "—",
-  statusName:
-    WISHLIST_STATUS_CHOICES.find((_, ind) => ind === item.status) ?? "—",
-});
-
 export type BuyListItemInterface = PropsToInterface<typeof props>;
-export class BuyListItem extends MyModel(keyName, props, derivedProps) {}
+export class BuyListItem extends MyModel(keyName, props) {}
 export class BuyListItemStore extends MyStore(keyName, BuyListItem, slug) {}
 export const BuyListItemFields: ViewFields<BuyListItemInterface> = {
   datetimeFields: ["addedAt"] as const,

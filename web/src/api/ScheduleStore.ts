@@ -35,9 +35,6 @@ const props = {
 };
 
 const derivedProps = (item: ScheduleInterface) => ({
-  freqName: FREQ_CHOICES.find((_, ind) => ind === item.freq) ?? "—",
-  weekStartName:
-    WEEKDAY_CHOICES.find((_, ind) => ind === item.weekStart) ?? "—",
   collidingDates: formatValue(
     generateCollidingDates(item),
     "",

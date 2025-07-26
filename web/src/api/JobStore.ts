@@ -52,16 +52,8 @@ const props = {
   jobType: prop<number>(0),
 };
 
-const derivedProps = (item: JobInterface) => ({
-  sourceName: SOURCE_CHOICES.find((_, ind) => ind === item.source) ?? "—",
-  statusName: STATUS_CHOICES.find((_, ind) => ind === item.status) ?? "—",
-  workSetupName:
-    WORK_SETUP_CHOICES.find((_, ind) => ind === item.workSetup) ?? "—",
-  jobTypeName: JOB_TYPE_CHOICES.find((_, ind) => ind === item.jobType) ?? "—",
-});
-
 export type JobInterface = PropsToInterface<typeof props>;
-export class Job extends MyModel(keyName, props, derivedProps) {}
+export class Job extends MyModel(keyName, props) {}
 export class JobStore extends MyStore(keyName, Job, slug) {}
 export const JobFields: ViewFields<JobInterface> = {
   datetimeFields: ["createdAt", "updatedAt"] as const,

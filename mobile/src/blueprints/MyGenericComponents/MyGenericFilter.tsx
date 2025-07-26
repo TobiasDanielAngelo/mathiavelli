@@ -178,7 +178,7 @@ export const MyFilter = observer(({ fields }: { fields: Field[][] }) => {
   }, [params.size]);
 
   return (
-    <View style={{ height: "10%" }}>
+    <View style={{ width: 300 }}>
       {fields.map((row, i) => (
         <View key={i}>
           {row.map((field) =>
@@ -324,7 +324,7 @@ export const MyGenericFilter = <T extends Record<string, any>>({
   ]) satisfies Field[][];
 
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <Text>{title}</Text>
       <MyMultiDropdownSelector
         label="Fields"

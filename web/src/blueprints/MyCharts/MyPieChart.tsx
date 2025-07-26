@@ -100,6 +100,7 @@ export const MyPieChart = observer(
     nameKey,
     traceKey,
     itemMap,
+    related,
     formatter,
     selectionLabel,
     title = "",
@@ -109,7 +110,8 @@ export const MyPieChart = observer(
       nameKey,
       dataKey,
       traceKey,
-      itemMap
+      itemMap,
+      related
     );
 
     return (
@@ -120,15 +122,21 @@ export const MyPieChart = observer(
           onChangeValue={setSelectedField}
           options={Array.from(
             new Set(data.map((s) => s[traceKey as string]))
-          ).map((s) => ({
-            id: s,
-            name: formatValue(
-              s,
-              traceKey as string,
-              [],
-              itemMap?.find((s) => s.key === traceKey)
-            ),
-          }))}
+          ).map((s) => {
+            const relatedName = related?.find(
+              (t) => t.id === s && t.field === traceKey
+            )?.name;
+
+            return {
+              id: s,
+              name: formatValue(
+                relatedName ?? s,
+                traceKey as string,
+                [],
+                itemMap?.find((s) => s.key === traceKey)
+              ),
+            };
+          })}
           label={selectionLabel ?? "Traces"}
         />
         <ResponsiveContainer width={width} height={height}>

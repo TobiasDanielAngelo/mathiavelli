@@ -3,11 +3,9 @@ import { useMemo } from "react";
 import {
   AUTHENTICATOR_CHOICES,
   Credential,
-  CredentialFields,
   CredentialInterface,
 } from "../../api/CredentialStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -22,7 +20,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: CredentialViewContext,
@@ -110,16 +108,16 @@ export const CredentialForm = ({
       objectName="credential"
       fields={fields}
       store={credentialStore}
-      datetimeFields={CredentialFields.datetimeFields}
-      dateFields={CredentialFields.dateFields}
-      timeFields={CredentialFields.timeFields}
+      datetimeFields={credentialStore.datetimeFields}
+      dateFields={credentialStore.dateFields}
+      timeFields={credentialStore.timeFields}
     />
   );
 };
 
 export const CredentialCard = observer((props: { item: Credential }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useCredentialView();
+  const { fetchFcn, shownFields, itemMap, related } = useCredentialView();
   const { credentialStore } = useStore();
 
   return (
@@ -127,12 +125,13 @@ export const CredentialCard = observer((props: { item: Credential }) => {
       item={item}
       shownFields={shownFields}
       header={["id", "email", "username"]}
-      important={["platformName"]}
-      prices={CredentialFields.pricesFields}
+      important={["platform"]}
+      prices={credentialStore.priceFields}
       FormComponent={CredentialForm}
       deleteItem={credentialStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -159,21 +158,17 @@ export const CredentialCollection = observer(() => {
 });
 
 export const CredentialFilter = observer(() => {
+  const { credentialStore } = useStore();
   return (
     <MyGenericFilter
       view={new Credential({}).$view}
       title="Credential Filters"
       dateFields={[
-        ...CredentialFields.dateFields,
-        ...CredentialFields.datetimeFields,
+        ...credentialStore.dateFields,
+        ...credentialStore.datetimeFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={[
-        "authenticatorAppName",
-        "billingAccountsName",
-        "platformName",
-      ]}
-      optionFields={[]}
+      relatedFields={credentialStore.relatedFields}
+      optionFields={credentialStore.optionFields}
     />
   );
 });
@@ -203,15 +198,14 @@ export const CredentialTable = observer(() => {
       items={credentialStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <CredentialRow item={item} />}
-      priceFields={CredentialFields.pricesFields}
+      priceFields={credentialStore.priceFields}
       {...values}
     />
   );
 });
 
 export const CredentialView = observer(() => {
-  const { credentialStore, platformStore, accountStore, settingStore } =
-    useStore();
+  const { credentialStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<CredentialInterface, Credential>(
     settingStore,
@@ -227,27 +221,7 @@ export const CredentialView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "platform",
-          values: platformStore.items,
-          label: "name",
-        },
-        {
-          key: "billingAccount",
-          values: accountStore.items,
-          label: "name",
-        },
-        {
-          key: "authenticatorApp",
-          values: AUTHENTICATOR_CHOICES,
-          label: "",
-        },
-      ] satisfies KV<any>[],
-    [platformStore.items.length, accountStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -260,6 +234,7 @@ export const CredentialView = observer(() => {
       FilterComponent={CredentialFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={CredentialTable}
+      related={credentialStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

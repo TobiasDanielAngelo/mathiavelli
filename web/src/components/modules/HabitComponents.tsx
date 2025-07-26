@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import { Habit, HabitFields, HabitInterface } from "../../api/HabitStore";
+import { Habit, HabitInterface } from "../../api/HabitStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -17,7 +16,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 import { ScheduleForm } from "./ScheduleComponents";
 
 export const { Context: HabitViewContext, useGenericView: useHabitView } =
@@ -82,16 +81,16 @@ export const HabitForm = ({
       objectName="habit"
       fields={fields}
       store={habitStore}
-      datetimeFields={HabitFields.datetimeFields}
-      dateFields={HabitFields.dateFields}
-      timeFields={HabitFields.timeFields}
+      datetimeFields={habitStore.datetimeFields}
+      dateFields={habitStore.dateFields}
+      timeFields={habitStore.timeFields}
     />
   );
 };
 
 export const HabitCard = observer((props: { item: Habit }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useHabitView();
+  const { fetchFcn, shownFields, itemMap, related } = useHabitView();
   const { habitStore } = useStore();
 
   return (
@@ -100,11 +99,12 @@ export const HabitCard = observer((props: { item: Habit }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["title"]}
-      prices={HabitFields.pricesFields}
+      prices={habitStore.priceFields}
       FormComponent={HabitForm}
       deleteItem={habitStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -135,14 +135,14 @@ export const HabitCollection = observer(() => {
 });
 
 export const HabitFilter = observer(() => {
+  const { habitStore } = useStore();
   return (
     <MyGenericFilter
       view={new Habit({}).$view}
       title="Habit Filters"
-      dateFields={[...HabitFields.datetimeFields, ...HabitFields.dateFields]}
-      excludeFields={["id"]}
-      relatedFields={["goalName"]}
-      optionFields={[]}
+      dateFields={[...habitStore.datetimeFields, ...habitStore.dateFields]}
+      relatedFields={habitStore.relatedFields}
+      optionFields={habitStore.optionFields}
     />
   );
 });
@@ -172,14 +172,14 @@ export const HabitTable = observer(() => {
       items={habitStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <HabitRow item={item} />}
-      priceFields={HabitFields.pricesFields}
+      priceFields={habitStore.priceFields}
       {...values}
     />
   );
 });
 
 export const HabitView = observer(() => {
-  const { habitStore, settingStore, scheduleStore, goalStore } = useStore();
+  const { habitStore, settingStore } = useStore();
   const { isVisible, setVisible, setVisible4 } = useVisible();
   const values = useViewValues<HabitInterface, Habit>(
     settingStore,
@@ -193,27 +193,9 @@ export const HabitView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
-
-    const scheds = resp.data.map((s) => s.schedule);
-    scheduleStore.fetchAll(`page=all&id__in=${scheds.join(",")}`);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "schedule",
-          values: scheduleStore.items.map((s) => s.$view),
-          label: "definition",
-        },
-        {
-          key: "goal",
-          values: goalStore.items,
-          label: "title",
-        },
-      ] satisfies KV<any>[],
-    [scheduleStore.items.length, goalStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [
     {
@@ -233,6 +215,7 @@ export const HabitView = observer(() => {
       FilterComponent={HabitFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={HabitTable}
+      related={habitStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

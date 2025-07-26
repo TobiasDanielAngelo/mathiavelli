@@ -22,13 +22,8 @@ const props = {
   date: prop<string>(""),
 };
 
-const derivedProps = (item: WorkoutInterface) => ({
-  categoryName:
-    WORKOUT_CATEGORY_CHOICES.find((_, ind) => ind === item.category) ?? "—",
-});
-
 export type WorkoutInterface = PropsToInterface<typeof props>;
-export class Workout extends MyModel(keyName, props, derivedProps) {}
+export class Workout extends MyModel(keyName, props) {}
 export class WorkoutStore extends MyStore(keyName, Workout, slug) {}
 export const WorkoutFields: ViewFields<WorkoutInterface> = {
   datetimeFields: ["date"] as const,

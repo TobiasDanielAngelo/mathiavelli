@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import {
   BuyListItem,
-  BuyListItemFields,
   BuyListItemInterface,
   PRIORITY_CHOICES,
   WISHLIST_STATUS_CHOICES,
@@ -78,16 +77,16 @@ export const BuyListItemForm = ({
       objectName="buy list item"
       fields={fields}
       store={buyListItemStore}
-      datetimeFields={BuyListItemFields.datetimeFields}
-      dateFields={BuyListItemFields.dateFields}
-      timeFields={BuyListItemFields.timeFields}
+      datetimeFields={buyListItemStore.datetimeFields}
+      dateFields={buyListItemStore.dateFields}
+      timeFields={buyListItemStore.timeFields}
     />
   );
 };
 
 export const BuyListItemCard = observer((props: { item: BuyListItem }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useBuyListItemView();
+  const { fetchFcn, shownFields, itemMap, related } = useBuyListItemView();
   const { buyListItemStore } = useStore();
 
   return (
@@ -96,11 +95,12 @@ export const BuyListItemCard = observer((props: { item: BuyListItem }) => {
       shownFields={shownFields}
       header={["id", "addedAt"]}
       important={["name"]}
-      prices={BuyListItemFields.pricesFields}
+      prices={buyListItemStore.priceFields}
       FormComponent={BuyListItemForm}
       deleteItem={buyListItemStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -127,17 +127,18 @@ export const BuyListItemCollection = observer(() => {
 });
 
 export const BuyListItemFilter = observer(() => {
+  const { buyListItemStore } = useStore();
+
   return (
     <MyGenericFilter
       view={new BuyListItem({}).$view}
       title="Buy List Item Filters"
       dateFields={[
-        ...BuyListItemFields.dateFields,
-        ...BuyListItemFields.datetimeFields,
+        ...buyListItemStore.dateFields,
+        ...buyListItemStore.datetimeFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["priorityName", "statusName"]}
-      optionFields={[]}
+      relatedFields={buyListItemStore.relatedFields}
+      optionFields={buyListItemStore.optionFields}
     />
   );
 });
@@ -167,7 +168,7 @@ export const BuyListItemTable = observer(() => {
       items={buyListItemStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <BuyListItemRow item={item} />}
-      priceFields={BuyListItemFields.pricesFields}
+      priceFields={buyListItemStore.priceFields}
       {...values}
     />
   );
@@ -190,22 +191,7 @@ export const BuyListItemView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "status",
-          values: WISHLIST_STATUS_CHOICES,
-          label: "",
-        },
-        {
-          key: "priority",
-          values: PRIORITY_CHOICES,
-          label: "",
-        },
-      ] satisfies KV<any>[],
-    []
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -221,6 +207,7 @@ export const BuyListItemView = observer(() => {
       isVisible={isVisible}
       setVisible={setVisible}
       TableComponent={BuyListItemTable}
+      related={buyListItemStore.related}
       itemMap={itemMap}
       {...values}
     />

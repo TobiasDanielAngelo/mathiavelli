@@ -43,6 +43,7 @@ export const MyLineChart = observer(
     xKey,
     yKey,
     itemMap,
+    related,
     formatter,
     excludedFromTotal,
     selectionLabel,
@@ -56,6 +57,7 @@ export const MyLineChart = observer(
         xKey,
         yKey,
         itemMap,
+        related,
         excludedFromTotal,
         noTotal
       );

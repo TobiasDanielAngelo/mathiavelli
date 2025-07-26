@@ -4,10 +4,8 @@ import { useStore } from "../../api/Store";
 import {
   Workout,
   WORKOUT_CATEGORY_CHOICES,
-  WorkoutFields,
   WorkoutInterface,
 } from "../../api/WorkoutStore";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -22,7 +20,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: WorkoutViewContext, useGenericView: useWorkoutView } =
   createGenericViewContext<WorkoutInterface>();
@@ -69,16 +67,16 @@ export const WorkoutForm = ({
       objectName="workout"
       fields={fields}
       store={workoutStore}
-      datetimeFields={WorkoutFields.datetimeFields}
-      dateFields={WorkoutFields.dateFields}
-      timeFields={WorkoutFields.timeFields}
+      datetimeFields={workoutStore.datetimeFields}
+      dateFields={workoutStore.dateFields}
+      timeFields={workoutStore.timeFields}
     />
   );
 };
 
 export const WorkoutCard = observer((props: { item: Workout }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useWorkoutView();
+  const { fetchFcn, shownFields, itemMap, related } = useWorkoutView();
   const { workoutStore } = useStore();
 
   return (
@@ -87,11 +85,12 @@ export const WorkoutCard = observer((props: { item: Workout }) => {
       shownFields={shownFields}
       header={["id"]}
       important={["name"]}
-      prices={WorkoutFields.pricesFields}
+      prices={workoutStore.priceFields}
       FormComponent={WorkoutForm}
       deleteItem={workoutStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -118,17 +117,14 @@ export const WorkoutCollection = observer(() => {
 });
 
 export const WorkoutFilter = observer(() => {
+  const { workoutStore } = useStore();
   return (
     <MyGenericFilter
       view={new Workout({}).$view}
       title="Workout Filters"
-      dateFields={[
-        ...WorkoutFields.datetimeFields,
-        ...WorkoutFields.dateFields,
-      ]}
-      excludeFields={["id"]}
-      relatedFields={["categoryName"]}
-      optionFields={[]}
+      dateFields={[...workoutStore.datetimeFields, ...workoutStore.dateFields]}
+      relatedFields={workoutStore.relatedFields}
+      optionFields={workoutStore.optionFields}
     />
   );
 });
@@ -158,7 +154,7 @@ export const WorkoutTable = observer(() => {
       items={workoutStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <WorkoutRow item={item} />}
-      priceFields={WorkoutFields.pricesFields}
+      priceFields={workoutStore.priceFields}
       {...values}
     />
   );
@@ -194,6 +190,7 @@ export const WorkoutView = observer(() => {
       FilterComponent={WorkoutFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={WorkoutTable}
+      related={workoutStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

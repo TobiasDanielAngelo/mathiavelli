@@ -7,6 +7,7 @@ import { MyConfirmModal } from "../MyConfirmModal";
 import { MyDropdownMenu } from "../MyDropdownMenu";
 import { IconName, MyIcon } from "../MyIcon";
 import { MyModal } from "../MyModal";
+import { Related } from "../../api";
 
 export interface IAction {
   onClick: () => void;
@@ -36,6 +37,7 @@ interface MyGenericCardProps<T> extends ItemDetailsProps<T> {
   moreActions?: IAction[];
   dropdownActions?: Page[];
   itemMap?: KV<any>[];
+  related: Related[];
 }
 
 export const MyGenericCard = observer(
@@ -51,6 +53,7 @@ export const MyGenericCard = observer(
     moreActions,
     dropdownActions,
     itemMap,
+    related,
   }: MyGenericCardProps<T>) => {
     const {
       isVisible1,
@@ -108,6 +111,7 @@ export const MyGenericCard = observer(
               showMore={showMore}
               setShowMore={setShowMore}
               itemMap={itemMap}
+              related={related}
             />
 
             <div className="flex justify-between mt-2 flex-row-reverse">

@@ -8,6 +8,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models import Q
 import json
 from lzstring import LZString
+from django.db.models import CharField
 
 
 class CustomAuthentication(TokenAuthentication):
@@ -71,7 +72,6 @@ class CustomModelViewSet(viewsets.ModelViewSet):
                 except FieldDoesNotExist:
                     for term in search_terms:
                         search_q &= Q(**{f"{field_name}__icontains": term})
-                    continue
                 if field.choices:
                     matched_values = [
                         val
@@ -79,9 +79,17 @@ class CustomModelViewSet(viewsets.ModelViewSet):
                         if any(term.lower() in label.lower() for term in search_terms)
                     ]
                     search_q &= Q(**{f"{field_name}__in": matched_values})
-                else:
+                if field.is_relation:
+                    rel_model = field.related_model
+                    char_fields = [
+                        f.name
+                        for f in rel_model._meta.get_fields()
+                        if isinstance(f, CharField)
+                    ]
                     for term in search_terms:
-                        search_q &= Q(**{f"{field_name}__icontains": term})
+                        for rel_char in char_fields:
+                            lookup = f"{field.name}__{rel_char}__icontains"
+                            search_q |= Q(**{lookup: term})
             elif "__not_" in key:
                 actual_key = key.replace("__not_", "__")
                 if actual_key.endswith("__in"):
@@ -108,6 +116,8 @@ class CustomModelViewSet(viewsets.ModelViewSet):
                 print("Order failed:", e)
         else:
             queryset = queryset.order_by("-id")
+
+        self.paginator.model = queryset.model
 
         if page_param == "all":
             all_queryset = list(queryset)

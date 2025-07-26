@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  ItemToBring,
-  ItemToBringFields,
-  ItemToBringInterface,
-} from "../../api/ItemToBringStore";
+import { ItemToBring, ItemToBringInterface } from "../../api/ItemToBringStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -21,7 +16,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const {
   Context: ItemToBringViewContext,
@@ -76,16 +71,16 @@ export const ItemToBringForm = ({
       objectName="itemToBring"
       fields={fields}
       store={itemToBringStore}
-      datetimeFields={ItemToBringFields.datetimeFields}
-      dateFields={ItemToBringFields.dateFields}
-      timeFields={ItemToBringFields.timeFields}
+      datetimeFields={itemToBringStore.datetimeFields}
+      dateFields={itemToBringStore.dateFields}
+      timeFields={itemToBringStore.timeFields}
     />
   );
 };
 
 export const ItemToBringCard = observer((props: { item: ItemToBring }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useItemToBringView();
+  const { fetchFcn, shownFields, itemMap, related } = useItemToBringView();
   const { itemToBringStore } = useStore();
 
   return (
@@ -94,11 +89,12 @@ export const ItemToBringCard = observer((props: { item: ItemToBring }) => {
       shownFields={shownFields}
       header={["id"]}
       important={[]}
-      prices={ItemToBringFields.pricesFields}
+      prices={itemToBringStore.priceFields}
       FormComponent={ItemToBringForm}
       deleteItem={itemToBringStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -129,17 +125,17 @@ export const ItemToBringCollection = observer(() => {
 });
 
 export const ItemToBringFilter = observer(() => {
+  const { itemToBringStore } = useStore();
   return (
     <MyGenericFilter
       view={new ItemToBring({}).$view}
       title="ItemToBring Filters"
       dateFields={[
-        ...ItemToBringFields.datetimeFields,
-        ...ItemToBringFields.dateFields,
+        ...itemToBringStore.datetimeFields,
+        ...itemToBringStore.dateFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["documentName", "inventoryItemName"]}
-      optionFields={[]}
+      relatedFields={itemToBringStore.relatedFields}
+      optionFields={itemToBringStore.optionFields}
     />
   );
 });
@@ -169,15 +165,14 @@ export const ItemToBringTable = observer(() => {
       items={itemToBringStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <ItemToBringRow item={item} />}
-      priceFields={ItemToBringFields.pricesFields}
+      priceFields={itemToBringStore.priceFields}
       {...values}
     />
   );
 });
 
 export const ItemToBringView = observer(() => {
-  const { itemToBringStore, settingStore, personalItemStore, documentStore } =
-    useStore();
+  const { itemToBringStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<ItemToBringInterface, ItemToBring>(
     settingStore,
@@ -193,18 +188,7 @@ export const ItemToBringView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "inventoryItem",
-          values: personalItemStore.items,
-          label: "name",
-        },
-        { key: "document", values: documentStore.items, label: "title" },
-      ] satisfies KV<any>[],
-    [personalItemStore.items.length, documentStore.items.length]
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -217,6 +201,7 @@ export const ItemToBringView = observer(() => {
       FilterComponent={ItemToBringFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={ItemToBringTable}
+      related={itemToBringStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

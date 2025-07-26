@@ -54,6 +54,12 @@ export const fetchCSRF = async () => {
   });
 };
 
+export type Related = {
+  id: number | string;
+  field: string;
+  name: string;
+};
+
 export async function guidedRequest<T>(
   endpoint: string,
   options: {
@@ -64,7 +70,11 @@ export async function guidedRequest<T>(
   },
   customURL?: string,
   hasNoCredentials?: boolean
-): Promise<{ details: any; ok: boolean; data: T | null }> {
+): Promise<{
+  details: any;
+  ok: boolean;
+  data: T | null;
+}> {
   const input = new URLSearchParams(options.params);
   const filtered = new URLSearchParams();
 
@@ -126,10 +136,24 @@ export async function fetchItemsRequest<T>(
   details: any;
   ok: boolean;
   data: T[] | null;
+  related: Related[] | null;
+  optionFields: string[];
+  relatedFields: string[];
+  dateFields: string[];
+  datetimeFields: string[];
+  priceFields: string[];
+  timeFields: string[];
   pageDetails?: Omit<PaginatedResponse<T>, "results">;
 }> {
   const result = await guidedRequest<{
     results: T[];
+    related: Related[];
+    optionFields: string[];
+    relatedFields: string[];
+    dateFields: string[];
+    datetimeFields: string[];
+    priceFields: string[];
+    timeFields: string[];
     count: number;
     next: string | null;
     previous: string | null;
@@ -138,11 +162,44 @@ export async function fetchItemsRequest<T>(
     ids: number[];
   }>(endpoint, { method: "GET", params: params });
 
-  if (!result.ok || !result.data) return { ...result, data: null };
+  if (!result.ok || !result.data)
+    return {
+      ...result,
+      related: null,
+      data: null,
+      relatedFields: [],
+      optionFields: [],
+      dateFields: [],
+      datetimeFields: [],
+      priceFields: [],
+      timeFields: [],
+    };
 
-  const { results, ...pageDetails } = result.data;
+  const {
+    results,
+    related,
+    optionFields,
+    relatedFields,
+    dateFields,
+    datetimeFields,
+    timeFields,
+    priceFields,
+    ...pageDetails
+  } = result.data;
 
-  return { details: "", ok: true, data: results, pageDetails };
+  return {
+    details: "",
+    ok: true,
+    data: results,
+    related: related,
+    optionFields,
+    relatedFields,
+    dateFields,
+    timeFields,
+    datetimeFields,
+    priceFields,
+    pageDetails,
+  };
 }
 
 export async function postItemRequest<T>(endpoint: string, body?: T) {

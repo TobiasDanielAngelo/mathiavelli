@@ -17,6 +17,7 @@ import {
   deleteItemRequest,
   fetchItemsRequest,
   postItemRequest,
+  Related,
   updateItemRequest,
 } from ".";
 import { Store } from "./Store";
@@ -105,6 +106,13 @@ export function MyStore<
   @model(`myApp/${keyName}Store`)
   class GenericStore extends Model({
     items: prop<T[]>(() => []),
+    related: prop<Related[]>(() => []),
+    relatedFields: prop<string[]>(() => []),
+    optionFields: prop<string[]>(() => []),
+    dateFields: prop<string[]>(() => []),
+    datetimeFields: prop<string[]>(() => []),
+    priceFields: prop<string[]>(() => []),
+    timeFields: prop<string[]>(() => []),
   }) {
     @computed
     get allItems() {
@@ -150,6 +158,24 @@ export function MyStore<
       }
 
       resetOnFetch && this.resetItems();
+
+      result.related?.forEach((s: Related) => {
+        const existingRelated = this.related.find(
+          (t) => t.field === s.field && t.id === s.id
+        );
+        if (!existingRelated) {
+          this.related.push(s);
+        } else {
+          existingRelated.name = s.name;
+        }
+      });
+
+      this.dateFields = result.dateFields;
+      this.datetimeFields = result.datetimeFields;
+      this.timeFields = result.timeFields;
+      this.priceFields = result.priceFields;
+      this.relatedFields = result.relatedFields;
+      this.optionFields = result.optionFields;
 
       result.data.forEach((s: Partial<T>) => {
         if (!s.id) return;

@@ -18,6 +18,7 @@ export const ItemDetails = observer(
     prices = [],
     showMore,
     itemMap = [],
+    related = [],
   }: ItemDetailsProps<T>) => {
     const itemView = item.$view ?? item;
 
@@ -40,12 +41,20 @@ export const ItemDetails = observer(
 
     const renderRow = (key: keyof T, title: string) => {
       const value = item[key];
+      const relatedName = related?.find(
+        (s) => s.field === key && s.id === item[key]
+      )?.name;
       const kv = itemMap?.find((s) => s.key === key);
       const keyTitle = key === "id" ? "ID" : toTitleCase(key as string);
       const body =
         key === "id"
           ? toRomanWithExponents(value)
-          : formatValue(value, String(key), prices as string[], kv);
+          : formatValue(
+              relatedName ?? value,
+              String(key),
+              prices as string[],
+              kv
+            );
 
       return body === "—" ? (
         <div key={String(key)}></div>

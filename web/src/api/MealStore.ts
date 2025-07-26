@@ -14,13 +14,8 @@ const props = {
   date: prop<string>(""),
 };
 
-const derivedProps = (item: MealInterface) => ({
-  categoryName:
-    MEAL_CATEGORY_CHOICES.find((_, ind) => ind === item.category) ?? "—",
-});
-
 export type MealInterface = PropsToInterface<typeof props>;
-export class Meal extends MyModel(keyName, props, derivedProps) {}
+export class Meal extends MyModel(keyName, props) {}
 export class MealStore extends MyStore(keyName, Meal, slug) {}
 export const MealFields: ViewFields<MealInterface> = {
   datetimeFields: ["date"] as const,

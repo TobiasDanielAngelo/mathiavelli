@@ -3,14 +3,12 @@ import { useMemo } from "react";
 import {
   Job,
   JOB_TYPE_CHOICES,
-  JobFields,
   JobInterface,
   SOURCE_CHOICES,
   STATUS_CHOICES,
   WORK_SETUP_CHOICES,
 } from "../../api/JobStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import { MyGenericCard } from "../../blueprints/MyGenericComponents/MyGenericCard";
 import { MyGenericCollection } from "../../blueprints/MyGenericComponents/MyGenericCollection";
 import { MyGenericFilter } from "../../blueprints/MyGenericComponents/MyGenericFilter";
@@ -25,7 +23,7 @@ import {
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 
 export const { Context: JobViewContext, useGenericView: useJobView } =
   createGenericViewContext<JobInterface>();
@@ -102,16 +100,16 @@ export const JobForm = ({
       objectName="job"
       fields={fields}
       store={jobStore}
-      datetimeFields={JobFields.datetimeFields}
-      dateFields={JobFields.dateFields}
-      timeFields={JobFields.timeFields}
+      datetimeFields={jobStore.datetimeFields}
+      dateFields={jobStore.dateFields}
+      timeFields={jobStore.timeFields}
     />
   );
 };
 
 export const JobCard = observer((props: { item: Job }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useJobView();
+  const { fetchFcn, shownFields, itemMap, related } = useJobView();
   const { jobStore } = useStore();
 
   return (
@@ -120,11 +118,12 @@ export const JobCard = observer((props: { item: Job }) => {
       shownFields={shownFields}
       header={["id", "createdAt"]}
       important={["title"]}
-      prices={JobFields.pricesFields}
+      prices={jobStore.priceFields}
       FormComponent={JobForm}
       deleteItem={jobStore.deleteItem}
       fetchFcn={fetchFcn}
       itemMap={itemMap}
+      related={related}
     />
   );
 });
@@ -155,19 +154,14 @@ export const JobCollection = observer(() => {
 });
 
 export const JobFilter = observer(() => {
+  const { jobStore } = useStore();
   return (
     <MyGenericFilter
       view={new Job({}).$view}
       title="Job Filters"
-      dateFields={[...JobFields.dateFields, ...JobFields.datetimeFields]}
-      excludeFields={["id"]}
-      relatedFields={[
-        "jobTypeName",
-        "sourceName",
-        "statusName",
-        "workSetupName",
-      ]}
-      optionFields={[]}
+      dateFields={[...jobStore.dateFields, ...jobStore.datetimeFields]}
+      relatedFields={jobStore.relatedFields}
+      optionFields={jobStore.optionFields}
     />
   );
 });
@@ -197,7 +191,7 @@ export const JobTable = observer(() => {
       items={jobStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <JobRow item={item} />}
-      priceFields={JobFields.pricesFields}
+      priceFields={jobStore.priceFields}
       {...values}
     />
   );
@@ -220,32 +214,7 @@ export const JobView = observer(() => {
     setPageDetails(resp.pageDetails);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "status",
-          values: STATUS_CHOICES,
-          label: "",
-        },
-        {
-          key: "source",
-          values: SOURCE_CHOICES,
-          label: "",
-        },
-        {
-          key: "workSetup",
-          values: WORK_SETUP_CHOICES,
-          label: "",
-        },
-        {
-          key: "jobType",
-          values: JOB_TYPE_CHOICES,
-          label: "",
-        },
-      ] satisfies KV<any>[],
-    []
-  );
+  const itemMap = useMemo(() => [] satisfies KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -258,6 +227,7 @@ export const JobView = observer(() => {
       FilterComponent={JobFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={JobTable}
+      related={jobStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}

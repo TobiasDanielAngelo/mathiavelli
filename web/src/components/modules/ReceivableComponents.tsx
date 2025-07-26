@@ -1,12 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import {
-  Receivable,
-  ReceivableFields,
-  ReceivableInterface,
-} from "../../api/ReceivableStore";
+import { Receivable, ReceivableInterface } from "../../api/ReceivableStore";
 import { useStore } from "../../api/Store";
-import { KV, ActionModalDef } from "../../constants/interfaces";
 import {
   IAction,
   MyGenericCard,
@@ -25,7 +20,7 @@ import { MyModal } from "../../blueprints/MyModal";
 import { SideBySideView } from "../../blueprints/SideBySideView";
 import { generateShortId, toOptions } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
-import { Field } from "../../constants/interfaces";
+import { ActionModalDef, Field, KV } from "../../constants/interfaces";
 import { AccountIdMap } from "./AccountComponents";
 import { CategoryIdMap } from "./CategoryComponents";
 import { TransactionForm } from "./TransactionComponents";
@@ -92,16 +87,16 @@ export const ReceivableForm = ({
       objectName="receivable"
       fields={fields}
       store={receivableStore}
-      datetimeFields={ReceivableFields.datetimeFields}
-      dateFields={ReceivableFields.dateFields}
-      timeFields={ReceivableFields.timeFields}
+      datetimeFields={receivableStore.datetimeFields}
+      dateFields={receivableStore.dateFields}
+      timeFields={receivableStore.timeFields}
     />
   );
 };
 
 export const ReceivableCard = observer((props: { item: Receivable }) => {
   const { item } = props;
-  const { fetchFcn, shownFields, itemMap } = useReceivableView();
+  const { fetchFcn, shownFields, itemMap, related } = useReceivableView();
   const { receivableStore } = useStore();
   const { isVisible1, setVisible1, isVisible2, setVisible2 } = useVisible();
 
@@ -147,12 +142,13 @@ export const ReceivableCard = observer((props: { item: Receivable }) => {
         shownFields={shownFields}
         header={["id", "datetimeDue"]}
         important={["lentAmount"]}
-        prices={ReceivableFields.pricesFields}
+        prices={receivableStore.priceFields}
         FormComponent={ReceivableForm}
         deleteItem={receivableStore.deleteItem}
         fetchFcn={fetchFcn}
         moreActions={moreActions}
         itemMap={itemMap}
+        related={related}
       />
     </>
   );
@@ -184,17 +180,17 @@ export const ReceivableCollection = observer(() => {
 });
 
 export const ReceivableFilter = observer(() => {
+  const { receivableStore } = useStore();
   return (
     <MyGenericFilter
       view={new Receivable({}).$view}
       title="Receivable Filters"
       dateFields={[
-        ...ReceivableFields.dateFields,
-        ...ReceivableFields.datetimeFields,
+        ...receivableStore.dateFields,
+        ...receivableStore.datetimeFields,
       ]}
-      excludeFields={["id"]}
-      relatedFields={["paymentDescription"]}
-      optionFields={[]}
+      relatedFields={receivableStore.relatedFields}
+      optionFields={receivableStore.optionFields}
     />
   );
 });
@@ -224,14 +220,14 @@ export const ReceivableTable = observer(() => {
       items={receivableStore.items}
       pageIds={pageDetails?.ids ?? []}
       renderActions={(item) => <ReceivableRow item={item} />}
-      priceFields={ReceivableFields.pricesFields}
+      priceFields={receivableStore.priceFields}
       {...values}
     />
   );
 });
 
 export const ReceivableView = observer(() => {
-  const { receivableStore, transactionStore, settingStore } = useStore();
+  const { receivableStore, settingStore } = useStore();
   const { isVisible, setVisible } = useVisible();
   const values = useViewValues<ReceivableInterface, Receivable>(
     settingStore,
@@ -246,34 +242,9 @@ export const ReceivableView = observer(() => {
       return;
     }
     setPageDetails(resp.pageDetails);
-    const payments = resp.data
-      .map((s) => s.payment)
-      .flat(1)
-      .filter((s) => typeof s === "number");
-    const chargeTRX = resp.data
-      .map((s) => s.chargeTransaction)
-      .flat(1)
-      .filter((s) => typeof s === "number");
-    const transactions = [...payments, ...chargeTRX];
-    transactionStore.fetchAll(`id__in=${transactions.join(",")}`);
   };
 
-  const itemMap = useMemo(
-    () =>
-      [
-        {
-          key: "payment",
-          values: transactionStore.items,
-          label: "description",
-        },
-        {
-          key: "chargeTransaction",
-          values: transactionStore.items,
-          label: "description",
-        },
-      ] as KV<any>[],
-    [transactionStore.items.length]
-  );
+  const itemMap = useMemo(() => [] as KV<any>[], []);
 
   const actionModalDefs = [] satisfies ActionModalDef[];
 
@@ -286,6 +257,7 @@ export const ReceivableView = observer(() => {
       FilterComponent={ReceivableFilter}
       actionModalDefs={actionModalDefs}
       TableComponent={ReceivableTable}
+      related={receivableStore.related}
       fetchFcn={fetchFcn}
       isVisible={isVisible}
       setVisible={setVisible}
