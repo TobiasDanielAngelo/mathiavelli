@@ -90,8 +90,6 @@ class CookieLoginView(KnoxLoginView):
         return response.Response(content)
 
     def post(self, request, format=None):
-        print("Cookie?", request.COOKIES)
-        print("Header X-From-Mobile?", request.headers.get("X-From-Mobile"))
         is_mobile = request.headers.get("X-From-Mobile") == "true"
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
