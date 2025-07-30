@@ -65,6 +65,7 @@ export const MyTable = (props: {
           ))}
         </View>
         <FlatList
+          keyboardShouldPersistTaps="handled"
           data={matrix.slice(1)}
           keyExtractor={(_, i) => i.toString()}
           renderItem={({ item: s, index: i }) => (

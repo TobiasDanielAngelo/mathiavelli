@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import type { Option, StateSetter } from "../constants/interfaces";
+import { FlatList, Pressable, Text, View } from "react-native";
+import type { Option } from "../constants/interfaces";
 import { MyCheckBox } from "./MyCheckbox";
 import { MyIcon } from "./MyIcon";
 import { MyInput } from "./MyInput";
 
 export const MyDropdownSelector = (props: {
   label?: string;
-  value: number;
-  onChangeValue: (t: number) => void;
+  value: number | null;
+  onChangeValue: (t: number | null) => void;
   options?: Option[];
   msg?: string;
   noSearch?: boolean;
@@ -34,11 +34,14 @@ export const MyDropdownSelector = (props: {
   );
 
   const toggleValue = (t: number) => {
-    onChangeValue(t === value ? -1 : t);
+    onChangeValue(t === value ? null : t);
+    setOpen(false);
+    setSearch("");
+    setIsOption(true);
   };
 
   return (
-    <View style={{ position: "relative", paddingHorizontal: 2 }}>
+    <View style={{ paddingHorizontal: 2 }}>
       {label && (
         <Text style={{ fontSize: 15, color: "blue", marginBottom: 5 }}>
           {label}
@@ -57,6 +60,7 @@ export const MyDropdownSelector = (props: {
               alignItems: "center",
               flexDirection: "row",
               flex: 1,
+              backgroundColor: "white",
             }}
             onPress={() => setOpen(!isOpen)}
           >
@@ -97,23 +101,31 @@ export const MyDropdownSelector = (props: {
             borderWidth: 1,
             borderRadius: 5,
             borderColor: "gray",
+            backgroundColor: "white",
           }}
         >
-          {filteredOptions.map((opt) => (
-            <View
-              style={{
-                alignItems: "center",
-                flexDirection: "row",
-              }}
-              key={opt.id}
-            >
-              <MyCheckBox
-                value={value === opt.id}
-                onChangeValue={() => toggleValue(opt.id as number)}
-              />
-              <Text>{opt.name}</Text>
-            </View>
-          ))}
+          <FlatList
+            data={filteredOptions}
+            keyExtractor={(_, i) => i.toString()}
+            keyboardShouldPersistTaps="handled"
+            renderItem={({ item: opt }) => (
+              <View
+                style={{
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+                key={opt.id}
+              >
+                <MyCheckBox
+                  value={value === opt.id}
+                  onChangeValue={() => toggleValue(opt.id as number)}
+                />
+                <Text onPress={() => toggleValue(opt.id as number)}>
+                  {opt.name}
+                </Text>
+              </View>
+            )}
+          />
         </View>
       )}
       <Text style={{ color: "darkred" }}>{msg}</Text>

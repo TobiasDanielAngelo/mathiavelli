@@ -72,12 +72,14 @@ export const TransactionForm = ({
             label: "From...",
             type: "select",
             options: toOptions(accountStore.items, "name"),
+            fetchFcn: (t) => accountStore.fetchAll(`name__search=${t}`),
           },
           {
             name: "receiver",
             label: "To...",
             type: "select",
             options: toOptions(accountStore.items, "name"),
+            fetchFcn: (t) => accountStore.fetchAll(`name__search=${t}`),
           },
         ],
         [

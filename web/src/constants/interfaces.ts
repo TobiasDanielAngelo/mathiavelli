@@ -68,6 +68,7 @@ export type Field = {
   label: string;
   type: string;
   options?: Option[];
+  fetchFcn?: (t: string) => void;
   function?: (t: any) => any;
   centered?: boolean;
   infoType?: string;

@@ -1,21 +1,15 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
-import { useStore } from "../../api/Store";
+import { useEffect } from "react";
+import { ImageBackground, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Route, Routes, useNavigate } from "react-router-native";
-import {
-  Button,
-  FlatList,
-  ImageBackground,
-  Platform,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AccountView } from "../modules/AccountComponents";
-import { HealthView } from "../modules/HealthComponents";
+import { useStore } from "../../api/Store";
+import { MenuBar } from "../../blueprints/MenuBar";
+import { Menu } from "../../blueprints/MenuCard";
+import { useVisible } from "../../constants/hooks";
 import { ModularView } from "../dashboards/ModularView";
+import { AccountView } from "../modules/AccountComponents";
 import { BodyFatView } from "../modules/BodyFatComponents";
 import { BuyListItemView } from "../modules/BuyListItemComponents";
 import { CategoryView } from "../modules/CategoryComponents";
@@ -28,6 +22,7 @@ import { FollowUpView } from "../modules/FollowUpComponents";
 import { GoalView } from "../modules/GoalComponents";
 import { HabitView } from "../modules/HabitComponents";
 import { HabitLogView } from "../modules/HabitLogComponents";
+import { HealthView } from "../modules/HealthComponents";
 import { InventoryCategoryView } from "../modules/InventoryCategoryComponents";
 import { IssueCommentView } from "../modules/IssueCommentComponents";
 import { IssueTagView } from "../modules/IssueTagComponents";
@@ -52,16 +47,6 @@ import { WaistMeasurementView } from "../modules/WaistMeasurementComponents";
 import { WeighInView } from "../modules/WeighInComponents";
 import { WorkoutView } from "../modules/WorkoutComponents";
 import { NavBar } from "./NavigationBar";
-import { MySpeedDial } from "../../blueprints/MySpeedDial";
-import { MyButton } from "../../blueprints";
-import { LinearGradient } from "expo-linear-gradient";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
-import { MenuBar } from "../../blueprints/MenuBar";
-import { Menu } from "../../blueprints/MenuCard";
-import { useVisible } from "../../constants/hooks";
 import { TestingView } from "./TestingView";
 
 export const MainView = observer(() => {

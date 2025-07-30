@@ -24,6 +24,7 @@ export const ResponsiveDrawer = observer(
     return (
       <MyDrawer isOpen={open} onClose={() => setOpen?.(false)}>
         <FlatList
+          keyboardShouldPersistTaps="handled"
           data={paths}
           keyExtractor={(_, i) => i.toString()}
           renderItem={({ item: s }) => {

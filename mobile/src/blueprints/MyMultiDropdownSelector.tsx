@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FlatList, Pressable, Text, View } from "react-native";
 import type { Option } from "../constants/interfaces";
-import { Pressable, Text, View } from "react-native";
 import { MyCheckBox } from "./MyCheckbox";
 import { MyIcon } from "./MyIcon";
 
@@ -88,6 +88,7 @@ export const MyMultiDropdownSelector = (props: {
             borderWidth: 1,
             borderRadius: 5,
             borderColor: "gray",
+            backgroundColor: "whtie",
           }}
         >
           <View
@@ -102,21 +103,25 @@ export const MyMultiDropdownSelector = (props: {
             />
             <Text>Select All</Text>
           </View>
-          {options.map((opt) => (
-            <View
-              style={{
-                alignItems: "center",
-                flexDirection: "row",
-              }}
-              key={opt.id}
-            >
-              <MyCheckBox
-                value={value.includes(opt.id)}
-                onChangeValue={() => onToggle(opt.id)}
-              />
-              <Text>{opt.name}</Text>
-            </View>
-          ))}
+          <FlatList
+            data={options}
+            keyExtractor={(_, i) => i.toString()}
+            keyboardShouldPersistTaps="handled"
+            renderItem={({ item: opt }) => (
+              <View
+                style={{
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <MyCheckBox
+                  value={value.includes(opt.id)}
+                  onChangeValue={() => onToggle(opt.id)}
+                />
+                <Text>{opt.name}</Text>
+              </View>
+            )}
+          />
         </View>
       )}
       <Text style={{ color: "darkred" }}>{msg}</Text>

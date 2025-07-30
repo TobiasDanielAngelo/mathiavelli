@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Option } from "../constants/interfaces";
 import { MyIcon } from "./MyIcon";
 
@@ -7,9 +7,10 @@ export const MyDropdownSelector = (props: {
   options?: Option[];
   value?: number;
   onChangeValue: (t: number) => void;
+  fetchFcn?: (t: string) => void;
   msg?: string;
 }) => {
-  const { label, options, onChangeValue, value, msg } = props;
+  const { label, options, onChangeValue, value, msg, fetchFcn } = props;
 
   const [isOption, setIsOption] = useState(true);
   const [search, setSearch] = useState("");
@@ -17,6 +18,14 @@ export const MyDropdownSelector = (props: {
   const filteredOptions = options?.filter((opt) =>
     opt.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      search !== "" && fetchFcn?.(search);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   return (
     <div className="mb-0 flex flex-row items-center justify-center gap-2">

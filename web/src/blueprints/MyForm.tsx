@@ -58,7 +58,12 @@ const renderField = (
       return <MyInput key={key} {...commonProps} isPassword />;
     case "select":
       return (
-        <MyDropdownSelector key={key} {...commonProps} options={t.options} />
+        <MyDropdownSelector
+          key={key}
+          {...commonProps}
+          fetchFcn={t.fetchFcn}
+          options={t.options}
+        />
       );
     case "date":
     case "time":

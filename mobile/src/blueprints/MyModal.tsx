@@ -1,5 +1,12 @@
 import { PropsWithChildren, useEffect, useRef } from "react";
-import { Animated, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Overlay } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StateSetter } from "../constants/interfaces";
@@ -17,15 +24,6 @@ export const MyModal = (
   }>
 ) => {
   const { isVisible, setVisible, children, title, subTitle } = props;
-  const opacity = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(opacity, {
-      toValue: isVisible ? 1 : 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, [isVisible]);
 
   return (
     <Overlay
@@ -41,9 +39,11 @@ export const MyModal = (
           <Text style={styles.text}>{subTitle}</Text>
           <MyIcon icon="times" onPress={() => setVisible(false)} />
         </HView>
-        <ScrollView keyboardShouldPersistTaps="handled">
-          <View style={styles.children}>{children}</View>
-        </ScrollView>
+        <FlatList
+          data={[1]}
+          renderItem={() => <View style={styles.children}>{children}</View>}
+          keyboardShouldPersistTaps="handled"
+        />
       </SafeAreaView>
     </Overlay>
   );
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
   children: {},
   safeAreaContainer: {
-    paddingVertical: 10,
     width: 300,
+    maxHeight: "100%",
   },
 });

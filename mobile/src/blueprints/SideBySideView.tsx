@@ -39,6 +39,7 @@ export const SideBySideView = ({
   if (isPortrait) {
     return (
       <FlatList
+        keyboardShouldPersistTaps="handled"
         data={orderedItems}
         keyExtractor={(item) => item.key}
         renderItem={({ item }) => (

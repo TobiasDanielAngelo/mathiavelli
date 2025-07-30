@@ -69,6 +69,8 @@ class CustomModelViewSet(viewsets.ModelViewSet):
                 search_terms = value.split()
                 try:
                     field = self.queryset.model._meta.get_field(field_name)
+                    for term in search_terms:
+                        search_q &= Q(**{f"{field_name}__icontains": term})
                 except FieldDoesNotExist:
                     for term in search_terms:
                         search_q &= Q(**{f"{field_name}__icontains": term})

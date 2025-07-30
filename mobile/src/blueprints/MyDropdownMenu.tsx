@@ -31,6 +31,7 @@ export const MyDropdownMenu = (props: {
         data={actions}
         keyExtractor={(_, i) => i.toString()}
         contentContainerStyle={styles.list}
+        keyboardShouldPersistTaps="handled"
         renderItem={({ item }) => {
           const onPress = () => {
             item.onPress?.();

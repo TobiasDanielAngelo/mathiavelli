@@ -1,11 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { useEffect } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { sortAndFilterByIds } from "../../constants/helpers";
 import { useVisible } from "../../constants/hooks";
 import { PaginatedDetails } from "../../constants/interfaces";
 import { MyIcon } from "../MyIcon";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const TopBar = () => (
   <View style={styles2.topBar}>
@@ -67,6 +65,7 @@ export const MyGenericCollection = observer(
           <>
             {PageBar ? <PageBar /> : <></>}
             <FlatList
+              keyboardShouldPersistTaps="handled"
               data={sortAndFilterByIds(
                 items,
                 pageDetails?.ids ?? items.map((s) => s.id),

@@ -283,6 +283,8 @@ export function MyStore<
   return GenericStore;
 }
 
+export type IStore = InstanceType<ReturnType<typeof MyStore>>;
+
 export const functionBinder = (item: any) => {
   for (const key of Object.getOwnPropertyNames(item)) {
     if (typeof (item as any)[key] === "function") {

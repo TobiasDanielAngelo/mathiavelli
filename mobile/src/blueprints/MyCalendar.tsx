@@ -48,7 +48,6 @@ export const MyCalendar = observer(
             borderRadius: 10,
             margin: 10,
             backgroundColor: "transparent",
-            height: "100%",
           }}
           theme={{
             textDisabledColor: "darkgray",
