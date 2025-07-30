@@ -45,8 +45,16 @@ export const FinanceView = observer(() => {
 
   return (
     <div className="m-2 grid md:grid-cols-2">
-      <TransactionDashboard graph="pie" itemMap={itemMap} />
-      <TransactionDashboard graph="line" itemMap={itemMap} />
+      <TransactionDashboard
+        graph="pie"
+        itemMap={itemMap}
+        related={transactionStore.related}
+      />
+      <TransactionDashboard
+        graph="line"
+        itemMap={itemMap}
+        related={transactionStore.related}
+      />
     </div>
   );
 });

@@ -82,8 +82,13 @@ const AllForms = {
 const FormNames = Object.keys(AllForms);
 
 export const DashboardView = observer(() => {
-  const { transactionStore, categoryStore, accountStore, eventStore } =
-    useStore();
+  const {
+    transactionStore,
+    categoryStore,
+    accountStore,
+    eventStore,
+    weighInStore,
+  } = useStore();
   const { setVisible1, isVisible1 } = useVisible();
 
   const [selectedForm, setSelectedForm] = useState(0);
@@ -181,9 +186,17 @@ export const DashboardView = observer(() => {
       />
       <EventDisplay calendarProps={calendarProps} />
       <TaskDashboard />
-      <TransactionDashboard graph="pie" itemMap={itemMap} />
-      <TransactionDashboard graph="line" itemMap={itemMap} />
-      <WeighInDashboard />
+      <TransactionDashboard
+        graph="pie"
+        itemMap={itemMap}
+        related={transactionStore.related}
+      />
+      <TransactionDashboard
+        graph="line"
+        itemMap={itemMap}
+        related={transactionStore.related}
+      />
+      <WeighInDashboard related={weighInStore.related} />
       <MySpeedDial actions={actions} />
     </div>
   );
