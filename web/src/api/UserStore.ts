@@ -6,6 +6,8 @@ const slug = "users/";
 const keyName = "User";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   username: prop<string>(""),
   firstName: prop<string>(""),
   lastName: prop<string>(""),

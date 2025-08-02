@@ -16,6 +16,8 @@ const slug = "career/follow-ups/";
 const keyName = "FollowUp";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   job: prop<number | null>(null),
   date: prop<string>(""),
   message: prop<string>(""),
@@ -27,7 +29,7 @@ export type FollowUpInterface = PropsToInterface<typeof props>;
 export class FollowUp extends MyModel(keyName, props) {}
 export class FollowUpStore extends MyStore(keyName, FollowUp, slug) {}
 export const FollowUpFields: ViewFields<FollowUpInterface> = {
-  datetimeFields: [] as const,
+  datetimeFields: ["createdAt", "updatedAt"] as const,
   dateFields: ["date"] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

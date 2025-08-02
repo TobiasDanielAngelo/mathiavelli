@@ -130,7 +130,7 @@ export const TaskCard = observer((props: { item: Task }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["id", "dateCreated"]}
+      header={["id"]}
       important={["title"]}
       prices={taskStore.priceFields}
       FormComponent={TaskForm}

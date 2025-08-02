@@ -65,8 +65,6 @@ export const TicketForm = ({
             options: toOptions(PRIORITY_CHOICES),
           },
         ],
-        [{ name: "createdAt", label: "Created At", type: "datetime" }],
-        [{ name: "updatedAt", label: "Updated At", type: "datetime" }],
         [
           {
             name: "assignedTo",

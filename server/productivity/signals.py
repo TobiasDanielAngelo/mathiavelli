@@ -189,12 +189,12 @@ def sync_habitlog_from_event(sender, instance, **kwargs):
 
         HabitLog.objects.get_or_create(
             habit=habit,
-            date_created=log_date,
+            date_logged=log_date,
         )
     else:
         HabitLog.objects.filter(
             habit=habit,
-            date_created=log_date,
+            date_logged=log_date,
         ).delete()
 
 

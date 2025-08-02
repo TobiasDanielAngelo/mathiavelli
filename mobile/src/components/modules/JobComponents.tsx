@@ -72,8 +72,6 @@ export const JobForm = ({
         ],
         [{ name: "appliedDate", label: "Applied Date", type: "date" }],
         [{ name: "notes", label: "Notes", type: "textarea" }],
-        [{ name: "createdAt", label: "Created At", type: "datetime" }],
-        [{ name: "updatedAt", label: "Updated At", type: "datetime" }],
         [
           {
             name: "workSetup",

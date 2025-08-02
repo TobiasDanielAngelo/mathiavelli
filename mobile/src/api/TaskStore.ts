@@ -15,6 +15,8 @@ const slug = "productivity/tasks/";
 const keyName = "Task";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   title: prop<string>(""),
   description: prop<string>(""),
   goal: prop<number | null>(null),
@@ -25,7 +27,6 @@ const props = {
   dateCompleted: prop<string>(""),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
-  dateCreated: prop<string>(""),
   isArchived: prop<boolean>(false),
 };
 
@@ -44,7 +45,8 @@ export class Task extends MyModel(keyName, props, derivedProps) {}
 export class TaskStore extends MyStore(keyName, Task, slug) {}
 export const TaskFields: ViewFields<TaskInterface> = {
   datetimeFields: [
-    "dateCreated",
+    "createdAt",
+    "updatedAt",
     "dateCompleted",
     "dateStart",
     "dateEnd",

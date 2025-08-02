@@ -54,7 +54,7 @@ export const JournalForm = ({
         ],
         [
           {
-            name: "datetimeCreated",
+            name: "createdAt",
             label: "Created",
             type: "datetime",
           },
@@ -87,7 +87,7 @@ export const JournalCard = observer((props: { item: Journal }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["id", "datetimeCreated"]}
+      header={["id", "createdAt"]}
       important={["title"]}
       prices={journalStore.priceFields}
       FormComponent={JournalForm}

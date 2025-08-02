@@ -14,6 +14,8 @@ const slug = "personal/documents/";
 const keyName = "Document";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   title: prop<string>(""),
   description: prop<string>(""),
   documentType: prop<number>(0),
@@ -21,8 +23,6 @@ const props = {
   issuedDate: prop<string>(""),
   expiryDate: prop<string>(""),
   isActive: prop<boolean>(false),
-  createdAt: prop<string>(""),
-  updatedAt: prop<string>(""),
 };
 
 export type DocumentInterface = PropsToInterface<typeof props>;
@@ -30,7 +30,7 @@ export class Document extends MyModel(keyName, props) {}
 export class DocumentStore extends MyStore(keyName, Document, slug) {}
 
 export const DocumentFields: ViewFields<DocumentInterface> = {
-  datetimeFields: ["createdAt", "updatedAt"] as const,
+  datetimeFields: ["createdAt", "updatedAt", "createdAt", "updatedAt"] as const,
   dateFields: ["issuedDate", "expiryDate"] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

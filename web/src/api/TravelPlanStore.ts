@@ -21,6 +21,8 @@ const slug = "travel/travel-plans/";
 const keyName = "TravelPlan";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   itemsToBring: prop<number[] | null>(null),
   country: prop<string>(""),
   city: prop<string>(""),
@@ -28,7 +30,6 @@ const props = {
   targetDate: prop<string>(""),
   status: prop<number>(0),
   notes: prop<string>(""),
-  createdAt: prop<string>(""),
 };
 
 const derivedProps = (item: TravelPlanInterface) => {
@@ -48,7 +49,7 @@ export type TravelPlanInterface = PropsToInterface<typeof props>;
 export class TravelPlan extends MyModel(keyName, props, derivedProps) {}
 export class TravelPlanStore extends MyStore(keyName, TravelPlan, slug) {}
 export const TravelPlanFields: ViewFields<TravelPlanInterface> = {
-  datetimeFields: ["createdAt"] as const,
+  datetimeFields: ["createdAt", "updatedAt", "createdAt"] as const,
   dateFields: ["targetDate"] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

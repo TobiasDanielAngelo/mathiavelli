@@ -63,7 +63,6 @@ export const IssueCommentForm = ({
           },
         ],
         [{ name: "content", label: "Content", type: "textarea" }],
-        [{ name: "createdAt", label: "Created At", type: "datetime" }],
       ] satisfies Field[][],
     [ticketStore.items.length, userStore.items.length]
   );

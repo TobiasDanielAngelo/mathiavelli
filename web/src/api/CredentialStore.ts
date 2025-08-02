@@ -15,6 +15,8 @@ const slug = "personal/credentials/";
 const keyName = "Credential";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   platform: prop<number | null>(null),
   billingAccounts: prop<number[] | null>(null),
   email: prop<string>(""),
@@ -31,17 +33,15 @@ const props = {
   customAuthenticator: prop<string>(""),
   notes: prop<string>(""),
   backupCodes: prop<string>(""),
-  dateCreated: prop<string>(""),
   authenticatorApp: prop<number>(0),
-  addedAt: prop<string>(""),
 };
 
 export type CredentialInterface = PropsToInterface<typeof props>;
 export class Credential extends MyModel(keyName, props) {}
 export class CredentialStore extends MyStore(keyName, Credential, slug) {}
 export const CredentialFields: ViewFields<CredentialInterface> = {
-  datetimeFields: ["addedAt"] as const,
-  dateFields: ["dateCreated"] as const,
+  datetimeFields: ["createdAt", "updatedAt", "createdAt"] as const,
+  dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: [] as const,
 };

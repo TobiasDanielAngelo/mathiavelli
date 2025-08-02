@@ -73,7 +73,6 @@ export const CredentialForm = ({
         [{ name: "recoveryEmail", label: "Recovery Email", type: "text" }],
         [{ name: "recoveryPhone", label: "Recovery Phone", type: "text" }],
         [{ name: "loginMethod", label: "Login Method", type: "text" }],
-        [{ name: "dateCreated", label: "Date Created", type: "date" }],
         [{ name: "profileUrl", label: "Profile Url", type: "text" }],
         [
           {
@@ -98,7 +97,6 @@ export const CredentialForm = ({
           },
         ],
         [{ name: "notes", label: "Notes", type: "textarea" }],
-        [{ name: "addedAt", label: "Added At", type: "datetime" }],
       ] satisfies Field[][],
     [platformStore.items.length, accountStore.items.length]
   );

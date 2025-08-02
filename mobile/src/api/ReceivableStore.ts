@@ -6,6 +6,8 @@ const slug = "finance/receivables/";
 const keyName = "Receivable";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   payment: prop<number[] | null>(null),
   chargeTransaction: prop<number | null>(null),
   borrowerName: prop<string>(""),
@@ -28,7 +30,13 @@ export type ReceivableInterface = PropsToInterface<typeof props>;
 export class Receivable extends MyModel(keyName, props, derivedProps) {}
 export class ReceivableStore extends MyStore(keyName, Receivable, slug) {}
 export const ReceivableFields: ViewFields<ReceivableInterface> = {
-  datetimeFields: ["datetimeOpened", "datetimeDue", "datetimeClosed"] as const,
+  datetimeFields: [
+    "createdAt",
+    "updatedAt",
+    "datetimeOpened",
+    "datetimeDue",
+    "datetimeClosed",
+  ] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: ["lentAmount", "paymentTotal"] as const,

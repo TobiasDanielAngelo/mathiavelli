@@ -6,6 +6,8 @@ const slug = "finance/transactions/";
 const keyName = "Transaction";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   category: prop<number | null>(null),
   description: prop<string>(""),
   transmitter: prop<number | null>(null),
@@ -28,7 +30,7 @@ export type TransactionInterface = PropsToInterface<typeof props>;
 export class Transaction extends MyModel(keyName, props, derivedProps) {}
 export class TransactionStore extends MyStore(keyName, Transaction, slug) {}
 export const TransactionFields: ViewFields<TransactionInterface> = {
-  datetimeFields: ["datetimeTransacted"] as const,
+  datetimeFields: ["createdAt", "updatedAt", "datetimeTransacted"] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: ["amount"] as const,

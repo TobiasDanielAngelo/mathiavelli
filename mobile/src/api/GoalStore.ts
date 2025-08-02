@@ -7,13 +7,14 @@ const slug = "productivity/goals/";
 const keyName = "Goal";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   title: prop<string>(""),
   description: prop<string>(""),
   parentGoal: prop<number | null>(null),
   dateCompleted: prop<string>(""),
   dateStart: prop<string>(""),
   dateEnd: prop<string>(""),
-  dateCreated: prop<string>(""),
   isArchived: prop<boolean>(false),
 };
 
@@ -29,7 +30,8 @@ export class GoalStore extends MyStore(keyName, Goal, slug) {}
 
 export const GoalFields: ViewFields<GoalInterface> = {
   datetimeFields: [
-    "dateCreated",
+    "createdAt",
+    "updatedAt",
     "dateStart",
     "dateEnd",
     "dateCompleted",

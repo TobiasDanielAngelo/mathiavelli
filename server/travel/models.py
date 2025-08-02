@@ -48,7 +48,6 @@ class TravelPlan(CustomModel):
     target_date = fields.OptionalDateField()
     status = fields.ChoiceIntegerField(STATUS_CHOICES, 0)
     notes = fields.LongCharField()
-    created_at = fields.AutoCreatedAtField()
 
 
 class Requirement(CustomModel):

@@ -9,7 +9,6 @@ class Productivity(CustomModel):
     description = fields.MediumCharField()
     date_start = fields.OptionalDateTimeField()
     date_end = fields.OptionalDateTimeField()
-    date_created = fields.AutoCreatedAtField()
     date_completed = fields.OptionalDateTimeField()
     is_archived = fields.DefaultBooleanField(False)
 
@@ -151,7 +150,7 @@ class Event(Productivity):
 
 class HabitLog(CustomModel):
     habit = fields.CascadeRequiredForeignKey(Habit)
-    date_created = fields.DefaultNowField()
+    date_logged = fields.DefaultNowField()
 
 
 # For a game

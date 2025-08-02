@@ -7,6 +7,8 @@ const slug = "productivity/events/";
 const keyName = "Event";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   title: prop<string>(""),
   description: prop<string>(""),
   dateStart: prop<string>(""),
@@ -15,7 +17,6 @@ const props = {
   isArchived: prop<boolean>(false),
   location: prop<string>(""),
   tags: prop<number[] | null>(null),
-  dateCreated: prop<string>(""),
   task: prop<number | null>(null),
   excuse: prop<string>(""),
 };
@@ -35,9 +36,10 @@ export class Event extends MyModel(keyName, props, derivedProps) {}
 export class EventStore extends MyStore(keyName, Event, slug) {}
 export const EventFields: ViewFields<EventInterface> = {
   datetimeFields: [
+    "createdAt",
+    "updatedAt",
     "dateStart",
     "dateEnd",
-    "dateCreated",
     "dateCompleted",
   ] as const,
   dateFields: [] as const,

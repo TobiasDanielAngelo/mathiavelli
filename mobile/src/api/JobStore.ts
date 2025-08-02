@@ -36,6 +36,8 @@ const slug = "career/jobs/";
 const keyName = "Job";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   title: prop<string>(""),
   company: prop<string>(""),
   location: prop<string>(""),
@@ -44,8 +46,6 @@ const props = {
   deadline: prop<string>(""),
   appliedDate: prop<string>(""),
   notes: prop<string>(""),
-  createdAt: prop<string>(""),
-  updatedAt: prop<string>(""),
   source: prop<number>(0),
   status: prop<number>(0),
   workSetup: prop<number>(0),
@@ -64,7 +64,7 @@ export type JobInterface = PropsToInterface<typeof props>;
 export class Job extends MyModel(keyName, props, derivedProps) {}
 export class JobStore extends MyStore(keyName, Job, slug) {}
 export const JobFields: ViewFields<JobInterface> = {
-  datetimeFields: ["createdAt", "updatedAt"] as const,
+  datetimeFields: ["createdAt", "updatedAt", "createdAt", "updatedAt"] as const,
   dateFields: ["deadline", "appliedDate"] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

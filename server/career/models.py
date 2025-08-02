@@ -50,9 +50,6 @@ class Job(CustomModel):
     applied_date = fields.OptionalDateField()
     notes = fields.LongCharField()
 
-    created_at = fields.AutoCreatedAtField()
-    updated_at = fields.AutoUpdatedAtField()
-
     source = fields.ChoiceIntegerField(SOURCE_CHOICES)
     status = fields.ChoiceIntegerField(STATUS_CHOICES)
     work_setup = fields.ChoiceIntegerField(WORK_SETUP_CHOICES)

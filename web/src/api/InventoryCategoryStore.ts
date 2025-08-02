@@ -6,6 +6,8 @@ const slug = "finance/inventory-categories/";
 const keyName = "InventoryCategory";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   name: prop<string>(""),
 };
 
@@ -17,7 +19,7 @@ export class InventoryCategoryStore extends MyStore(
   slug
 ) {}
 export const InventoryCategoryFields: ViewFields<InventoryCategoryInterface> = {
-  datetimeFields: [] as const,
+  datetimeFields: ["createdAt", "updatedAt"] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

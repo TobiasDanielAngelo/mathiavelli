@@ -15,6 +15,8 @@ const slug = "settings/";
 const keyName = "Setting";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   key: prop<string>(""),
   value: prop<string>(""),
   description: prop<string>(""),
@@ -50,7 +52,7 @@ export class SettingStore extends MyStore(keyName, Setting, slug) {
   };
 }
 export const SettingFields: ViewFields<SettingInterface> = {
-  datetimeFields: [] as const,
+  datetimeFields: ["createdAt", "updatedAt"] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

@@ -47,7 +47,6 @@ export const HabitLogForm = ({
             options: toOptions(habitStore.items, "title"),
           },
         ],
-        [{ name: "dateCreated", label: "Created At", type: "datetime" }],
       ] satisfies Field[][],
     [habitStore.items.length]
   );
@@ -76,7 +75,7 @@ export const HabitLogCard = observer((props: { item: HabitLog }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["id", "dateCreated"]}
+      header={["id"]}
       important={[]}
       prices={habitLogStore.priceFields}
       FormComponent={HabitLogForm}

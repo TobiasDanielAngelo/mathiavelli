@@ -11,8 +11,6 @@ class Account(CustomModel):
     #     (1, "USD"),
     # ]
     name = fields.ShortCharField(display=True)
-    datetime_added = fields.DefaultNowField()
-    # currency = fields.ChoiceIntegerField(CURRENCY_CHOICES)
 
     # def __str__(self):
     #     return f"{self.pk} - {self.name}"
@@ -106,14 +104,13 @@ class BuyListItem(CustomModel):
     name = fields.ShortCharField(display=True)
     description = fields.MediumCharField()
     estimated_price = fields.AmountField()
-    added_at = fields.AutoCreatedAtField()
     planned_date = fields.OptionalDateField()
     priority = fields.ChoiceIntegerField(PRIORITY_CHOICES)
     status = fields.ChoiceIntegerField(WISHLIST_STATUS_CHOICES)
 
 
 class InventoryCategory(CustomModel):
-    name = fields.ShortCharField()
+    name = fields.ShortCharField(display=True)
 
     class Meta:
         verbose_name_plural = "inventory categories"

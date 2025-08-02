@@ -11,6 +11,8 @@ const slug = "productivity/schedules/";
 const keyName = "Schedule";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   name: prop<string>(""),
   freq: prop<number>(0),
   interval: prop<number>(0),
@@ -70,7 +72,7 @@ export const WEEKDAY_CHOICES = [
 export type ScheduleInterface = PropsToInterface<typeof props>;
 
 export const ScheduleFields: ViewFields<ScheduleInterface> = {
-  datetimeFields: [] as const,
+  datetimeFields: ["createdAt", "updatedAt"] as const,
   dateFields: ["startDate", "endDate"] as const,
   timeFields: ["startTime", "endTime"] as const,
   pricesFields: [] as const,

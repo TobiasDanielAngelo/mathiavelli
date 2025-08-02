@@ -5,6 +5,9 @@ from django.core.exceptions import ValidationError
 
 
 class CustomModel(models.Model):
+    created_at = fields.AutoCreatedAtField()
+    updated_at = fields.AutoUpdatedAtField()
+
     def __str__(self):
         display_fields = [
             str(getattr(self, field.name))

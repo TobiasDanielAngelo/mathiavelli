@@ -45,13 +45,6 @@ export const DreamForm = ({
             type: "textarea",
           },
         ],
-        [
-          {
-            name: "dateCreated",
-            label: "Created",
-            type: "date",
-          },
-        ],
       ] satisfies Field[][],
     []
   );
@@ -80,7 +73,7 @@ export const DreamCard = observer((props: { item: Dream }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["id", "dateCreated"]}
+      header={["id"]}
       prices={dreamStore.priceFields}
       FormComponent={DreamForm}
       deleteItem={dreamStore.deleteItem}

@@ -41,13 +41,6 @@ export const NoteForm = ({
       [
         [{ name: "title", label: "Title", type: "text" }],
         [{ name: "body", label: "Body", type: "textarea" }],
-        [
-          {
-            name: "updatedAt",
-            label: "Updated At",
-            type: "datetime",
-          },
-        ],
         [{ name: "file", label: "File Attachment", type: "file" }],
       ] satisfies Field[][],
     []

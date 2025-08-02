@@ -8,6 +8,8 @@ const slug = "health/meals/";
 const keyName = "Meal";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   name: prop<string>(""),
   category: prop<number>(0),
   calories: prop<number>(0),
@@ -18,7 +20,7 @@ export type MealInterface = PropsToInterface<typeof props>;
 export class Meal extends MyModel(keyName, props) {}
 export class MealStore extends MyStore(keyName, Meal, slug) {}
 export const MealFields: ViewFields<MealInterface> = {
-  datetimeFields: ["date"] as const,
+  datetimeFields: ["createdAt", "updatedAt", "date"] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

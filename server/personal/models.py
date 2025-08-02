@@ -6,12 +6,10 @@ from core import fields
 class Journal(CustomModel):
     title = fields.ShortCharField()
     description = fields.LongCharField()
-    datetime_created = fields.DefaultNowField()
 
 
 class Dream(CustomModel):
     entry = fields.LongCharField()
-    date_created = fields.DefaultTodayField()
 
 
 class Platform(CustomModel):
@@ -47,9 +45,7 @@ class Credential(CustomModel):
     custom_authenticator = fields.MediumCharField()
     notes = fields.LongCharField()
     backup_codes = fields.LongCharField()
-    date_created = fields.OptionalDateField()
     authenticator_app = fields.ChoiceIntegerField(AUTHENTICATOR_CHOICES)
-    added_at = fields.AutoCreatedAtField()
 
     def __str__(self):
         main_id = self.username or self.email or "unknown"
@@ -71,5 +67,3 @@ class Document(CustomModel):
     issued_date = fields.OptionalDateField()
     expiry_date = fields.OptionalDateField()
     is_active = fields.DefaultBooleanField(True)
-    created_at = fields.AutoCreatedAtField()
-    updated_at = fields.AutoUpdatedAtField()

@@ -1,12 +1,22 @@
 import { modelAction, modelFlow, prop } from "mobx-keystone";
-import { SettingIdMap } from "../components/modules/SettingComponents";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
 import { functionBinder, MyModel, MyStore } from "./GenericStore";
+
+export const SettingIdMap = {
+  Theme: 1000001,
+  UGW: 1000002,
+  GW4: 1000003,
+  GW3: 1000004,
+  GW2: 1000005,
+  GW1: 1000006,
+} as const;
 
 const slug = "settings/";
 const keyName = "Setting";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   key: prop<string>(""),
   value: prop<string>(""),
   description: prop<string>(""),
@@ -42,7 +52,7 @@ export class SettingStore extends MyStore(keyName, Setting, slug) {
   };
 }
 export const SettingFields: ViewFields<SettingInterface> = {
-  datetimeFields: [] as const,
+  datetimeFields: ["createdAt", "updatedAt"] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

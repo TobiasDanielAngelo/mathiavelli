@@ -15,6 +15,8 @@ const slug = "health/workouts/";
 const keyName = "Workout";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   name: prop<string>(""),
   category: prop<number>(0),
   durationMinutes: prop<number>(0),
@@ -26,7 +28,7 @@ export type WorkoutInterface = PropsToInterface<typeof props>;
 export class Workout extends MyModel(keyName, props) {}
 export class WorkoutStore extends MyStore(keyName, Workout, slug) {}
 export const WorkoutFields: ViewFields<WorkoutInterface> = {
-  datetimeFields: ["date"] as const,
+  datetimeFields: ["createdAt", "updatedAt", "date"] as const,
   dateFields: [] as const,
   timeFields: [] as const,
   pricesFields: [] as const,

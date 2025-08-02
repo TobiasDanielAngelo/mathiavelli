@@ -25,8 +25,6 @@ class Ticket(CustomModel):
     description = fields.LongCharField()
     status = fields.ChoiceIntegerField(STATUS_CHOICES)
     priority = fields.ChoiceIntegerField(PRIORITY_CHOICES)
-    created_at = fields.AutoCreatedAtField()
-    updated_at = fields.DefaultNowField()
     assigned_to = fields.SetNullOptionalForeignKey(User)
 
 
@@ -34,12 +32,9 @@ class Comment(CustomModel):
     ticket = fields.CascadeRequiredForeignKey(Ticket)
     user = fields.CascadeRequiredForeignKey(User)
     content = fields.LongCharField()
-    created_at = fields.AutoCreatedAtField()
 
 
 class Note(CustomModel):
     title = fields.ShortCharField(display=True)
     body = fields.LongCharField()
     file = fields.FileField("notes/")
-    created_at = fields.AutoCreatedAtField()
-    updated_at = fields.AutoUpdatedAtField()

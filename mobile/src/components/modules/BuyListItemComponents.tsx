@@ -50,7 +50,6 @@ export const BuyListItemForm = ({
       [
         [{ name: "name", label: "Name", type: "text" }],
         [{ name: "estimatedPrice", label: "Estimated Price", type: "number" }],
-        [{ name: "addedAt", label: "Added At", type: "datetime" }],
         [{ name: "plannedDate", label: "Planned Date", type: "date" }],
         [
           {
@@ -96,7 +95,7 @@ export const BuyListItemCard = observer((props: { item: BuyListItem }) => {
     <MyGenericCard
       item={item}
       shownFields={shownFields}
-      header={["id", "addedAt"]}
+      header={["id"]}
       important={["name"]}
       prices={BuyListItemFields.pricesFields}
       FormComponent={BuyListItemForm}

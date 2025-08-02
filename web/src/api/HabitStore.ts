@@ -6,6 +6,8 @@ const slug = "productivity/habits/";
 const keyName = "Habit";
 const props = {
   id: prop<number | string>(-1),
+  createdAt: prop<string>(""),
+  updatedAt: prop<string>(""),
   title: prop<string>(""),
   description: prop<string>(""),
   goal: prop<number | null>(null),
@@ -15,7 +17,6 @@ const props = {
   dateEnd: prop<string>(""),
   dateCompleted: prop<string>(""),
   isArchived: prop<boolean>(false),
-  dateCreated: prop<string>(""),
   points: prop<number>(0),
 };
 
@@ -24,7 +25,8 @@ export class Habit extends MyModel(keyName, props) {}
 export class HabitStore extends MyStore(keyName, Habit, slug) {}
 export const HabitFields: ViewFields<HabitInterface> = {
   datetimeFields: [
-    "dateCreated",
+    "createdAt",
+    "updatedAt",
     "dateStart",
     "dateEnd",
     "dateCompleted",
