@@ -27,9 +27,7 @@ for attr_name in dir(vs_module):
 
 urlpatterns = [
     path("", include(router.urls)),
-    # path("login", views.LoginAPI.as_view(), name="login"),
     path("signup", views.RegistrationAPI.as_view(), name="register"),
-    # path("reauth", views.ReauthAPI.as_view(), name="reauth"),
     path("cookie-logout", views.CookieLogoutView.as_view(), name="cookie-logout"),
     path("cookie-login", views.CookieLoginView.as_view(), name="cookie-login"),
     path("cookie-reauth", views.CookieReauthView.as_view(), name="cookie-reauth"),

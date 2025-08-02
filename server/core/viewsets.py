@@ -121,6 +121,12 @@ class CustomModelViewSet(viewsets.ModelViewSet):
 
         self.paginator.model = queryset.model
 
+        check_last_updated = params.get("check_last_updated")
+        last_updated = params.get("last_updated")
+        if check_last_updated:
+            queryset = queryset.filter(updated_at__gte=last_updated)
+            return response.Response({"count": len(queryset)})
+
         if page_param == "all":
             all_queryset = list(queryset)
             serializer = self.get_serializer(all_queryset, many=True)
