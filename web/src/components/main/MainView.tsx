@@ -45,6 +45,7 @@ import { NavBar } from "./NavigationBar";
 import { TestingView } from "../dashboards/TestingView";
 
 export const MainView = observer(() => {
+  const store = useStore();
   const {
     // userStore,
     accountStore,
@@ -59,7 +60,7 @@ export const MainView = observer(() => {
     weighInAnalyticsStore,
     scheduleStore,
     settingStore,
-  } = useStore();
+  } = store;
 
   const navigate = useNavigate();
 
@@ -83,7 +84,28 @@ export const MainView = observer(() => {
     }
   };
 
+  // const subscribeToStore = () => {
+  //   taskStore.setSubscription(true);
+  // };
+
+  // const getSubscriptions = () => {
+  //   const allStoreKeys = Object.keys(store.$);
+  //   const allStores = allStoreKeys
+  //     .map((s) => store[s as keyof typeof store] as unknown as IStore)
+  //     .filter((s) => s.isSubscribed);
+  //   allStores.forEach((s) => s.checkUpdated(s.lastUpdated));
+  // };
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     getSubscriptions();
+  //   }, 10000);
+
+  //   return () => clearInterval(interval);
+  // });
+
   useEffect(() => {
+    // subscribeToStore();
     fetchAll();
   }, []);
 

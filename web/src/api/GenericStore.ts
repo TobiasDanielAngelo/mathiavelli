@@ -113,6 +113,10 @@ export function MyStore<
     datetimeFields: prop<string[]>(() => []),
     priceFields: prop<string[]>(() => []),
     timeFields: prop<string[]>(() => []),
+    isSubscribed: prop<boolean>(false),
+    lastUpdated: prop<string>(""),
+    latestParam: prop<string>(""),
+    countToUpdate: prop<number>(0),
   }) {
     @computed
     get allItems() {
@@ -135,6 +139,11 @@ export function MyStore<
       return computeItemsSignature(ModelClass, this.items);
     }
 
+    @modelAction
+    setSubscription = function (this: GenericStore, state: boolean) {
+      this.isSubscribed = state;
+    };
+
     @modelFlow
     fetchAll = _async(function* (this: GenericStore, params?: string) {
       let result;
@@ -146,7 +155,12 @@ export function MyStore<
           icon: "error",
           title: "Network Error",
         });
-        return { details: "Network Error", ok: false, data: null };
+        return {
+          details: "Network Error",
+          ok: false,
+          data: null,
+          pageDetails: null,
+        };
       }
 
       if (!result.ok || !result.data) {
@@ -154,7 +168,12 @@ export function MyStore<
           icon: "error",
           title: "An error has occurred.",
         });
-        return { details: result.details, ok: false, data: null };
+        return {
+          details: result.details,
+          ok: false,
+          data: null,
+          pageDetails: null,
+        };
       }
 
       resetOnFetch && this.resetItems();
@@ -185,8 +204,45 @@ export function MyStore<
           this.items.find((t) => t.$view.id === s.id)?.update(s);
         }
       });
+      this.lastUpdated = new Date().toISOString();
+      this.latestParam = params ?? "";
 
       return result;
+    });
+
+    @modelFlow
+    checkUpdated = _async(function* (this: GenericStore, lastUpdated: string) {
+      let result;
+
+      try {
+        result = yield* _await(
+          fetchItemsRequest<Partial<T>>(
+            slug,
+            `check_last_updated=1&last_updated=${lastUpdated}`
+          )
+        );
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Network Error",
+        });
+        return { details: "Network Error", ok: false, data: null };
+      }
+
+      if (!result.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "An error has occurred.",
+        });
+        return { details: result.details, ok: false, data: null };
+      }
+
+      this.countToUpdate = result.pageDetails?.count ?? 0;
+    });
+
+    @modelFlow
+    fetchUpdated = _async(function* (this: GenericStore) {
+      return yield* _await(this.fetchAll(this.latestParam));
     });
 
     @modelFlow

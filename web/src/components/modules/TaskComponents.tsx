@@ -162,7 +162,15 @@ export const TaskDashboard = observer(() => {
 
 export const TaskCollection = observer(() => {
   const { taskStore } = useStore();
-  const { pageDetails, PageBar } = useTaskView();
+  const { pageDetails, PageBar, setPageDetails } = useTaskView();
+
+  const onClickUpdate = async () => {
+    const resp = await taskStore.fetchUpdated();
+    if (!resp.ok || !resp.ok || !resp.pageDetails) {
+      return;
+    }
+    setPageDetails(resp.pageDetails);
+  };
 
   return (
     <SideBySideView
@@ -173,6 +181,8 @@ export const TaskCollection = observer(() => {
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={taskStore.items}
+          updates={taskStore.countToUpdate}
+          onClickUpdate={onClickUpdate}
         />
       }
       SideB={<TaskDashboard />}

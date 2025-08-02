@@ -99,6 +99,7 @@ export const AccountCollection = observer(() => {
           pageDetails={pageDetails}
           PageBar={PageBar}
           items={accountStore.items}
+          updates={accountStore.countToUpdate}
         />
       }
       SideB=""
