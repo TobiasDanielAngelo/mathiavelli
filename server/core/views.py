@@ -55,11 +55,6 @@ class RegistrationAPI(generics.GenericAPIView):
             serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        if request.FILES:
-            Employee.objects.filter(id=user.id).update(
-                avatar=f'{settings.STATIC_URL}{request.FILES["avatar"].name}'
-            )
-            self.upload(request)
 
         return Response(
             {

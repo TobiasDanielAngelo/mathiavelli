@@ -2,7 +2,6 @@ import { computed } from "mobx";
 import {
   _async,
   _await,
-  getRoot,
   model,
   Model,
   modelAction,
@@ -12,7 +11,6 @@ import {
   prop,
 } from "mobx-keystone";
 import Swal from "sweetalert2";
-import { PropsToInterface } from "../constants/interfaces";
 import {
   deleteItemRequest,
   fetchItemsRequest,
@@ -20,7 +18,7 @@ import {
   Related,
   updateItemRequest,
 } from ".";
-import { Store } from "./Store";
+import { PropsToInterface } from "../constants/interfaces";
 import { LoginInterface } from "./UserStore";
 
 type KeystoneModel<U> = {
@@ -29,34 +27,9 @@ type KeystoneModel<U> = {
   update: (details: Partial<U>) => void;
 };
 
-type StoreItemType<K extends keyof Store> = Store[K] extends {
-  items: (infer U)[];
-}
-  ? U
-  : never;
-
 export type NullableProps<T> = {
   [K in keyof T]: T[K] | null;
 };
-
-function hasAllItems(obj: any): obj is { allItems: Map<number | string, any> } {
-  return obj && typeof obj === "object" && "allItems" in obj;
-}
-
-export function getStoreItem<K extends keyof Store>(
-  self: any,
-  storeKey: K,
-  id?: number | string | null
-): StoreItemType<K> | undefined {
-  if (!id || id === null) return;
-  const targetedStore = getRoot<Store>(self)?.[storeKey];
-  if (typeof targetedStore === "string" || typeof targetedStore === "function")
-    return;
-  if (hasAllItems(targetedStore)) {
-    const item = targetedStore.allItems.get(id);
-    return item as StoreItemType<K>;
-  }
-}
 
 export function MyModel<TProps extends ModelProps, TView>(
   keyName: string,
@@ -376,3 +349,29 @@ export const functionBinder = (item: any) => {
     }
   }
 };
+
+export function storesToProps<
+  T extends Record<string, new (...args: any[]) => any>
+>(classes: T) {
+  const result: Record<string, ReturnType<typeof prop>> = {};
+
+  for (const key in classes) {
+    const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+    result[camelKey] = prop<InstanceType<T[typeof key]>>();
+  }
+
+  return result;
+}
+
+export function instantiateStores<
+  T extends Record<string, new (...args: any[]) => any>
+>(classes: T) {
+  const result: Record<string, InstanceType<T[keyof T]>> = {};
+
+  for (const key in classes) {
+    const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+    result[camelKey] = new classes[key]({});
+  }
+
+  return result;
+}

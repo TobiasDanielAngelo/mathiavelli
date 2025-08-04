@@ -16,7 +16,6 @@
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
     "@uidotdev/usehooks": "^2.4.1",
-    "@uiw/react-color": "^2.5.5",
     "date-fns": "^4.1.0",
     "lz-string": "^1.5.0",
     "mobx": "^6.13.7",

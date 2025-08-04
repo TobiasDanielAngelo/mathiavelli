@@ -1,6 +1,6 @@
 import { prop } from "mobx-keystone";
 import { PropsToInterface, ViewFields } from "../constants/interfaces";
-import { getStoreItem, MyModel, MyStore } from "./GenericStore";
+import { MyModel, MyStore } from "./GenericStore";
 
 export const PURPOSE_CHOICES = [
   "Work",
@@ -34,9 +34,7 @@ const props = {
 
 const derivedProps = (item: TravelPlanInterface) => {
   const itemsToBring = (s: number | string) => {
-    const i = getStoreItem(item, "itemToBringStore", s);
-    if (i?.document) return i.document;
-    if (i?.inventoryItem) return i.inventoryItem;
+    return s;
   };
   return {
     itemsToBringName: item.itemsToBring?.map((s) => itemsToBring(s) ?? ""),
