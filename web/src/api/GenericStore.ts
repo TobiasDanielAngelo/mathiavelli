@@ -2,6 +2,7 @@ import { computed } from "mobx";
 import {
   _async,
   _await,
+  MaybeOptionalModelProp,
   model,
   Model,
   modelAction,
@@ -350,28 +351,42 @@ export const functionBinder = (item: any) => {
   }
 };
 
+type CamelCase<S extends string> = S extends `${infer F}${infer R}`
+  ? `${Lowercase<F>}${R}`
+  : S;
+
 export function storesToProps<
   T extends Record<string, new (...args: any[]) => any>
->(classes: T) {
-  const result: Record<string, ReturnType<typeof prop>> = {};
+>(
+  classes: T
+): {
+  [K in keyof T as CamelCase<K & string>]: MaybeOptionalModelProp<
+    InstanceType<T[K]>
+  >;
+} {
+  const result = {} as Record<string, MaybeOptionalModelProp<unknown>>;
 
   for (const key in classes) {
     const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
     result[camelKey] = prop<InstanceType<T[typeof key]>>();
   }
 
-  return result;
+  return result as any;
 }
 
 export function instantiateStores<
   T extends Record<string, new (...args: any[]) => any>
->(classes: T) {
-  const result: Record<string, InstanceType<T[keyof T]>> = {};
+>(
+  classes: T
+): {
+  [K in keyof T as CamelCase<K & string>]: InstanceType<T[K]>;
+} {
+  const result = {} as Record<string, unknown>;
 
   for (const key in classes) {
     const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
     result[camelKey] = new classes[key]({});
   }
 
-  return result;
+  return result as any; // TS can't infer runtime object shape fully
 }
