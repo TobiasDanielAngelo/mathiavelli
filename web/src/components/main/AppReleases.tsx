@@ -9,7 +9,7 @@ export const AppReleases = observer(() => {
     ["Title", "File", "Description"],
     ...appReleaseStore.items.map((s) => [
       s.title,
-      String(s.file),
+      <a href={String(s.file)}>Download the App</a>,
       s.description,
     ]),
   ];
