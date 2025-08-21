@@ -38,3 +38,9 @@ class Note(CustomModel):
     title = fields.ShortCharField(display=True)
     body = fields.LongCharField()
     file = fields.FileField("notes/")
+
+
+class AppRelease(CustomModel):
+    title = fields.ShortCharField(display=True)
+    description = fields.LongCharField()
+    file = fields.FileField("releases/")

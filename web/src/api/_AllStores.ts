@@ -36,3 +36,4 @@ export { DocumentStore } from "./DocumentStore";
 export { TravelPlanStore } from "./TravelPlanStore";
 export { ItemToBringStore } from "./ItemToBringStore";
 export { RequirementStore } from "./RequirementStore";
+export { AppReleaseStore } from "./AppReleaseStore";

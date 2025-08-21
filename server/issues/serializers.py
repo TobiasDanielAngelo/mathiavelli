@@ -24,3 +24,9 @@ class NoteSerializer(CustomSerializer):
     class Meta:
         model = Note
         fields = "__all__"
+
+
+class AppReleaseSerializer(CustomSerializer):
+    class Meta:
+        model = AppRelease
+        fields = "__all__"

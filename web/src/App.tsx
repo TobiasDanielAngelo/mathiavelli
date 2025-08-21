@@ -3,6 +3,7 @@ import { createStore, StoreContext } from "./api/Store";
 import "./App.css";
 import { LoginView } from "./components/main/LoginView";
 import { MainView } from "./components/main/MainView";
+import { AppReleases } from "./components/main/AppReleases";
 
 function App() {
   const store = createStore();
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/*" element={<MainView />} />
             <Route path="/login" element={<LoginView />} />
+            <Route path="/app-releases" element={<AppReleases />} />
           </Routes>
         </BrowserRouter>
       </StoreContext.Provider>

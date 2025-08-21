@@ -15,3 +15,7 @@ class CommentAdmin(CustomAdmin):
 
 class NoteAdmin(CustomAdmin):
     pass
+
+
+class AppReleaseAdmin(CustomAdmin):
+    pass

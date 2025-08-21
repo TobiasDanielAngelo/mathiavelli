@@ -1,4 +1,5 @@
 from core.viewsets import CustomModelViewSet
+from rest_framework.permissions import AllowAny
 from .serializers import *
 
 
@@ -20,3 +21,14 @@ class CommentViewSet(CustomModelViewSet):
 class NoteViewSet(CustomModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+
+
+class AppReleaseViewSet(CustomModelViewSet):
+    queryset = AppRelease.objects.all()
+    serializer_class = AppReleaseSerializer
+
+    permission_classes = [
+        AllowAny,
+    ]
+
+    http_method_names = ["get", "head", "options"]
